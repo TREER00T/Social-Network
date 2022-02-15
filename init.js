@@ -1,10 +1,10 @@
-var express     = require('express'),
-    app         = express(),
-    router      = express.Router(),
-    bodyParser  = require('body-parser'),
-    dotenv      = require('dotenv'),
-    Database    = require('./app/Util/DatabaseHelper'),
-    Validation  = require('./app/Util/Validation');
+let express = require('express'),
+    app = express(),
+    router = express.Router(),
+    bodyParser = require('body-parser'),
+    dotenv = require('dotenv'),
+    Database = require('./app/Util/DatabaseHelper'),
+    Validation = require('./app/Util/Validation');
 
 
 dotenv.config();
