@@ -1,4 +1,4 @@
-var { json }            = require('./ReturnJson'),
+const { json }            = require('./ReturnJson'),
     Response            = require('./Response'),
     jwt                 = require('jsonwebtoken'),
     { JWK, parse }      = require('node-jose');
@@ -14,7 +14,7 @@ exports.isVerificationCode = (code)=>{
 }
 
 exports.httpMethod = (res,requestMethod)=>{
-    var httpMethod = [
+    const httpMethod = [
          'GET',
          'PUT',
          'POST',

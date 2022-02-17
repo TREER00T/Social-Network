@@ -1,6 +1,6 @@
-var express     = require('express'),
-    router      = express.Router(),
-    User        = require('../controller/User');
+const express = require('express'),
+    router = express.Router(),
+    User = require('../controller/User');
 
 
 router.post('/gvc', User.generateVerificationCodeAndGetPhoneNumber);

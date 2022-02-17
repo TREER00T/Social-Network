@@ -1,4 +1,4 @@
-var jwt           = require('jsonwebtoken'),
+const jwt           = require('jsonwebtoken'),
     { JWK, JWE  } = require('node-jose');
 
 exports.VerificationCode = ()=>{
@@ -6,7 +6,7 @@ exports.VerificationCode = ()=>{
 }
 
 exports.jwtSign = (payload,subject)=>{
-   var signOptions = {
+    const signOptions = {
       subject:  `${subject}`,
       expiresIn:  '12h',
       algorithm:  'RS256'
@@ -24,7 +24,7 @@ exports.jwtEncrypt = async (raw, format = 'compact', contentAlg = 'A256GCM', alg
 }
 
 exports.jwtRefresh = (payload,subject)=>{
-   var signOptions = {
+    const signOptions = {
       subject:  `${subject}`,
       expiresIn:  '1d',
       algorithm:  'RS256'
