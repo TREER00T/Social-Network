@@ -1,6 +1,17 @@
-exports.json = (res,obj,arr = null)=>{
-    if(arr != null){
-       return  res.status(200).json({'code':`${obj.code}`,'message':`${obj.message}`,'data':arr});
+let res;
+
+exports.builder = (obj, arr = null) => {
+    if (this.res != null) {
+        return this.res.status(200).json(this.json(obj, arr));
     }
-    res.status(200).json(obj);
+   return this.json(obj,arr)
+}
+
+exports.initialization = (res) => {
+    this.res = res;
+}
+
+
+exports.json = (obj, arr = null) => {
+    return (arr != null) ? {'code': `${obj.code}`, 'message': `${obj.message}`, 'data': arr} : obj;
 }

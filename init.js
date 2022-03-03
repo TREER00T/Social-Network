@@ -3,27 +3,32 @@ let express = require('express'),
     router = express.Router(),
     bodyParser = require('body-parser'),
     dotenv = require('dotenv'),
-    Database = require('./app/Util/DatabaseHelper'),
-    Validation = require('./app/Util/Validation');
+    Database = require('./app/model/DatabaseHelper'),
+    Validation = require('./app/Util/Validation'),
+    Console = require('console'),
+    {initialization} = require("./app/Util/ReturnJson");
 
 
 dotenv.config();
 
 Database.createUsersTable();
 
-app.use(bodyParser.urlencoded({ extended: true }),bodyParser.json(),router);
+app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json(), router);
 
-router.use((req,res,next)=>{
-    try{
-        Validation.httpMethod(res,req.method);
+router.use((req, res, next) => {
+    initialization(res);
+    try {
+        Validation.checkHttpMethod(req.method);
         next();
-    }catch(e){
-        throw new Error('Can not set header');
+    } catch (e) {
+        throw new Error('Can not validate method');
     }
 });
 
-app.use('/auth',require('./app/routes/AuthRoutes'));
+app.use('/auth', require('./app/routes/AuthRoutes'));
 
-app.listen(process.env.PORT,()=>{
-    console.log('Server are running...');
+app.listen(process.env.PORT, () => {
+    Console.log('Server are running...');
 });
+
+module.exports = {app, Database};

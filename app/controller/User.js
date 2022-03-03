@@ -1,38 +1,30 @@
 const {
         isPhoneNumber, isVerificationCode,
-        splitBeararJwt, jwtDecrypt, jwtVerify
+        getSplitBearerJwt, getJwtDecrypt, getJwtVerify
     } = require('../Util/Validation'),
-    Database = require('../Util/DatabaseHelper'),
-    {json} = require('../Util/ReturnJson'),
+    Database = require('../model/DatabaseHelper'),
+    {builder, initialization} = require('../Util/ReturnJson'),
     {
-        jwtEncrypt, jwtSign, jwtRefresh,
-        VerificationCode
+        getJwtEncrypt, getJwtSign, getJwtRefresh,
+        getVerificationCode
     } = require('../Util/Generate'),
     Response = require('../Util/Response');
 
 
 exports.generateVerificationCodeAndGetPhoneNumber = (req, res) => {
 
+    initialization(res);
     let phoneNumber = req.body.phoneNumber;
 
-    if (!isPhoneNumber(phoneNumber))
-        return json(res,
-            Response.HTTP_BAD_REQUEST
-        )
+    if (!isPhoneNumber(phoneNumber)) return builder(Response.HTTP_BAD_REQUEST);
 
-    return Database.insertPhoneAndVerificationCode(phoneNumber, VerificationCode(), (result) => {
+    return Database.insertPhoneAndVerificationCode(phoneNumber, getVerificationCode(), (result) => {
 
-        if (result)
-            json(res,
-                Response.HTTP_CREATED
-            )
+        if (result) return builder(Response.HTTP_CREATED);
 
-        return Database.updateVerificationCode(phoneNumber, VerificationCode(), (result) => {
+        return Database.updateVerificationCode(phoneNumber, getVerificationCode(), (result) => {
 
-            if (result)
-                json(res,
-                    Response.HTTP_OK
-                )
+            if (result) return builder(Response.HTTP_OK);
 
         });
 
@@ -44,45 +36,46 @@ exports.generateVerificationCodeAndGetPhoneNumber = (req, res) => {
 
 exports.checkVerificationCodeInDatabaseAndSingUpOrLogin = (req, res) => {
 
+    initialization(res);
+
     let phoneNumber = req.body.phoneNumber;
     let verificationCode = req.body.verificationCode;
 
-    if (!isPhoneNumber(phoneNumber) && !isVerificationCode(verificationCode))
-        json(res,
+    if (!isPhoneNumber(phoneNumber) && !isVerificationCode(verificationCode)) {
+        return builder(
             Response.HTTP_BAD_REQUEST
         )
-
+    }
     return Database.checkVerificationCode(phoneNumber, verificationCode, (result) => {
-        if (!result)
-            return json(res,
-                Response.HTTP_UNAUTHORIZED
-            )
 
-            (async () => {
-                json(res,
-                    Response.HTTP_ACCEPTED,
-                    {
-                        'accessToken': await jwtEncrypt(jwtSign({
-                            'phoneNumber': `${phoneNumber}`,
-                            type: 'at'
-                        }, phoneNumber)),
-                        'refreshToken': await jwtEncrypt(jwtRefresh({
-                            'phoneNumber': `${phoneNumber}`,
-                            type: 'rt'
-                        }, phoneNumber))
-                    }
-                )
-            })()
+        if (!result) return builder(Response.HTTP_UNAUTHORIZED);
+
+        (async () => {
+            builder(
+                Response.HTTP_ACCEPTED,
+                {
+                    'accessToken': await getJwtEncrypt(getJwtSign({
+                        'phoneNumber': `${phoneNumber}`,
+                        type: 'at'
+                    }, phoneNumber)),
+                    'refreshToken': await getJwtEncrypt(getJwtRefresh({
+                        'phoneNumber': `${phoneNumber}`,
+                        type: 'rt'
+                    }, phoneNumber))
+                }
+            )
+        })()
 
     });
 
 }
 
 exports.test = (req, res) => {
+    initialization(res);
     let bearerHeader = req.headers['authorization'];
     (async () => {
-        let token = await jwtDecrypt(splitBeararJwt(bearerHeader))
-        jwtVerify(res, token.replace(/["]+/g, ''), {}, (decoded) => {
+        let token = await getJwtDecrypt(getSplitBearerJwt(bearerHeader))
+        getJwtVerify(token.replace(/["]+/g, ''), {}, (decoded) => {
 
             if (Date.now() >= decoded.exp * 1000) {
                 console.log('yes');
