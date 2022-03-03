@@ -1,7 +1,5 @@
 let Response = require('../app/Util/Response'),
-    {Database} = require('../init'),
     {checkHttpMethod} = require('../app/Util/Validation');
-const Console = require("console");
 
 describe('init.js file test', () => {
 

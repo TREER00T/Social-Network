@@ -5,7 +5,6 @@ let express = require('express'),
     dotenv = require('dotenv'),
     Database = require('./app/model/DatabaseHelper'),
     Validation = require('./app/Util/Validation'),
-    Console = require('console'),
     {initialization} = require("./app/Util/ReturnJson");
 
 
@@ -28,7 +27,7 @@ router.use((req, res, next) => {
 app.use('/auth', require('./app/routes/AuthRoutes'));
 
 app.listen(process.env.PORT, () => {
-    Console.log('Server are running...');
+    console.log('Server are running...');
 });
 
 module.exports = {app, Database};
