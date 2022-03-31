@@ -1,33 +1,35 @@
-let express = require('express'),
-    app = express(),
-    router = express.Router(),
-    bodyParser = require('body-parser'),
-    dotenv = require('dotenv'),
-    Database = require('./app/model/DatabaseHelper'),
-    Validation = require('./app/Util/Validation'),
-    {initialization} = require("./app/Util/ReturnJson");
+let initializationDatabase = require('./app/database/InitDatabase'),
+    initializationRouter = require('./app/routes/InitRouter'),
+    db = require('./app/database/OpenSql'),
+    {
+        getOperatorAndValue
+    } = require("./app/database/util/FieldUtilities");
+const {EQUAL_TO} = require("./app/database/util/SqlKeyword");
+const {update} = require("./app/database/OpenSql");
+const {ali} = require("./app/model/DatabaseOpenHelper");
 
 
-dotenv.config();
+initializationRouter.Router();
 
-Database.createUsersTable();
+// initializationDatabase.Database();
 
-app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json(), router);
+/*
+db.update().result((result)=>{
+    console.log(result)
+});
 
-router.use((req, res, next) => {
-    initialization(res);
-    try {
-        Validation.checkHttpMethod(req.method);
-        next();
-    } catch (e) {
-        throw new Error('Can not validate method');
+ */
+
+// query(`${USE_DATABASE} UPDATE ?? SET ?? = ?,??=? WHERE ?? = ? `, ['users','verificationCode','122875','username','ali','phoneNumber','09030207892'], getError());
+
+
+update({
+    table: 'users',
+    editField: {
+        verificationCode: 122875,
+        username: 'ali'
+    },
+    where: {
+        phoneNumber: getOperatorAndValue(EQUAL_TO, '09030207892')
     }
 });
-
-app.use('/auth', require('./app/routes/AuthRoutes'));
-
-app.listen(process.env.PORT, () => {
-    console.log('Server are running...');
-});
-
-module.exports = {app, Database};

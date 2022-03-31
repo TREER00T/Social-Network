@@ -13,15 +13,18 @@ exports.isVerificationCode = (code) => /^[0-9]{6}$/.test(code);
 // If http method not found in httpMethod array It should be return json response
 exports.checkHttpMethod = (requestMethod) => {
 
-    const httpMethod = [
+    const arrayOfHttpMethods = [
         'GET',
         'PUT',
         'POST',
         'PATCH',
         'DELETE'
     ];
-    if (!httpMethod.includes(requestMethod)) {
-        return builder(Response.HTTP_METHOD_NOT_ALLOWED);
+    if (!arrayOfHttpMethods.includes(requestMethod)) {
+        return builder(
+            Response.HTTP_METHOD_NOT_ALLOWED.code,
+            Response.HTTP_METHOD_NOT_ALLOWED
+        )
     }
 
 
@@ -35,13 +38,15 @@ exports.getJwtVerify = (token, verifyOptions, callBack) => {
         if (err) {
 
             return builder(
+                Response.HTTP_UNAUTHORIZED_INVALID_TOKEN.code,
                 Response.HTTP_UNAUTHORIZED_INVALID_TOKEN
-            );
+            )
         }
 
         if (this.isTokenExpiredError(err)) {
 
             return builder(
+                Response.HTTP_UNAUTHORIZED_TOKEN_EXP.code,
                 Response.HTTP_UNAUTHORIZED_TOKEN_EXP
             )
         }
@@ -55,7 +60,7 @@ exports.getJwtDecrypt = async (encryptedBody) => {
     await keystore.add(await JWK.asKey(process.env.JWE_PRAIVATE_KEY, 'pem'));
     let outPut = parse.compact(encryptedBody);
     let decryptedVal = await outPut.perform(keystore);
-    return Buffer.from(decryptedVal.plaintext).toString();
+    return Buffer.from(decryptedVal.plaintext).toString()
 }
 
 // Returns split jwt without bearer

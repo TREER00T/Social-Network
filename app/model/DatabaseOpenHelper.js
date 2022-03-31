@@ -20,13 +20,12 @@ module.exports = {
         }, 'The user phone number or verification code are false');
     },
     updateVerificationCode: (phoneNumber, verificationCode, callBack) => {
-        query('UPDATE users SET verificationCode = ? WHERE phoneNumber = ? ', [verificationCode, phoneNumber], (err, result) => {
-            (result.changedRows > 0) ? callBack(true) : callBack(false);
-        }, 'Cannot update column verificationCode')
+        query('UPDATE users SET verificationCode = ? WHERE phoneNumber = ? ', [12, '09030207892'], 'Cannot update column verificationCode')
     },
     deleteUserForUnitTest: (phoneNumber, callBack) => {
         query('DELETE FROM ?? WHERE phoneNumber = ?', [[phoneNumber], 'users'], (err, result) => {
             (result) ? callBack(true) : callBack(false);
         }, 'Can not delete user')
     }
+
 }
