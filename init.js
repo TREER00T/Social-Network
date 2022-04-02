@@ -30,6 +30,10 @@ update({
         username: 'ali'
     },
     where: {
-        phoneNumber: getOperatorAndValue(EQUAL_TO, '09030207892')
+        phoneNumber: getOperatorAndValue(EQUAL_TO, '09030207892'),
+        NOT_IN: 0,
+        BETWEEN: 10,
+        AND: 5,
+        LIKE:12
     }
 });

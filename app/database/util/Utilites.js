@@ -26,6 +26,8 @@ const {
 
 
 let stringOFQuestionMarkAndEqual;
+const OPERATOR_IN = 'IN',
+    OPERATOR_NOT_IN = 'NOT IN';
 
 
 /**
@@ -76,18 +78,6 @@ let arrayOfOperatorForWhereCondition = [
     NOT_EQUAL_TO,
     LESS_THAN_OR_EQUAL_TO,
     GREATER_THAN_OR_EQUAL_TO
-];
-
-
-/**
- * @param {IN}
- * @param {LIKE}
- * @param {NOT_IN}
- * */
-let arrayOfOperatorWithOneQuestionMarkForWhereCondition = [
-    IN,
-    LIKE,
-    NOT_IN
 ];
 
 
@@ -154,7 +144,7 @@ function generateArrayOfKeyAndValueForSqlQuery(jsonObject) {
         size = 0;
     for (let key in jsonObject.editField) {
         let value = jsonObject.editField[key];
-        arrayOfKeyAndValue[index] = `${key}`;
+        arrayOfKeyAndValue.push(`${key}`);
         index++;
         size++;
         arrayOfKeyAndValue[index++] = `${value}`;
@@ -190,7 +180,7 @@ function getSqlDataType(arrayOfStateField) {
     for (let index in arrayOfStateField) {
         let item = arrayOfStateField[index];
 
-        newArrayOfStateField[index] = `${item} `;
+        newArrayOfStateField.push(`${item} `);
     }
 
     return newArrayOfStateField.join('');
@@ -204,11 +194,99 @@ function splitOperatorInString(str) {
     return str.split(' ')[0];
 }
 
+function removeUnderscoreInString(str) {
+    return str.replaceAll('_', ' ').toUpperCase();
+}
+
+let arrayOfOperatorDoubleQuestionMarkEqualQuestionMarkInUpdateSqlQuery = [
+    OR,
+    AND
+];
+
+let arrayOfOperatorDoseNotHaveQuestionMark = [
+    OPERATOR_IN,
+    OPERATOR_NOT_IN
+];
+
+let arrayOfOperatorOneQuestionMarkInUpdateSqlQuery = [
+    LIKE,
+    BETWEEN,
+    NOT_BETWEEN
+];
+
+let arrayOfValidOperatorForUpdateSqlQuery = [
+    OR,
+    AND,
+    LIKE,
+    BETWEEN,
+    NOT_BETWEEN,
+    OPERATOR_IN,
+    OPERATOR_NOT_IN
+];
+
+
+//  ${QUESTION_MARK}  AND and between fix this bug check before index of array arrayOfEqualAndQuestionMarks if it use and ?? = ? else use ?
+
 function checkOtherConditionInWhereObject(jsonObject) {
+    let index = 0,
+        arrayOfEqualAndQuestionMarks = [],
+        initPlaceHolder = `${DOUBLE_QUESTION_MARK} ${EQUAL_TO} ${QUESTION_MARK}`;
+
     for (let key in jsonObject) {
         let value = jsonObject[key];
-        let isValidOperator = arrayOfOperatorForWhereCondition.includes(value);
+        let firstIndex = (index === 0);
+        let keyword = removeUnderscoreInString(key);
+        let isOperatorForUpdateSqlQueryInArray = arrayOfValidOperatorForUpdateSqlQuery.includes(keyword);
+        let isOperatorDoseNotHaveQuestionMark = arrayOfOperatorDoseNotHaveQuestionMark.includes(keyword);
+        let isOperatorHaveOneQuestionMark = arrayOfOperatorOneQuestionMarkInUpdateSqlQuery.includes(keyword);
+        let isOperatorHaveDoubleQuestionMark = arrayOfOperatorDoubleQuestionMarkEqualQuestionMarkInUpdateSqlQuery.includes(keyword);
+
+        if (key === BETWEEN)
+            console.log(arrayOfEqualAndQuestionMarks)
+
+
+        if (isOperatorDoseNotHaveQuestionMark) {
+            arrayOfEqualAndQuestionMarks.push(`${keyword} (?) `);
+            index++;
+            continue;
+        }
+
+
+        if (!isOperatorForUpdateSqlQueryInArray && firstIndex) {
+            arrayOfEqualAndQuestionMarks.push(`${EQUAL_TO} ${QUESTION_MARK} `);
+            index++;
+            continue;
+        }
+
+
+        if (isOperatorForUpdateSqlQueryInArray) {
+            arrayOfEqualAndQuestionMarks.push(`${keyword} `);
+            index++;
+            continue;
+        }
+
+
+        if (!isOperatorForUpdateSqlQueryInArray) {
+            arrayOfEqualAndQuestionMarks.push(`${COMMA} ${initPlaceHolder} `);
+            console.log(key)
+            index++;
+        }
+
+
+        if (isOperatorHaveOneQuestionMark) {
+            arrayOfEqualAndQuestionMarks.push(`${keyword} ${initPlaceHolder} `);
+            index++;
+        }
+
+        if (!isOperatorHaveOneQuestionMark && firstIndex) {
+            arrayOfEqualAndQuestionMarks.push(`${EQUAL_TO} ${QUESTION_MARK} ${keyword} ${QUESTION_MARK} `);
+            index++;
+        }
+
+
+
     }
+    console.log(arrayOfEqualAndQuestionMarks)
 }
 
 
@@ -240,19 +318,19 @@ module.exports = {
 
 
             if (isValidQuestionMarkForKeyword)
-                newArrayOfKeywordsWithSqlContext[index] = ` ${item} ${QUESTION_MARK} `;
+                newArrayOfKeywordsWithSqlContext.push(` ${item} ${QUESTION_MARK} `);
 
 
             if (!isValidQuestionMarkForKeyword)
-                newArrayOfKeywordsWithSqlContext[index] = ` ${item} `;
+                newArrayOfKeywordsWithSqlContext.push(` ${item} `);
 
 
             if (item === ASC && nextKeyword === DESC || item === DESC && nextKeyword === ASC)
-                newArrayOfKeywordsWithSqlContext[index] = ` ${item} ${COMMA} ${QUESTION_MARK} `;
+                newArrayOfKeywordsWithSqlContext.push(` ${item} ${COMMA} ${QUESTION_MARK} `);
 
 
             if (isSetLimit && item === LIMIT)
-                newArrayOfKeywordsWithSqlContext[index] = ` ${item} ${QUESTION_MARK} ${COMMA} ${QUESTION_MARK} `;
+                newArrayOfKeywordsWithSqlContext.push(` ${item} ${QUESTION_MARK} ${COMMA} ${QUESTION_MARK} `);
 
 
             if (isSetWhereCondition && isValidOperatorForWhereCondition && nextKeyword === AND ||
@@ -301,6 +379,9 @@ module.exports = {
         generateArrayOfKeyAndValueForSqlQuery(jsonObject);
 
         checkOtherConditionInWhereObject(jsonObject.where);
+
+        // DOUBLE_QUESTION_MARK
+        // module.exports.sqlQuery
     }
 
 
