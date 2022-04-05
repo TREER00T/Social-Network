@@ -1,7 +1,12 @@
-const {builder} = require('./ReturnJson'),
+const {
+        builder
+    } = require('./ReturnJson'),
     Response = require('./Response'),
     jwt = require('jsonwebtoken'),
-    {JWK, parse} = require('node-jose');
+    {
+        JWK,
+        parse
+    } = require('node-jose');
 
 
 // Checks phone number E.g : 09030207892 return true
@@ -20,13 +25,13 @@ exports.checkHttpMethod = (requestMethod) => {
         'PATCH',
         'DELETE'
     ];
+
     if (!arrayOfHttpMethods.includes(requestMethod)) {
         return builder(
             Response.HTTP_METHOD_NOT_ALLOWED.code,
             Response.HTTP_METHOD_NOT_ALLOWED
         )
     }
-
 
 }
 

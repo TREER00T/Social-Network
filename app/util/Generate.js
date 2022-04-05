@@ -1,5 +1,10 @@
 const jwt = require('jsonwebtoken'),
-    {JWK, JWE} = require('node-jose');
+    {
+        JWK,
+        JWE
+    } = require('node-jose');
+
+
 
 // Generates verification code E.g : 335496
 exports.getVerificationCode = () => {

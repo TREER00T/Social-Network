@@ -1,4 +1,4 @@
-const {query} = require('../Util/DatabaseConnection');
+const {query} = require('../util/DatabaseConnection');
 
 
 module.exports = {

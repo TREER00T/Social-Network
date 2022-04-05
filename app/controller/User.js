@@ -1,14 +1,22 @@
 const {
-        isPhoneNumber, isVerificationCode,
-        getSplitBearerJwt, getJwtDecrypt, getJwtVerify
-    } = require('../Util/Validation'),
+        getJwtVerify,
+        isPhoneNumber,
+        getJwtDecrypt,
+        getSplitBearerJwt,
+        isVerificationCode
+    } = require('../util/Validation'),
     Database = require('../model/DatabaseOpenHelper'),
-    {builder, initialization} = require('../Util/ReturnJson'),
     {
-        getJwtEncrypt, getJwtSign, getJwtRefresh,
+        builder,
+        initialization
+    } = require('../util/ReturnJson'),
+    {
+        getJwtSign,
+        getJwtEncrypt,
+        getJwtRefresh,
         getVerificationCode
-    } = require('../Util/Generate'),
-    Response = require('../Util/Response');
+    } = require('../util/Generate'),
+    Response = require('../util/Response');
 
 
 exports.generateVerificationCodeAndGetPhoneNumber = (req, res) => {

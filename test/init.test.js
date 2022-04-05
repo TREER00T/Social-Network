@@ -1,5 +1,5 @@
-let Response = require('../app/Util/Response'),
-    {checkHttpMethod} = require('../app/Util/Validation');
+let Response = require('../app/util/Response'),
+    {checkHttpMethod} = require('../app/util/Validation');
 
 describe('init.js file test', () => {
 

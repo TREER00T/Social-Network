@@ -3,8 +3,10 @@ let express = require('express'),
     router = express.Router(),
     bodyParser = require('body-parser'),
     dotenv = require('dotenv'),
-    Validation = require('../Util/Validation'),
-    {initialization} = require('../Util/ReturnJson');
+    Validation = require('../util/Validation'),
+    {
+        initialization
+    } = require('../util/ReturnJson');
 
 
 module.exports = {

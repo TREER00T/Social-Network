@@ -1,10 +1,12 @@
 const {
         query,
         sqlQueryResult
-    } = require('../Util/DatabaseConnection'),
+    } = require('../util/DatabaseConnection'),
     {
-        DOUBLE_QUESTION_MARK,
-        IF_NOT_EXISTS, QUESTION_MARK
+        WHERE,
+        IF_NOT_EXISTS,
+        QUESTION_MARK,
+        DOUBLE_QUESTION_MARK
     } = require('./util/SqlKeyword'),
     {
         getError,
@@ -24,7 +26,6 @@ const DAtABASE_NAME = process.env.DATABASE,
 module.exports = {
 
 
-    // finish
     createDatabase() {
         query(`CREATE DATABASE IF NOT EXISTS ${DAtABASE_NAME}`
             + ` CHARACTER SET utf8 COLLATE utf8_unicode_ci`,
@@ -33,7 +34,6 @@ module.exports = {
     },
 
 
-    // finish
     createTable(jsonArray) {
         getCreateTableSqlQuery(jsonArray);
 
@@ -47,7 +47,6 @@ module.exports = {
     },
 
 
-    // finish
     addForeignKey(jsonObject) {
         realSql = USE_DATABASE + ' ALTER TABLE ' + '`' + jsonObject.table + '`' +
             ` ADD FOREIGN KEY (` + '`' + jsonObject.foreignKey + '`' + `) ` +
@@ -70,24 +69,24 @@ module.exports = {
     update(jsonObject) {
 
         generateUpdateSqlQuery(jsonObject);
-        // console.log(generateDoubleQuestionMarksEqualQuestionMark(['users', 'verificationCode', '1225', 'phoneNumber', '09030207892']));
-        //   query(`${USE_DATABASE} UPDATE ?? SET ?? = ?,??=? WHERE ?? = ? `, ['users','verificationCode','122875','username','ali','phoneNumber','09030207892'], getError());
+
+        realSql = USE_DATABASE + ` UPDATE ?? ` + `SET ${util.stringOfDataForForSet} ${WHERE} ?? ` + util.sqlQuery;
+
+        query(realSql, util.arrayOfDataForUpdateQuery, getError('Failed to update rows'));
 
         return this;
     },
 
 
-    // finish
     add(jsonArray) {
         realSql = `${USE_DATABASE}` + `INSERT INTO ${jsonArray.table}` + ` SET ${QUESTION_MARK}`;
 
-        query(realSql, jsonArray.data, getError('Failed to insert Rows'));
+        query(realSql, jsonArray.data, getError('Failed to insert rows'));
 
         return this;
     },
 
 
-    // finish
     find(jsonArray) {
         getOptionKeywordSqlQuery(jsonArray);
 
@@ -100,7 +99,6 @@ module.exports = {
     },
 
 
-    // finish
     result(callBackResult) {
         sqlQueryResult((result) => {
             callBackResult(result);

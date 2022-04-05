@@ -15,7 +15,6 @@ const {
     ORDER_BY,
     EQUAL_TO,
     LESS_THAN,
-    NOT_BETWEEN,
     GREATER_THAN,
     NOT_EQUAL_TO,
     QUESTION_MARK,
@@ -25,9 +24,9 @@ const {
 } = require('./SqlKeyword');
 
 
-let stringOFQuestionMarkAndEqual;
-const OPERATOR_IN = 'IN',
-    OPERATOR_NOT_IN = 'NOT IN';
+let stringOFQuestionMarkAndEqual,
+    arrayOFKeyAndValueDateForUpdateQuery = [];
+const OPERATOR_IN = 'IN';
 
 
 /**
@@ -57,7 +56,6 @@ let arrayOfValidOptionKeyword = [
  * @param {BETWEEN}
  * @param {EQUAL_TO}
  * @param {LESS_THAN}
- * @param {NOT_BETWEEN}
  * @param {GREATER_THAN}
  * @param {NOT_EQUAL_TO}
  * @param {LESS_THAN_OR_EQUAL_TO}
@@ -73,7 +71,6 @@ let arrayOfOperatorForWhereCondition = [
     BETWEEN,
     EQUAL_TO,
     LESS_THAN,
-    NOT_BETWEEN,
     GREATER_THAN,
     NOT_EQUAL_TO,
     LESS_THAN_OR_EQUAL_TO,
@@ -92,7 +89,6 @@ let arrayOfOperatorForWhereCondition = [
  * @param {ORDER_BY}
  * @param {EQUAL_TO}
  * @param {LESS_THAN}
- * @param {NOT_BETWEEN}
  * @param {GREATER_THAN}
  * @param {NOT_EQUAL_TO}
  * @param {LESS_THAN_OR_EQUAL_TO}
@@ -109,12 +105,12 @@ let arrayOfQuestionMark = [
     ORDER_BY,
     EQUAL_TO,
     LESS_THAN,
-    NOT_BETWEEN,
     GREATER_THAN,
     NOT_EQUAL_TO,
     LESS_THAN_OR_EQUAL_TO,
     GREATER_THAN_OR_EQUAL_TO
 ];
+
 
 function generateDoubleQuestionMarksEqualQuestionMark(sizeOfKey) {
     let mergeQuestionMarksWithEqual = '';
@@ -144,6 +140,8 @@ function generateArrayOfKeyAndValueForSqlQuery(jsonObject) {
         size = 0;
     for (let key in jsonObject.editField) {
         let value = jsonObject.editField[key];
+        arrayOFKeyAndValueDateForUpdateQuery.push(key);
+        arrayOFKeyAndValueDateForUpdateQuery.push(value.toString());
         arrayOfKeyAndValue.push(`${key}`);
         index++;
         size++;
@@ -155,37 +153,6 @@ function generateArrayOfKeyAndValueForSqlQuery(jsonObject) {
 }
 
 
-function addDataTypeForFieldInFirstItemOfArray(type, arrayOfStateField) {
-    let firstIndexOldArray = arrayOfStateField[0];
-
-    if (Number.isInteger(firstIndexOldArray)) {
-        arrayOfStateField.splice(arrayOfStateField.indexOf(firstIndexOldArray), 1);
-        arrayOfStateField.unshift(`${type}(${firstIndexOldArray}) `);
-    }
-
-    let firstIndexNewArray = arrayOfStateField[0];
-    let isDataTypeInNewArray = firstIndexNewArray.includes(type);
-
-    if (!isDataTypeInNewArray) {
-        arrayOfStateField.unshift(`${type}`);
-    }
-
-    return arrayOfStateField;
-}
-
-
-function getSqlDataType(arrayOfStateField) {
-    let newArrayOfStateField = [];
-
-    for (let index in arrayOfStateField) {
-        let item = arrayOfStateField[index];
-
-        newArrayOfStateField.push(`${item} `);
-    }
-
-    return newArrayOfStateField.join('');
-}
-
 function splitValueInString(str) {
     return str.split(' ')[1];
 }
@@ -194,99 +161,142 @@ function splitOperatorInString(str) {
     return str.split(' ')[0];
 }
 
+function splitDataFormOperatorIn(str) {
+    let newArray;
+    newArray = str.split(' ');
+    newArray.splice(0, 1);
+    newArray.slice();
+    return newArray;
+}
+
 function removeUnderscoreInString(str) {
     return str.replaceAll('_', ' ').toUpperCase();
 }
 
-let arrayOfOperatorDoubleQuestionMarkEqualQuestionMarkInUpdateSqlQuery = [
-    OR,
-    AND
-];
+function splitColumnFormOperatorIn(str) {
+    return str.split(' ')[0];
+}
 
-let arrayOfOperatorDoseNotHaveQuestionMark = [
-    OPERATOR_IN,
-    OPERATOR_NOT_IN
-];
+function removeSpaceWordInString(str) {
+    return str.replace('SPACE', '');
+}
 
-let arrayOfOperatorOneQuestionMarkInUpdateSqlQuery = [
-    LIKE,
-    BETWEEN,
-    NOT_BETWEEN
-];
-
-let arrayOfValidOperatorForUpdateSqlQuery = [
+let arrayOfValidOperatorQuery = [
     OR,
     AND,
     LIKE,
     BETWEEN,
-    NOT_BETWEEN,
-    OPERATOR_IN,
-    OPERATOR_NOT_IN
+    OPERATOR_IN
 ];
 
 
-//  ${QUESTION_MARK}  AND and between fix this bug check before index of array arrayOfEqualAndQuestionMarks if it use and ?? = ? else use ?
-
-function checkOtherConditionInWhereObject(jsonObject) {
+function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
     let index = 0,
-        arrayOfEqualAndQuestionMarks = [],
-        initPlaceHolder = `${DOUBLE_QUESTION_MARK} ${EQUAL_TO} ${QUESTION_MARK}`;
+        isKeywordBetweenUsed = false,
+        arrayOfEqualAndQuestionMarks = [];
 
     for (let key in jsonObject) {
         let value = jsonObject[key];
         let firstIndex = (index === 0);
+        let isOperatorBetween = (key === BETWEEN);
+        let isCharacter = (key.length === 1);
+        let isOperatorLike = (key === LIKE);
         let keyword = removeUnderscoreInString(key);
-        let isOperatorForUpdateSqlQueryInArray = arrayOfValidOperatorForUpdateSqlQuery.includes(keyword);
-        let isOperatorDoseNotHaveQuestionMark = arrayOfOperatorDoseNotHaveQuestionMark.includes(keyword);
-        let isOperatorHaveOneQuestionMark = arrayOfOperatorOneQuestionMarkInUpdateSqlQuery.includes(keyword);
-        let isOperatorHaveDoubleQuestionMark = arrayOfOperatorDoubleQuestionMarkEqualQuestionMarkInUpdateSqlQuery.includes(keyword);
+        let isOperatorAnd = (keyword === AND);
+        let checkSpaceWordInString = value.toString().search('SPACE') > -1;
 
-        if (key === BETWEEN)
-            console.log(arrayOfEqualAndQuestionMarks)
+        let newValue = (checkSpaceWordInString) ? splitValueInString(removeSpaceWordInString(value)) :
+            splitValueInString(`${EQUAL_TO} ${value}`);
+
+        let isOperatorIn = (OPERATOR_IN === keyword);
+        let isValidOperatorForUpdateSqlQueryInArray = arrayOfValidOperatorQuery.includes(keyword);
 
 
-        if (isOperatorDoseNotHaveQuestionMark) {
+        if (!isCharacter && !isValidOperatorForUpdateSqlQueryInArray) {
+            arrayOFKeyAndValueDateForUpdateQuery.push(key);
+            arrayOFKeyAndValueDateForUpdateQuery.push(`${newValue}`);
+        }
+
+
+        if (isOperatorIn && firstIndex) {
             arrayOfEqualAndQuestionMarks.push(`${keyword} (?) `);
+            arrayOFKeyAndValueDateForUpdateQuery.push(splitColumnFormOperatorIn(value));
+            arrayOFKeyAndValueDateForUpdateQuery.push(splitDataFormOperatorIn(value));
+            index++;
+        }
+
+
+        if (isOperatorIn && !firstIndex) {
+            arrayOfEqualAndQuestionMarks.push(`${DOUBLE_QUESTION_MARK} ${keyword} (?) `);
+            arrayOFKeyAndValueDateForUpdateQuery.push(splitColumnFormOperatorIn(value));
+            arrayOFKeyAndValueDateForUpdateQuery.push(splitDataFormOperatorIn(value));
+            index++;
+        }
+
+        if (isOperatorLike || isOperatorBetween || isOperatorAnd)
+            arrayOFKeyAndValueDateForUpdateQuery.push(`${value}`);
+
+
+        if (isOperatorBetween && !firstIndex) {
+            arrayOfEqualAndQuestionMarks.push(`${DOUBLE_QUESTION_MARK} ${keyword} ${QUESTION_MARK} `);
+            isKeywordBetweenUsed = true;
+            index++;
+        }
+
+        if (isOperatorBetween && firstIndex) {
+            arrayOfEqualAndQuestionMarks.push(`${keyword} ${QUESTION_MARK} `);
+            isKeywordBetweenUsed = true;
+            index++;
+        }
+
+        if (isOperatorAnd && isKeywordBetweenUsed) {
+            arrayOfEqualAndQuestionMarks.push(`${keyword} ${QUESTION_MARK} `);
+            isKeywordBetweenUsed = false;
+            index++;
+        }
+
+
+        if (isOperatorLike && !firstIndex) {
+            arrayOfEqualAndQuestionMarks.push(`${DOUBLE_QUESTION_MARK} ${keyword} ${QUESTION_MARK} `);
+            index++;
+        }
+
+        if (isOperatorLike && firstIndex) {
+            arrayOfEqualAndQuestionMarks.push(`${keyword} ${QUESTION_MARK} `);
+            index++;
+        }
+
+
+        if (isValidOperatorForUpdateSqlQueryInArray) {
             index++;
             continue;
         }
 
 
-        if (!isOperatorForUpdateSqlQueryInArray && firstIndex) {
-            arrayOfEqualAndQuestionMarks.push(`${EQUAL_TO} ${QUESTION_MARK} `);
-            index++;
-            continue;
-        }
+        let operator = (checkSpaceWordInString) ? splitOperatorInString(removeSpaceWordInString(value)) :
+            splitOperatorInString(`${EQUAL_TO} ${value}`);
 
 
-        if (isOperatorForUpdateSqlQueryInArray) {
-            arrayOfEqualAndQuestionMarks.push(`${keyword} `);
-            index++;
-            continue;
-        }
+        let initPlaceHolder = `${DOUBLE_QUESTION_MARK} ${operator} ${QUESTION_MARK}`;
 
-
-        if (!isOperatorForUpdateSqlQueryInArray) {
-            arrayOfEqualAndQuestionMarks.push(`${COMMA} ${initPlaceHolder} `);
-            console.log(key)
+        if (firstIndex && !isCharacter) {
+            arrayOfEqualAndQuestionMarks.push(`${operator} ${QUESTION_MARK} `);
             index++;
         }
 
-
-        if (isOperatorHaveOneQuestionMark) {
-            arrayOfEqualAndQuestionMarks.push(`${keyword} ${initPlaceHolder} `);
+        if (!firstIndex && isCharacter) {
+            arrayOfEqualAndQuestionMarks.push(`${value}`);
             index++;
         }
 
-        if (!isOperatorHaveOneQuestionMark && firstIndex) {
-            arrayOfEqualAndQuestionMarks.push(`${EQUAL_TO} ${QUESTION_MARK} ${keyword} ${QUESTION_MARK} `);
+        if (!firstIndex && !isCharacter) {
+            arrayOfEqualAndQuestionMarks.push(`${initPlaceHolder} `);
             index++;
         }
-
 
 
     }
-    console.log(arrayOfEqualAndQuestionMarks)
+    return arrayOfEqualAndQuestionMarks.join(' ');
 }
 
 
@@ -294,6 +304,8 @@ module.exports = {
 
 
     sqlQuery: '',
+    arrayOfDataForUpdateQuery: '',
+    stringOfDataForForSet: '',
 
 
     getOptionKeywordSqlQuery(jsonArray) {
@@ -374,14 +386,19 @@ module.exports = {
         return (err !== undefined) ? err : 'Default OpenSql Error';
     },
 
+
     generateUpdateSqlQuery(jsonObject) {
 
         generateArrayOfKeyAndValueForSqlQuery(jsonObject);
 
-        checkOtherConditionInWhereObject(jsonObject.where);
+        module.exports.sqlQuery = getQueryAndCheckOtherConditionInWhereObject(jsonObject.where);
 
-        // DOUBLE_QUESTION_MARK
-        // module.exports.sqlQuery
+        module.exports.stringOfDataForForSet = stringOFQuestionMarkAndEqual;
+
+        arrayOFKeyAndValueDateForUpdateQuery.unshift(jsonObject.table);
+
+        module.exports.arrayOfDataForUpdateQuery = arrayOFKeyAndValueDateForUpdateQuery;
+
     }
 
 

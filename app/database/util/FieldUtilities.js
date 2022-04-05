@@ -1,21 +1,17 @@
 const {
     OR,
-    IN,
     AND,
     LIKE,
     NULL,
-    WHERE,
-    NOT_IN,
     BETWEEN,
     NOT_NULL,
     EQUAL_TO,
     LESS_THAN,
-    NOT_BETWEEN,
     GREATER_THAN,
     NOT_EQUAL_TO,
     LESS_THAN_OR_EQUAL_TO,
     GREATER_THAN_OR_EQUAL_TO
-} = require("./SqlKeyword");
+} = require('./SqlKeyword');
 
 
 let arrayOfOperator = [
@@ -27,7 +23,6 @@ let arrayOfOperator = [
     NOT_NULL,
     EQUAL_TO,
     LESS_THAN,
-    NOT_BETWEEN,
     NOT_EQUAL_TO,
     GREATER_THAN,
     LESS_THAN_OR_EQUAL_TO,
@@ -43,7 +38,7 @@ module.exports = {
         if (!itemInArrayOfOperator)
             throw  new Error('Invalid data type');
 
-        return `${operator} ${value}`;
+        return `${operator} SPACE${value}`;
 
     }
 
