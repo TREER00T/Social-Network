@@ -25,7 +25,7 @@ const {
 
 
 let stringOfQuestionMarkAndEqual,
-    arrayOfKeyAndValueDateForUpdateQuery = [];
+    arrayOfKeyAndValueDateForQuery = [];
 const OPERATOR_IN = 'IN';
 
 
@@ -140,8 +140,8 @@ function generateArrayOfKeyAndValueForSqlQuery(jsonObject) {
         size = 0;
     for (let key in jsonObject.editField) {
         let value = jsonObject.editField[key];
-        arrayOfKeyAndValueDateForUpdateQuery.push(key);
-        arrayOfKeyAndValueDateForUpdateQuery.push(value.toString());
+        arrayOfKeyAndValueDateForQuery.push(key);
+        arrayOfKeyAndValueDateForQuery.push(value.toString());
         arrayOfKeyAndValue.push(`${key}`);
         index++;
         size++;
@@ -217,33 +217,33 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
 
 
         if (!isCharacter && !isValidOperatorForUpdateSqlQueryInArray) {
-            arrayOfKeyAndValueDateForUpdateQuery.push(key);
-            arrayOfKeyAndValueDateForUpdateQuery.push(`${newValue}`);
+            arrayOfKeyAndValueDateForQuery.push(key);
+            arrayOfKeyAndValueDateForQuery.push(`${newValue}`);
         }
 
 
         if (isOperatorIn && firstIndex) {
             arrayOfEqualAndQuestionMarks.push(`${keyword} (?) `);
-            arrayOfKeyAndValueDateForUpdateQuery.push(splitColumnNameFromString(value));
-            arrayOfKeyAndValueDateForUpdateQuery.push(splitDataFormOperatorInAndPutOnArray(value));
+            arrayOfKeyAndValueDateForQuery.push(splitColumnNameFromString(value));
+            arrayOfKeyAndValueDateForQuery.push(splitDataFormOperatorInAndPutOnArray(value));
             index++;
         }
 
 
         if (isOperatorIn && !firstIndex) {
             arrayOfEqualAndQuestionMarks.push(`${DOUBLE_QUESTION_MARK} ${keyword} (?) `);
-            arrayOfKeyAndValueDateForUpdateQuery.push(splitColumnNameFromString(value));
-            arrayOfKeyAndValueDateForUpdateQuery.push(splitDataFormOperatorInAndPutOnArray(value));
+            arrayOfKeyAndValueDateForQuery.push(splitColumnNameFromString(value));
+            arrayOfKeyAndValueDateForQuery.push(splitDataFormOperatorInAndPutOnArray(value));
             index++;
         }
 
         if (isOperatorLike || isOperatorBetween) {
-            arrayOfKeyAndValueDateForUpdateQuery.push(splitColumnNameFromString(value));
-            arrayOfKeyAndValueDateForUpdateQuery.push(splitValueFromString(value));
+            arrayOfKeyAndValueDateForQuery.push(splitColumnNameFromString(value));
+            arrayOfKeyAndValueDateForQuery.push(splitValueFromString(value));
         }
-        
+
         if (isOperatorAnd)
-            arrayOfKeyAndValueDateForUpdateQuery.push(`${value}`);
+            arrayOfKeyAndValueDateForQuery.push(`${value}`);
 
 
         if (isOperatorBetween && !firstIndex) {
@@ -396,7 +396,7 @@ module.exports = {
     },
 
 
-    generateUpdateSqlQuery(jsonObject) {
+    generateUpdateSqlQueryWithData(jsonObject) {
 
         generateArrayOfKeyAndValueForSqlQuery(jsonObject);
 
@@ -404,10 +404,20 @@ module.exports = {
 
         module.exports.stringOfDataForForSet = stringOfQuestionMarkAndEqual;
 
-        arrayOfKeyAndValueDateForUpdateQuery.unshift(jsonObject.table);
+        arrayOfKeyAndValueDateForQuery.unshift(jsonObject.table);
 
-        module.exports.arrayOfDataForUpdateQuery = arrayOfKeyAndValueDateForUpdateQuery;
+        module.exports.arrayOfDataForUpdateQuery = arrayOfKeyAndValueDateForQuery;
 
+    },
+
+
+    generateDeleteSqlQueryWithData(jsonObject){
+
+        module.exports.sqlQuery = getQueryAndCheckOtherConditionInWhereObject(jsonObject.where);
+
+        arrayOfKeyAndValueDateForQuery.unshift(jsonObject.table);
+
+        module.exports.arrayOfDataForUpdateQuery = arrayOfKeyAndValueDateForQuery;
     }
 
 

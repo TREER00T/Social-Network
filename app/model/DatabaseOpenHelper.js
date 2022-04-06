@@ -23,9 +23,7 @@ module.exports = {
         query('UPDATE users SET verificationCode = ? WHERE phoneNumber = ? ', [12, '09030207892'], 'Cannot update column verificationCode')
     },
     deleteUserForUnitTest: (phoneNumber, callBack) => {
-        query('DELETE FROM ?? WHERE phoneNumber = ?', [[phoneNumber], 'users'], (err, result) => {
-            (result) ? callBack(true) : callBack(false);
-        }, 'Can not delete user')
+        query('USE TREER00T; DELETE FROM ?? WHERE phoneNumber in(?)', ['users',['07','08']], 'Can not delete user')
     }
 
 }

@@ -11,8 +11,9 @@ const {
     {
         getError,
         getCreateTableSqlQuery,
-        generateUpdateSqlQuery,
-        getOptionKeywordSqlQuery
+        getOptionKeywordSqlQuery,
+        generateDeleteSqlQueryWithData,
+        generateUpdateSqlQueryWithData
     } = require('./util/Utilites'),
     util = require('./util/Utilites');
 
@@ -37,7 +38,7 @@ module.exports = {
     createTable(jsonArray) {
         getCreateTableSqlQuery(jsonArray);
 
-        realSql = `${USE_DATABASE}` +
+        realSql = USE_DATABASE +
             ` CREATE TABLE ${IF_NOT_EXISTS} ${jsonArray.table} ` +
             `(${util.sqlQuery})`;
 
@@ -60,17 +61,23 @@ module.exports = {
     },
 
 
-    remove() {
-        // TODO
+    remove(jsonObject) {
+
+        generateDeleteSqlQueryWithData(jsonObject);
+
+        realSql = USE_DATABASE + 'DELETE FROM ?? WHERE ?? ' + util.sqlQuery;
+
+        query(realSql, util.arrayOfDataForUpdateQuery, getError('Failed to delete rows'));
+
         return this;
     },
 
 
     update(jsonObject) {
 
-        generateUpdateSqlQuery(jsonObject);
+        generateUpdateSqlQueryWithData(jsonObject);
 
-        realSql = USE_DATABASE + ` UPDATE ?? ` + `SET ${util.stringOfDataForForSet} ${WHERE} ?? ` + util.sqlQuery;
+        realSql = USE_DATABASE + ' UPDATE ?? ' + `SET ${util.stringOfDataForForSet} ${WHERE} ?? ` + util.sqlQuery;
 
         query(realSql, util.arrayOfDataForUpdateQuery, getError('Failed to update rows'));
 
@@ -79,7 +86,8 @@ module.exports = {
 
 
     add(jsonArray) {
-        realSql = `${USE_DATABASE}` + `INSERT INTO ${jsonArray.table}` + ` SET ${QUESTION_MARK}`;
+
+        realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table + ' SET ' + QUESTION_MARK;
 
         query(realSql, jsonArray.data, getError('Failed to insert rows'));
 
@@ -88,10 +96,11 @@ module.exports = {
 
 
     find(jsonArray) {
+
         getOptionKeywordSqlQuery(jsonArray);
 
-        realSql = `${USE_DATABASE} SELECT ${DOUBLE_QUESTION_MARK} ` +
-            ` FROM ${DOUBLE_QUESTION_MARK} ${util.sqlQuery}`;
+        realSql = USE_DATABASE + ' SELECT ' + DOUBLE_QUESTION_MARK +
+            ' FROM ' + DOUBLE_QUESTION_MARK + ' ' + util.sqlQuery;
 
         query(realSql, jsonArray.data, getError(jsonArray.throwErr));
 

@@ -19,7 +19,7 @@ module.exports = {
         con.connect((err) => {
             (function (cb) {
                 if (typeof cb === 'function')
-                    cb((err !== undefined) ? err : '');
+                    cb((err !== null) ? err : '');
             })(queryResult);
             try {
                 con.query(sql, arrayObjects, (err, result) => {
