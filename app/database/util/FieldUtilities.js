@@ -38,7 +38,7 @@ module.exports = {
         if (!itemInArrayOfOperator)
             throw  new Error('Invalid data type');
 
-        return `${operator} SPACE${value}`;
+        return `${operator}SPACE${value}`;
 
     }
 

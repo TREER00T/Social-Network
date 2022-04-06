@@ -24,8 +24,8 @@ const {
 } = require('./SqlKeyword');
 
 
-let stringOFQuestionMarkAndEqual,
-    arrayOFKeyAndValueDateForUpdateQuery = [];
+let stringOfQuestionMarkAndEqual,
+    arrayOfKeyAndValueDateForUpdateQuery = [];
 const OPERATOR_IN = 'IN';
 
 
@@ -130,7 +130,7 @@ function generateDoubleQuestionMarksEqualQuestionMark(sizeOfKey) {
 
     }
 
-    return stringOFQuestionMarkAndEqual = mergeQuestionMarksWithEqual;
+    return stringOfQuestionMarkAndEqual = mergeQuestionMarksWithEqual;
 }
 
 
@@ -140,8 +140,8 @@ function generateArrayOfKeyAndValueForSqlQuery(jsonObject) {
         size = 0;
     for (let key in jsonObject.editField) {
         let value = jsonObject.editField[key];
-        arrayOFKeyAndValueDateForUpdateQuery.push(key);
-        arrayOFKeyAndValueDateForUpdateQuery.push(value.toString());
+        arrayOfKeyAndValueDateForUpdateQuery.push(key);
+        arrayOfKeyAndValueDateForUpdateQuery.push(value.toString());
         arrayOfKeyAndValue.push(`${key}`);
         index++;
         size++;
@@ -161,7 +161,7 @@ function splitOperatorInString(str) {
     return str.split(' ')[0];
 }
 
-function splitDataFormOperatorIn(str) {
+function splitDataFormOperatorInAndPutOnArray(str) {
     let newArray;
     newArray = str.split(' ');
     newArray.splice(0, 1);
@@ -173,12 +173,16 @@ function removeUnderscoreInString(str) {
     return str.replaceAll('_', ' ').toUpperCase();
 }
 
-function splitColumnFormOperatorIn(str) {
+function splitValueFromString(str) {
+    return str.split(' ')[1];
+}
+
+function splitColumnNameFromString(str) {
     return str.split(' ')[0];
 }
 
 function removeSpaceWordInString(str) {
-    return str.replace('SPACE', '');
+    return str.replace('SPACE', ' ');
 }
 
 let arrayOfValidOperatorQuery = [
@@ -213,28 +217,33 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
 
 
         if (!isCharacter && !isValidOperatorForUpdateSqlQueryInArray) {
-            arrayOFKeyAndValueDateForUpdateQuery.push(key);
-            arrayOFKeyAndValueDateForUpdateQuery.push(`${newValue}`);
+            arrayOfKeyAndValueDateForUpdateQuery.push(key);
+            arrayOfKeyAndValueDateForUpdateQuery.push(`${newValue}`);
         }
 
 
         if (isOperatorIn && firstIndex) {
             arrayOfEqualAndQuestionMarks.push(`${keyword} (?) `);
-            arrayOFKeyAndValueDateForUpdateQuery.push(splitColumnFormOperatorIn(value));
-            arrayOFKeyAndValueDateForUpdateQuery.push(splitDataFormOperatorIn(value));
+            arrayOfKeyAndValueDateForUpdateQuery.push(splitColumnNameFromString(value));
+            arrayOfKeyAndValueDateForUpdateQuery.push(splitDataFormOperatorInAndPutOnArray(value));
             index++;
         }
 
 
         if (isOperatorIn && !firstIndex) {
             arrayOfEqualAndQuestionMarks.push(`${DOUBLE_QUESTION_MARK} ${keyword} (?) `);
-            arrayOFKeyAndValueDateForUpdateQuery.push(splitColumnFormOperatorIn(value));
-            arrayOFKeyAndValueDateForUpdateQuery.push(splitDataFormOperatorIn(value));
+            arrayOfKeyAndValueDateForUpdateQuery.push(splitColumnNameFromString(value));
+            arrayOfKeyAndValueDateForUpdateQuery.push(splitDataFormOperatorInAndPutOnArray(value));
             index++;
         }
 
-        if (isOperatorLike || isOperatorBetween || isOperatorAnd)
-            arrayOFKeyAndValueDateForUpdateQuery.push(`${value}`);
+        if (isOperatorLike || isOperatorBetween) {
+            arrayOfKeyAndValueDateForUpdateQuery.push(splitColumnNameFromString(value));
+            arrayOfKeyAndValueDateForUpdateQuery.push(splitValueFromString(value));
+        }
+        
+        if (isOperatorAnd)
+            arrayOfKeyAndValueDateForUpdateQuery.push(`${value}`);
 
 
         if (isOperatorBetween && !firstIndex) {
@@ -393,11 +402,11 @@ module.exports = {
 
         module.exports.sqlQuery = getQueryAndCheckOtherConditionInWhereObject(jsonObject.where);
 
-        module.exports.stringOfDataForForSet = stringOFQuestionMarkAndEqual;
+        module.exports.stringOfDataForForSet = stringOfQuestionMarkAndEqual;
 
-        arrayOFKeyAndValueDateForUpdateQuery.unshift(jsonObject.table);
+        arrayOfKeyAndValueDateForUpdateQuery.unshift(jsonObject.table);
 
-        module.exports.arrayOfDataForUpdateQuery = arrayOFKeyAndValueDateForUpdateQuery;
+        module.exports.arrayOfDataForUpdateQuery = arrayOfKeyAndValueDateForUpdateQuery;
 
     }
 
