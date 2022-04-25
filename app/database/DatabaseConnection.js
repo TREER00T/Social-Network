@@ -1,9 +1,9 @@
 const mysql = require('mysql'),
     dotenv = require('dotenv');
 
-dotenv.config();
-
 let queryResult;
+
+dotenv.config();
 
 const con = mysql.createConnection({
     host: process.env.HOST,
@@ -15,12 +15,9 @@ const con = mysql.createConnection({
 
 module.exports = {
 
+
     query(sql, arrayObjects, throwErr) {
-        con.connect((err) => {
-            (function (cb) {
-                if (typeof cb === 'function')
-                    cb((err !== null) ? err : '');
-            })(queryResult);
+
             try {
                 con.query(sql, arrayObjects, (err, result) => {
 
@@ -33,7 +30,8 @@ module.exports = {
             } catch (e) {
                 throw new Error(throwErr);
             }
-        });
+
+
     },
 
     sqlQueryResult(callBackResult) {

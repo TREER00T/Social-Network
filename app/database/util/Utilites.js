@@ -14,10 +14,12 @@ const {
     BETWEEN,
     ORDER_BY,
     EQUAL_TO,
+    NOT_NULL,
     LESS_THAN,
     GREATER_THAN,
     NOT_EQUAL_TO,
     QUESTION_MARK,
+    AUTO_INCREMENT,
     DOUBLE_QUESTION_MARK,
     LESS_THAN_OR_EQUAL_TO,
     GREATER_THAN_OR_EQUAL_TO
@@ -25,7 +27,7 @@ const {
 
 
 let stringOfQuestionMarkAndEqual,
-    arrayOfKeyAndValueDateForQuery = [];
+    arrayOfKeyAndValueDataForQuery = [];
 const OPERATOR_IN = 'IN';
 
 
@@ -134,20 +136,19 @@ function generateDoubleQuestionMarksEqualQuestionMark(sizeOfKey) {
 }
 
 
-function generateArrayOfKeyAndValueForSqlQuery(jsonObject) {
+function generateArrayOfKeyAndValueForEditField(jsonObject) {
     let arrayOfKeyAndValue = [],
         index = 0,
         size = 0;
     for (let key in jsonObject.editField) {
         let value = jsonObject.editField[key];
-        arrayOfKeyAndValueDateForQuery.push(key);
-        arrayOfKeyAndValueDateForQuery.push(value.toString());
+        arrayOfKeyAndValueDataForQuery.push(key);
+        arrayOfKeyAndValueDataForQuery.push(value.toString());
         arrayOfKeyAndValue.push(`${key}`);
         index++;
         size++;
         arrayOfKeyAndValue[index++] = `${value}`;
     }
-    arrayOfKeyAndValue.unshift(`${jsonObject.table}`);
     generateDoubleQuestionMarksEqualQuestionMark(size);
     return arrayOfKeyAndValue;
 }
@@ -194,6 +195,25 @@ let arrayOfValidOperatorQuery = [
 ];
 
 
+function getStringOfEnumTypesWithComma(arrayOfEnumTypes) {
+    let stringOfEnumTypesWithComma = '';
+    arrayOfEnumTypes.forEach((item, index, arr) => {
+
+        let lastIndex = arr.lastIndexOf(item);
+
+        if (lastIndex) {
+            stringOfEnumTypesWithComma += `${COMMA} '${item}'`;
+        }
+
+        if (!lastIndex) {
+            stringOfEnumTypesWithComma += `'${item}'`;
+        }
+
+    });
+    return stringOfEnumTypesWithComma;
+}
+
+
 function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
     let index = 0,
         isKeywordBetweenUsed = false,
@@ -217,33 +237,33 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
 
 
         if (!isCharacter && !isValidOperatorForUpdateSqlQueryInArray) {
-            arrayOfKeyAndValueDateForQuery.push(key);
-            arrayOfKeyAndValueDateForQuery.push(`${newValue}`);
+            arrayOfKeyAndValueDataForQuery.push(key);
+            arrayOfKeyAndValueDataForQuery.push(`${newValue}`);
         }
 
 
         if (isOperatorIn && firstIndex) {
             arrayOfEqualAndQuestionMarks.push(`${keyword} (?) `);
-            arrayOfKeyAndValueDateForQuery.push(splitColumnNameFromString(value));
-            arrayOfKeyAndValueDateForQuery.push(splitDataFormOperatorInAndPutOnArray(value));
+            arrayOfKeyAndValueDataForQuery.push(splitColumnNameFromString(value));
+            arrayOfKeyAndValueDataForQuery.push(splitDataFormOperatorInAndPutOnArray(value));
             index++;
         }
 
 
         if (isOperatorIn && !firstIndex) {
             arrayOfEqualAndQuestionMarks.push(`${DOUBLE_QUESTION_MARK} ${keyword} (?) `);
-            arrayOfKeyAndValueDateForQuery.push(splitColumnNameFromString(value));
-            arrayOfKeyAndValueDateForQuery.push(splitDataFormOperatorInAndPutOnArray(value));
+            arrayOfKeyAndValueDataForQuery.push(splitColumnNameFromString(value));
+            arrayOfKeyAndValueDataForQuery.push(splitDataFormOperatorInAndPutOnArray(value));
             index++;
         }
 
         if (isOperatorLike || isOperatorBetween) {
-            arrayOfKeyAndValueDateForQuery.push(splitColumnNameFromString(value));
-            arrayOfKeyAndValueDateForQuery.push(splitValueFromString(value));
+            arrayOfKeyAndValueDataForQuery.push(splitColumnNameFromString(value));
+            arrayOfKeyAndValueDataForQuery.push(splitValueFromString(value));
         }
 
         if (isOperatorAnd)
-            arrayOfKeyAndValueDateForQuery.push(`${value}`);
+            arrayOfKeyAndValueDataForQuery.push(`${value}`);
 
 
         if (isOperatorBetween && !firstIndex) {
@@ -313,8 +333,81 @@ module.exports = {
 
 
     sqlQuery: '',
-    arrayOfDataForUpdateQuery: '',
     stringOfDataForForSet: '',
+    dataForInsertSqlQuery: [],
+    arrayOfDataForUpdateOrDeleteQuery: '',
+    stringOfDoubleQuestionMarkAndComma: '',
+
+
+    addDataTypeForFieldInFirstItemOfArray(type, data) {
+
+        if (data === undefined)
+            return type;
+
+        let stringDataTypeField = '',
+            isArray = Array.isArray(data),
+            isValidType = false;
+
+        if (Number.isInteger(data))
+            stringDataTypeField = `${type}(${data}) `;
+
+        if (isArray) {
+
+            data.forEach((item) => {
+
+                let arrayOfValidTypeOption = [
+                    AUTO_INCREMENT,
+                    NOT_NULL
+                ];
+
+                let isInArray = arrayOfValidTypeOption.includes(item);
+                if (isInArray)
+                    isValidType = type;
+
+            })
+        }
+
+        if (isArray && isValidType)
+            stringDataTypeField = `${type} ${data.join(' ')} `;
+
+        if (isArray && !isValidType)
+            stringDataTypeField = `${type}(${getStringOfEnumTypesWithComma(data)}) `;
+
+        return stringDataTypeField;
+    },
+
+
+    generateDoubleQuestionMarkAndComma(jsonArray) {
+
+        let newStringOfDoubleQuestionMarkAndComma = '';
+
+        for (let keys = Object.keys(jsonArray), i = 0, end = keys.length; i < end; i++) {
+
+            let key = keys[i], value = jsonArray[key];
+
+
+            if (typeof value === 'object') {
+
+                let array2D = [];
+                value.forEach((item) => {
+                    array2D.push([item]);
+                });
+
+                module.exports.dataForInsertSqlQuery[i] = array2D;
+            }
+
+
+            if (end !== (i + 1))
+                newStringOfDoubleQuestionMarkAndComma += `${key} ${COMMA} `;
+
+            if (end === (i + 1))
+                newStringOfDoubleQuestionMarkAndComma += key;
+
+        }
+
+        return newStringOfDoubleQuestionMarkAndComma;
+
+    },
 
 
     getOptionKeywordSqlQuery(jsonArray) {
@@ -384,7 +477,10 @@ module.exports = {
             .replace(/,\s*$/, ''); // replace last comma in array
 
         if (jsonArray.primaryKey !== undefined)
-            return module.exports.sqlQuery += `${COMMA} ${jsonArray.primaryKey}`;
+            return module.exports.sqlQuery += `${COMMA} PRIMARY KEY (${jsonArray.primaryKey})`;
+
+        if (jsonArray.index !== undefined)
+            return module.exports.sqlQuery += `${COMMA} INDEX ${jsonArray.index}`;
 
 
         return module.exports.sqlQuery;
@@ -398,26 +494,52 @@ module.exports = {
 
     generateUpdateSqlQueryWithData(jsonObject) {
 
-        generateArrayOfKeyAndValueForSqlQuery(jsonObject);
+        generateArrayOfKeyAndValueForEditField(jsonObject);
 
         module.exports.sqlQuery = getQueryAndCheckOtherConditionInWhereObject(jsonObject.where);
 
         module.exports.stringOfDataForForSet = stringOfQuestionMarkAndEqual;
 
-        arrayOfKeyAndValueDateForQuery.unshift(jsonObject.table);
+        arrayOfKeyAndValueDataForQuery.unshift(jsonObject.table);
 
-        module.exports.arrayOfDataForUpdateQuery = arrayOfKeyAndValueDateForQuery;
+        module.exports.arrayOfDataForUpdateOrDeleteQuery = arrayOfKeyAndValueDataForQuery;
 
+        arrayOfKeyAndValueDataForQuery = [];
     },
 
 
-    generateDeleteSqlQueryWithData(jsonObject){
+    generateDeleteSqlQueryWithData(jsonObject) {
 
         module.exports.sqlQuery = getQueryAndCheckOtherConditionInWhereObject(jsonObject.where);
 
-        arrayOfKeyAndValueDateForQuery.unshift(jsonObject.table);
+        arrayOfKeyAndValueDataForQuery.unshift(jsonObject.table);
 
-        module.exports.arrayOfDataForUpdateQuery = arrayOfKeyAndValueDateForQuery;
+        module.exports.arrayOfDataForUpdateOrDeleteQuery = arrayOfKeyAndValueDataForQuery;
+
+        arrayOfKeyAndValueDataForQuery = [];
+        module.exports.sqlQuery = '';
+    },
+
+
+    getStringOfColumnWithComma(data) {
+        let newData = data;
+        return (data !== Array) ? newData : data.forEach((item, index, arrayOfColumns) => {
+            let isLastIndex = arrayOfColumns[arrayOfColumns.length - 1];
+            if (!isLastIndex)
+                newData += `${item} ${COMMA}`;
+            if (isLastIndex)
+                newData += item;
+        });
+    },
+
+
+    removeSqlQuery() {
+        return module.exports.sqlQuery = '';
+    },
+
+
+    removeStringOfDataForForSet() {
+        return module.exports.stringOfDataForForSet = '';
     }
 
 

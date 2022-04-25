@@ -16,7 +16,7 @@ const OR = 'OR',
     CASCADE = 'CASCADE',
     BETWEEN = 'BETWEEN',
     QUESTION_MARK = '?',
-    COMMENT = 'COMMENT',
+    SET_NULL = 'SET NULL',
     RESTRICT = 'RESTRICT',
     ORDER_BY = 'ORDER BY',
     NOT_NULL = 'NOT NULL',
@@ -28,11 +28,12 @@ const OR = 'OR',
     AUTO_INCREMENT = 'AUTO_INCREMENT';
 
 let int = 'int',
+    bit = 'bit',
+    Enum = 'enum',
     char = 'char',  // 0 - 255
-    varchar = 'varchar',
     date = 'date',  // 2022-03-20
     time = 'time',  // 23:55:54
-    boolean = 'boolean',
+    varchar = 'varchar',
     datetime = 'datetime';  // 2022-03-20 20:32:42
 
 module.exports = {
@@ -49,8 +50,8 @@ module.exports = {
     LIMIT: LIMIT,
     OFFSET: OFFSET,
     CASCADE: CASCADE,
-    COMMENT: COMMENT,
     BETWEEN: BETWEEN,
+    SET_NULL: SET_NULL,
     RESTRICT: RESTRICT,
     NOT_NULL: NOT_NULL,
     ORDER_BY: ORDER_BY,
@@ -68,10 +69,11 @@ module.exports = {
 
 
     int: int,
+    bit: bit,
     date: date,
     time: time,
     char: char,
-    boolean: boolean,
+    Enum: Enum,
     varchar: varchar,
     datetime: datetime
 

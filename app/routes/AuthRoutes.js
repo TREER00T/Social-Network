@@ -1,11 +1,10 @@
 const express = require('express'),
     router = express.Router(),
-    User = require('../controller/User');
+    User = require('app/controller/user/auth/GvcInterface');
 
 
-router.post('/gvc', User.generateVerificationCodeAndGetPhoneNumber);
-router.post('/verify', User.checkVerificationCodeInDatabaseAndSingUpOrLogin);
-router.get('/test', User.test);
+router.post('/gvc', User.gvc);
+router.post('/verify', User.isValidAuthCode);
 
 
 module.exports = router;

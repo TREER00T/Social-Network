@@ -2,14 +2,14 @@
 let res;
 
 module.exports = {
-    builder(code, obj, arr = null) {
+    builder(obj, arr = null) {
         if (res != null) {
-            return res.status(code).json(module.exports.json(obj, arr));
+            return res.status(obj.code).json(module.exports.json(obj, arr));
         }
         return module.exports.json(obj, arr)
     },
 
-    initialization(response) {
+    initializationRes(response) {
         res = response;
     },
 

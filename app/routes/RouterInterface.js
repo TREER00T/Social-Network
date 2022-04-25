@@ -3,21 +3,22 @@ let express = require('express'),
     router = express.Router(),
     bodyParser = require('body-parser'),
     dotenv = require('dotenv'),
-    Validation = require('../util/Validation'),
+    Validation = require('app/util/Validation'),
     {
-        initialization
-    } = require('../util/ReturnJson');
+        initializationRes
+    } = require('app/util/ReturnJson');
 
 
 module.exports = {
-    Router: () => {
+
+    initialization() {
 
         dotenv.config();
 
         app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json(), router);
 
         router.use((req, res, next) => {
-            initialization(res);
+            initializationRes(res);
             try {
                 Validation.checkHttpMethod(req.method);
                 next();
@@ -26,12 +27,12 @@ module.exports = {
             }
         });
 
-        app.use('/auth', require('../routes/AuthRoutes'));
+        app.use('/auth', require('app/routes/AuthRoutes'));
 
         app.listen(process.env.PORT, () => {
             console.log('Server are running...');
         });
 
-
     }
+
 }

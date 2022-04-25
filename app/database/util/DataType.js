@@ -1,48 +1,50 @@
 const {
         int,
+        bit,
         char,
         date,
+        Enum,
         time,
         varchar,
-        boolean,
         datetime
     } = require('./SqlKeyword'),
     {
-        getSqlDataType,
         addDataTypeForFieldInFirstItemOfArray
     } = require('./Utilites');
 
 
 module.exports = {
 
-    VARCHAR(arrayOfStateField) {
-        return getSqlDataType(addDataTypeForFieldInFirstItemOfArray(varchar, arrayOfStateField));
+    VARCHAR(data) {
+        return addDataTypeForFieldInFirstItemOfArray(varchar, data);
     },
 
-    INT(arrayOfStateField) {
-        return getSqlDataType(addDataTypeForFieldInFirstItemOfArray(int, arrayOfStateField));
+    INT(data) {
+        return addDataTypeForFieldInFirstItemOfArray(int, data);
     },
 
-    CHAR(arrayOfStateField) {
-        return getSqlDataType(addDataTypeForFieldInFirstItemOfArray(char, arrayOfStateField));
+    CHAR(data) {
+        return addDataTypeForFieldInFirstItemOfArray(char, data);
     },
 
-
-    DATE(arrayOfStateField) {
-        return getSqlDataType(addDataTypeForFieldInFirstItemOfArray(date, arrayOfStateField));
+    DATE(data) {
+        return addDataTypeForFieldInFirstItemOfArray(date, data);
     },
 
-
-    TIME(arrayOfStateField) {
-        return getSqlDataType(addDataTypeForFieldInFirstItemOfArray(time, arrayOfStateField));
+    TIME(data) {
+        return addDataTypeForFieldInFirstItemOfArray(time, data);
     },
 
-    BOOLEAN(arrayOfStateField) {
-        return getSqlDataType(addDataTypeForFieldInFirstItemOfArray(boolean, arrayOfStateField));
+    BIT(data) {
+        return addDataTypeForFieldInFirstItemOfArray(bit, data);
     },
 
-    DATETIME(arrayOfStateField) {
-        return getSqlDataType(addDataTypeForFieldInFirstItemOfArray(datetime, arrayOfStateField));
+    DATETIME(data) {
+        return addDataTypeForFieldInFirstItemOfArray(datetime, data);
+    },
+
+    ENUM(data) {
+        return addDataTypeForFieldInFirstItemOfArray(Enum, data);
     }
 
 }

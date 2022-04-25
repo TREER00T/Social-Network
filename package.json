@@ -4,26 +4,22 @@
   "description": "Chat Application",
   "main": "init.js",
   "scripts": {
-    "start": "nodemon init.js",
-    "test": "jest --watchAll --detectOpenHandles"
-  },
-  "jest": {
-    "testEnvironment": "jsdom"
+    "start": "nodemon init.js"
   },
   "author": "Ali Azmoodeh Valadi",
   "license": "ISC",
   "dependencies": {
-    "app-root-path": "^3.0.0",
     "body-parser": "^1.19.1",
-    "dotenv": "^15.0.0",
     "express": "^4.17.2",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
     "node-jose": "^2.1.0",
-    "nodemon": "^2.0.15",
     "socket.io": "^4.4.1"
   },
   "devDependencies": {
-    "jest": "^27.5.1"
+    "app-module-path": "^2.2.0",
+    "cypress": "^9.5.4",
+    "dotenv": "^16.0.0",
+    "nodemon": "^2.0.15"
   }
 }
