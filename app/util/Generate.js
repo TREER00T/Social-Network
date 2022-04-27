@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken'),
     {
         JWK,
         JWE
-    } = require('node-jose');
+    } = require('node-jose'),
+    crypto = require('crypto');
 
 
 module.exports = {
@@ -43,6 +44,24 @@ module.exports = {
             algorithm: 'RS256'
         };
         return jwt.sign(payload, process.env.PRAIVATE_KEY, signOptions);
+    },
+
+
+    getApiKey() {
+        const rand = crypto.randomBytes(50);
+
+        let formatValidString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+        let chars = formatValidString.repeat(5);
+
+        let str = '';
+
+        for (let i = 0; i < rand.length; i++) {
+            let decimal = rand[i];
+            str += chars[decimal];
+        }
+
+        return str.trim();
     }
 
 

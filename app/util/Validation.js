@@ -1,13 +1,10 @@
-const {
-        builder
-    } = require('./ReturnJson'),
+const Json = require('./ReturnJson'),
     Response = require('./Response'),
     jwt = require('jsonwebtoken'),
     {
         JWK,
         parse
-    } = require('node-jose'),
-    crypto = require('crypto');
+    } = require('node-jose');
 
 
 module.exports = {
@@ -26,7 +23,7 @@ module.exports = {
 
 
     // If http method not found in httpMethod array It should be return json response
-    checkHttpMethod(requestMethod) {
+    isValidHttpMethod(requestMethod) {
 
         const arrayOfHttpMethods = [
             'GET',
@@ -37,8 +34,7 @@ module.exports = {
         ];
 
         if (!arrayOfHttpMethods.includes(requestMethod)) {
-            return builder(
-                Response.HTTP_METHOD_NOT_ALLOWED.code,
+            return Json.builder(
                 Response.HTTP_METHOD_NOT_ALLOWED
             )
         }
@@ -47,25 +43,24 @@ module.exports = {
 
 
     // The verify jwt and check jwt expired time
-    getJwtVerify(token, verifyOptions, callBack) {
-        jwt.verify(token, process.env.PUBLIC_KEY, verifyOptions, (err, decoded) => {
+    getJwtVerify(token, cb) {
+        jwt.verify(token, process.env.PUBLIC_KEY, {}, (err, decoded) => {
 
             if (err) {
 
-                return builder(
-                    Response.HTTP_UNAUTHORIZED_INVALID_TOKEN.code,
+                return Json.builder(
                     Response.HTTP_UNAUTHORIZED_INVALID_TOKEN
                 )
             }
 
-            if (this.isTokenExpiredError(err)) {
+            if (Date.now() >= decoded.exp * 1000) {
 
-                return builder(
-                    Response.HTTP_UNAUTHORIZED_TOKEN_EXP.code,
+                return Json.builder(
                     Response.HTTP_UNAUTHORIZED_TOKEN_EXP
                 )
             }
-            callBack(decoded);
+
+            cb(decoded);
         });
     },
 
@@ -82,31 +77,7 @@ module.exports = {
 
     // Returns split jwt without bearer
     getSplitBearerJwt(bearerHeader) {
-        return bearerHeader.split(' ')[2];
-    },
-
-
-    // search TokenExpiredError in error
-    isTokenExpiredError(err) {
-        return /TokenExpiredError/.test(err);
-    },
-
-
-    getApiKey() {
-        const rand = crypto.randomBytes(50);
-
-        let formatValidString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-
-        let chars = formatValidString.repeat(5);
-
-        let str = '';
-
-        for (let i = 0; i < rand.length; i++) {
-            let decimal = rand[i];
-            str += chars[decimal];
-        }
-
-        return str.trim();
+        return bearerHeader.split(' ')[1];
     }
 
 

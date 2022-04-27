@@ -2,18 +2,18 @@
 let res;
 
 module.exports = {
+
     builder(obj, arr = null) {
-        if (res != null) {
-            return res.status(obj.code).json(module.exports.json(obj, arr));
-        }
-        return module.exports.json(obj, arr)
+        let jsonContent = JSON.stringify(module.exports.jsonObject(obj, arr));
+        res.end(jsonContent);
     },
 
     initializationRes(response) {
         res = response;
     },
 
-    json(obj, arr = null) {
+    jsonObject(obj, arr) {
         return (arr != null) ? {'code': `${obj.code}`, 'message': `${obj.message}`, 'data': arr} : obj;
     }
+
 }

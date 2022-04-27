@@ -4,9 +4,9 @@ let express = require('express'),
     bodyParser = require('body-parser'),
     dotenv = require('dotenv'),
     Validation = require('app/util/Validation'),
-    {
-        initializationRes
-    } = require('app/util/ReturnJson');
+    Pipeline = require('app/routes/Pipeline'),
+    Json = require('app/util/ReturnJson'),
+    Response = require('app/util/Response');
 
 
 module.exports = {
@@ -18,13 +18,19 @@ module.exports = {
         app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json(), router);
 
         router.use((req, res, next) => {
-            initializationRes(res);
-            try {
-                Validation.checkHttpMethod(req.method);
-                next();
-            } catch (e) {
-                throw new Error('Can not validate method');
-            }
+
+            Json.initializationRes(res);
+
+            Validation.isValidHttpMethod(req.method);
+
+            let isSetUserToken = Pipeline.isSetUserToken(req.headers['authorization']);
+            let isSetUserApiKey = Pipeline.isSetUserApiKey(req.body.apiKey);
+
+            if (!isSetUserApiKey && !isSetUserToken)
+                return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
+
+
+            next();
         });
 
         app.use('/auth', require('app/routes/AuthRoutes'));

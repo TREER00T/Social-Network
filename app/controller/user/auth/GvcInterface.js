@@ -1,7 +1,4 @@
-const {
-        builder,
-        initializationRes
-    } = require('app/util/ReturnJson'),
+const Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
     Update = require('app/model/update/user/users'),
     Insert = require('app/model/add/insert/user/users'),
@@ -20,12 +17,12 @@ const {
 
 exports.gvc = (req, res) => {
 
-    initializationRes(res);
+    Json.initializationRes(res);
 
     let phone = req.body.phone;
 
     if (!isPhoneNumber(phone))
-        return builder(Response.HTTP_BAD_REQUEST);
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
     Find.userPhone(phone, (isInDb) => {
@@ -33,14 +30,14 @@ exports.gvc = (req, res) => {
         if (!isInDb) {
             Insert.phoneAndAuthCode(phone, getVerificationCode(), (isAdded) => {
                 if (isAdded)
-                    return builder(Response.HTTP_CREATED);
+                    return Json.builder(Response.HTTP_CREATED);
             });
         }
 
         if (isInDb) {
             Update.authCode(phone, getVerificationCode(), (isUpdated) => {
                 if (isUpdated)
-                    return builder(Response.HTTP_OK);
+                    return Json.builder(Response.HTTP_OK);
             });
         }
 
@@ -54,21 +51,20 @@ exports.gvc = (req, res) => {
 exports.isValidAuthCode = (req, res) => {
 
 
-    initializationRes(res);
+    Json.initializationRes(res);
 
     let {phone, authCode} = req.body;
 
     if (!isPhoneNumber(phone) && !isVerificationCode(authCode))
-        return builder(Response.HTTP_BAD_REQUEST)
-
+        return Json.builder(Response.HTTP_BAD_REQUEST)
 
     Find.isValidAuthCode(phone, authCode, (result) => {
 
         if (!result)
-            return builder(Response.HTTP_UNAUTHORIZED);
+            return Json.builder(Response.HTTP_UNAUTHORIZED);
 
         (async () => {
-            builder(
+            Json.builder(
                 Response.HTTP_ACCEPTED,
                 {
                     'accessToken': await getJwtEncrypt(getJwtSign({
@@ -82,6 +78,7 @@ exports.isValidAuthCode = (req, res) => {
                 }
             )
         })();
+
 
     });
 
