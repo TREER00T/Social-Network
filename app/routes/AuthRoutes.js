@@ -4,7 +4,8 @@ const express = require('express'),
 
 
 router.post('/gvc', User.gvc);
-router.post('/verify', User.isValidAuthCode);
+router.post('/verify/authCode', User.isValidAuthCode);
+router.post('/verify/twoStep', User.isValidPassWord);
 
 
 module.exports = router;

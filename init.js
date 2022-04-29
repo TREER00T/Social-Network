@@ -1,8 +1,5 @@
 require('app-module-path').addPath(__dirname);
-let Database = require('app/database/DatabaseInterface'),
-    Router = require('app/routes/RouterInterface');
-
-Database.initialization();
+let Router = require('app/routes/RouterInterface');
 
 
 Router.initialization();

@@ -4,6 +4,7 @@ const {
     AND,
     ASC,
     LIKE,
+    STAR,
     DESC,
     NULL,
     COMMA,
@@ -27,7 +28,8 @@ const {
 
 
 let stringOfQuestionMarkAndEqual,
-    arrayOfKeyAndValueDataForQuery = [];
+    arrayOfKeyAndValueDataForQuery = [],
+    isStarUsed;
 const OPERATOR_IN = 'IN';
 
 
@@ -540,7 +542,36 @@ module.exports = {
 
     removeStringOfDataForForSet() {
         return module.exports.stringOfDataForForSet = '';
+    },
+
+
+    removeDataForInsertSqlQuery() {
+        return module.exports.dataForInsertSqlQuery = [];
+    },
+
+
+    removeArrayOfDataForUpdateOrDeleteQuery() {
+        return module.exports.arrayOfDataForUpdateOrDeleteQuery = '';
+    },
+
+    getData() {
+        return isStarUsed;
+    },
+
+    removeStarInArray(jsonArray) {
+        let index = jsonArray.data[0];
+        let arr = jsonArray.data;
+        let isStringZeroIndex = typeof index === 'string';
+
+        if (index === STAR && isStringZeroIndex) {
+            isStarUsed = STAR;
+            arr.shift();
+            return arr;
+        }
+
+        if (!isStringZeroIndex) {
+            isStarUsed = DOUBLE_QUESTION_MARK;
+            return arr;
+        }
     }
-
-
 }

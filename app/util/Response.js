@@ -52,6 +52,10 @@ module.exports = {
         code: 208,
         message: 'Already Reported'
     },
+    HTTP_OK_BUT_TWO_STEP_VERIFICATION: {
+        code: 209,
+        message: 'OK , But you need to two step verification'
+    },
     HTTP_IM_USED: {
         code: 226,
         message: 'IM Used'

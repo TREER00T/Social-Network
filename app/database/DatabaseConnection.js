@@ -18,18 +18,18 @@ module.exports = {
 
     query(sql, arrayObjects, throwErr) {
 
-            try {
-                con.query(sql, arrayObjects, (err, result) => {
+        try {
+            con.query(sql, arrayObjects, (err, result) => {
 
-                    (function (cb) {
-                        if (typeof cb === 'function')
-                            cb((err !== null) ? err : result);
-                    })(queryResult);
+                (function (cb) {
+                    if (typeof cb === 'function')
+                        cb((err !== null) ? err : result);
+                })(queryResult);
 
-                });
-            } catch (e) {
-                throw new Error(throwErr);
-            }
+            });
+        } catch (e) {
+            throw new Error(throwErr);
+        }
 
 
     },

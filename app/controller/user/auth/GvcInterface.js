@@ -12,7 +12,10 @@ const Json = require('app/util/ReturnJson'),
         getJwtRefresh,
         getJwtEncrypt,
         getVerificationCode
-    } = require('app/util/Generate');
+    } = require('app/util/Generate'),
+    {
+        getTokenPayLoad
+    } = require('app/routes/Pipeline');
 
 
 exports.gvc = (req, res) => {
@@ -23,7 +26,6 @@ exports.gvc = (req, res) => {
 
     if (!isPhoneNumber(phone))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
 
     Find.userPhone(phone, (isInDb) => {
 
@@ -63,24 +65,44 @@ exports.isValidAuthCode = (req, res) => {
         if (!result)
             return Json.builder(Response.HTTP_UNAUTHORIZED);
 
-        (async () => {
-            Json.builder(
-                Response.HTTP_ACCEPTED,
-                {
-                    'accessToken': await getJwtEncrypt(getJwtSign({
-                        'phoneNumber': `${phone}`,
-                        type: 'at'
-                    }, phone)),
-                    'refreshToken': await getJwtEncrypt(getJwtRefresh({
-                        'phoneNumber': `${phone}`,
-                        type: 'rt'
-                    }, phone))
-                }
-            )
-        })();
 
+        Find.password(phone, (result) => {
+
+            if (!result)
+                return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
+
+
+            (async () => {
+                Json.builder(
+                    Response.HTTP_ACCEPTED,
+                    {
+                        'accessToken': await getJwtEncrypt(getJwtSign({
+                            'phoneNumber': `${phone}`,
+                            type: 'at'
+                        }, phone)),
+                        'refreshToken': await getJwtEncrypt(getJwtRefresh({
+                            'phoneNumber': `${phone}`,
+                            type: 'rt'
+                        }, phone))
+                    }
+                )
+            })();
+
+
+        });
 
     });
 
+
+}
+
+
+exports.isValidPassWord = (req, res) => {
+
+    Json.initializationRes(res);
+
+    getTokenPayLoad((data) => {
+        console.log(data);
+    });
 
 }

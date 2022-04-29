@@ -3,24 +3,28 @@ const {
         sqlQueryResult
     } = require('app/database/DatabaseConnection'),
     {
+        STAR,
         WHERE,
         QUESTION_MARK,
         IF_NOT_EXISTS,
         DOUBLE_QUESTION_MARK
     } = require('./util/SqlKeyword'),
     {
+        getData,
         getError,
         removeSqlQuery,
+        removeStarInArray,
         getCreateTableSqlQuery,
         getOptionKeywordSqlQuery,
         getStringOfColumnWithComma,
         removeStringOfDataForForSet,
+        removeDataForInsertSqlQuery,
         generateDeleteSqlQueryWithData,
         generateUpdateSqlQueryWithData,
-        generateDoubleQuestionMarkAndComma
+        generateDoubleQuestionMarkAndComma,
+        removeArrayOfDataForUpdateOrDeleteQuery
     } = require('./util/Utilites'),
     util = require('./util/Utilites');
-const {log} = require("nodemon/lib/utils");
 
 
 let realSql;
@@ -50,6 +54,8 @@ module.exports = {
 
         query(realSql, {}, getError('Failed to create table'));
 
+        removeSqlQuery();
+
         return this;
     },
 
@@ -78,6 +84,7 @@ module.exports = {
 
         removeSqlQuery();
         removeStringOfDataForForSet();
+        removeArrayOfDataForUpdateOrDeleteQuery();
 
         return this;
     },
@@ -93,6 +100,7 @@ module.exports = {
 
         removeSqlQuery();
         removeStringOfDataForForSet();
+        removeArrayOfDataForUpdateOrDeleteQuery();
 
         return this;
     },
@@ -105,11 +113,13 @@ module.exports = {
 
         query(realSql, util.dataForInsertSqlQuery, getError(jsonArray.throwErr));
 
+        removeDataForInsertSqlQuery();
+
         return this;
     },
 
 
-    addOne(jsonArray){
+    addOne(jsonArray) {
 
         realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table + ' SET ' + QUESTION_MARK;
 
@@ -131,6 +141,8 @@ module.exports = {
 
         query(realSql, jsonArray.data, getError(jsonArray.throwErr));
 
+        removeSqlQuery();
+
         return this;
     },
 
@@ -149,10 +161,14 @@ module.exports = {
 
         getOptionKeywordSqlQuery(jsonArray);
 
-        realSql = USE_DATABASE + ' SELECT ' + DOUBLE_QUESTION_MARK +
+        removeStarInArray(jsonArray);
+
+        realSql = USE_DATABASE + ' SELECT ' + getData() +
             ' FROM ' + DOUBLE_QUESTION_MARK + ' ' + util.sqlQuery;
 
         query(realSql, jsonArray.data, getError(jsonArray.throwErr));
+
+        removeSqlQuery();
 
         return this;
     },

@@ -1,4 +1,5 @@
 const OR = 'OR',
+    STAR = '*',
     COMMA = ',',
     AND = 'AND',
     ASC = 'ASC',
@@ -42,6 +43,7 @@ module.exports = {
     IN: IN,
     AND: AND,
     ASC: ASC,
+    STAR: STAR,
     NULL: NULL,
     DESC: DESC,
     LIKE: LIKE,
