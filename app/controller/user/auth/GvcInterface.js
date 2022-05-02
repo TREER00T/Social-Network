@@ -5,7 +5,6 @@ const Json = require('app/util/ReturnJson'),
     Find = require('app/model/find/user/users'),
     {
         isPhoneNumber,
-        isValidDataHash,
         isVerificationCode
     } = require('app/util/Validation'),
     {
@@ -17,11 +16,9 @@ const Json = require('app/util/ReturnJson'),
         getVerificationCode
     } = require('app/util/Generate'),
     {
-        getTokenPayLoad
+        getAccessTokenPayLoad,
+        getRefreshTokenPayLoad
     } = require('app/routes/Pipeline');
-const {HTTP_ACCEPTED} = require("app/util/Response");
-const Pipeline = require("app/routes/Pipeline");
-const {date} = require("app/database/util/SqlKeyword");
 
 
 exports.gvc = (req, res) => {
@@ -116,7 +113,7 @@ exports.isValidPassWord = (req, res) => {
 
     Json.initializationRes(res);
 
-    getTokenPayLoad((data) => {
+    getAccessTokenPayLoad((data) => {
 
         let phone = data.phoneNumber;
         let password = req.body.password;
@@ -151,12 +148,9 @@ exports.refreshToken = (req, res) => {
     Json.initializationRes(res);
 
 
-    getTokenPayLoad((data) => {
+    getRefreshTokenPayLoad((data) => {
 
         let phone = data.phoneNumber;
-
-        if (data.type !== 'rt')
-            return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
         Find.userPhone(phone, (isInDb) => {

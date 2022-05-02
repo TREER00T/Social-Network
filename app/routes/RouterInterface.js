@@ -25,15 +25,16 @@ module.exports = {
             Validation.isValidHttpMethod(req.method);
 
 
-            let isSetUserToken = Pipeline.isSetUserToken(req.headers['authorization']);
+            let isSetUserAccessToken = Pipeline.isSetUserAccessToken(req.headers['authorization']);
+            let isSetUserRefreshToken = Pipeline.isSetUserRefreshToken(req.headers['authorization']);
             let isSetUserApiKey = Pipeline.isSetUserApiKey(req.body.apiKey);
             let isSetPhone = (req.body.phone !== undefined) ? true : false;
 
 
 
-            if (!isSetUserApiKey && !isSetUserToken && !isSetPhone ||
-                isSetUserApiKey && !isSetUserToken && isSetPhone ||
-                !isSetUserApiKey && isSetUserToken && isSetPhone)
+            if (!isSetUserApiKey && !isSetUserAccessToken && !isSetPhone && !isSetUserRefreshToken ||
+                isSetUserApiKey && !isSetUserAccessToken && isSetPhone ||
+                !isSetUserApiKey && isSetUserAccessToken && isSetPhone)
                 return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
 
 
