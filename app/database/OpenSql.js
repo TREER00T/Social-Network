@@ -12,11 +12,13 @@ const {
         getData,
         removeSqlQuery,
         removeStarInArray,
+        generateValueWithComma,
         getCreateTableSqlQuery,
         getOptionKeywordSqlQuery,
         getStringOfColumnWithComma,
         removeStringOfDataForForSet,
         removeDataForInsertSqlQuery,
+        removeStringOfValueWithComma,
         generateDeleteSqlQueryWithData,
         generateUpdateSqlQueryWithData,
         generateDoubleQuestionMarkAndComma,
@@ -53,6 +55,20 @@ module.exports = {
         query(realSql, null);
 
         removeSqlQuery();
+
+        return this;
+    },
+
+
+    dropTable(data) {
+
+        generateValueWithComma(data);
+
+        realSql = USE_DATABASE + 'Drop Table IF EXISTS ' + util.stringOfValueWithComma;
+
+        query(realSql,{});
+
+        removeStringOfValueWithComma();
 
         return this;
     },

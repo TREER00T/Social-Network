@@ -7,7 +7,7 @@ let express = require('express'),
     Pipeline = require('app/routes/Pipeline'),
     Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
-    User = require("app/controller/user/auth/GvcInterface");
+    User = require("app/controller/user/auth/AuthInterface");
 
 
 module.exports = {

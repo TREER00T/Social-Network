@@ -1,6 +1,6 @@
 const express = require('express'),
     router = express.Router(),
-    User = require('app/controller/user/auth/GvcInterface');
+    User = require('app/controller/user/auth/AuthInterface');
 
 
 router.post('/generate/user', User.gvc);

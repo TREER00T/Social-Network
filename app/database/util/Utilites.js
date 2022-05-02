@@ -270,6 +270,7 @@ module.exports = {
     sqlQuery: '',
     stringOfDataForForSet: '',
     dataForInsertSqlQuery: [],
+    stringOfValueWithComma: '',
     arrayOfDataForUpdateOrDeleteQuery: '',
     stringOfDoubleQuestionMarkAndComma: '',
 
@@ -309,6 +310,42 @@ module.exports = {
             stringDataTypeField = `${type}(${getStringOfEnumTypesWithComma(data)}) `;
 
         return stringDataTypeField;
+    },
+
+
+    generateValueWithComma(data) {
+
+        if (typeof data === 'string')
+            return module.exports.stringOfValueWithComma = data;
+
+        let arrayOfString = [],
+            stringOfValueWithComma = '',
+            arrayOfJson = JSON.parse(JSON.stringify(data));
+
+        arrayOfJson.forEach((item) => {
+
+            for (let i in item)
+                arrayOfString.push(item[i]);
+
+        });
+
+
+        arrayOfString.forEach((item, index, array) => {
+
+            let isLastIndex = array.length === index+1;
+
+
+            if (!isLastIndex)
+                stringOfValueWithComma += `${item} ${COMMA} `;
+
+            if (isLastIndex)
+                stringOfValueWithComma += item;
+
+
+        });
+
+
+        return stringOfValueWithComma;
     },
 
 
@@ -494,6 +531,11 @@ module.exports = {
     },
 
 
+    removeStringOfValueWithComma() {
+        return module.exports.stringOfValueWithComma = '';
+    },
+
+
     removeSqlQuery() {
         return module.exports.sqlQuery = '';
     },
@@ -513,9 +555,11 @@ module.exports = {
         return module.exports.arrayOfDataForUpdateOrDeleteQuery = '';
     },
 
+
     getData() {
         return isStarOrQuestionMark;
     },
+
 
     removeStarInArray(jsonArray) {
         let index = jsonArray.data[0];
@@ -533,4 +577,6 @@ module.exports = {
             return arr;
         }
     }
+
+
 }
