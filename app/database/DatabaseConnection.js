@@ -1,5 +1,8 @@
 const mysql = require('mysql'),
-    dotenv = require('dotenv');
+    dotenv = require('dotenv'),
+    {
+        DataBaseException
+    } = require('app/exception/DataBaseException');
 
 let queryResult;
 
@@ -16,7 +19,7 @@ const con = mysql.createConnection({
 module.exports = {
 
 
-    query(sql, arrayObjects, throwErr) {
+    query(sql, arrayObjects) {
 
         try {
             con.query(sql, arrayObjects, (err, result) => {
@@ -28,7 +31,7 @@ module.exports = {
 
             });
         } catch (e) {
-            throw new Error(throwErr);
+            DataBaseException(e);
         }
 
 

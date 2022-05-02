@@ -1,0 +1,3 @@
+exports.ValidationException = (error) => {
+
+}

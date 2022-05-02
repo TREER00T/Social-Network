@@ -4,7 +4,12 @@ const Json = require('./ReturnJson'),
     {
         JWK,
         parse
-    } = require('node-jose');
+    } = require('node-jose'),
+    {
+        ValidationException
+    } = require('app/exception/ValidationException'), {
+        TokenExpiredError
+    } = require('jsonwebtoken');
 
 
 module.exports = {
@@ -12,13 +17,21 @@ module.exports = {
 
     // Checks phone number E.g : 09030207892 return true
     isPhoneNumber(data) {
-        return /^\d+$/.test(data);
+        try {
+            return /^\d+$/.test(data);
+        } catch (e) {
+            ValidationException(e);
+        }
     },
 
 
     // Checks the verification code E.g : 335486 return true
     isVerificationCode(code) {
-        return /^[0-9]{6}$/.test(code);
+        try {
+            return /^[0-9]{6}$/.test(code);
+        } catch (e) {
+            ValidationException(e);
+        }
     },
 
 
@@ -33,51 +46,53 @@ module.exports = {
             'DELETE'
         ];
 
-        if (!arrayOfHttpMethods.includes(requestMethod)) {
-            return Json.builder(
-                Response.HTTP_METHOD_NOT_ALLOWED
-            )
-        }
+        if (!arrayOfHttpMethods.includes(requestMethod))
+            return Json.builder(Response.HTTP_METHOD_NOT_ALLOWED);
+
 
     },
 
 
     // The verify jwt and check jwt expired time
     getJwtVerify(token, cb) {
-        jwt.verify(token, process.env.PUBLIC_KEY, {}, (err, decoded) => {
+        try {
+            jwt.verify(token, process.env.PUBLIC_KEY, {}, (err, decoded) => {
 
-            if (err) {
 
-                return Json.builder(
-                    Response.HTTP_UNAUTHORIZED_INVALID_TOKEN
-                )
-            }
+                if (err !== null && err instanceof TokenExpiredError)
+                    return Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
 
-            if (Date.now() >= decoded.exp * 1000) {
 
-                return Json.builder(
-                    Response.HTTP_UNAUTHORIZED_TOKEN_EXP
-                )
-            }
+                cb(decoded);
+            });
+        } catch (e) {
+            ValidationException(e);
+        }
 
-            cb(decoded);
-        });
     },
 
 
     // The jwt decrypt with JWK library and return jwt
     async getJwtDecrypt(encryptedBody) {
-        let keystore = JWK.createKeyStore();
-        await keystore.add(await JWK.asKey(process.env.JWE_PRAIVATE_KEY, 'pem'));
-        let outPut = parse.compact(encryptedBody);
-        let decryptedVal = await outPut.perform(keystore);
-        return Buffer.from(decryptedVal.plaintext).toString();
+        try {
+            let keystore = JWK.createKeyStore();
+            await keystore.add(await JWK.asKey(process.env.JWE_PRAIVATE_KEY, 'pem'));
+            let outPut = parse.compact(encryptedBody);
+            let decryptedVal = await outPut.perform(keystore);
+            return Buffer.from(decryptedVal.plaintext).toString();
+        } catch (e) {
+            ValidationException(e);
+        }
     },
 
 
     // Returns split jwt without bearer
     getSplitBearerJwt(bearerHeader) {
-        return bearerHeader.split(' ')[1];
+        try {
+            return bearerHeader.split(' ')[1];
+        } catch (e) {
+            ValidationException(e);
+        }
     }
 
 

@@ -1,7 +1,11 @@
 let openSql = require('app/database/OpenSql'),
     {
+        AND,
         EQUAL_TO
-    } = require('app/database/util/SqlKeyword');
+    } = require('app/database/util/SqlKeyword'),
+    {
+        DataBaseException
+    } = require('app/exception/DataBaseException');
 
 
 module.exports = {
@@ -14,7 +18,11 @@ module.exports = {
             data: ['phone', 'users', 'phone', `${phone}`],
             where: true
         }).result((result) => {
-            (result[1].length !== 0) ? cb(true) : cb(false)
+            try {
+                (result[1].length !== 0) ? cb(true) : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
         })
     },
 
@@ -29,7 +37,11 @@ module.exports = {
             ],
             where: true
         }).result((result) => {
-            (result.length > 0) ? cb(true) : cb(false);
+            try {
+                (result.length > 0) ? cb(true) : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
         });
     },
 
@@ -43,8 +55,52 @@ module.exports = {
             ],
             where: true
         }).result((result) => {
-            (result[1][0].password === null) ? cb(true) : cb(false);
+            try {
+                (result[1][0].password !== null) ? cb(true) : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    isValidPassword(phone, password, cb) {
+        openSql.find({
+            optionKeyword: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'phone', 'users', 'phone', `${phone}`, 'password', `${password}`
+            ],
+            where: true
+        }).result((result) => {
+            try {
+                 (typeof result[1][0] !== 'undefined') ? cb(true) : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    getApiKey(phone,cb){
+        openSql.find({
+            optionKeyword: [
+                EQUAL_TO,
+            ],
+            data: [
+                'apiKey', 'users', 'phone', `${phone}`
+            ],
+            where: true
+        }).result((result) => {
+            try {
+                cb(result[1][0].apiKey);
+            } catch (e) {
+                DataBaseException(e);
+            }
         });
     }
+
 
 }

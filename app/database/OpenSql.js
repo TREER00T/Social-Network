@@ -3,7 +3,6 @@ const {
         sqlQueryResult
     } = require('app/database/DatabaseConnection'),
     {
-        STAR,
         WHERE,
         QUESTION_MARK,
         IF_NOT_EXISTS,
@@ -11,7 +10,6 @@ const {
     } = require('./util/SqlKeyword'),
     {
         getData,
-        getError,
         removeSqlQuery,
         removeStarInArray,
         getCreateTableSqlQuery,
@@ -39,7 +37,7 @@ module.exports = {
     createDatabase() {
         query(`CREATE DATABASE IF NOT EXISTS ${DAtABASE_NAME}`
             + ` CHARACTER SET utf8 COLLATE utf8_unicode_ci`,
-            null, getError('Connection time out'));
+            null);
         return this;
     },
 
@@ -52,7 +50,7 @@ module.exports = {
             ` CREATE TABLE ${IF_NOT_EXISTS} ${jsonArray.table} ` +
             `(${util.sqlQuery})`;
 
-        query(realSql, {}, getError('Failed to create table'));
+        query(realSql, null);
 
         removeSqlQuery();
 
@@ -68,7 +66,7 @@ module.exports = {
             `(` + '`' + jsonObject.field + '`' + `) ON DELETE ` +
             `${jsonObject.onDelete} ON UPDATE ${jsonObject.onUpdate}`;
 
-        query(realSql, {}, getError('Can not add foreign key'));
+        query(realSql, null);
 
         return this;
     },
@@ -78,9 +76,10 @@ module.exports = {
 
         generateDeleteSqlQueryWithData(jsonObject);
 
-        realSql = USE_DATABASE + 'DELETE FROM ?? WHERE ?? ' + util.sqlQuery;
+        realSql = USE_DATABASE + 'DELETE FROM ' + DOUBLE_QUESTION_MARK + ' WHERE ' +
+            DOUBLE_QUESTION_MARK + util.sqlQuery;
 
-        query(realSql, util.arrayOfDataForUpdateOrDeleteQuery, getError(jsonObject.throwErr));
+        query(realSql, util.arrayOfDataForUpdateOrDeleteQuery);
 
         removeSqlQuery();
         removeStringOfDataForForSet();
@@ -94,9 +93,10 @@ module.exports = {
 
         generateUpdateSqlQueryWithData(jsonObject);
 
-        realSql = USE_DATABASE + ' UPDATE ?? ' + `SET ${util.stringOfDataForForSet} ${WHERE} ?? ` + util.sqlQuery;
+        realSql = USE_DATABASE + ' UPDATE ' + DOUBLE_QUESTION_MARK +
+            `SET ${util.stringOfDataForForSet} ${WHERE} ${DOUBLE_QUESTION_MARK} ` + util.sqlQuery;
 
-        query(realSql, util.arrayOfDataForUpdateOrDeleteQuery, getError(jsonObject.throwErr));
+        query(realSql, util.arrayOfDataForUpdateOrDeleteQuery);
 
         removeSqlQuery();
         removeStringOfDataForForSet();
@@ -111,7 +111,7 @@ module.exports = {
         realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table + ' (' +
             generateDoubleQuestionMarkAndComma(jsonArray.data) + ') VALUES ' + QUESTION_MARK;
 
-        query(realSql, util.dataForInsertSqlQuery, getError(jsonArray.throwErr));
+        query(realSql, util.dataForInsertSqlQuery);
 
         removeDataForInsertSqlQuery();
 
@@ -123,7 +123,7 @@ module.exports = {
 
         realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table + ' SET ' + QUESTION_MARK;
 
-        query(realSql, jsonArray.data, getError('Failed to insert rows'));
+        query(realSql, jsonArray.data);
 
         return this;
 
@@ -139,7 +139,7 @@ module.exports = {
 
         realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table + ` (${getStringOfColumnWithComma(jsonArray.data[0])}) ` + selectSqlQuery;
 
-        query(realSql, jsonArray.data, getError(jsonArray.throwErr));
+        query(realSql, jsonArray.data);
 
         removeSqlQuery();
 
@@ -151,7 +151,7 @@ module.exports = {
 
         realSql = USE_DATABASE + ` ${sqlQuery}`;
 
-        query(realSql, {}, getError('Failed to exist custom query'));
+        query(realSql, null);
 
         return this;
     },
@@ -166,7 +166,7 @@ module.exports = {
         realSql = USE_DATABASE + ' SELECT ' + getData() +
             ' FROM ' + DOUBLE_QUESTION_MARK + ' ' + util.sqlQuery;
 
-        query(realSql, jsonArray.data, getError(jsonArray.throwErr));
+        query(realSql, jsonArray.data);
 
         removeSqlQuery();
 

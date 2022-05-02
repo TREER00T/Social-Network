@@ -3,7 +3,8 @@ const express = require('express'),
     User = require('app/controller/user/auth/GvcInterface');
 
 
-router.post('/gvc', User.gvc);
+router.post('/generate/user', User.gvc);
+router.post('/refresh/token', User.refreshToken);
 router.post('/verify/authCode', User.isValidAuthCode);
 router.post('/verify/twoStep', User.isValidPassWord);
 

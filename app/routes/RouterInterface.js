@@ -29,7 +29,11 @@ module.exports = {
             let isSetUserApiKey = Pipeline.isSetUserApiKey(req.body.apiKey);
             let isSetPhone = (req.body.phone !== undefined) ? true : false;
 
-            if (!isSetUserApiKey && !isSetUserToken && !isSetPhone)
+
+
+            if (!isSetUserApiKey && !isSetUserToken && !isSetPhone ||
+                isSetUserApiKey && !isSetUserToken && isSetPhone ||
+                !isSetUserApiKey && isSetUserToken && isSetPhone)
                 return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
 
 

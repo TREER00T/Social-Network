@@ -5,10 +5,13 @@ const Json = require('app/util/ReturnJson'),
     Find = require('app/model/find/user/users'),
     {
         isPhoneNumber,
+        isValidDataHash,
         isVerificationCode
     } = require('app/util/Validation'),
     {
+        getApiKey,
         getJwtSign,
+        getHashData,
         getJwtRefresh,
         getJwtEncrypt,
         getVerificationCode
@@ -16,6 +19,9 @@ const Json = require('app/util/ReturnJson'),
     {
         getTokenPayLoad
     } = require('app/routes/Pipeline');
+const {HTTP_ACCEPTED} = require("app/util/Response");
+const Pipeline = require("app/routes/Pipeline");
+const {date} = require("app/database/util/SqlKeyword");
 
 
 exports.gvc = (req, res) => {
@@ -68,8 +74,95 @@ exports.isValidAuthCode = (req, res) => {
 
         Find.password(phone, (result) => {
 
+
+            if (result) {
+
+                (async () => {
+                    Json.builder(
+                        Response.HTTP_ACCEPTED,
+                        {
+                            'accessToken': await getJwtEncrypt(getJwtSign({
+                                'phoneNumber': `${phone}`,
+                                type: 'at'
+                            }, phone)),
+                            'refreshToken': await getJwtEncrypt(getJwtRefresh({
+                                'phoneNumber': `${phone}`,
+                                type: 'rt'
+                            }, phone))
+                        }
+                    )
+                })();
+
+                return;
+            }
+
+            Update.apikey(phone, getHashData(getApiKey(), phone), result => {
+
+                if (result)
+                    Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
+
+            });
+
+
+        });
+
+    });
+
+
+}
+
+
+exports.isValidPassWord = (req, res) => {
+
+    Json.initializationRes(res);
+
+    getTokenPayLoad((data) => {
+
+        let phone = data.phoneNumber;
+        let password = req.body.password;
+
+
+        Find.isValidPassword(phone, getHashData(password, phone), (result) => {
+
+
             if (!result)
-                return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
+                return Json.builder(Response.HTTP_FORBIDDEN);
+
+
+            Find.getApiKey(phone, (result) => {
+
+                return Json.builder(HTTP_ACCEPTED, {
+                    'apiKey': result
+                });
+
+            });
+
+
+        });
+
+    });
+
+}
+
+
+exports.refreshToken = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+
+    getTokenPayLoad((data) => {
+
+        let phone = data.phoneNumber;
+
+        if (data.type !== 'rt')
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+
+        Find.userPhone(phone, (isInDb) => {
+
+            if (!isInDb)
+                return Json.builder(Response.HTTP_FORBIDDEN);
 
 
             (async () => {
@@ -88,21 +181,9 @@ exports.isValidAuthCode = (req, res) => {
                 )
             })();
 
-
         });
 
     });
 
-
-}
-
-
-exports.isValidPassWord = (req, res) => {
-
-    Json.initializationRes(res);
-
-    getTokenPayLoad((data) => {
-        console.log(data);
-    });
 
 }

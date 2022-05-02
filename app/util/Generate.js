@@ -65,10 +65,9 @@ module.exports = {
     },
 
 
-    getPassWordHash(password){
-        let salt = crypto.randomBytes(16).toString('hex');
+    getHashData(data,salt){
 
-       let hash = crypto.pbkdf2Sync(password, salt,
+       let hash = crypto.pbkdf2Sync(data, salt,
             1000, 64, `sha512`).toString(`hex`);
 
        return hash.trim();
