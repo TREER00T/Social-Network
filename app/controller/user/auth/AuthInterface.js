@@ -3,6 +3,7 @@ const Json = require('app/util/ReturnJson'),
     Update = require('app/model/update/user/users'),
     Insert = require('app/model/add/insert/user/users'),
     Find = require('app/model/find/user/users'),
+    CreateUser = require('app/model/create/users'),
     {
         isPhoneNumber,
         isVerificationCode
@@ -33,10 +34,14 @@ exports.gvc = (req, res) => {
     Find.userPhone(phone, (isInDb) => {
 
         if (!isInDb) {
+
+            CreateUser.savedMessages(phone);
+
             Insert.phoneAndAuthCode(phone, getVerificationCode(), (isAdded) => {
                 if (isAdded)
                     return Json.builder(Response.HTTP_CREATED);
             });
+
         }
 
         if (isInDb) {
@@ -128,7 +133,7 @@ exports.isValidPassWord = (req, res) => {
 
             Find.getApiKey(phone, (result) => {
 
-                return Json.builder(HTTP_ACCEPTED, {
+                return Json.builder(Response.HTTP_ACCEPTED, {
                     'apiKey': result
                 });
 

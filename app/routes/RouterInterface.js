@@ -6,8 +6,7 @@ let express = require('express'),
     Validation = require('app/util/Validation'),
     Pipeline = require('app/routes/Pipeline'),
     Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
-    User = require("app/controller/user/auth/AuthInterface");
+    Response = require('app/util/Response');
 
 
 module.exports = {
@@ -28,7 +27,7 @@ module.exports = {
             let isSetUserAccessToken = Pipeline.isSetUserAccessToken(req.headers['authorization']);
             let isSetUserRefreshToken = Pipeline.isSetUserRefreshToken(req.headers['authorization']);
             let isSetUserApiKey = Pipeline.isSetUserApiKey(req.body.apiKey);
-            let isSetPhone = (req.body.phone !== undefined) ? true : false;
+            let isSetPhone = (req.body.phone !== undefined);
 
 
 
