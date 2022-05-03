@@ -43,7 +43,7 @@ module.exports = {
 
         app.use('/auth', require('app/routes/AuthRoutes'));
 
-        app.listen(process.env.PORT, () => {
+        app.listen(process.env.EXPRESS_PORT, () => {
             console.log('Server are running...');
         });
 
