@@ -7,8 +7,7 @@ const Json = require('./ReturnJson'),
     } = require('node-jose'),
     {
         ValidationException
-    } = require('app/exception/ValidationException'),
-    {
+    } = require('app/exception/ValidationException'), {
         TokenExpiredError
     } = require('jsonwebtoken');
 
@@ -49,6 +48,7 @@ module.exports = {
 
         if (!arrayOfHttpMethods.includes(requestMethod))
             return Json.builder(Response.HTTP_METHOD_NOT_ALLOWED);
+
 
     },
 
