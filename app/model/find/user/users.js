@@ -29,6 +29,8 @@ module.exports = {
     isValidAuthCode(phone, authCode, cb) {
         openSql.find({
             optionKeyword: [
+                EQUAL_TO,
+                AND,
                 EQUAL_TO
             ],
             data: [
@@ -38,7 +40,7 @@ module.exports = {
             where: true
         }).result((result) => {
             try {
-                (result.length > 0) ? cb(true) : cb(false);
+                (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -71,12 +73,13 @@ module.exports = {
                 EQUAL_TO
             ],
             data: [
-                'phone', 'users', 'phone', `${phone}`, 'password', `${password}`
+                'password', 'users', 'phone',
+                `${phone}`, 'password', `${password}`
             ],
             where: true
         }).result((result) => {
             try {
-                 (typeof result[1][0] !== 'undefined') ? cb(true) : cb(false);
+                (typeof result[1][0] !== 'undefined') ? cb(true) : cb(false);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -84,10 +87,10 @@ module.exports = {
     },
 
 
-    getApiKey(phone,cb){
+    getApiKey(phone, cb) {
         openSql.find({
             optionKeyword: [
-                EQUAL_TO,
+                EQUAL_TO
             ],
             data: [
                 'apiKey', 'users', 'phone', `${phone}`

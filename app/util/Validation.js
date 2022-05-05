@@ -58,10 +58,10 @@ module.exports = {
         try {
             jwt.verify(token, process.env.PUBLIC_KEY, {}, (err, decoded) => {
 
-
-                if (err !== null && err instanceof TokenExpiredError)
+                if (err !== null && err instanceof TokenExpiredError) {
+                    cb('TOKEN_EXP');
                     return Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
-
+                }
 
                 cb(decoded);
             });
@@ -79,7 +79,12 @@ module.exports = {
             await keystore.add(await JWK.asKey(process.env.JWE_PRAIVATE_KEY, 'pem'));
             let outPut = parse.compact(encryptedBody);
             let decryptedVal = await outPut.perform(keystore);
-            return Buffer.from(decryptedVal.plaintext).toString();
+            let token = Buffer.from(decryptedVal.plaintext).toString();
+
+            if (typeof decryptedVal.plaintext === ('undefined' || null))
+                return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
+
+            return token;
         } catch (e) {
             ValidationException(e);
         }
@@ -89,7 +94,11 @@ module.exports = {
     // Returns split jwt without bearer
     getSplitBearerJwt(bearerHeader) {
         try {
-            return bearerHeader.split(' ')[1];
+            let token = bearerHeader.split(' ')[1];
+            if ((token !== null || typeof token !== 'undefined')
+                && typeof bearerHeader !== 'undefined')
+                return token;
+            return false;
         } catch (e) {
             ValidationException(e);
         }

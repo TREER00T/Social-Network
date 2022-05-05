@@ -19,7 +19,7 @@ const Json = require('app/util/ReturnJson'),
     {
         getAccessTokenPayLoad,
         getRefreshTokenPayLoad
-    } = require('app/routes/Pipeline');
+    } = require('app/middleware/ApiPipeline');
 
 
 exports.gvc = (req, res) => {
@@ -77,7 +77,7 @@ exports.isValidAuthCode = (req, res) => {
         Find.password(phone, (result) => {
 
 
-            if (result) {
+            if (!result) {
 
                 (async () => {
                     Json.builder(

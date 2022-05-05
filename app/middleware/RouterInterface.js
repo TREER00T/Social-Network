@@ -4,7 +4,7 @@ let express = require('express'),
     bodyParser = require('body-parser'),
     dotenv = require('dotenv'),
     Validation = require('app/util/Validation'),
-    Pipeline = require('app/routes/Pipeline'),
+    Pipeline = require('app/middleware/ApiPipeline'),
     Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response');
 
@@ -24,15 +24,20 @@ module.exports = {
             Validation.isValidHttpMethod(req.method);
 
 
-            let isSetUserAccessToken = Pipeline.isSetUserAccessToken(req.headers['authorization']);
-            let isSetUserRefreshToken = Pipeline.isSetUserRefreshToken(req.headers['authorization']);
-            let isSetUserApiKey = Pipeline.isSetUserApiKey(req.body.apiKey);
+            let accessToken = req.headers['authorization-at'];
+            let refreshToken = req.headers['authorization-rt'];
+            let apiKey = req.body.apiKey;
+
+
+            let isSetUserAccessToken = Pipeline.accessTokenVerify(accessToken);
+            let isSetUserRefreshToken = Pipeline.refreshTokenVerify(refreshToken);
+            let isSetUserApiKey = Pipeline.isSetUserApiKey(apiKey);
             let isSetPhone = (req.body.phone !== undefined);
 
 
             if (!isSetUserApiKey && !isSetUserAccessToken && !isSetPhone && !isSetUserRefreshToken ||
-                isSetUserApiKey && !isSetUserAccessToken && (isSetPhone || !isSetPhone) && !isSetUserRefreshToken ||
-                !isSetUserApiKey && isSetUserAccessToken && (isSetPhone || !isSetPhone) && isSetUserRefreshToken)
+                isSetUserApiKey && !isSetUserAccessToken && !isSetPhone ||
+                !isSetUserApiKey && isSetUserAccessToken && !isSetPhone)
                 return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
 
 

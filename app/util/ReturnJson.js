@@ -4,8 +4,12 @@ let res;
 module.exports = {
 
     builder(obj, arr = null) {
-        let jsonContent = JSON.stringify(module.exports.jsonObject(obj, arr));
-        res.end(jsonContent);
+        if (typeof res !== 'undefined') {
+            let jsonContent = JSON.stringify(module.exports.jsonObject(obj, arr));
+            res.end(jsonContent);
+            return true;
+        }
+        return module.exports.jsonObject(obj, arr);
     },
 
     initializationRes(response) {
