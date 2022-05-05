@@ -76,32 +76,28 @@ exports.isValidAuthCode = (req, res) => {
 
         Find.password(phone, (result) => {
 
-            if (!result) {
+            if (result) {
 
                 return Find.getApiKey(phone, (result) => {
 
-                    if (result !== undefined || result !== null) {
+                    (async () => {
 
-                        (async () => {
+                        Json.builder(
+                            Response.HTTP_ACCEPTED,
+                            {
+                                'accessToken': await getJwtEncrypt(getJwtSign({
+                                    'phoneNumber': `${phone}`,
+                                    type: 'at'
+                                }, phone)),
+                                'refreshToken': await getJwtEncrypt(getJwtRefresh({
+                                    'phoneNumber': `${phone}`,
+                                    type: 'rt'
+                                }, phone)),
+                                'apiKey': result
+                            }
+                        )
 
-                            Json.builder(
-                                Response.HTTP_ACCEPTED,
-                                {
-                                    'accessToken': await getJwtEncrypt(getJwtSign({
-                                        'phoneNumber': `${phone}`,
-                                        type: 'at'
-                                    }, phone)),
-                                    'refreshToken': await getJwtEncrypt(getJwtRefresh({
-                                        'phoneNumber': `${phone}`,
-                                        type: 'rt'
-                                    }, phone)),
-                                    'apiKey': result
-                                }
-                            )
-
-                        })();
-
-                    }
+                    })();
 
                 });
 
@@ -111,13 +107,16 @@ exports.isValidAuthCode = (req, res) => {
 
                 if (result === undefined || result === null) {
 
-                    Update.apikey(phone, getApiKey(), result => {
+                    return Update.apikey(phone, getApiKey(), result => {
 
                         if (result)
                             Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
 
                     });
+
                 }
+
+                Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
 
             });
 

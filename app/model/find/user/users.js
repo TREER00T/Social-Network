@@ -1,7 +1,8 @@
 let openSql = require('app/database/OpenSql'),
     {
         AND,
-        EQUAL_TO
+        EQUAL_TO,
+        IS_NOT_NULL
     } = require('app/database/util/SqlKeyword'),
     {
         DataBaseException
@@ -50,15 +51,18 @@ module.exports = {
     password(phone, cb) {
         openSql.find({
             optionKeyword: [
-                EQUAL_TO
+                EQUAL_TO,
+                AND,
+                IS_NOT_NULL
             ],
             data: [
-                'password', 'users', 'phone', `${phone}`
+                'password', 'users', 'phone', `${phone}`,
+                'password'
             ],
             where: true
         }).result((result) => {
             try {
-                (result[1][0].password !== null) ? cb(true) : cb(false);
+                (result[1][0].password !== null || '' ) ? cb(true) : cb(false);
             } catch (e) {
                 DataBaseException(e);
             }

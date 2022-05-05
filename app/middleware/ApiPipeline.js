@@ -2,9 +2,7 @@ let {
         getJwtVerify,
         getJwtDecrypt,
         getSplitBearerJwt
-    } = require('app/util/Validation'),
-    Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response');
+    } = require('app/util/Validation');
 
 let refreshTokenPayload, accessTokenPayload, apiKey;
 
@@ -46,10 +44,7 @@ module.exports = {
                                 cb(decode)
                         })(refreshTokenPayload);
 
-                        return;
                     }
-
-                    Json.builder(Response.HTTP_BAD_REQUEST);
 
                 });
 
@@ -84,10 +79,8 @@ module.exports = {
                                 cb(decode)
                         })(accessTokenPayload);
 
-                        return;
                     }
 
-                    Json.builder(Response.HTTP_BAD_REQUEST);
                 });
 
             })();

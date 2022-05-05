@@ -15,6 +15,7 @@ const {
     EQUAL_TO,
     NOT_NULL,
     LESS_THAN,
+    IS_NOT_NULL,
     GREATER_THAN,
     NOT_EQUAL_TO,
     QUESTION_MARK,
@@ -453,6 +454,14 @@ module.exports = {
 
             if (!isLimit && item === LIMIT)
                 newArrayOfKeywordsWithSqlContext.push(` ${item} ${QUESTION_MARK} ${isNextItemOffset} `);
+
+
+            if (item === IS_NOT_NULL && !isFirstIndex)
+                newArrayOfKeywordsWithSqlContext.push(` ${DOUBLE_QUESTION_MARK} ${item} `);
+
+
+            if (item === IS_NOT_NULL && isFirstIndex)
+                newArrayOfKeywordsWithSqlContext.push(` ${item} `);
 
 
         });
