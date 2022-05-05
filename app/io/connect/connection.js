@@ -22,15 +22,15 @@ io.use((socket, next) => {
     let apiKey = socket.handshake.query.apiKey;
 
 
-    Pipeline.accessTokenVerify(accessToken, (result) => {
+    Pipeline.accessTokenVerify(accessToken, result => {
 
         if (typeof result !== 'object' || result !== 'IN_VALID_TOKEN')
 
-            Pipeline.getAccessTokenPayLoad((data) => {
+            Pipeline.getAccessTokenPayLoad(data => {
 
                 let phone = data.phoneNumber;
 
-                Pipeline.userApiKey(phone, apiKey, (result) => {
+                Pipeline.userApiKey(phone, apiKey, result => {
 
                     if (result) {
                         let userId = `${socket.id}`;
@@ -45,7 +45,7 @@ io.use((socket, next) => {
 
     });
 
-}).on('connection', (socket) => {
+}).on('connection', socket => {
 
     socket.on('disconnect', () => {
 

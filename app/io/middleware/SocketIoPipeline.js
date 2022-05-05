@@ -18,7 +18,7 @@ module.exports = {
         if (key === undefined || key === null)
             return cb(false);
 
-        getApiKey(phone, (result) => {
+        getApiKey(phone, result => {
 
             if (result !== key) {
                 return cb(false);
@@ -52,7 +52,7 @@ module.exports = {
             if (tokenWithDoubleQuestion !== undefined)
                 token = tokenWithDoubleQuestion.replace(/["]+/g, '');
 
-            getJwtVerify(token, (decode) => {
+            getJwtVerify(token, decode => {
 
                 if (decode === 'TOKEN_EXP') {
                     return cb(Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP));
@@ -80,14 +80,14 @@ module.exports = {
 
 
     getAccessTokenPayLoad(cb) {
-        accessTokenPayload = ((data) => {
+        accessTokenPayload = (data => {
             cb(data);
         });
     },
 
 
     getApiKey(cb) {
-        apiKey = ((data) => {
+        apiKey = (data => {
             cb(data);
         });
     }

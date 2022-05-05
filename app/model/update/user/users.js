@@ -15,7 +15,7 @@ module.exports = {
             where: {
                 phone: `${phone}`
             }
-        }).result((result) => {
+        }).result(result => {
             try {
                 (result[1].changedRows !== 0) ? cb(true) : cb(false);
             } catch (e) {
@@ -34,7 +34,7 @@ module.exports = {
             where: {
                 phone: `${phone}`
             }
-        }).result((result) => {
+        }).result(result => {
             try {
                 (result[1].changedRows !== 0) ? cb(true) : cb(false);
             } catch (e) {

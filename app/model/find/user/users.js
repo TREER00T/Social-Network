@@ -17,7 +17,7 @@ module.exports = {
             ],
             data: ['phone', 'users', 'phone', `${phone}`],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {
@@ -38,7 +38,7 @@ module.exports = {
                 `${phone}`, 'authCode', `${authCode}`
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {
@@ -56,7 +56,7 @@ module.exports = {
                 'password', 'users', 'phone', `${phone}`
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 (result[1][0].password !== null) ? cb(true) : cb(false);
             } catch (e) {
@@ -77,7 +77,7 @@ module.exports = {
                 `${phone}`, 'password', `${password}`
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 (typeof result[1][0] !== 'undefined') ? cb(true) : cb(false);
             } catch (e) {
@@ -96,7 +96,7 @@ module.exports = {
                 'apiKey', 'users', 'phone', `${phone}`
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 cb(result[1][0].apiKey);
             } catch (e) {

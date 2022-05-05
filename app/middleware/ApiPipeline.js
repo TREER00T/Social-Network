@@ -37,7 +37,7 @@ module.exports = {
                 if (tokenWithDoubleQuestion !== undefined)
                     token = tokenWithDoubleQuestion.replace(/["]+/g, '');
 
-                getJwtVerify(token, (decode) => {
+                getJwtVerify(token, decode => {
 
                     if (decode.type === 'rt') {
 
@@ -75,7 +75,7 @@ module.exports = {
                 if (tokenWithDoubleQuestion !== undefined)
                     token = tokenWithDoubleQuestion.replace(/["]+/g, '');
 
-                getJwtVerify(token, (decode) => {
+                getJwtVerify(token, decode => {
 
                     if (decode.type === 'at') {
 
@@ -99,21 +99,21 @@ module.exports = {
     },
 
     getRefreshTokenPayLoad(cb) {
-        refreshTokenPayload = ((data) => {
+        refreshTokenPayload = (data => {
             cb(data);
         });
     },
 
 
     getAccessTokenPayLoad(cb) {
-        accessTokenPayload = ((data) => {
+        accessTokenPayload = (data => {
             cb(data);
         });
     },
 
 
     getApiKey(cb) {
-        apiKey = ((data) => {
+        apiKey = (data => {
             cb(data);
         });
     }

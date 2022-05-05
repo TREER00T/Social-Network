@@ -191,7 +191,7 @@ module.exports = {
 
 
     result(callBackResult) {
-        sqlQueryResult((result) => {
+        sqlQueryResult(result => {
             callBackResult(result);
         });
     }
