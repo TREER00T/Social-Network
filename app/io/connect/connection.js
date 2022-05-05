@@ -14,6 +14,7 @@ http.listen(port, () => {
     console.log('Socket.io running...');
 });
 
+let allUsers = {};
 
 io.use((socket, next) => {
 
@@ -31,8 +32,12 @@ io.use((socket, next) => {
 
                 Pipeline.userApiKey(phone, apiKey, (result) => {
 
-                    if (result)
+                    if (result) {
+                        let userId = `${socket.id}`;
+                        allUsers[userId] = phone;
+                        socket.nickname = data;
                         next();
+                    }
 
                 });
 
@@ -40,9 +45,19 @@ io.use((socket, next) => {
 
     });
 
+}).on('connection', (socket) => {
+
+    socket.on('disconnect', () => {
+
+        let userId = socket.id;
+        delete allUsers[userId];
+
+    });
+
 });
 
 
 module.exports = {
-    io
+    io,
+    allUsers
 };

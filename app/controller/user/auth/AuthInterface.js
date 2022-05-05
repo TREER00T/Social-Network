@@ -76,32 +76,48 @@ exports.isValidAuthCode = (req, res) => {
 
         Find.password(phone, (result) => {
 
-
             if (!result) {
 
-                (async () => {
-                    Json.builder(
-                        Response.HTTP_ACCEPTED,
-                        {
-                            'accessToken': await getJwtEncrypt(getJwtSign({
-                                'phoneNumber': `${phone}`,
-                                type: 'at'
-                            }, phone)),
-                            'refreshToken': await getJwtEncrypt(getJwtRefresh({
-                                'phoneNumber': `${phone}`,
-                                type: 'rt'
-                            }, phone))
-                        }
-                    )
-                })();
+                return Find.getApiKey(phone, (result) => {
 
-                return;
+                    if (result !== undefined || result !== null) {
+
+                        (async () => {
+
+                            Json.builder(
+                                Response.HTTP_ACCEPTED,
+                                {
+                                    'accessToken': await getJwtEncrypt(getJwtSign({
+                                        'phoneNumber': `${phone}`,
+                                        type: 'at'
+                                    }, phone)),
+                                    'refreshToken': await getJwtEncrypt(getJwtRefresh({
+                                        'phoneNumber': `${phone}`,
+                                        type: 'rt'
+                                    }, phone)),
+                                    'apiKey': result
+                                }
+                            )
+
+                        })();
+
+                    }
+
+                });
+
             }
 
-            Update.apikey(phone, getHashData(getApiKey(), phone), result => {
+            Find.getApiKey(phone, (result) => {
 
-                if (result)
-                    Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
+                if (result === undefined || result === null) {
+
+                    Update.apikey(phone, getApiKey(), result => {
+
+                        if (result)
+                            Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
+
+                    });
+                }
 
             });
 
@@ -114,7 +130,7 @@ exports.isValidAuthCode = (req, res) => {
 }
 
 
-exports.isValidPassWord = (req, res) => {
+exports.isValidPassword = (req, res) => {
 
     Json.initializationRes(res);
 
@@ -165,6 +181,7 @@ exports.refreshToken = (req, res) => {
 
 
             (async () => {
+
                 Json.builder(
                     Response.HTTP_ACCEPTED,
                     {
@@ -178,6 +195,7 @@ exports.refreshToken = (req, res) => {
                         }, phone))
                     }
                 )
+
             })();
 
         });
