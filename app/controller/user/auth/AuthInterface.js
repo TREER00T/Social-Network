@@ -78,26 +78,32 @@ exports.isValidAuthCode = (req, res) => {
 
             if (result) {
 
-                return Find.getApiKey(phone, (result) => {
+              return Find.getUserId(phone, id => {
 
-                    (async () => {
+                     Find.getApiKey(phone, (result) => {
 
-                        Json.builder(
-                            Response.HTTP_ACCEPTED,
-                            {
-                                'accessToken': await getJwtEncrypt(getJwtSign({
-                                    'phoneNumber': `${phone}`,
-                                    type: 'at'
-                                }, phone)),
-                                'refreshToken': await getJwtEncrypt(getJwtRefresh({
-                                    'phoneNumber': `${phone}`,
-                                    type: 'rt'
-                                }, phone)),
-                                'apiKey': result
-                            }
-                        )
+                        (async () => {
 
-                    })();
+                            Json.builder(
+                                Response.HTTP_ACCEPTED,
+                                {
+                                    'accessToken': await getJwtEncrypt(getJwtSign({
+                                        'phoneNumber': `${phone}`,
+                                        'id': `${id}`,
+                                        type: 'at'
+                                    }, phone)),
+                                    'refreshToken': await getJwtEncrypt(getJwtRefresh({
+                                        'phoneNumber': `${phone}`,
+                                        'id': `${id}`,
+                                        type: 'rt'
+                                    }, phone)),
+                                    'apiKey': result
+                                }
+                            )
+
+                        })();
+
+                    });
 
                 });
 
@@ -139,7 +145,7 @@ exports.isValidPassword = (req, res) => {
         let password = req.body.password;
 
 
-        Find.isValidPassword(phone, getHashData(password, phone), (result) => {
+        Find.isValidPassword(phone, getHashData(password.trim(), phone), (result) => {
 
 
             if (!result)
@@ -171,6 +177,7 @@ exports.refreshToken = (req, res) => {
     getRefreshTokenPayLoad((data) => {
 
         let phone = data.phoneNumber;
+        let id = data.id;
 
 
         Find.userPhone(phone, (isInDb) => {
@@ -186,10 +193,12 @@ exports.refreshToken = (req, res) => {
                     {
                         'accessToken': await getJwtEncrypt(getJwtSign({
                             'phoneNumber': `${phone}`,
+                            'id': `${id}`,
                             type: 'at'
                         }, phone)),
                         'refreshToken': await getJwtEncrypt(getJwtRefresh({
                             'phoneNumber': `${phone}`,
+                            'id': `${id}`,
                             type: 'rt'
                         }, phone))
                     }

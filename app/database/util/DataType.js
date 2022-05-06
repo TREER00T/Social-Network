@@ -1,12 +1,12 @@
 const {
         int,
-        bit,
         char,
         date,
         Enum,
         time,
         varchar,
-        datetime
+        datetime,
+        BOOLEAN
     } = require('./SqlKeyword'),
     {
         addDataTypeForFieldInFirstItemOfArray
@@ -35,16 +35,16 @@ module.exports = {
         return addDataTypeForFieldInFirstItemOfArray(time, data);
     },
 
-    BIT(data) {
-        return addDataTypeForFieldInFirstItemOfArray(bit, data);
-    },
-
     DATETIME(data) {
         return addDataTypeForFieldInFirstItemOfArray(datetime, data);
     },
 
     ENUM(data) {
         return addDataTypeForFieldInFirstItemOfArray(Enum, data);
+    },
+
+    BOOLEAN(data) {
+        return addDataTypeForFieldInFirstItemOfArray(BOOLEAN, data);
     }
 
 }

@@ -1,9 +1,10 @@
 let openSql = require('app/database/OpenSql'),
     {
         INT,
-        BIT,
+        ENUM,
+        BOOLEAN,
         VARCHAR,
-        DATETIME, ENUM
+        DATETIME
     } = require('app/database/util/DataType'),
     {
         NOT_NULL,
@@ -24,13 +25,13 @@ module.exports = {
                 email: VARCHAR(255),
                 phone: VARCHAR(20),
                 apiKey: VARCHAR(255),
-                isActive: BIT(),
+                isActive: BOOLEAN(),
                 authCode: INT(6),
                 username: VARCHAR(32),
                 password: VARCHAR(255),
                 lastName: VARCHAR(20),
                 firstName: VARCHAR(20),
-                isBlocked: BIT()
+                isBlocked: BOOLEAN()
             },
             primaryKey: 'id'
         })
@@ -93,11 +94,11 @@ module.exports = {
                 text: VARCHAR(4096),
                 date: DATETIME(),
                 type: ENUM(['Image', 'Location', 'Document', 'Video', 'Voice']),
-                isReply: BIT(),
+                isReply: BOOLEAN(),
                 fileUrl: VARCHAR(130),
                 fileName: VARCHAR(15),
                 fileSize: VARCHAR(10),
-                isForward: BIT(),
+                isForward: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()
             },
@@ -150,12 +151,12 @@ module.exports = {
                 date: DATETIME(),
                 text: VARCHAR(4096),
                 type: ENUM(['Image', 'Location', 'Document', 'Video', 'Voice']),
-                isReply: BIT(),
+                isReply: BOOLEAN(),
                 fileUrl: VARCHAR(130),
                 fileSize: VARCHAR(10),
                 senderId: INT(),
                 fileName: VARCHAR(255),
-                isForward: BIT(),
+                isForward: BOOLEAN(),
                 receiverId: INT(),
                 targetReplyId: INT(),
                 forwardDataId: INT()

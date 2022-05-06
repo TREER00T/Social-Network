@@ -62,7 +62,8 @@ module.exports = {
             where: true
         }).result((result) => {
             try {
-                (result[1][0].password !== null || '' ) ? cb(true) : cb(false);
+                let password = result[1][0].password;
+                (password === null || password.length === 0) ? cb(true) : cb(false);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -103,6 +104,47 @@ module.exports = {
         }).result((result) => {
             try {
                 cb(result[1][0].apiKey);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    getUserId(phone, cb) {
+        openSql.find({
+            optionKeyword: [
+                EQUAL_TO
+            ],
+            data: [
+                'id', 'users', 'phone', `${phone}`
+            ],
+            where: true
+        }).result((result) => {
+            try {
+                cb(result[1][0].id);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    isGroupIdInUserList(groupId, userId, cb) {
+        openSql.find({
+            optionKeyword: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'groupId', 'listofusergroups', 'groupId', `${groupId}`,
+                'userId', `${userId}`
+            ],
+            where: true
+        }).result((result) => {
+            try {
+                (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {
                 DataBaseException(e);
             }

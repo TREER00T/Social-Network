@@ -2,6 +2,8 @@ let express = require('express'),
     app = express(),
     http = require('http').Server(app),
     io = require('socket.io')(http),
+    Update = require('app/model/update/user/users'),
+    Util = require('app/io/util/util'),
     Pipeline = require('app/io/middleware/SocketIoPipeline');
 
 require('dotenv').config();
@@ -15,6 +17,7 @@ http.listen(port, () => {
 });
 
 let allUsers = {};
+let userData = {};
 
 io.use((socket, next) => {
 
@@ -29,8 +32,12 @@ io.use((socket, next) => {
             Pipeline.getAccessTokenPayLoad(data => {
 
                 let phone = data.phoneNumber;
+                let userId = data.id;
 
-                Pipeline.userApiKey(phone, apiKey, result => {
+                userData['phone'] = phone;
+                userData['id'] = userId;
+
+                Pipeline.userApiKey(phone, apiKey.trim(), result => {
 
                     if (result) {
                         let userId = `${socket.id}`;
@@ -47,10 +54,34 @@ io.use((socket, next) => {
 
 }).on('connection', socket => {
 
+    let socketId = socket.id;
+    let phone = userData.phone;
+    let isActive = 1;
+
+    Update.userOnline(phone, isActive);
+
+
+    socket.on('setOnListOfUsersChat', arrayOfUser => {
+
+        let listOfUsersArray = arrayOfUser['data'];
+
+        allUsers[socketId] = {listOfPvChat: listOfUsersArray};
+
+    });
+
+
     socket.on('disconnect', () => {
 
-        let userId = socket.id;
-        delete allUsers[userId];
+
+        delete allUsers[socketId];
+
+        let isActive = 0;
+
+
+        Update.userOnline(phone, isActive);
+
+        // io.to(socketid).emit('message', 'whatever');
+        // io.socket.broadcast.emit('userOffline');
 
     });
 
@@ -59,5 +90,6 @@ io.use((socket, next) => {
 
 module.exports = {
     io,
-    allUsers
+    allUsers: allUsers,
+    user: userData
 };

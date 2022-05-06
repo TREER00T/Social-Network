@@ -41,6 +41,19 @@ module.exports = {
                 DataBaseException(e);
             }
         })
+    },
+
+
+    userOnline(phone, status) {
+        openSql.update({
+            table: 'users',
+            editField: {
+                isActive: `${status}`
+            },
+            where: {
+                phone: `${phone}`
+            }
+        });
     }
 
 }

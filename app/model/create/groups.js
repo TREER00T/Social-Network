@@ -1,9 +1,10 @@
 let openSql = require('app/database/OpenSql'),
     {
         INT,
-        BIT,
         ENUM,
-        VARCHAR, DATETIME
+        BOOLEAN,
+        VARCHAR,
+        DATETIME
     } = require('app/database/util/DataType'),
     {
         NOT_NULL,
@@ -75,7 +76,7 @@ module.exports = {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 adminId: INT(),
                 groupId: INT(),
-                isOwner: BIT()
+                isOwner: BOOLEAN()
             },
             primaryKey: 'id',
         })
@@ -92,11 +93,11 @@ module.exports = {
                 text: VARCHAR(4096),
                 date: DATETIME(),
                 type: ENUM(['Image', 'Location', 'Document', 'Video', 'Voice']),
-                isReply: BIT(),
+                isReply: BOOLEAN(),
                 fileUrl: VARCHAR(130),
                 fileName: VARCHAR(15),
                 fileSize: VARCHAR(10),
-                isForward: BIT(),
+                isForward: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()
             },
