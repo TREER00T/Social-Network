@@ -68,10 +68,12 @@ io.use((socket, next) => {
 
         let listOfUsersArray = arrayOfUser['data'];
 
-        Util.searchAndReplaceUserIdToSocketId(listOfUsersArray, allUsers, result => {
+        Util.searchAndReplaceInArrayOfUserIdToSocketId(listOfUsersArray, allUsers, result => {
+
             allUsers[socketId] = {
                 listOfSocketIdForPvChat: result
             };
+
             let isOnline = true;
             Util.sendUserOnlineStatusForSpecificUsers(result, isOnline);
         });
@@ -84,6 +86,7 @@ io.use((socket, next) => {
         let listOfUser = allUsers[socketId].listOfSocketIdForPvChat;
 
         let isOnline = false;
+
         Util.sendUserOnlineStatusForSpecificUsers(listOfUser, isOnline, () => {
             delete allUsers[socketId];
         });
