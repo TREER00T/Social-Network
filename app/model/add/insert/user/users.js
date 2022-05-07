@@ -10,9 +10,9 @@ module.exports = {
                 phone: `${phone}`,
                 authCode: authCode
             }
-        }).result((result) => {
+        }).result(result => {
             (result) ? cb(true) : cb(false);
-        })
+        });
     }
 
 }

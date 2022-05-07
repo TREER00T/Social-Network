@@ -18,7 +18,7 @@ module.exports = {
             ],
             data: ['id', 'groups', 'id', `${id}`],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {

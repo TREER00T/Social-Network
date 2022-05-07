@@ -26,7 +26,7 @@ io.use((socket, next) => {
 
     Pipeline.accessTokenVerify(accessToken, result => {
 
-        if (typeof result !== 'object' || result !== 'IN_VALID_TOKEN')
+        if (result !== 'TOKEN_EXP' || 'IN_VALID_TOKEN' && result) {
 
             Pipeline.getAccessTokenPayLoad(data => {
 
@@ -50,6 +50,8 @@ io.use((socket, next) => {
                 });
 
             });
+
+        }
 
     });
 

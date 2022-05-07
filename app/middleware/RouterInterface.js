@@ -6,7 +6,8 @@ let express = require('express'),
     Validation = require('app/util/Validation'),
     Pipeline = require('app/middleware/ApiPipeline'),
     Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response');
+    Response = require('app/util/Response'),
+    authRouter = require('app/routes/AuthRoutes');
 
 
 module.exports = {
@@ -46,7 +47,7 @@ module.exports = {
         });
 
 
-        app.use('/auth', require('app/routes/AuthRoutes'));
+        app.use('/auth', authRouter);
 
         app.listen(process.env.EXPRESS_PORT, () => {
             console.log('Server are running...');

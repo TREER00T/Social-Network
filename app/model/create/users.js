@@ -34,7 +34,7 @@ module.exports = {
                 isBlocked: BOOLEAN()
             },
             primaryKey: 'id'
-        })
+        });
 
 
     },
@@ -50,7 +50,7 @@ module.exports = {
                 groupId: INT()
             },
             primaryKey: 'id'
-        })
+        });
 
     },
 
@@ -65,7 +65,7 @@ module.exports = {
                 tblChatId: VARCHAR(100)
             },
             primaryKey: 'id'
-        })
+        });
 
     },
 
@@ -80,7 +80,7 @@ module.exports = {
                 channelId: INT()
             },
             primaryKey: 'id'
-        })
+        });
 
     },
 
@@ -104,7 +104,7 @@ module.exports = {
             },
             primaryKey: 'id',
             index: phone + 'SavedMessages(`text`)'
-        })
+        });
 
     },
 
@@ -122,7 +122,7 @@ module.exports = {
                 deviceLocation: VARCHAR(50)
             },
             primaryKey: 'id'
-        })
+        });
 
     },
 
@@ -137,7 +137,7 @@ module.exports = {
                 userTargetId: INT()
             },
             primaryKey: 'id'
-        })
+        });
 
     },
 
@@ -163,7 +163,7 @@ module.exports = {
             },
             primaryKey: 'id',
             index: e2eId + 'E2EContents(`text`)'
-        })
+        });
 
     }
 

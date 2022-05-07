@@ -18,13 +18,13 @@ module.exports = {
             ],
             data: ['phone', 'users', 'phone', `${phone}`],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {
                 DataBaseException(e);
             }
-        })
+        });
     },
 
     isValidAuthCode(phone, authCode, cb) {
@@ -39,7 +39,7 @@ module.exports = {
                 `${phone}`, 'authCode', `${authCode}`
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {
@@ -60,7 +60,7 @@ module.exports = {
                 'password'
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 let password = result[1][0].password;
                 (password === null || password.length === 0) ? cb(true) : cb(false);
@@ -82,7 +82,7 @@ module.exports = {
                 `${phone}`, 'password', `${password}`
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 (typeof result[1][0] !== 'undefined') ? cb(true) : cb(false);
             } catch (e) {
@@ -101,7 +101,7 @@ module.exports = {
                 'apiKey', 'users', 'phone', `${phone}`
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 cb(result[1][0].apiKey);
             } catch (e) {
@@ -120,7 +120,7 @@ module.exports = {
                 'id', 'users', 'phone', `${phone}`
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 cb(result[1][0].id);
             } catch (e) {
@@ -142,7 +142,7 @@ module.exports = {
                 'userId', `${userId}`
             ],
             where: true
-        }).result((result) => {
+        }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {

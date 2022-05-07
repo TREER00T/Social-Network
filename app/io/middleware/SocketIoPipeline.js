@@ -3,8 +3,6 @@ let {
         getJwtDecrypt,
         getSplitBearerJwt
     } = require('app/util/Validation'),
-    Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
     {
         getApiKey
     } = require('app/model/find/user/users');
@@ -18,7 +16,7 @@ module.exports = {
         if (key === undefined || key === null)
             return cb(false);
 
-        getApiKey(phone, (result) => {
+        getApiKey(phone, result => {
 
             if (result !== key) {
                 return cb(false);
@@ -52,10 +50,15 @@ module.exports = {
             if (tokenWithDoubleQuestion !== undefined)
                 token = tokenWithDoubleQuestion.replace(/["]+/g, '');
 
-            getJwtVerify(token, (decode) => {
+            getJwtVerify(token, decode => {
+
 
                 if (decode === 'TOKEN_EXP') {
-                    return cb(Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP));
+                    return cb('TOKEN_EXP');
+                }
+
+                if (decode === 'IN_VALID_TOKEN') {
+                    return cb('IN_VALID_TOKEN');
                 }
 
 
@@ -66,11 +69,7 @@ module.exports = {
                             cb(decode)
                     })(accessTokenPayload);
 
-                    return;
                 }
-
-                cb('IN_VALID_TOKEN');
-
 
             });
 
@@ -80,14 +79,14 @@ module.exports = {
 
 
     getAccessTokenPayLoad(cb) {
-        accessTokenPayload = ((data) => {
+        accessTokenPayload = (data => {
             cb(data);
         });
     },
 
 
     getApiKey(cb) {
-        apiKey = ((data) => {
+        apiKey = (data => {
             cb(data);
         });
     }

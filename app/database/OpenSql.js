@@ -11,7 +11,7 @@ const {
     {
         getData,
         removeSqlQuery,
-        removeStarInArray,
+        removeStarOrCountInArrayOfOptionKeywords,
         generateValueWithComma,
         getCreateTableSqlQuery,
         getOptionKeywordSqlQuery,
@@ -177,7 +177,7 @@ module.exports = {
 
         getOptionKeywordSqlQuery(jsonArray);
 
-        removeStarInArray(jsonArray);
+        removeStarOrCountInArrayOfOptionKeywords(jsonArray);
 
         realSql = USE_DATABASE + ' SELECT ' + getData() +
             ' FROM ' + DOUBLE_QUESTION_MARK + ' ' + util.sqlQuery;
@@ -191,7 +191,7 @@ module.exports = {
 
 
     result(callBackResult) {
-        sqlQueryResult((result) => {
+        sqlQueryResult(result => {
             callBackResult(result);
         });
     }

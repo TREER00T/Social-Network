@@ -28,7 +28,7 @@ module.exports = {
                 acceptAt: VARCHAR(16)
             },
             primaryKey: 'id'
-        })
+        });
 
     },
 
@@ -52,7 +52,7 @@ module.exports = {
             },
             primaryKey: 'id',
             index: channelId + 'ChannelContents(`text`)'
-        })
+        });
 
     },
 
@@ -67,7 +67,7 @@ module.exports = {
                 channelId: INT()
             },
             primaryKey: 'id',
-        })
+        });
 
     },
 
@@ -86,7 +86,7 @@ module.exports = {
             },
             primaryKey: 'id',
             index: 'Channels_Name(`name`)'
-        })
+        });
 
     },
 
@@ -102,7 +102,7 @@ module.exports = {
                 channelId: INT()
             },
             primaryKey: 'id',
-        })
+        });
 
     }
 

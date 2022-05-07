@@ -31,13 +31,13 @@ exports.gvc = (req, res) => {
     if (!isPhoneNumber(phone))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    Find.userPhone(phone, (isInDb) => {
+    Find.userPhone(phone, isInDb => {
 
         if (!isInDb) {
 
             CreateUser.savedMessages(phone);
 
-            Insert.phoneAndAuthCode(phone, getVerificationCode(), (isAdded) => {
+            Insert.phoneAndAuthCode(phone, getVerificationCode(), isAdded => {
                 if (isAdded)
                     return Json.builder(Response.HTTP_CREATED);
             });
@@ -45,7 +45,7 @@ exports.gvc = (req, res) => {
         }
 
         if (isInDb) {
-            Update.authCode(phone, getVerificationCode(), (isUpdated) => {
+            Update.authCode(phone, getVerificationCode(), isUpdated => {
                 if (isUpdated)
                     return Json.builder(Response.HTTP_OK);
             });
@@ -68,19 +68,19 @@ exports.isValidAuthCode = (req, res) => {
     if (!isPhoneNumber(phone) && !isVerificationCode(authCode))
         return Json.builder(Response.HTTP_BAD_REQUEST)
 
-    Find.isValidAuthCode(phone, authCode, (result) => {
+    Find.isValidAuthCode(phone, authCode, result => {
 
         if (!result)
             return Json.builder(Response.HTTP_UNAUTHORIZED);
 
 
-        Find.password(phone, (result) => {
+        Find.password(phone, result => {
 
             if (result) {
 
               return Find.getUserId(phone, id => {
 
-                     Find.getApiKey(phone, (result) => {
+                     Find.getApiKey(phone, result => {
 
                         (async () => {
 
@@ -109,7 +109,7 @@ exports.isValidAuthCode = (req, res) => {
 
             }
 
-            Find.getApiKey(phone, (result) => {
+            Find.getApiKey(phone, result => {
 
                 if (result === undefined || result === null) {
 
@@ -139,20 +139,20 @@ exports.isValidPassword = (req, res) => {
 
     Json.initializationRes(res);
 
-    getAccessTokenPayLoad((data) => {
+    getAccessTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
         let password = req.body.password;
 
 
-        Find.isValidPassword(phone, getHashData(password.trim(), phone), (result) => {
+        Find.isValidPassword(phone, getHashData(password.trim(), phone), result => {
 
 
             if (!result)
                 return Json.builder(Response.HTTP_FORBIDDEN);
 
 
-            Find.getApiKey(phone, (result) => {
+            Find.getApiKey(phone, result => {
 
                 return Json.builder(Response.HTTP_ACCEPTED, {
                     'apiKey': result
@@ -174,13 +174,13 @@ exports.refreshToken = (req, res) => {
     Json.initializationRes(res);
 
 
-    getRefreshTokenPayLoad((data) => {
+    getRefreshTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
         let id = data.id;
 
 
-        Find.userPhone(phone, (isInDb) => {
+        Find.userPhone(phone, isInDb => {
 
             if (!isInDb)
                 return Json.builder(Response.HTTP_FORBIDDEN);

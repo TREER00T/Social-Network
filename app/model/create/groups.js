@@ -29,7 +29,7 @@ module.exports = {
                 acceptAt: VARCHAR(16)
             },
             primaryKey: 'id'
-        })
+        });
 
     },
 
@@ -48,7 +48,7 @@ module.exports = {
             },
             primaryKey: 'id',
             index: 'Groups_Name(`name`)'
-        })
+        });
 
     },
 
@@ -63,7 +63,7 @@ module.exports = {
                 groupId: INT()
             },
             primaryKey: 'id',
-        })
+        });
 
     },
 
@@ -79,7 +79,7 @@ module.exports = {
                 isOwner: BOOLEAN()
             },
             primaryKey: 'id',
-        })
+        });
 
     },
 
@@ -103,7 +103,7 @@ module.exports = {
             },
             primaryKey: 'id',
             index: groupId + 'GroupContents(`text`)'
-        })
+        });
 
     }
 

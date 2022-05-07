@@ -9,6 +9,7 @@ const {
     COMMA,
     WHERE,
     LIMIT,
+    COUNT,
     OFFSET,
     BETWEEN,
     ORDER_BY,
@@ -28,7 +29,7 @@ const {
 
 let stringOfQuestionMarkAndEqual,
     arrayOfKeyAndValueDataForQuery = [],
-    isStarOrQuestionMark;
+    isStarOrQuestionMarkOrCount;
 const OPERATOR_IN = 'IN';
 
 
@@ -333,7 +334,7 @@ module.exports = {
 
         arrayOfString.forEach((item, index, array) => {
 
-            let isLastIndex = array.length === index+1;
+            let isLastIndex = array.length === index + 1;
 
 
             if (!isLastIndex)
@@ -566,25 +567,29 @@ module.exports = {
 
 
     getData() {
-        return isStarOrQuestionMark;
+        return isStarOrQuestionMarkOrCount;
     },
 
 
-    removeStarInArray(jsonArray) {
-        let index = jsonArray.data[0];
-        let arr = jsonArray.data;
-        let isArrayZeroIndex = Array.isArray(index);
+    removeStarOrCountInArrayOfOptionKeywords(jsonArray) {
+        let index = jsonArray.optionKeyword[0];
+        let optionKeywordArray = jsonArray.optionKeyword;
 
-        if (index === STAR && !isArrayZeroIndex) {
-            isStarOrQuestionMark = STAR;
-            arr.shift();
-            return arr;
+        if (index !== STAR && index !== COUNT){
+            isStarOrQuestionMarkOrCount = DOUBLE_QUESTION_MARK;
         }
 
-        if (index !== STAR && !isArrayZeroIndex || isArrayZeroIndex) {
-            isStarOrQuestionMark = DOUBLE_QUESTION_MARK;
-            return arr;
+        if (index === STAR) {
+            isStarOrQuestionMarkOrCount = STAR;
+            optionKeywordArray.shift();
         }
+
+        if (index === COUNT) {
+            isStarOrQuestionMarkOrCount = `${COUNT} AS size`;
+            optionKeywordArray.shift();
+        }
+
+        return optionKeywordArray;
     }
 
 

@@ -5,7 +5,7 @@ module.exports = {
 
     searchAndReplaceUserIdToSocketId(arrayOfUsersId, users, cb) {
         let listOfUsersSocketId = [];
-        arrayOfUsersId.forEach((item) => {
+        arrayOfUsersId.forEach(item => {
 
             for (let socketId in users) {
                 let userId = users[socketId].data.userId;
@@ -24,14 +24,16 @@ module.exports = {
         cb(listOfUsersSocketId);
     },
 
-    sendUserOnlineStatusForSpecificUsers(arr, isOnline,cb) {
-        arr.forEach((item, index) => {
-            Server
-                .io.to(item[index].socketId).emit('onlineStatus', Json.builder({
-                userId: item[index].userId,
-                isOnline: isOnline
-            }));
-        });
+    sendUserOnlineStatusForSpecificUsers(arr, isOnline, cb) {
+        if (arr !== undefined && arr?.length !== 0) {
+            arr.forEach((item, index) => {
+                Server
+                    .io.to(item[index].socketId).emit('onlineStatus', Json.builder({
+                    userId: item[index].userId,
+                    isOnline: isOnline
+                }));
+            });
+        }
     }
 
 }

@@ -8,7 +8,7 @@ const Json = require('./ReturnJson'),
     {
         ValidationException
     } = require('app/exception/ValidationException'), {
-        TokenExpiredError
+        TokenExpiredError, JsonWebTokenError
     } = require('jsonwebtoken');
 
 
@@ -61,6 +61,11 @@ module.exports = {
                 if (err !== null && err instanceof TokenExpiredError) {
                     cb('TOKEN_EXP');
                     return Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
+                }
+
+                if (err instanceof JsonWebTokenError){
+                    cb('IN_VALID_TOKEN');
+                    return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
                 }
 
                 cb(decoded);

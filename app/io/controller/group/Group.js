@@ -6,9 +6,10 @@ let Server = require('app/io/connect/connection'),
 
 let allUsersTyping = {},
     state = {},
-    allUsersInServer = Server.allUsers;
+    allUsersInServer = Server.allUsers,
+    groupNamespace = Server.io.of('/group');
 
-Server.io.on('connection', (socket) => {
+groupNamespace.on('connection', socket => {
 
     let socketId = socket.id;
 
@@ -20,7 +21,7 @@ Server.io.on('connection', (socket) => {
         Find.groupId(groupId, result => {
 
             if (!result) {
-                return socket.emit('groupInitError',
+                return groupNamespace.emit('groupInitError',
                     Json.builder(Response.HTTP_NOT_FOUND));
             }
 
@@ -28,13 +29,13 @@ Server.io.on('connection', (socket) => {
 
                 if (!result) {
                     state['isGroupInUserList'] = false;
-                    return socket.emit('groupInitError',
+                    return groupNamespace.emit('groupInitError',
                         Json.builder(Response.HTTP_BAD_REQUEST));
                 }
 
                 state['isGroupInUserList'] = true;
 
-                allUsersInServer[socket.id] = {
+                allUsersInServer[socketId] = {
                     data: {
                         groupId: groupId
                     }
@@ -46,11 +47,11 @@ Server.io.on('connection', (socket) => {
 
     });
 
-    let isGroupInUserList = state['isGroupInUserList'];
-    let groupId = allUsersInServer[socket.id].data.groupId;
-
-    if (isGroupInUserList)
-        socket.join(groupId)
+    // let isGroupInUserList = state['isGroupInUserList'];
+    // let groupId = allUsersInServer[socket.id].data.groupId;
+    //
+    // if (isGroupInUserList)
+    //     socket.join(groupId)
 
 
     // socket.on('onGroupTyping', data => {

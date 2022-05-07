@@ -22,7 +22,7 @@ module.exports = {
                 conversationType: ENUM(['Group', 'Channel', 'E2E', 'Personal'])
             },
             primaryKey: 'id'
-        })
+        });
 
     }
 
