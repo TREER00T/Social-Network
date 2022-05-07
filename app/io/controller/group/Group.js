@@ -10,10 +10,12 @@ let allUsersTyping = {},
 
 Server.io.on('connection', (socket) => {
 
-    socket.on('groupInit', date => {
+    let socketId = socket.id;
 
-        let groupId = date.id;
-        let userId = Server.user.id;
+    socket.on('groupInit', data => {
+
+        let groupId = data.id;
+        let userId = allUsersInServer[socketId].data.userId;
 
         Find.groupId(groupId, result => {
 
@@ -34,9 +36,7 @@ Server.io.on('connection', (socket) => {
 
                 allUsersInServer[socket.id] = {
                     data: {
-                        phone: Server.user.phone,
-                        groupId: 'groupId',
-                        userId: userId
+                        groupId: groupId
                     }
                 };
 

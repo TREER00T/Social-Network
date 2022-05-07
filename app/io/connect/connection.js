@@ -17,7 +17,6 @@ http.listen(port, () => {
 });
 
 let allUsers = {};
-let userData = {};
 
 io.use((socket, next) => {
 
@@ -34,15 +33,17 @@ io.use((socket, next) => {
                 let phone = data.phoneNumber;
                 let userId = data.id;
 
-                userData['phone'] = phone;
-                userData['id'] = userId;
-
                 Pipeline.userApiKey(phone, apiKey.trim(), result => {
 
                     if (result) {
-                        let userId = `${socket.id}`;
-                        allUsers[userId] = phone;
-                        socket.nickname = data;
+                        let socketId = `${socket.id}`;
+                        allUsers[socketId] = {
+                            data: {
+                                phone: `${phone}`,
+                                userId: userId
+                            }
+                        };
+                        socket.nickname = socketId;
                         next();
                     }
 
@@ -55,7 +56,7 @@ io.use((socket, next) => {
 }).on('connection', socket => {
 
     let socketId = socket.id;
-    let phone = userData.phone;
+    let phone = allUsers[socketId].data.phone;
     let isActive = 1;
 
     Update.userOnline(phone, isActive);
@@ -65,23 +66,29 @@ io.use((socket, next) => {
 
         let listOfUsersArray = arrayOfUser['data'];
 
-        allUsers[socketId] = {listOfPvChat: listOfUsersArray};
+        Util.searchAndReplaceUserIdToSocketId(listOfUsersArray, allUsers, result => {
+            allUsers[socketId] = {
+                listOfSocketIdForPvChat: result
+            };
+            let isOnline = true;
+            Util.sendUserOnlineStatusForSpecificUsers(result, isOnline);
+        });
 
     });
 
 
     socket.on('disconnect', () => {
 
+        let listOfUser = allUsers[socketId].listOfSocketIdForPvChat;
 
-        delete allUsers[socketId];
+        let isOnline = false;
+        Util.sendUserOnlineStatusForSpecificUsers(listOfUser, isOnline, () => {
+            delete allUsers[socketId];
+        });
 
         let isActive = 0;
 
-
         Update.userOnline(phone, isActive);
-
-        // io.to(socketid).emit('message', 'whatever');
-        // io.socket.broadcast.emit('userOffline');
 
     });
 
@@ -90,6 +97,5 @@ io.use((socket, next) => {
 
 module.exports = {
     io,
-    allUsers: allUsers,
-    user: userData
+    allUsers: allUsers
 };
