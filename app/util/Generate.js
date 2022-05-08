@@ -65,12 +65,30 @@ module.exports = {
     },
 
 
-    getHashData(data,salt){
+    getHashData(data, salt) {
 
-       let hash = crypto.pbkdf2Sync(data, salt,
+        let hash = crypto.pbkdf2Sync(data, salt,
             1000, 64, `sha512`).toString(`hex`);
 
-       return hash.trim();
+        return hash.trim();
+    },
+
+
+    getFileHashName() {
+        const rand = crypto.randomBytes(30);
+
+        let formatValidString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+        let chars = formatValidString.repeat(5);
+
+        let str = '';
+
+        for (let i = 0; i < rand.length; i++) {
+            let decimal = rand[i];
+            str += chars[decimal];
+        }
+
+        return str.trim();
     }
 
 

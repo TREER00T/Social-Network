@@ -1,4 +1,4 @@
-// let Server = require('app/io/connect/connection');
+let Server = require('app/io/connect/connection');
 
 module.exports = {
 
@@ -129,24 +129,24 @@ module.exports = {
         cb(jsonObject);
     },
 
-    //
-    // sendUserOnlineStatusForSpecificUsers(arr, isOnline, cb) {
-    //
-    //     let isArrayNull = arr?.length === 0;
-    //
-    //     if (arr !== undefined && !isArrayNull) {
-    //
-    //         arr.forEach((item, index) => {
-    //
-    //             Server.io.to(item[index].socketId).emit('onlineStatus', {
-    //                 userId: item[index].userId,
-    //                 isOnline: isOnline
-    //             });
-    //
-    //         });
-    //
-    //     }
-    //
-    // }
+
+    sendUserOnlineStatusForSpecificUsers(arr, isOnline, cb) {
+
+        let isArrayNull = arr?.length === 0;
+
+        if (arr !== undefined && !isArrayNull) {
+
+            arr.forEach((item, index) => {
+
+                Server.io.to(item[index].socketId).emit('onlineStatus', {
+                    userId: item[index].userId,
+                    isOnline: isOnline
+                });
+
+            });
+
+        }
+
+    }
 
 }
