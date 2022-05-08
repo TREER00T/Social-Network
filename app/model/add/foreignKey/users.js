@@ -8,7 +8,7 @@ module.exports = {
 
     e2eContents(e2eId) {
         openSql.addForeignKey({
-            table: `${e2eId}E2EContents`,
+            table: '`' + e2eId + 'E2EContents',
             foreignKey: 'forwardDataId',
             referenceTable: 'forwardContents',
             field: 'id',
@@ -16,15 +16,7 @@ module.exports = {
             onUpdate: CASCADE
         });
         openSql.addForeignKey({
-            table: `${e2eId}E2EContents`,
-            foreignKey: 'receiverId',
-            referenceTable: 'users',
-            field: 'id',
-            onDelete: CASCADE,
-            onUpdate: CASCADE
-        });
-        openSql.addForeignKey({
-            table: `${e2eId}E2EContents`,
+            table: '`' + e2eId + 'E2EContents',
             foreignKey: 'senderId',
             referenceTable: 'users',
             field: 'id',
@@ -75,6 +67,14 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
+        openSql.addForeignKey({
+            table: '`' + phone + 'SavedMessages',
+            foreignKey: 'senderId',
+            referenceTable: 'users',
+            field: 'id',
+            onDelete: CASCADE,
+            onUpdate: CASCADE
+        });
     },
 
 
@@ -118,7 +118,7 @@ module.exports = {
     },
 
 
-    listOfUserE2Es(){
+    listOfUserE2Es() {
         openSql.addForeignKey({
             table: 'listOfUserE2Es',
             foreignKey: 'userId',

@@ -18,6 +18,7 @@ module.exports = {
             table: `forwardContents`,
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
+                messageId: INT(),
                 conversationId: INT(),
                 conversationType: ENUM(['Group', 'Channel', 'E2E', 'Personal'])
             },

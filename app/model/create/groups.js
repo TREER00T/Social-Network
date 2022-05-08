@@ -8,7 +8,7 @@ let openSql = require('app/database/OpenSql'),
     } = require('app/database/util/DataType'),
     {
         NOT_NULL,
-        AUTO_INCREMENT
+        AUTO_INCREMENT, CASCADE
     } = require('app/database/util/SqlKeyword');
 
 
@@ -22,7 +22,8 @@ module.exports = {
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 note: VARCHAR(255),
-                type: ENUM(['Spam', 'Fake Account', 'Violence', 'Child Abuse', 'Illegal Drugs', 'Personal Details', 'Pornography', 'Other']),
+                type: ENUM(['Spam', 'Fake Account', 'Violence', 'Child Abuse',
+                    'Illegal Drugs', 'Personal Details', 'Pornography', 'Other']),
                 status: ENUM(['accept', 'pending', 'decline']),
                 userId: INT(),
                 groupId: INT(),
@@ -32,7 +33,6 @@ module.exports = {
         });
 
     },
-
 
     groups() {
 
@@ -92,9 +92,10 @@ module.exports = {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 text: VARCHAR(4096),
                 date: DATETIME(),
-                type: ENUM(['Image', 'Location', 'Document', 'Video', 'Voice']),
+                type: ENUM(['None', 'Image', 'Location', 'Document', 'Video', 'Voice']),
                 isReply: BOOLEAN(),
                 fileUrl: VARCHAR(130),
+                senderId: INT(),
                 fileName: VARCHAR(15),
                 fileSize: VARCHAR(10),
                 isForward: BOOLEAN(),

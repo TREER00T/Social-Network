@@ -56,6 +56,14 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
+        openSql.addForeignKey({
+            table: '`' + channelId + 'ChannelContents',
+            foreignKey: 'senderId',
+            referenceTable: 'channels',
+            field: 'id',
+            onDelete: CASCADE,
+            onUpdate: CASCADE
+        });
     },
 
 

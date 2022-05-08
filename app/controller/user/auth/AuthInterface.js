@@ -19,7 +19,8 @@ const Json = require('app/util/ReturnJson'),
     {
         getAccessTokenPayLoad,
         getRefreshTokenPayLoad
-    } = require('app/middleware/ApiPipeline');
+    } = require('app/middleware/ApiPipeline'),
+    AddUserForeignKey = require('app/model/add/foreignKey/users');
 
 
 exports.gvc = (req, res) => {
@@ -36,6 +37,7 @@ exports.gvc = (req, res) => {
         if (!isInDb) {
 
             CreateUser.savedMessages(phone);
+            AddUserForeignKey.savedMessages(phone);
 
             Insert.phoneAndAuthCode(phone, getVerificationCode(), isAdded => {
                 if (isAdded)
@@ -78,9 +80,9 @@ exports.isValidAuthCode = (req, res) => {
 
             if (result) {
 
-              return Find.getUserId(phone, id => {
+                return Find.getUserId(phone, id => {
 
-                     Find.getApiKey(phone, result => {
+                    Find.getApiKey(phone, result => {
 
                         (async () => {
 
