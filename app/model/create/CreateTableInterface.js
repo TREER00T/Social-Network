@@ -20,7 +20,7 @@ let {
     } = require('./channels'),
     {
         forwardContents
-    } = require('./contents');
+    } = require('app/model/create/common');
 
 
 module.exports = {

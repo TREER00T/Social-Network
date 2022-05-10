@@ -1,4 +1,8 @@
-let Server = require('app/io/connect/connection');
+let Server = require('app/io/connect/socket'),
+    {
+        NULL
+    } = require('app/database/util/SqlKeyword');
+const {use} = require("express/lib/router");
 
 module.exports = {
 
@@ -41,6 +45,10 @@ module.exports = {
 
         }
 
+        let isNullResponse = realSocketId === '';
+        if (isNullResponse)
+            return cb('IN_VALID_USER_ID');
+
         cb(realSocketId);
     },
 
@@ -48,8 +56,8 @@ module.exports = {
     validateMessage(jsonObject, cb) {
 
         let arrayOfValidJsonObjectKey = [
-            'text', 'type', 'isReply', 'fileUrl', 'fileSize', 'senderId',
-            'fileName', 'isForward', 'targetReplyId', 'forwardDataId'
+            'text', 'type', 'isReply', 'fileName', 'senderId', 'isForward',
+            'targetReplyId', 'forwardDataId', 'locationLat', 'locationLon'
         ];
 
         let arrayOfMessageType = [
@@ -78,15 +86,23 @@ module.exports = {
 
 
         const MESSAGE_WITHOUT_FILE = 'None';
+        const MESSAGE_TYPE_LOCATION = 'Location';
         let isReplyInJsonObject = jsonObject.isReply === true;
         let isForwardInJsonObject = jsonObject.isForward === true;
         let isNoneMessageType = jsonObject.type === MESSAGE_WITHOUT_FILE;
+        let isMessageTypeLocation = jsonObject.type === MESSAGE_TYPE_LOCATION;
         let isMessageTypeNull = jsonObject.type?.length === 0 || undefined || null;
-        let isFileUrlNull = jsonObject.fileUrl?.length === 0 || null;
-        let isTextNull = jsonObject.fileUrl?.length === 0 || null;
-        let isFileSizeNull = jsonObject.fileSize?.length === 0 || null;
+        let isTextNull = jsonObject.text?.length === 0 || null;
         let isFileNameNull = jsonObject.fileName?.length === 0 || null;
         let isSenderIdNull = jsonObject.senderId?.length === 0 || null;
+        let isLocationLatNull = jsonObject.locationLat?.length === 0 || null;
+        let isLocationLonNull = jsonObject.locationLon?.length === 0 || null;
+
+
+        if (isMessageTypeLocation || isLocationLonNull || isLocationLatNull) {
+            cb('IN_VALID_OBJECT_KEY');
+            return;
+        }
 
 
         if (isMessageTypeNull) {
@@ -95,14 +111,13 @@ module.exports = {
         }
 
 
-        if (!isMessageTypeNull && !isNoneMessageType &&
-            !isFileUrlNull && !isFileSizeNull && !isFileNameNull) {
+        if (!isMessageTypeNull && !isNoneMessageType || !isFileNameNull) {
             cb('IN_VALID_OBJECT_KEY');
             return;
         }
 
 
-        if (isTextNull){
+        if (isTextNull && isNoneMessageType) {
             cb('IN_VALID_OBJECT_KEY');
             return;
         }
@@ -112,6 +127,10 @@ module.exports = {
             cb('IN_VALID_OBJECT_KEY');
             return;
         }
+
+
+        if (isTextNull && !isNoneMessageType)
+            jsonObject.text = NULL;
 
 
         if (!isMessageTypeNull)

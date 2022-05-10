@@ -45,6 +45,7 @@ module.exports = {
             try {
                 let dataBase64 = Buffer.from(data).toString('base64');
                 socket.write(dataBase64);
+                console.log('g')
             } catch (e) {
                 FileException(e);
             }

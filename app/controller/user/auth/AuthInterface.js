@@ -62,7 +62,6 @@ exports.gvc = (req, res) => {
 
 exports.isValidAuthCode = (req, res) => {
 
-
     Json.initializationRes(res);
 
     let {phone, authCode} = req.body;

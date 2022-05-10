@@ -62,8 +62,9 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                let password = result[1][0].password;
-                (password === null || password.length === 0) ? cb(true) : cb(false);
+                (result[1].length === 0) ? cb(true) : cb(false);
+                let password = result[1][0].password.trim();
+                (password.length === 0) ? cb(true) : cb(false);
             } catch (e) {
                 DataBaseException(e);
             }
