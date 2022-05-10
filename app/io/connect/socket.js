@@ -13,15 +13,17 @@ let app = require('express')(),
 require('dotenv').config();
 
 
-let port = process.env.SOCKET_IO_PORT;
+const IN_VALID_USER_ID = 'IN_VALID_USER_ID';
+
+
+let port = process.env.SOCKET_IO_PORT,
+    allUsers = {},
+    state;
+
 
 http.listen(port, () => {
     console.log('Socket.io running...');
 });
-
-
-let allUsers = {},
-    state;
 
 
 io.use((socket, next) => {
@@ -95,6 +97,9 @@ io.use((socket, next) => {
 
         Util.searchAndReplaceInArrayOfUserIdToSocketId(listOfUsersArray, allUsers, result => {
 
+            if (result === IN_VALID_USER_ID)
+                return socket.emit('emitListOfUserChatError', Response.HTTP_NOT_FOUND);
+
             allUsers[socketId] = {
                 listOfSocketIdForPvChat: result
             };
@@ -111,6 +116,9 @@ io.use((socket, next) => {
 
         Util.searchAndReplaceUserIdToSocketId(userId, allUsers, socketId => {
 
+            if (socketId === IN_VALID_USER_ID)
+                return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
+
             let user = allUsers[socketId];
             io.to(user).emit('isPvTyping', {
                 'isPvTyping': data['isPvTyping']
@@ -124,7 +132,6 @@ io.use((socket, next) => {
         let receiverId = jsonObject['receiverId'];
 
         Util.searchAndReplaceUserIdToSocketId(receiverId, allUsers, socketId => {
-            const IN_VALID_USER_ID = 'IN_VALID_USER_ID';
 
             if (socketId === IN_VALID_USER_ID)
                 return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);

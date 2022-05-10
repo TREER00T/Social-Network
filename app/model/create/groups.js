@@ -97,7 +97,7 @@ module.exports = {
                 fileUrl: VARCHAR(130),
                 senderId: INT(),
                 fileName: VARCHAR(15),
-                fileSize: VARCHAR(10),
+                fileSize: VARCHAR(15),
                 isForward: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()

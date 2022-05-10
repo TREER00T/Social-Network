@@ -98,7 +98,7 @@ module.exports = {
                 fileUrl: VARCHAR(130),
                 senderId: INT(),
                 fileName: VARCHAR(15),
-                fileSize: VARCHAR(10),
+                fileSize: VARCHAR(15),
                 isForward: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()
@@ -154,9 +154,9 @@ module.exports = {
                 type: ENUM(['None', 'Image', 'Location', 'Document', 'Video', 'Voice']),
                 isReply: BOOLEAN(),
                 fileUrl: VARCHAR(130),
-                fileSize: VARCHAR(10),
                 senderId: INT(),
-                fileName: VARCHAR(255),
+                fileSize: VARCHAR(15),
+                fileName: VARCHAR(15),
                 isForward: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()

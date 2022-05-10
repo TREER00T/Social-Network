@@ -29,6 +29,9 @@ module.exports = {
             }
 
         });
+        let isNullResponse = listOfUsersSocketId.length === 0;
+        if (isNullResponse)
+            return cb('IN_VALID_USER_ID');
 
         cb(listOfUsersSocketId);
     },

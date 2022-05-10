@@ -1,5 +1,6 @@
 let fs = require('fs'),
-    Util = require('app/util/Generate'),
+    Generate = require('app/util/Generate'),
+    Util = require('app/util/util'),
     dotenv = require('dotenv'),
     {
         FileException
@@ -23,8 +24,9 @@ module.exports = {
 
 
         let pathDir = 'cache/',
+            jsonObject,
             url = `http://${process.env.IP}:${process.env.EXPRESS_PORT}`,
-            randomFileName = Util.getFileHashName();
+            randomFileName = Generate.getFileHashName();
 
 
         if (fileFormat === IMAGE)
@@ -45,14 +47,22 @@ module.exports = {
             try {
                 let dataBase64 = Buffer.from(data).toString('base64');
                 socket.write(dataBase64);
-                console.log('g')
+
+                const byteSize = fs.statSync(ROOT_PROJECT_FOLDER + pathDir).size;
+                const fileSize = Util.formatBytes(byteSize);
+                jsonObject = {
+                    fileSize: fileSize
+                };
+
             } catch (e) {
                 FileException(e);
             }
 
         });
 
-        return url + '/' + pathDir;
+        return jsonObject = {
+            fullFilePath: url + '/' + pathDir
+        };
     }
 
 
