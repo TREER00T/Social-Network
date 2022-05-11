@@ -122,7 +122,7 @@ module.exports = {
     },
 
 
-    addOMulti(jsonArray) {
+    addMultiValue(jsonArray) {
 
         realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table + ' (' +
             generateDoubleQuestionMarkAndComma(jsonArray.data) + ') VALUES ' + QUESTION_MARK;
@@ -153,7 +153,8 @@ module.exports = {
         let selectSqlQuery = ' SELECT ' + DOUBLE_QUESTION_MARK +
             ' FROM ' + DOUBLE_QUESTION_MARK + ' ' + util.sqlQuery;
 
-        realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table + ` (${getStringOfColumnWithComma(jsonArray.data[0])}) ` + selectSqlQuery;
+        realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table +
+            ` (${getStringOfColumnWithComma(jsonArray.data[0])}) ` + selectSqlQuery;
 
         query(realSql, jsonArray.data);
 

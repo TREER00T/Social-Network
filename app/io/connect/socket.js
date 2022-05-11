@@ -177,9 +177,9 @@ io.use((socket, next) => {
                         delete data['receiverId'];
                         data['senderId'] = socketUserId;
 
-                        if (isDataBinaryNUll) {
+                        if (isDataBinaryNUll)
                             return io.to(user).emit('emitPvMessage', result);
-                        }
+
 
 
                         let fullFilePath = File.decodeAndWriteFile(dataBinary, data['type'],
@@ -205,10 +205,9 @@ io.use((socket, next) => {
 
         FindGroup.groupId(groupId, result => {
 
-            if (!result) {
-                return socket.emit('groupInitError',
-                    Json.builder(Response.HTTP_NOT_FOUND));
-            }
+            if (!result)
+                return socket.emit('groupInitError', Json.builder(Response.HTTP_NOT_FOUND));
+
 
             FindInUser.isGroupIdInUserList(groupId, userId, result => {
 

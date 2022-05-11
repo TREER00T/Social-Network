@@ -2,6 +2,7 @@ let openSql = require('app/database/OpenSql'),
     {
         INT,
         ENUM,
+        POINT,
         BOOLEAN,
         VARCHAR,
         DATETIME
@@ -48,7 +49,7 @@ module.exports = {
                 senderId: INT(),
                 fileName: VARCHAR(15),
                 fileSize: VARCHAR(15),
-                locationId: INT(),
+                location: POINT(),
                 isForward: BOOLEAN(),
                 isUploading: BOOLEAN(),
                 targetReplyId: INT(),

@@ -25,19 +25,6 @@ module.exports = {
             primaryKey: 'id'
         });
 
-    },
-
-    location() {
-
-        openSql.createTable({
-            table: `location`,
-            field: {
-                id: INT([NOT_NULL, AUTO_INCREMENT]),
-                location: INT(),
-            },
-            primaryKey: 'id'
-        });
-
     }
 
 
