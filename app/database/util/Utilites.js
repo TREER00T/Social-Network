@@ -29,7 +29,7 @@ const {
 
 let stringOfQuestionMarkAndEqual,
     arrayOfKeyAndValueDataForQuery = [],
-    isStarOrQuestionMarkOrCount;
+    fieldData;
 const OPERATOR_IN = 'IN';
 
 
@@ -567,25 +567,31 @@ module.exports = {
 
 
     getData() {
-        return isStarOrQuestionMarkOrCount;
+        return fieldData;
     },
 
 
-    removeStarOrCountInArrayOfOptionKeywords(jsonArray) {
+    removeFieldDataInSelect(jsonArray) {
         let index = jsonArray.optionKeyword[0];
+        let isPointField = /X\(/.test(index);
         let optionKeywordArray = jsonArray.optionKeyword;
 
-        if (index !== STAR && index !== COUNT){
-            isStarOrQuestionMarkOrCount = DOUBLE_QUESTION_MARK;
+        if (index !== STAR && COUNT && !isPointField) {
+            fieldData = DOUBLE_QUESTION_MARK;
+        }
+
+        if (index !== STAR && COUNT && isPointField) {
+            fieldData = index;
+            optionKeywordArray.shift();
         }
 
         if (index === STAR) {
-            isStarOrQuestionMarkOrCount = STAR;
+            fieldData = STAR;
             optionKeywordArray.shift();
         }
 
         if (index === COUNT) {
-            isStarOrQuestionMarkOrCount = `${COUNT} AS size`;
+            fieldData = `${COUNT} AS size`;
             optionKeywordArray.shift();
         }
 

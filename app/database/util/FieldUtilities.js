@@ -3,6 +3,7 @@ const {
     AND,
     LIKE,
     NULL,
+    POINT,
     BETWEEN,
     NOT_NULL,
     EQUAL_TO,
@@ -12,6 +13,7 @@ const {
     LESS_THAN_OR_EQUAL_TO,
     GREATER_THAN_OR_EQUAL_TO
 } = require('./SqlKeyword');
+const {COMMA} = require("app/database/util/SqlKeyword");
 
 
 let arrayOfOperator = [
@@ -40,6 +42,15 @@ module.exports = {
 
         return `${operator}SPACE${value}`;
 
+    },
+
+
+    POINT(Lat, Lon) {
+        return `${POINT}(${Lat} ${Lon})`;
+    },
+
+    fieldPoint(field){
+        return `X(${field}) AS Lat ${COMMA} Y(${field}) AS Lon`;
     }
 
 }

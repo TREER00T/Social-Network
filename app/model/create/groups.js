@@ -8,7 +8,7 @@ let openSql = require('app/database/OpenSql'),
     } = require('app/database/util/DataType'),
     {
         NOT_NULL,
-        AUTO_INCREMENT, CASCADE
+        AUTO_INCREMENT
     } = require('app/database/util/SqlKeyword');
 
 
@@ -98,7 +98,9 @@ module.exports = {
                 senderId: INT(),
                 fileName: VARCHAR(15),
                 fileSize: VARCHAR(15),
+                locationId: INT(),
                 isForward: BOOLEAN(),
+                isUploading: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()
             },

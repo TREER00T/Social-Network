@@ -2,7 +2,6 @@ let Server = require('app/io/connect/socket'),
     {
         NULL
     } = require('app/database/util/SqlKeyword');
-const {use} = require("express/lib/router");
 
 module.exports = {
 
@@ -59,7 +58,7 @@ module.exports = {
     validateMessage(jsonObject, cb) {
 
         let arrayOfValidJsonObjectKey = [
-            'text', 'type', 'isReply', 'fileName', 'senderId', 'isForward',
+            'text', 'type', 'isReply', 'fileName', 'receiverId', 'isForward', 'fileFormat',
             'targetReplyId', 'forwardDataId', 'locationLat', 'locationLon'
         ];
 
@@ -97,6 +96,7 @@ module.exports = {
         let isMessageTypeNull = jsonObject.type?.length === 0 || undefined || null;
         let isTextNull = jsonObject.text?.length === 0 || null;
         let isFileNameNull = jsonObject.fileName?.length === 0 || null;
+        let isFileFormatNull = jsonObject.filFormat?.length === 0 || null;
         let isSenderIdNull = jsonObject.senderId?.length === 0 || null;
         let isLocationLatNull = jsonObject.locationLat?.length === 0 || null;
         let isLocationLonNull = jsonObject.locationLon?.length === 0 || null;
@@ -114,7 +114,8 @@ module.exports = {
         }
 
 
-        if (!isMessageTypeNull && !isNoneMessageType || !isFileNameNull) {
+        if (isMessageTypeNull && !isNoneMessageType && !isFileFormatNull &&
+            !isFileNameNull && !isMessageTypeLocation) {
             cb('IN_VALID_OBJECT_KEY');
             return;
         }
@@ -136,7 +137,7 @@ module.exports = {
             jsonObject.text = NULL;
 
 
-        if (!isMessageTypeNull)
+        if (isMessageTypeNull)
             jsonObject.type = MESSAGE_WITHOUT_FILE;
 
 
@@ -147,6 +148,7 @@ module.exports = {
         if (isForwardInJsonObject)
             jsonObject.isForward = 1;
 
+        jsonObject.isUploading = 1;
 
         cb(jsonObject);
     },

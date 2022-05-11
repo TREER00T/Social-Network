@@ -24,6 +24,14 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
+        openSql.addForeignKey({
+            table: '`' + groupId + 'GroupContents',
+            foreignKey: 'locationId',
+            referenceTable: 'location',
+            field: 'id',
+            onDelete: CASCADE,
+            onUpdate: CASCADE
+        });
     },
 
     groupsAdmins() {

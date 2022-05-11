@@ -19,6 +19,7 @@ let {
         reportChannels
     } = require('./channels'),
     {
+        location,
         forwardContents
     } = require('app/model/create/common');
 
@@ -31,6 +32,7 @@ module.exports = {
         groups();
         devices();
         channels();
+        location();
         groupsUsers();
         groupsAdmins();
         reportGroups();

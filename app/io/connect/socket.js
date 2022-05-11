@@ -13,7 +13,13 @@ let app = require('express')(),
 require('dotenv').config();
 
 
+module.exports = {
+    io
+}
+
+
 const IN_VALID_USER_ID = 'IN_VALID_USER_ID';
+const IN_VALID_OBJECT_KEY = 'IN_VALID_OBJECT_KEY';
 
 
 let port = process.env.SOCKET_IO_PORT,
@@ -67,6 +73,7 @@ io.use((socket, next) => {
 
     let socketId = socket.id;
     let phone = allUsers[socketId].data.phone;
+    let socketUserId = allUsers[socketId].data.userId;
     let isActive = 1;
 
     Update.userOnline(phone, isActive);
@@ -128,32 +135,42 @@ io.use((socket, next) => {
 
     });
 
-    socket.on('onPvMessage', jsonObject => {
+    socket.on('onPvMessage', (jsonObject, dataBinary) => {
         let receiverId = jsonObject['receiverId'];
 
-        Util.searchAndReplaceUserIdToSocketId(receiverId, allUsers, socketId => {
 
-            if (socketId === IN_VALID_USER_ID)
-                return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
+        if (jsonObject !== undefined)
+
+            Util.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
+
+                if (receiverSocketId === IN_VALID_USER_ID)
+                    return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
 
 
-            // let user = allUsersInServer[socketId];
-            // let isDataBinaryNUll = jsonObject['dataBinary'] === undefined;
+                let user = allUsers[receiverSocketId];
+                let isDataBinaryNUll = dataBinary === undefined;
 
-            // if (isDataBinaryNUll) {
-            //     return pvNamespace.to(user).emit('emitPvMessage', {
-            //         senderId: jsonObject['senderId'],
-            //         data: jsonObject.data
-            //     });
-            // }
-            //
-            // Util.validateMessage(jsonObject, result => {
-            //     // if (result !== 'IN_VALID_OBJECT_KEY')
-            //         // connect database
-            // });
-            // File.decodeAndWriteFile(jsonObject['dataBinary'], 'Image', socket);
+                Util.validateMessage(jsonObject, result => {
 
-        });
+                    if (result === IN_VALID_OBJECT_KEY)
+                        return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+                    delete jsonObject['receiverId'];
+                    jsonObject['senderId'] = socketUserId;
+
+                    if (isDataBinaryNUll) {
+                        return io.to(user).emit('emitPvMessage', result);
+                    }
+
+
+                    let fullFilePath = File.decodeAndWriteFile(dataBinary, jsonObject['type'],
+                        socket, jsonObject['fileFormat']).fileUrl;
+
+
+                    // connect database
+                });
+
+            });
 
     });
 
@@ -193,12 +210,6 @@ io.use((socket, next) => {
         });
 
     });
-
-    // let isGroupInUserList = state['isGroupInUserList'];
-    // let groupId = allUsersInServer[socket.id].data.groupId;
-    //
-    // if (isGroupInUserList)
-    //     socket.join(groupId)
 
 
     // socket.on('onGroupTyping', data => {

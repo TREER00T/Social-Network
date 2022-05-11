@@ -23,6 +23,14 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
+        openSql.addForeignKey({
+            table: '`' + e2eId + 'E2EContents',
+            foreignKey: 'locationId',
+            referenceTable: 'location',
+            field: 'id',
+            onDelete: CASCADE,
+            onUpdate: CASCADE
+        });
     },
 
 
@@ -71,6 +79,14 @@ module.exports = {
             table: '`' + phone + 'SavedMessages',
             foreignKey: 'senderId',
             referenceTable: 'users',
+            field: 'id',
+            onDelete: CASCADE,
+            onUpdate: CASCADE
+        });
+        openSql.addForeignKey({
+            table: '`' + phone + 'SavedMessages',
+            foreignKey: 'locationId',
+            referenceTable: 'location',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE

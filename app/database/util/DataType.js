@@ -4,9 +4,10 @@ const {
         date,
         Enum,
         time,
+        POINT,
         varchar,
-        datetime,
-        BOOLEAN
+        BOOLEAN,
+        datetime
     } = require('./SqlKeyword'),
     {
         addDataTypeForFieldInFirstItemOfArray
@@ -45,6 +46,10 @@ module.exports = {
 
     BOOLEAN(data) {
         return addDataTypeForFieldInFirstItemOfArray(BOOLEAN, data);
+    },
+
+    POINT(data) {
+        return addDataTypeForFieldInFirstItemOfArray(POINT, data);
     }
 
 }

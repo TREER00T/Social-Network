@@ -263,6 +263,10 @@ module.exports = {
     HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND: {
         code: 801,
         message: 'Token Or Api-Key was not found!'
+    },
+    HTTP_INVALID_JSON_OBJECT_KEY: {
+        code: 802,
+        message: 'In valid json object key'
     }
 
 };

@@ -11,7 +11,7 @@ dotenv.config();
 module.exports = {
 
 
-    decodeAndWriteFile(dataBinary, fileFormat, socket, docsFormat = '.pdf') {
+    decodeAndWriteFile(dataBinary, fileType, socket, docsFormat) {
 
         const PNG = '.png',
             MP4 = '.mp4',
@@ -19,32 +19,41 @@ module.exports = {
             IMAGE = 'Image',
             VIDEO = 'Video',
             VOICE = 'Voice',
-            ROOT_PROJECT_FOLDER = '../',
-            DOCUMENT = 'Document';
+            DOCUMENT = 'Document',
+            defaultFormat = '.pdf',
+            ROOT_PROJECT_FOLDER = '../';
 
 
         let pathDir = 'cache/',
             jsonObject,
-            url = `http://${process.env.IP}:${process.env.EXPRESS_PORT}`,
+            url = `http://${process.env.IP}`,
             randomFileName = Generate.getFileHashName();
 
 
-        if (fileFormat === IMAGE)
+        if (docsFormat === undefined)
+            docsFormat = defaultFormat;
+
+
+        if (fileType === IMAGE)
             pathDir += `img/${randomFileName + PNG}`;
 
-        if (fileFormat === DOCUMENT)
+
+        if (fileType === DOCUMENT)
             pathDir += `docs/${randomFileName + docsFormat}`;
 
-        if (fileFormat === VIDEO)
+
+        if (fileType === VIDEO)
             pathDir += `video/${randomFileName + MP4}`;
 
-        if (fileFormat === VOICE)
+
+        if (fileType === VOICE)
             pathDir += `voice/${randomFileName + MP3}`;
 
 
-        fs.writeFileSync(ROOT_PROJECT_FOLDER + pathDir, dataBinary);
-        fs.readFile(ROOT_PROJECT_FOLDER + pathDir, function (error, data) {
-            try {
+        try {
+            fs.writeFileSync(ROOT_PROJECT_FOLDER + pathDir, dataBinary);
+            fs.readFile(ROOT_PROJECT_FOLDER + pathDir, function (error, data) {
+
                 let dataBase64 = Buffer.from(data).toString('base64');
                 socket.write(dataBase64);
 
@@ -54,15 +63,15 @@ module.exports = {
                     fileSize: fileSize
                 };
 
-            } catch (e) {
-                FileException(e);
-            }
-
-        });
+            });
+        } catch (e) {
+            FileException(e);
+        }
 
         return jsonObject = {
-            fullFilePath: url + '/' + pathDir
+            fileUrl: url + '/' + pathDir
         };
+
     }
 
 
