@@ -4,10 +4,10 @@ let app = require('express')(),
     Update = require('app/model/update/user/users'),
     Util = require('app/io/util/util'),
     File = require('app/io/util/File'),
-    SocketUtil = require('app/io/util/util'),
     Response = require('app/util/Response'),
     Pipeline = require('app/io/middleware/SocketIoPipeline'),
-    Find = require('app/model/find/group/group'),
+    FindGroup = require('app/model/find/group/group'),
+    FindUser = require('app/model/find/user/users'),
     Json = require('app/util/ReturnJson'),
     FindInUser = require('app/model/find/user/users');
 require('dotenv').config();
@@ -119,58 +119,79 @@ io.use((socket, next) => {
 
 
     socket.on('onPvTyping', data => {
-        let userId = data['userId'];
+        let receiverId = data['receiverId'];
 
-        Util.searchAndReplaceUserIdToSocketId(userId, allUsers, socketId => {
+        Util.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
-            if (socketId === IN_VALID_USER_ID)
+            if (receiverId === IN_VALID_USER_ID)
                 return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
 
-            let user = allUsers[socketId];
-            io.to(user).emit('isPvTyping', {
-                'isPvTyping': data['isPvTyping']
+            FindUser.isExistChatRoom({
+                to: `${receiverId}`,
+                from: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
+
+                let user = allUsers[receiverId];
+
+                delete data['receiverId'];
+                data['senderId'] = socketUserId;
+
+                io.to(user).emit('isPvTyping', data);
+
             });
 
         });
 
     });
 
-    socket.on('onPvMessage', (jsonObject, dataBinary) => {
-        let receiverId = jsonObject['receiverId'];
+    socket.on('onPvMessage', (data, dataBinary) => {
+        let receiverId = data['receiverId'];
 
 
-        if (jsonObject !== undefined)
+        if (data !== undefined)
 
             Util.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
 
                 if (receiverSocketId === IN_VALID_USER_ID)
                     return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
 
+                FindUser.isExistChatRoom({
+                    to: `${receiverId}`,
+                    from: `${socketUserId}`
+                }, result => {
 
-                let user = allUsers[receiverSocketId];
-                let isDataBinaryNUll = dataBinary === undefined;
+                    if (!result)
+                        return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
 
-                Util.validateMessage(jsonObject, result => {
+                    let user = allUsers[receiverSocketId];
+                    let isDataBinaryNUll = dataBinary === undefined;
 
-                    if (result === IN_VALID_OBJECT_KEY)
-                        return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+                    Util.validateMessage(data, result => {
 
-                    delete jsonObject['receiverId'];
-                    jsonObject['senderId'] = socketUserId;
+                        if (result === IN_VALID_OBJECT_KEY)
+                            return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-                    if (isDataBinaryNUll) {
-                        return io.to(user).emit('emitPvMessage', result);
-                    }
+                        delete data['receiverId'];
+                        data['senderId'] = socketUserId;
 
-
-                    let fullFilePath = File.decodeAndWriteFile(dataBinary, jsonObject['type'],
-                        socket, jsonObject['fileFormat']).fileUrl;
+                        if (isDataBinaryNUll) {
+                            return io.to(user).emit('emitPvMessage', result);
+                        }
 
 
-                    // connect database
+                        let fullFilePath = File.decodeAndWriteFile(dataBinary, data['type'],
+                            socket, data['fileFormat']).fileUrl;
+
+
+                        // connect database
+                    });
+
                 });
-
             });
+
 
     });
 
@@ -182,7 +203,7 @@ io.use((socket, next) => {
         let groupId = data.id;
         let userId = allUsers[socketId].data.userId;
 
-        Find.groupId(groupId, result => {
+        FindGroup.groupId(groupId, result => {
 
             if (!result) {
                 return socket.emit('groupInitError',

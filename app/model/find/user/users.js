@@ -1,5 +1,6 @@
 let openSql = require('app/database/OpenSql'),
     {
+        OR,
         AND,
         EQUAL_TO,
         IS_NOT_NULL
@@ -146,6 +147,33 @@ module.exports = {
         }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    isExistChatRoom(data, cb) {
+        openSql.find({
+            optionKeyword: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO,
+                OR,
+                EQUAL_TO,
+                AND,
+                EQUAL_TO,
+            ],
+            data: [
+                'tblChatId', 'listofusere2es', 'to', `${data['to']}`,
+                'from', `${data['from']}`, 'to', `${data['from']}`,
+                'from', `${data['to']}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result.length === 0) ? cb(false) : cb(result[0].tblChatId);
             } catch (e) {
                 DataBaseException(e);
             }

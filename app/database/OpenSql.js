@@ -66,7 +66,7 @@ module.exports = {
 
         realSql = USE_DATABASE + 'Drop Table IF EXISTS ' + util.stringOfValueWithComma;
 
-        query(realSql,{});
+        query(realSql, {});
 
         removeStringOfValueWithComma();
 
@@ -185,6 +185,19 @@ module.exports = {
         query(realSql, jsonArray.data);
 
         removeSqlQuery();
+
+        return this;
+    },
+
+
+    findTable(tableName) {
+
+        realSql = 'SELECT TABLE_NAME ' +
+            'FROM INFORMATION_SCHEMA.TABLES ' +
+            'WHERE TABLE_NAME = ' + "'" + tableName + "' "  +
+            'and TABLE_SCHEMA = ' + "'" + DAtABASE_NAME + "'" ;
+
+        query(realSql,null);
 
         return this;
     },
