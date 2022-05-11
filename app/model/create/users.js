@@ -61,8 +61,8 @@ module.exports = {
             table: 'listOfUserE2Es',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
-                to: INT(),
-                from: INT(),
+                toUser: INT(),
+                fromUser: INT(),
                 tblChatId: VARCHAR(100)
             },
             primaryKey: 'id'

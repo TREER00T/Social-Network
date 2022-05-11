@@ -166,9 +166,9 @@ module.exports = {
                 EQUAL_TO,
             ],
             data: [
-                'tblChatId', 'listofusere2es', 'to', `${data['to']}`,
-                'from', `${data['from']}`, 'to', `${data['from']}`,
-                'from', `${data['to']}`
+                'tblChatId', 'listofusere2es', 'toUser', `${data['toUser']}`,
+                'fromUser', `${data['fromUser']}`, 'toUser', `${data['fromUser']}`,
+                'fromUser', `${data['toUser']}`
             ],
             where: true
         }).result(result => {

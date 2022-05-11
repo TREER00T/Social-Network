@@ -127,8 +127,8 @@ io.use((socket, next) => {
                 return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
 
             FindUser.isExistChatRoom({
-                to: `${receiverId}`,
-                from: `${socketUserId}`
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
             }, result => {
 
                 if (!result)
@@ -159,8 +159,8 @@ io.use((socket, next) => {
                     return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
 
                 FindUser.isExistChatRoom({
-                    to: `${receiverId}`,
-                    from: `${socketUserId}`
+                    toUser: `${receiverId}`,
+                    fromUser: `${socketUserId}`
                 }, result => {
 
                     if (!result)

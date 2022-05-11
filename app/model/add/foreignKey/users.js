@@ -137,7 +137,7 @@ module.exports = {
     listOfUserE2Es() {
         openSql.addForeignKey({
             table: 'listOfUserE2Es',
-            foreignKey: 'to',
+            foreignKey: 'toUser',
             referenceTable: 'users',
             field: 'id',
             onDelete: CASCADE,
@@ -145,7 +145,7 @@ module.exports = {
         });
         openSql.addForeignKey({
             table: 'listOfUserE2Es',
-            foreignKey: 'from',
+            foreignKey: 'fromUser',
             referenceTable: 'users',
             field: 'id',
             onDelete: CASCADE,
