@@ -1,4 +1,4 @@
-const express = require('express'),
+let express = require('express'),
     router = express.Router(),
     User = require('app/controller/user/auth/AuthInterface');
 

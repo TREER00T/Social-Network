@@ -7,7 +7,8 @@ let express = require('express'),
     Pipeline = require('app/middleware/ApiPipeline'),
     Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
-    authRouter = require('app/routes/AuthRoutes');
+    authRouter = require('app/routes/AuthRoutes'),
+    e2eRouter = require('app/routes/PvChatRoutes');
 
 
 module.exports = {
@@ -48,6 +49,7 @@ module.exports = {
 
 
         app.use('/auth', authRouter);
+        app.use('/e2e', e2eRouter);
 
         app.listen(process.env.EXPRESS_PORT, () => {
             console.log('Server are running...');

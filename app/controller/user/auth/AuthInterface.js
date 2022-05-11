@@ -1,4 +1,4 @@
-const Json = require('app/util/ReturnJson'),
+let Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
     Update = require('app/model/update/user/users'),
     Insert = require('app/model/add/insert/user/users'),
