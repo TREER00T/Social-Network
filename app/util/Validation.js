@@ -14,7 +14,6 @@ const Json = require('./ReturnJson'),
 
 module.exports = {
 
-
     // Checks phone number E.g : 09030207892 return true
     isPhoneNumber(data) {
         try {
@@ -63,7 +62,7 @@ module.exports = {
                     return Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
                 }
 
-                if (err instanceof JsonWebTokenError){
+                if (err instanceof JsonWebTokenError) {
                     cb('IN_VALID_TOKEN');
                     return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
                 }
@@ -89,7 +88,8 @@ module.exports = {
             if (typeof decryptedVal.plaintext === ('undefined' || null))
                 return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
 
-            return token;
+            return token.replace(/["]+/g, '');
+
         } catch (e) {
             ValidationException(e);
         }
@@ -108,6 +108,5 @@ module.exports = {
             ValidationException(e);
         }
     }
-
 
 }

@@ -88,17 +88,17 @@ exports.isValidAuthCode = (req, res) => {
                             Json.builder(
                                 Response.HTTP_ACCEPTED,
                                 {
-                                    'accessToken': await getJwtEncrypt(getJwtSign({
-                                        'phoneNumber': `${phone}`,
-                                        'id': `${id}`,
+                                    accessToken: await getJwtEncrypt(getJwtSign({
+                                        phoneNumber: `${phone}`,
+                                        id: `${id}`,
                                         type: 'at'
                                     }, phone)),
-                                    'refreshToken': await getJwtEncrypt(getJwtRefresh({
-                                        'phoneNumber': `${phone}`,
-                                        'id': `${id}`,
+                                    refreshToken: await getJwtEncrypt(getJwtRefresh({
+                                        phoneNumber: `${phone}`,
+                                        id: `${id}`,
                                         type: 'rt'
                                     }, phone)),
-                                    'apiKey': result
+                                    apiKey: result
                                 }
                             )
 
@@ -142,9 +142,14 @@ exports.isValidPassword = (req, res) => {
 
     getAccessTokenPayLoad(data => {
 
+
         let phone = data.phoneNumber;
         let password = req.body.password;
 
+        let iPasswordNull = (password === undefined || password?.length === 0);
+
+        if (iPasswordNull)
+            return Json.builder(Response.HTTP_BAD_REQUEST);
 
         Find.isValidPassword(phone, getHashData(password.trim(), phone), result => {
 
@@ -156,7 +161,7 @@ exports.isValidPassword = (req, res) => {
             Find.getApiKey(phone, result => {
 
                 return Json.builder(Response.HTTP_ACCEPTED, {
-                    'apiKey': result
+                    apiKey: result
                 });
 
             });
@@ -165,6 +170,7 @@ exports.isValidPassword = (req, res) => {
         });
 
     });
+
 
 }
 
@@ -192,14 +198,14 @@ exports.refreshToken = (req, res) => {
                 Json.builder(
                     Response.HTTP_ACCEPTED,
                     {
-                        'accessToken': await getJwtEncrypt(getJwtSign({
-                            'phoneNumber': `${phone}`,
-                            'id': `${id}`,
+                        accessToken: await getJwtEncrypt(getJwtSign({
+                            phoneNumber: `${phone}`,
+                            id: `${id}`,
                             type: 'at'
                         }, phone)),
-                        'refreshToken': await getJwtEncrypt(getJwtRefresh({
-                            'phoneNumber': `${phone}`,
-                            'id': `${id}`,
+                        refreshToken: await getJwtEncrypt(getJwtRefresh({
+                            phoneNumber: `${phone}`,
+                            id: `${id}`,
                             type: 'rt'
                         }, phone))
                     }

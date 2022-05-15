@@ -10,7 +10,10 @@ let openSql = require('app/database/OpenSql'),
     {
         NOT_NULL,
         AUTO_INCREMENT
-    } = require('app/database/util/SqlKeyword');
+    } = require('app/database/util/SqlKeyword'),
+    {
+        DataBaseException
+    } = require('app/exception/DataBaseException');
 
 
 module.exports = {
@@ -90,7 +93,7 @@ module.exports = {
     savedMessages(phone) {
 
         openSql.createTable({
-            table: '`' + phone + 'SavedMessages`',
+            table: phone + 'SavedMessages',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 text: VARCHAR(4096),
@@ -107,8 +110,7 @@ module.exports = {
                 targetReplyId: INT(),
                 forwardDataId: INT()
             },
-            primaryKey: 'id',
-            index: phone + 'SavedMessages(`text`)'
+            primaryKey: 'id'
         });
 
     },
@@ -117,7 +119,7 @@ module.exports = {
     devices() {
 
         openSql.createTable({
-            table: `devices`,
+            table: 'devices',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 userId: INT(),
@@ -135,7 +137,7 @@ module.exports = {
     userBlockList() {
 
         openSql.createTable({
-            table: `userBlockList`,
+            table: 'userBlockList',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 userId: INT(),
@@ -147,10 +149,10 @@ module.exports = {
     },
 
 
-    e2eContents(e2eId) {
+    e2eContents(fromUser, toUser, cb) {
 
         openSql.createTable({
-            table: '`' + e2eId + 'E2EContents`',
+            table: fromUser + 'And' + toUser + 'E2EContents',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 date: DATETIME(),
@@ -167,8 +169,13 @@ module.exports = {
                 targetReplyId: INT(),
                 forwardDataId: INT()
             },
-            primaryKey: 'id',
-            index: e2eId + 'E2EContents(`text`)'
+            primaryKey: 'id'
+        }).result(result => {
+            try {
+                (result[1].warningCount > 0 && result[1].warningCount !== undefined) ? cb(false) : cb(true);
+            } catch (e) {
+                DataBaseException(e);
+            }
         });
 
     }

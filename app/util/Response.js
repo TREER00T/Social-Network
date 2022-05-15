@@ -267,6 +267,14 @@ module.exports = {
     HTTP_INVALID_JSON_OBJECT_KEY: {
         code: 802,
         message: 'In valid json object key'
+    },
+    HTTP_User_NOT_FOUND: {
+        code: 803,
+        message: 'User Not Found'
+    },
+    HTTP_UNAUTHORIZED_INVALID_API_KEY: {
+        code: 804,
+        message: 'Unauthorized! Invalid Api Key'
     }
 
 };

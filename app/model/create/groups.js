@@ -47,8 +47,7 @@ module.exports = {
                 publicLink: VARCHAR(100),
                 description: VARCHAR(255)
             },
-            primaryKey: 'id',
-            index: 'Groups_Name(`name`)'
+            primaryKey: 'id'
         });
 
     },
@@ -105,8 +104,7 @@ module.exports = {
                 targetReplyId: INT(),
                 forwardDataId: INT()
             },
-            primaryKey: 'id',
-            index: groupId + 'GroupContents(`text`)'
+            primaryKey: 'id'
         });
 
     }

@@ -4,7 +4,7 @@ let express = require('express'),
 
 
 
-router.post('/room/create', PvChat.createChat);
+router.post('/room/create', PvChat.createE2EChat);
 
 
 module.exports = router;

@@ -29,6 +29,7 @@ module.exports = {
             let accessToken = req.headers['authorization-at'];
             let refreshToken = req.headers['authorization-rt'];
             let apiKey = req.body.apiKey;
+            let phone = req.body.phone;
 
 
             let isSetUserAccessToken = Pipeline.accessTokenVerify(accessToken);
@@ -42,6 +43,16 @@ module.exports = {
                 !isSetUserApiKey && isSetUserAccessToken && !isSetPhone)
                 return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
 
+
+            if (isSetPhone && isSetUserApiKey && isSetUserAccessToken) {
+                return Pipeline.isValidApiKey(apiKey, phone, result => {
+                    if (!result) {
+                        return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+                    }
+                    app.use(router);
+                    next();
+                });
+            }
 
             app.use(router);
             next();

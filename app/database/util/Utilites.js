@@ -479,6 +479,7 @@ module.exports = {
 
 
     getCreateTableSqlQuery(jsonArray) {
+
         let newArrayOfFieldItem = [];
 
         for (let value in jsonArray.field) {
@@ -487,17 +488,14 @@ module.exports = {
             newArrayOfFieldItem.push(`${value} ${key}${COMMA} `);
         }
 
-        module.exports.sqlQuery = newArrayOfFieldItem.join('')
+        let query = newArrayOfFieldItem.join('')
             .replace(/,\s*$/, ''); // replace last comma in array
 
         if (jsonArray.primaryKey !== undefined)
-            return module.exports.sqlQuery += `${COMMA} PRIMARY KEY (${jsonArray.primaryKey})`;
-
-        if (jsonArray.index !== undefined)
-            return module.exports.sqlQuery += `${COMMA} INDEX ${jsonArray.index}`;
+            query += ` ${COMMA} PRIMARY KEY (${jsonArray.primaryKey}) `;
 
 
-        return module.exports.sqlQuery;
+        return module.exports.sqlQuery = query;
     },
 
     generateUpdateSqlQueryWithData(jsonObject) {

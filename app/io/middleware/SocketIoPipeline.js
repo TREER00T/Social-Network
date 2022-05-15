@@ -45,10 +45,7 @@ module.exports = {
 
         (async () => {
 
-            let tokenWithDoubleQuestion = await getJwtDecrypt(isSetUserAccessToken);
-            let token;
-            if (tokenWithDoubleQuestion !== undefined)
-                token = tokenWithDoubleQuestion.replace(/["]+/g, '');
+            let token = await getJwtDecrypt(isSetUserAccessToken);
 
             getJwtVerify(token, decode => {
 

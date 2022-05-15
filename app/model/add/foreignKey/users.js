@@ -6,75 +6,75 @@ let openSql = require('app/database/OpenSql'),
 module.exports = {
 
 
-    e2eContents(e2eId) {
+    e2eContents(fromUser, toUser) {
         openSql.addForeignKey({
-            table: '`' + e2eId + 'E2EContents',
+            table: fromUser + 'And' + toUser + 'E2EContents',
             foreignKey: 'forwardDataId',
             referenceTable: 'forwardContents',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
-            table: '`' + e2eId + 'E2EContents',
+            table: fromUser + 'And' + toUser + 'E2EContents',
             foreignKey: 'senderId',
             referenceTable: 'users',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     },
 
 
     userBlockList() {
         openSql.addForeignKey({
-            table: `userBlockList`,
+            table: 'userBlockList',
             foreignKey: 'userId',
             referenceTable: 'users',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
-            table: `userBlockList`,
+            table: 'userBlockList',
             foreignKey: 'userTargetId',
             referenceTable: 'users',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     },
 
 
     devices() {
         openSql.addForeignKey({
-            table: `devices`,
+            table: 'devices',
             foreignKey: 'userId',
             referenceTable: 'users',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     },
 
 
     savedMessages(phone) {
         openSql.addForeignKey({
-            table: '`' + phone + 'SavedMessages`',
+            table: phone + 'SavedMessages',
             foreignKey: 'forwardDataId',
             referenceTable: 'forwardContents',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
-            table: '`' + phone + 'SavedMessages',
+            table: phone + 'SavedMessages',
             foreignKey: 'senderId',
             referenceTable: 'users',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     },
 
 
@@ -86,7 +86,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
             table: 'listOfUserGroups',
             foreignKey: 'userId',
@@ -94,7 +94,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     },
 
 
@@ -106,7 +106,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
             table: 'listOfUserChannels',
             foreignKey: 'userId',
@@ -114,7 +114,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     },
 
 
@@ -126,7 +126,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
             table: 'listOfUserE2Es',
             foreignKey: 'fromUser',
@@ -134,7 +134,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     }
 
 }

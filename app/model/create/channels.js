@@ -38,7 +38,7 @@ module.exports = {
     channelContents(channelId) {
 
         openSql.createTable({
-            table: '`' + channelId + 'ChannelContents`',
+            table:  channelId + 'ChannelContents',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 text: VARCHAR(4096),
@@ -55,8 +55,7 @@ module.exports = {
                 targetReplyId: INT(),
                 forwardDataId: INT()
             },
-            primaryKey: 'id',
-            index: channelId + 'ChannelContents(`text`)'
+            primaryKey: 'id'
         });
 
     },
@@ -80,7 +79,7 @@ module.exports = {
     channels() {
 
         openSql.createTable({
-            table: `channels`,
+            table: 'channels',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 img: VARCHAR(130),
@@ -89,8 +88,7 @@ module.exports = {
                 publicLink: VARCHAR(100),
                 description: VARCHAR(255)
             },
-            primaryKey: 'id',
-            index: 'Channels_Name(`name`)'
+            primaryKey: 'id'
         });
 
     },

@@ -25,6 +25,7 @@ const {
         removeArrayOfDataForUpdateOrDeleteQuery
     } = require('./util/Utilites'),
     util = require('./util/Utilites');
+const {sqlQuery} = require("app/database/util/Utilites");
 
 
 let realSql;
@@ -49,7 +50,7 @@ module.exports = {
         getCreateTableSqlQuery(jsonArray);
 
         realSql = USE_DATABASE +
-            ` CREATE TABLE ${IF_NOT_EXISTS} ${jsonArray.table} ` +
+            ` CREATE TABLE ${IF_NOT_EXISTS} ` + '`' + jsonArray.table + '`' +
             `(${util.sqlQuery})`;
 
         query(realSql, null);
@@ -195,19 +196,20 @@ module.exports = {
 
         realSql = 'SELECT TABLE_NAME ' +
             'FROM INFORMATION_SCHEMA.TABLES ' +
-            'WHERE TABLE_NAME = ' + "'" + tableName + "' "  +
-            'and TABLE_SCHEMA = ' + "'" + DAtABASE_NAME + "'" ;
+            'WHERE TABLE_NAME = ' + "'" + tableName + "' " +
+            'and TABLE_SCHEMA = ' + "'" + DAtABASE_NAME + "'";
 
-        query(realSql,null);
+        query(realSql, null);
 
         return this;
     },
 
 
     result(callBackResult) {
-        sqlQueryResult(result => {
-            callBackResult(result);
-        });
+        if (typeof callBackResult === 'function')
+            sqlQueryResult(result => {
+                callBackResult(result);
+            });
     }
 
 

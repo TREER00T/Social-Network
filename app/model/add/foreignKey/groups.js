@@ -9,21 +9,21 @@ module.exports = {
 
     groupContents(groupId) {
         openSql.addForeignKey({
-            table: '`' + groupId + 'GroupContents`',
+            table: groupId + 'GroupContents',
             foreignKey: 'forwardDataId',
             referenceTable: 'forwardContents',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
-            table: '`' + groupId + 'GroupContents',
+            table: groupId + 'GroupContents',
             foreignKey: 'senderId',
             referenceTable: 'users',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     },
 
     groupsAdmins() {
@@ -34,7 +34,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
             table: 'groupsAdmins',
             foreignKey: 'groupId',
@@ -42,7 +42,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     },
 
 
@@ -54,7 +54,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
             table: 'groupsUsers',
             foreignKey: 'groupId',
@@ -62,7 +62,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     },
 
 
@@ -74,7 +74,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
         openSql.addForeignKey({
             table: 'reportGroups',
             foreignKey: 'groupId',
@@ -82,7 +82,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        });
+        }).result(()=>{});
     }
 
 

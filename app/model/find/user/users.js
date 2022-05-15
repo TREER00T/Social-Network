@@ -178,6 +178,22 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+    isExistUser(userId, cb) {
+        openSql.find({
+            optionKeyword: [
+                EQUAL_TO
+            ],
+            data: ['id', 'users', 'id', `${userId}`],
+            where: true
+        }).result(result => {
+            try {
+                (result[1].length !== 0) ? cb(true) : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
 
 

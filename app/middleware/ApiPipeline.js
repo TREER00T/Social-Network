@@ -2,9 +2,12 @@ let {
         getJwtVerify,
         getJwtDecrypt,
         getSplitBearerJwt
-    } = require('app/util/Validation');
+    } = require('app/util/Validation'),
+    {
+        getApiKey
+    } = require('app/model/find/user/users');
 
-let refreshTokenPayload, accessTokenPayload, apiKey;
+let refreshTokenPayload, accessTokenPayload;
 
 module.exports = {
 
@@ -13,12 +16,23 @@ module.exports = {
         if (key === undefined)
             return false;
 
-        (function (cb) {
-            if (typeof cb === 'function')
-                cb(key)
-        })(apiKey);
+        module.exports.apiKey = key;
 
         return true;
+    },
+
+
+    isValidApiKey(key, phone, cb) {
+
+        getApiKey(phone, result => {
+
+            if (result !== key) {
+                return cb(false);
+            }
+
+            cb(true);
+        });
+
     },
 
 
@@ -30,20 +44,20 @@ module.exports = {
 
             (async () => {
 
-                let tokenWithDoubleQuestion = await getJwtDecrypt(isSetUserRefreshToken);
-                let token;
-                if (tokenWithDoubleQuestion !== undefined)
-                    token = tokenWithDoubleQuestion.replace(/["]+/g, '');
+                let token = await getJwtDecrypt(isSetUserRefreshToken);
 
                 getJwtVerify(token, decode => {
 
                     if (decode.type === 'rt') {
 
+                        module.exports.token = {
+                            rt: decode
+                        };
+
                         (function (cb) {
                             if (typeof cb === 'function')
                                 cb(decode)
                         })(refreshTokenPayload);
-
                     }
 
                 });
@@ -65,14 +79,15 @@ module.exports = {
 
             (async () => {
 
-                let tokenWithDoubleQuestion = await getJwtDecrypt(isSetUserAccessToken);
-                let token;
-                if (tokenWithDoubleQuestion !== undefined)
-                    token = tokenWithDoubleQuestion.replace(/["]+/g, '');
+                let token = await getJwtDecrypt(isSetUserAccessToken);
 
                 getJwtVerify(token, decode => {
 
                     if (decode.type === 'at') {
+
+                        module.exports.token = {
+                            at: decode
+                        };
 
                         (function (cb) {
                             if (typeof cb === 'function')
@@ -82,7 +97,6 @@ module.exports = {
                     }
 
                 });
-
             })();
 
             return true;
@@ -90,6 +104,7 @@ module.exports = {
 
         return false;
     },
+
 
     getRefreshTokenPayLoad(cb) {
         refreshTokenPayload = (data => {
@@ -100,13 +115,6 @@ module.exports = {
 
     getAccessTokenPayLoad(cb) {
         accessTokenPayload = (data => {
-            cb(data);
-        });
-    },
-
-
-    getApiKey(cb) {
-        apiKey = (data => {
             cb(data);
         });
     }

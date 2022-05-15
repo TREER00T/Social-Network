@@ -37,7 +37,6 @@ io.use((socket, next) => {
     let accessToken = socket.handshake.headers.authorization;
     let apiKey = socket.handshake.query.apiKey;
 
-
     Pipeline.accessTokenVerify(accessToken, result => {
 
         if (result !== 'TOKEN_EXP' || 'IN_VALID_TOKEN' && result) {
@@ -57,7 +56,6 @@ io.use((socket, next) => {
                                 userId: userId
                             }
                         };
-                        socket.nickname = socketId;
                         next();
                     }
 
@@ -179,7 +177,6 @@ io.use((socket, next) => {
 
                         if (isDataBinaryNUll)
                             return io.to(user).emit('emitPvMessage', result);
-
 
 
                         let fullFilePath = File.decodeAndWriteFile(dataBinary, data['type'],

@@ -1,4 +1,4 @@
-const mysql = require('mysql'),
+let mysql = require('mysql'),
     dotenv = require('dotenv'),
     {
         DataBaseException
@@ -8,7 +8,7 @@ let queryResult;
 
 dotenv.config();
 
-const con = mysql.createConnection({
+let con = mysql.createConnection({
     host: process.env.HOST,
     user: process.env.USER,
     password: process.env.PASSWORD,
@@ -23,6 +23,11 @@ module.exports = {
 
         try {
             con.query(sql, arrayObjects, (err, result) => {
+
+                if (err !== null)
+                    module.exports.result = err;
+
+                module.exports.result = result;
 
                 (function (cb) {
                     if (typeof cb === 'function')
