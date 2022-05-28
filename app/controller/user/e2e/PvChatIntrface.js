@@ -38,9 +38,28 @@ exports.createE2EChat = (req, res) => {
 
             Json.builder(Response.HTTP_CREATED);
 
+            // insert room in list user room
         });
 
 
     });
 
+};
+
+
+var multer = require('multer');
+var upload = multer({dest: 'uploads/'}).single("png");
+var a = multer({dest: 'uploads/'}).single("a");
+
+exports.uploadFile = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+    a(req, res, (err) => {
+      //  console.log(req.key.a)
+    });
+    upload(req, res, (err) => {
+
+    });
 };

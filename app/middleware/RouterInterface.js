@@ -1,5 +1,7 @@
 let express = require('express'),
     app = express(),
+    multer = require('multer'),
+    upload = multer(),
     router = express.Router(),
     bodyParser = require('body-parser'),
     dotenv = require('dotenv'),
@@ -38,10 +40,10 @@ module.exports = {
             let isSetPhone = (req.body.phone !== undefined);
 
 
-            if (!isSetUserApiKey && !isSetUserAccessToken && !isSetPhone && !isSetUserRefreshToken ||
-                isSetUserApiKey && !isSetUserAccessToken && !isSetPhone ||
-                !isSetUserApiKey && isSetUserAccessToken && !isSetPhone)
-                return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
+            // if (!isSetUserApiKey && !isSetUserAccessToken && !isSetPhone && !isSetUserRefreshToken ||
+            //     isSetUserApiKey && !isSetUserAccessToken && !isSetPhone ||
+            //     !isSetUserApiKey && isSetUserAccessToken && !isSetPhone)
+            //     return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
 
 
             if (isSetPhone && isSetUserApiKey && isSetUserAccessToken) {

@@ -4,7 +4,13 @@ let express = require('express'),
 
 
 
+let multer  = require('multer'),
+    upload = multer(),
+    type = upload.single('png');
+
+
 router.post('/room/create', PvChat.createE2EChat);
+router.post('/room/uploadFile',type, PvChat.uploadFile);
 
 
 module.exports = router;
