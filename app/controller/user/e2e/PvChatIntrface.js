@@ -47,9 +47,9 @@ exports.createE2EChat = (req, res) => {
 };
 
 
-var multer = require('multer');
-var upload = multer({dest: 'uploads/'}).single("png");
-var a = multer({dest: 'uploads/'}).single("a");
+let multer = require('multer'),
+    upload = multer({dest: 'uploads/'}).single("png"),
+    a = multer({dest: 'uploads/'}).single("a");
 
 exports.uploadFile = (req, res) => {
 
