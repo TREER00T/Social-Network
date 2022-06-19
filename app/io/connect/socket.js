@@ -3,7 +3,7 @@ let app = require('express')(),
     io = require('socket.io')(http),
     Update = require('app/model/update/user/users'),
     Util = require('app/io/util/util'),
-    File = require('app/io/util/File'),
+    File = require('app/util/File'),
     Response = require('app/util/Response'),
     Pipeline = require('app/io/middleware/SocketIoPipeline'),
     FindGroup = require('app/model/find/group/group'),
@@ -179,8 +179,8 @@ io.use((socket, next) => {
                             return io.to(user).emit('emitPvMessage', result);
 
 
-                        let fullFilePath = File.decodeAndWriteFile(dataBinary, data['type'],
-                            socket, data['fileFormat']).fileUrl;
+                        // let fullFilePath = File.decodeAndWriteFile(dataBinary, data['type'],
+                        //     socket, data['fileFormat']).fileUrl;
 
 
                         // connect database

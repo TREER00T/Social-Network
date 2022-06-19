@@ -1,5 +1,6 @@
 let Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
+    Util = require('app/util/util'),
     Update = require('app/model/update/user/users'),
     Insert = require('app/model/add/insert/user/users'),
     Find = require('app/model/find/user/users'),
@@ -39,7 +40,7 @@ exports.gvc = (req, res) => {
             CreateUser.savedMessages(phone);
             AddUserForeignKey.savedMessages(phone);
 
-            Insert.phoneAndAuthCode(phone, getVerificationCode(), isAdded => {
+            Insert.phoneAndAuthCode(phone, getVerificationCode(), Util.getRandomHexColor(), isAdded => {
                 if (isAdded)
                     return Json.builder(Response.HTTP_CREATED);
             });

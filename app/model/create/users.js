@@ -35,7 +35,8 @@ module.exports = {
                 password: VARCHAR(255),
                 lastName: VARCHAR(20),
                 firstName: VARCHAR(20),
-                isBlocked: BOOLEAN()
+                isBlocked: BOOLEAN(),
+                defaultColor: VARCHAR(7)
             },
             primaryKey: 'id'
         });

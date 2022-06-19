@@ -3,8 +3,11 @@ let Json = require('app/util/ReturnJson'),
     Create = require('app/model/create/users'),
     Add = require('app/model/add/foreignKey/users'),
     Find = require('app/model/find/user/users'),
-    PipeLine = require('app/middleware/ApiPipeline');
-
+    PipeLine = require('app/middleware/ApiPipeline'),
+    multer = require('multer'),
+    Util = require('app/util/util'),
+    File = require('app/util/File'),
+    multerFile = multer().single('file');
 
 exports.createE2EChat = (req, res) => {
 
@@ -47,19 +50,21 @@ exports.createE2EChat = (req, res) => {
 };
 
 
-let multer = require('multer'),
-    upload = multer({dest: 'uploads/'}).single("png"),
-    a = multer({dest: 'uploads/'}).single("a");
-
 exports.uploadFile = (req, res) => {
 
 
     Json.initializationRes(res);
 
-    a(req, res, (err) => {
-      //  console.log(req.key.a)
-    });
-    upload(req, res, (err) => {
+
+    multerFile(req, res, () => {
+
+        let file = req.file;
+
+        if (file !== undefined) {
+
+            File.decodeAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+        }
 
     });
+
 };

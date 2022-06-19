@@ -34,8 +34,8 @@ module.exports = {
             let phone = req.body.phone;
 
 
-            let isSetUserAccessToken = Pipeline.accessTokenVerify(accessToken);
-            let isSetUserRefreshToken = Pipeline.refreshTokenVerify(refreshToken);
+            // let isSetUserAccessToken = Pipeline.accessTokenVerify(accessToken);
+            // let isSetUserRefreshToken = Pipeline.refreshTokenVerify(refreshToken);
             let isSetUserApiKey = Pipeline.isSetUserApiKey(apiKey);
             let isSetPhone = (req.body.phone !== undefined);
 
@@ -46,15 +46,15 @@ module.exports = {
             //     return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
 
 
-            if (isSetPhone && isSetUserApiKey && isSetUserAccessToken) {
-                return Pipeline.isValidApiKey(apiKey, phone, result => {
-                    if (!result) {
-                        return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
-                    }
-                    app.use(router);
-                    next();
-                });
-            }
+            // if (isSetPhone && isSetUserApiKey && isSetUserAccessToken) {
+            //     return Pipeline.isValidApiKey(apiKey, phone, result => {
+            //         if (!result) {
+            //             return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+            //         }
+            //         app.use(router);
+            //         next();
+            //     });
+            // }
 
             app.use(router);
             next();

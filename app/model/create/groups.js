@@ -45,7 +45,8 @@ module.exports = {
                 name: VARCHAR(70),
                 inviteLink: VARCHAR(100),
                 publicLink: VARCHAR(100),
-                description: VARCHAR(255)
+                description: VARCHAR(255),
+                defaultColor: VARCHAR(7)
             },
             primaryKey: 'id'
         });

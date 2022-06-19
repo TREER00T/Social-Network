@@ -3,12 +3,13 @@ let openSql = require('app/database/OpenSql');
 
 module.exports = {
 
-    phoneAndAuthCode(phone, authCode, cb) {
+    phoneAndAuthCode(phone, authCode, defaultColor, cb) {
         openSql.addOne({
             table: 'users',
             data: {
                 phone: `${phone}`,
-                authCode: authCode
+                authCode: authCode,
+                defaultColor: defaultColor
             }
         }).result(result => {
             (result) ? cb(true) : cb(false);
