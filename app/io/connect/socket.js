@@ -2,8 +2,8 @@ let app = require('express')(),
     http = require('http').Server(app),
     io = require('socket.io')(http),
     Update = require('app/model/update/user/users'),
-    Util = require('app/io/util/util'),
-    File = require('app/util/File'),
+    IoUtil = require('app/io/util/util'),
+    RestFulUtil = require('app/util/util'),
     Response = require('app/util/Response'),
     Pipeline = require('app/io/middleware/SocketIoPipeline'),
     FindGroup = require('app/model/find/group/group'),
@@ -82,7 +82,7 @@ io.use((socket, next) => {
 
         let isOnline = false;
 
-        Util.sendUserOnlineStatusForSpecificUsers(listOfUser, isOnline, () => {
+        IoUtil.sendUserOnlineStatusForSpecificUsers(listOfUser, isOnline, () => {
             delete allUsers[socketId];
         });
 
@@ -100,7 +100,7 @@ io.use((socket, next) => {
 
         let listOfUsersArray = arrayOfUser['data'];
 
-        Util.searchAndReplaceInArrayOfUserIdToSocketId(listOfUsersArray, allUsers, result => {
+        IoUtil.searchAndReplaceInArrayOfUserIdToSocketId(listOfUsersArray, allUsers, result => {
 
             if (result === IN_VALID_USER_ID)
                 return socket.emit('emitListOfUserChatError', Response.HTTP_NOT_FOUND);
@@ -110,7 +110,7 @@ io.use((socket, next) => {
             };
 
             let isOnline = true;
-            Util.sendUserOnlineStatusForSpecificUsers(result, isOnline);
+            IoUtil.sendUserOnlineStatusForSpecificUsers(result, isOnline);
         });
 
     });
@@ -119,7 +119,7 @@ io.use((socket, next) => {
     socket.on('onPvTyping', data => {
         let receiverId = data['receiverId'];
 
-        Util.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
             if (receiverId === IN_VALID_USER_ID)
                 return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
@@ -145,13 +145,13 @@ io.use((socket, next) => {
 
     });
 
-    socket.on('onPvMessage', (data, dataBinary) => {
+    socket.on('onPvMessage', data => {
         let receiverId = data['receiverId'];
 
 
         if (data !== undefined)
 
-            Util.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
+            IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
 
                 if (receiverSocketId === IN_VALID_USER_ID)
                     return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
@@ -165,9 +165,8 @@ io.use((socket, next) => {
                         return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
 
                     let user = allUsers[receiverSocketId];
-                    let isDataBinaryNUll = dataBinary === undefined;
 
-                    Util.validateMessage(data, result => {
+                    RestFulUtil.validateMessage(data, result => {
 
                         if (result === IN_VALID_OBJECT_KEY)
                             return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
@@ -175,15 +174,11 @@ io.use((socket, next) => {
                         delete data['receiverId'];
                         data['senderId'] = socketUserId;
 
-                        if (isDataBinaryNUll)
-                            return io.to(user).emit('emitPvMessage', result);
+                        io.to(user).emit('emitPvMessage', result);
 
 
-                        // let fullFilePath = File.decodeAndWriteFile(dataBinary, data['type'],
-                        //     socket, data['fileFormat']).fileUrl;
 
-
-                        // connect database
+                       // connect db and insert data into e2e contents
                     });
 
                 });

@@ -60,7 +60,7 @@ module.exports = {
 
 
         try {
-            fs.writeFileSync(ROOT_PROJECT_FOLDER + pathDir, dataBinary );
+            fs.writeFileSync(ROOT_PROJECT_FOLDER + pathDir, dataBinary);
 
             fs.readFile(ROOT_PROJECT_FOLDER + pathDir, () => {
 

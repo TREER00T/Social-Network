@@ -5,9 +5,13 @@ let Json = require('app/util/ReturnJson'),
     Find = require('app/model/find/user/users'),
     PipeLine = require('app/middleware/ApiPipeline'),
     multer = require('multer'),
+    Insert = require('app/model/add/insert/user/users'),
     Util = require('app/util/util'),
     File = require('app/util/File'),
     multerFile = multer().single('file');
+
+
+
 
 exports.createE2EChat = (req, res) => {
 
@@ -41,7 +45,12 @@ exports.createE2EChat = (req, res) => {
 
             Json.builder(Response.HTTP_CREATED);
 
-            // insert room in list user room
+
+            let tableName = phone + 'And' + userId + 'E2EContents';
+
+            Insert.chatIdInListOfUserE2Es(phone, userId, tableName);
+
+
         });
 
 
@@ -63,6 +72,8 @@ exports.uploadFile = (req, res) => {
         if (file !== undefined) {
 
             File.decodeAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+
+
         }
 
     });
