@@ -3,7 +3,8 @@ let app = require('express')(),
     io = require('socket.io')(http),
     Update = require('app/model/update/user/users'),
     IoUtil = require('app/io/util/util'),
-    RestFulUtil = require('app/util/util'),
+    RestFulUtil = require('app/util/Util'),
+    Insert = require('app/model/add/insert/common/index'),
     Response = require('app/util/Response'),
     Pipeline = require('app/io/middleware/SocketIoPipeline'),
     FindGroup = require('app/model/find/group/group'),
@@ -171,17 +172,19 @@ io.use((socket, next) => {
                         if (result === IN_VALID_OBJECT_KEY)
                             return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
+
+                        let toUser =  data['receiverId'];
                         delete data['receiverId'];
                         data['senderId'] = socketUserId;
 
                         io.to(user).emit('emitPvMessage', result);
 
+                        Insert.message(socketUserId + 'And' + toUser + 'E2EContents', data);
 
-
-                       // connect db and insert data into e2e contents
                     });
 
                 });
+
             });
 
 

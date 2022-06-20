@@ -156,8 +156,8 @@ module.exports = {
             table: fromUser + 'And' + toUser + 'E2EContents',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
-                date: DATETIME(),
                 text: VARCHAR(4096),
+                date: DATETIME(),
                 type: ENUM(['None', 'Image', 'Location', 'Document', 'Video', 'Voice']),
                 isReply: BOOLEAN(),
                 fileUrl: VARCHAR(130),

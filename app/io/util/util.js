@@ -1,4 +1,7 @@
-let Server = require('app/io/connect/socket');
+let Server = require('app/io/connect/socket'),
+    {
+        NULL
+    } = require('app/database/util/SqlKeyword');
 
 module.exports = {
 

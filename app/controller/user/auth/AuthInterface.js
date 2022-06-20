@@ -1,6 +1,6 @@
 let Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
-    Util = require('app/util/util'),
+    Util = require('app/util/Util'),
     Update = require('app/model/update/user/users'),
     Insert = require('app/model/add/insert/user/users'),
     Find = require('app/model/find/user/users'),

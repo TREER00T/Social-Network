@@ -1,6 +1,6 @@
 let fs = require('fs'),
     Generate = require('app/util/Generate'),
-    Util = require('app/util/util'),
+    Util = require('app/util/Util'),
     dotenv = require('dotenv'),
     {
         FileException

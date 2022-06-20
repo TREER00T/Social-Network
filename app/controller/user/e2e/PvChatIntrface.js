@@ -6,7 +6,7 @@ let Json = require('app/util/ReturnJson'),
     PipeLine = require('app/middleware/ApiPipeline'),
     multer = require('multer'),
     Insert = require('app/model/add/insert/user/users'),
-    Util = require('app/util/util'),
+    Util = require('app/util/Util'),
     File = require('app/util/File'),
     multerFile = multer().single('file');
 

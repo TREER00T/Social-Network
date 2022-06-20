@@ -42,7 +42,7 @@ module.exports = {
 
         let arrayOfValidJsonObjectKey = [
             'text', 'type', 'isReply', 'fileName', 'receiverId', 'isForward', 'fileFormat',
-            'targetReplyId', 'forwardDataId', 'locationLat', 'locationLon'
+            'targetReplyId', 'forwardDataId', 'locationLat', 'locationLon', 'senderId'
         ];
 
         let arrayOfMessageType = [

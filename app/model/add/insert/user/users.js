@@ -16,6 +16,7 @@ module.exports = {
         });
     },
 
+
     chatIdInListOfUserE2Es(fromUser, toUser, tableName) {
         openSql.addOne({
             table: 'listOfUserE2Es',
