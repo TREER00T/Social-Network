@@ -11,7 +11,7 @@ dotenv.config();
 module.exports = {
 
 
-    decodeAndWriteFile(dataBinary, fileType) {
+    validationAndWriteFile(dataBinary, fileType) {
 
         const IMAGE = [
                 '.png',
@@ -58,28 +58,20 @@ module.exports = {
         if (!isAudio && !isVideo && !isImage)
             pathDir += `docs/${randomFileName + fileFormat}`;
 
-
         try {
             fs.writeFileSync(ROOT_PROJECT_FOLDER + pathDir, dataBinary);
 
-            fs.readFile(ROOT_PROJECT_FOLDER + pathDir, () => {
+            const byteSize = fs.statSync(ROOT_PROJECT_FOLDER + pathDir).size,
+                fileSize = Util.formatBytes(byteSize);
 
-                const byteSize = fs.statSync(ROOT_PROJECT_FOLDER + pathDir).size,
-                    fileSize = Util.formatBytes(byteSize);
-
-                jsonObject = {
-                    fileSize: fileSize
-                };
-
-            });
-
+            return jsonObject = {
+                fileUrl: url + '/' + pathDir,
+                fileSize: fileSize
+            };
         } catch (e) {
             FileException(e);
         }
 
-        return jsonObject = {
-            fileUrl: url + '/' + pathDir
-        };
 
     }
 

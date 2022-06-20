@@ -20,7 +20,6 @@ module.exports = {
 
 
 const IN_VALID_USER_ID = 'IN_VALID_USER_ID';
-const IN_VALID_OBJECT_KEY = 'IN_VALID_OBJECT_KEY';
 
 
 let port = process.env.SOCKET_IO_PORT,
@@ -169,11 +168,11 @@ io.use((socket, next) => {
 
                     RestFulUtil.validateMessage(data, result => {
 
-                        if (result === IN_VALID_OBJECT_KEY)
+                        if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
                             return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                        let toUser =  data['receiverId'];
+                        let toUser = data['receiverId'];
                         delete data['receiverId'];
                         data['senderId'] = socketUserId;
 

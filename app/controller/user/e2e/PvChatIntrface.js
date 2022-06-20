@@ -6,11 +6,11 @@ let Json = require('app/util/ReturnJson'),
     PipeLine = require('app/middleware/ApiPipeline'),
     multer = require('multer'),
     Insert = require('app/model/add/insert/user/users'),
+    CommonInsert = require('app/model/add/insert/common/index'),
     Util = require('app/util/Util'),
     File = require('app/util/File'),
-    multerFile = multer().single('file');
-
-
+    multerFile = multer().single('file'),
+    RestFulUtil = require('app/util/Util');
 
 
 exports.createE2EChat = (req, res) => {
@@ -67,15 +67,49 @@ exports.uploadFile = (req, res) => {
 
     multerFile(req, res, () => {
 
-        let file = req.file;
+        let data = JSON.parse(JSON.stringify(req.body));
 
-        if (file !== undefined) {
+        RestFulUtil.validateMessage(data, result => {
 
-            File.decodeAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+            if (result === (RestFulUtil.IN_VALID_OBJECT_KEY || RestFulUtil.IN_VALID_MESSAGE_TYPE))
+                return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+            let toUser = data['receiverId'];
+            let fromUser = data['senderId'];
+            delete data['receiverId'];
+
+            if (toUser && fromUser !== undefined) {
+
+                let file = req.file;
+
+                if (file !== undefined) {
+
+                    let {
+                        fileUrl,
+                        fileSize
+                    } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+
+                    data['fileUrl'] = fileUrl;
+                    data['fileSize'] = fileSize;
+                    data['fileName'] = file.originalname;
 
 
-        }
+                    CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, result => {
+                        if (result)
+                            return Json.builder(Response.HTTP_OK);
+                    });
+
+                }
+
+                return Json.builder(Response.HTTP_BAD_REQUEST);
+
+            }
+
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+        });
+
 
     });
+
 
 };

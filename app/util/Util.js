@@ -2,9 +2,13 @@ let {
     NULL
 } = require('app/database/util/SqlKeyword');
 
+const IN_VALID_MESSAGE_TYPE ='IN_VALID_MESSAGE_TYPE',
+    IN_VALID_OBJECT_KEY ='IN_VALID_OBJECT_KEY';
 
 module.exports = {
 
+    IN_VALID_OBJECT_KEY: IN_VALID_OBJECT_KEY,
+    IN_VALID_MESSAGE_TYPE: IN_VALID_MESSAGE_TYPE,
 
     formatBytes(realSize) {
 
@@ -41,7 +45,7 @@ module.exports = {
     validateMessage(jsonObject, cb) {
 
         let arrayOfValidJsonObjectKey = [
-            'text', 'type', 'isReply', 'fileName', 'receiverId', 'isForward', 'fileFormat',
+            'text', 'type', 'isReply', 'receiverId', 'isForward',
             'targetReplyId', 'forwardDataId', 'locationLat', 'locationLon', 'senderId'
         ];
 
@@ -54,7 +58,7 @@ module.exports = {
 
 
         if (!isTypeInMessageType) {
-            cb('IN_VALID_MESSAGE_TYPE');
+            cb(IN_VALID_MESSAGE_TYPE);
             return;
         }
 
@@ -63,7 +67,7 @@ module.exports = {
             let isValidObjectKey = arrayOfValidJsonObjectKey.includes(key);
 
             if (!isValidObjectKey) {
-                cb('IN_VALID_OBJECT_KEY');
+                cb(IN_VALID_OBJECT_KEY);
                 return;
             }
 
@@ -78,40 +82,37 @@ module.exports = {
         let isMessageTypeLocation = jsonObject.type === MESSAGE_TYPE_LOCATION;
         let isMessageTypeNull = jsonObject.type?.length === 0 || undefined || null;
         let isTextNull = jsonObject.text?.length === 0 || null;
-        let isFileNameNull = jsonObject.fileName?.length === 0 || null;
-        let isFileFormatNull = jsonObject.filFormat?.length === 0 || null;
         let isSenderIdNull = jsonObject.senderId?.length === 0 || null;
         let isLocationLatNull = jsonObject.locationLat?.length === 0 || null;
         let isLocationLonNull = jsonObject.locationLon?.length === 0 || null;
 
 
         if (isMessageTypeLocation || isLocationLonNull || isLocationLatNull) {
-            cb('IN_VALID_OBJECT_KEY');
+            cb(IN_VALID_OBJECT_KEY);
             return;
         }
 
 
         if (isMessageTypeNull) {
-            cb('IN_VALID_OBJECT_KEY');
+            cb(IN_VALID_OBJECT_KEY);
             return;
         }
 
 
-        if (isMessageTypeNull && !isNoneMessageType && !isFileFormatNull &&
-            !isFileNameNull && !isMessageTypeLocation) {
-            cb('IN_VALID_OBJECT_KEY');
+        if (isMessageTypeNull && !isNoneMessageType && !isMessageTypeLocation) {
+            cb(IN_VALID_OBJECT_KEY);
             return;
         }
 
 
         if (isTextNull && isNoneMessageType) {
-            cb('IN_VALID_OBJECT_KEY');
+            cb(IN_VALID_OBJECT_KEY);
             return;
         }
 
 
         if (isSenderIdNull) {
-            cb('IN_VALID_OBJECT_KEY');
+            cb(IN_VALID_OBJECT_KEY);
             return;
         }
 
