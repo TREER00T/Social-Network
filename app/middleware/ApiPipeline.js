@@ -50,10 +50,6 @@ module.exports = {
 
                     if (decode.type === 'rt') {
 
-                        module.exports.token = {
-                            rt: decode
-                        };
-
                         (function (cb) {
                             if (typeof cb === 'function')
                                 cb(decode)
@@ -84,10 +80,6 @@ module.exports = {
                 getJwtVerify(token, decode => {
 
                     if (decode.type === 'at') {
-
-                        module.exports.token = {
-                            at: decode
-                        };
 
                         (function (cb) {
                             if (typeof cb === 'function')

@@ -2,6 +2,7 @@ let openSql = require('app/database/OpenSql'),
     {
         OR,
         AND,
+        STAR,
         EQUAL_TO,
         IS_NOT_NULL
     } = require('app/database/util/SqlKeyword'),
@@ -190,6 +191,50 @@ module.exports = {
         }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    getTableNameForListOfE2EMessage(fromUser, toUser, cb) {
+        openSql.find({
+            optionKeyword: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO,
+                OR,
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'tblChatId', 'listOfUserE2Es', 'toUser', `${toUser}`,
+                'fromUser', `${fromUser}`, 'toUser', `${fromUser}`, 'fromUser', `${toUser}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0].tblChatId !== undefined) ? cb(result[1][0].tblChatId) : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    getListOfMessage(tableName, cb) {
+        openSql.find({
+            optionKeyword: [
+                STAR
+            ],
+            data: [
+                `${tableName}`
+            ]
+        }).result(result => {
+            try {
+                cb(result[1][0]);
             } catch (e) {
                 DataBaseException(e);
             }

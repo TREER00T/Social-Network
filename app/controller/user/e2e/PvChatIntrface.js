@@ -10,7 +10,10 @@ let Json = require('app/util/ReturnJson'),
     Util = require('app/util/Util'),
     File = require('app/util/File'),
     multerFile = multer().single('file'),
-    RestFulUtil = require('app/util/Util');
+    RestFulUtil = require('app/util/Util'),
+    {
+        getAccessTokenPayLoad
+    } = require('app/middleware/ApiPipeline');
 
 
 exports.createE2EChat = (req, res) => {
@@ -95,8 +98,11 @@ exports.uploadFile = (req, res) => {
 
 
                     CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, result => {
-                        if (result)
-                            return Json.builder(Response.HTTP_OK);
+
+                        return Json.builder(Response.HTTP_OK, {
+                            insertId: result
+                        });
+
                     });
 
                 }
@@ -113,3 +119,32 @@ exports.uploadFile = (req, res) => {
 
 
 };
+
+
+exports.listOfMessage = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+
+    let {to, size} = req.query;
+
+    getAccessTokenPayLoad(data => {
+
+        let from = data.userId;
+
+        Find.getTableNameForListOfE2EMessage(from, to, data => {
+
+            if (!data)
+                return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+
+            Find.getListOfMessage(data); // size
+        });
+
+
+    });
+
+
+
+}

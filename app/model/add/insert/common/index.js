@@ -1,4 +1,7 @@
-let openSql = require('app/database/OpenSql');
+let openSql = require('app/database/OpenSql'),
+    {
+        DataBaseException
+    } = require('app/exception/DataBaseException');
 
 
 module.exports = {
@@ -8,8 +11,11 @@ module.exports = {
             table: tableName,
             data: data
         }).result(result => {
-            console.log(result);
-           (result) ? cb(true) : cb(false);
+            try {
+                cb(result[1].insertId);
+            } catch (e) {
+                DataBaseException(e);
+            }
         });
     }
 

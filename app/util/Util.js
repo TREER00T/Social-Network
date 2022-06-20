@@ -2,8 +2,8 @@ let {
     NULL
 } = require('app/database/util/SqlKeyword');
 
-const IN_VALID_MESSAGE_TYPE ='IN_VALID_MESSAGE_TYPE',
-    IN_VALID_OBJECT_KEY ='IN_VALID_OBJECT_KEY';
+const IN_VALID_MESSAGE_TYPE = 'IN_VALID_MESSAGE_TYPE',
+    IN_VALID_OBJECT_KEY = 'IN_VALID_OBJECT_KEY';
 
 module.exports = {
 
@@ -132,7 +132,6 @@ module.exports = {
         if (isForwardInJsonObject)
             jsonObject.isForward = 1;
 
-        jsonObject.isUploading = 1;
 
         cb(jsonObject);
     },

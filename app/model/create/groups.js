@@ -101,7 +101,6 @@ module.exports = {
                 fileSize: VARCHAR(15),
                 location: POINT(),
                 isForward: BOOLEAN(),
-                isUploading: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()
             },
