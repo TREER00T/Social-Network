@@ -25,7 +25,6 @@ const {
         removeArrayOfDataForUpdateOrDeleteQuery
     } = require('./util/Utilites'),
     util = require('./util/Utilites');
-const {sqlQuery} = require("app/database/util/Utilites");
 
 
 let realSql;
@@ -45,12 +44,12 @@ module.exports = {
     },
 
 
-    createTable(jsonArray) {
+    createTable(jsonObject) {
 
-        getCreateTableSqlQuery(jsonArray);
+        getCreateTableSqlQuery(jsonObject);
 
         realSql = USE_DATABASE +
-            ` CREATE TABLE ${IF_NOT_EXISTS} ` + '`' + jsonArray.table + '`' +
+            ` CREATE TABLE ${IF_NOT_EXISTS} ` + '`' + jsonObject.table + '`' +
             `(${util.sqlQuery})`;
 
         query(realSql, null);
@@ -123,10 +122,10 @@ module.exports = {
     },
 
 
-    addMultiValue(jsonArray) {
+    addMultiValue(jsonObject) {
 
-        realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table + ' (' +
-            generateDoubleQuestionMarkAndComma(jsonArray.data) + ') VALUES ' + QUESTION_MARK;
+        realSql = USE_DATABASE + ' INSERT INTO ' + jsonObject.table + ' (' +
+            generateDoubleQuestionMarkAndComma(jsonObject.data) + ') VALUES ' + QUESTION_MARK;
 
         query(realSql, util.dataForInsertSqlQuery);
 
@@ -136,28 +135,28 @@ module.exports = {
     },
 
 
-    addOne(jsonArray) {
+    addOne(jsonObject) {
 
-        realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table + ' SET ' + QUESTION_MARK;
+        realSql = USE_DATABASE + ' INSERT INTO ' + jsonObject.table + ' SET ' + QUESTION_MARK;
 
-        query(realSql, jsonArray.data);
+        query(realSql, jsonObject.data);
 
         return this;
 
     },
 
 
-    addWithFind(jsonArray) {
+    addWithFind(jsonObject) {
 
-        getOptionKeywordSqlQuery(jsonArray);
+        getOptionKeywordSqlQuery(jsonObject);
 
         let selectSqlQuery = ' SELECT ' + DOUBLE_QUESTION_MARK +
             ' FROM ' + DOUBLE_QUESTION_MARK + ' ' + util.sqlQuery;
 
-        realSql = USE_DATABASE + ' INSERT INTO ' + jsonArray.table +
-            ` (${getStringOfColumnWithComma(jsonArray.data[0])}) ` + selectSqlQuery;
+        realSql = USE_DATABASE + ' INSERT INTO ' + jsonObject.table +
+            ` (${getStringOfColumnWithComma(jsonObject.data[0])}) ` + selectSqlQuery;
 
-        query(realSql, jsonArray.data);
+        query(realSql, jsonObject.data);
 
         removeSqlQuery();
 
@@ -175,16 +174,16 @@ module.exports = {
     },
 
 
-    find(jsonArray) {
+    find(jsonObject) {
 
-        getOptionKeywordSqlQuery(jsonArray);
+        getOptionKeywordSqlQuery(jsonObject);
 
-        removeFieldDataInSelect(jsonArray);
+        removeFieldDataInSelect(jsonObject);
 
         realSql = USE_DATABASE + ' SELECT ' + getData() +
             ' FROM ' + DOUBLE_QUESTION_MARK + ' ' + util.sqlQuery;
 
-        query(realSql, jsonArray.data);
+        query(realSql, jsonObject.data);
 
         removeSqlQuery();
 

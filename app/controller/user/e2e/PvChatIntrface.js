@@ -139,7 +139,7 @@ exports.listOfMessage = (req, res) => {
                 return Json.builder(Response.HTTP_User_NOT_FOUND);
 
 
-            Find.getListOfMessage(data); // size
+            Find.getListOfMessage(data);
         });
 
 

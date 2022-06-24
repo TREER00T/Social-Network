@@ -320,19 +320,10 @@ module.exports = {
         if (typeof data === 'string')
             return module.exports.stringOfValueWithComma = data;
 
-        let arrayOfString = [],
-            stringOfValueWithComma = '',
-            arrayOfJson = JSON.parse(JSON.stringify(data));
-
-        arrayOfJson.forEach((item) => {
-
-            for (let i in item)
-                arrayOfString.push(item[i]);
-
-        });
+        let stringOfValueWithComma = '';
 
 
-        arrayOfString.forEach((item, index, array) => {
+        data.forEach((item, index, array) => {
 
             let isLastIndex = array.length === index + 1;
 
@@ -345,7 +336,6 @@ module.exports = {
 
 
         });
-
 
         return stringOfValueWithComma;
     },
