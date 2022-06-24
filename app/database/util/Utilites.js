@@ -1,30 +1,32 @@
 const {
-    IN,
-    OR,
-    AND,
-    ASC,
-    LIKE,
-    STAR,
-    DESC,
-    COMMA,
-    WHERE,
-    LIMIT,
-    COUNT,
-    OFFSET,
-    BETWEEN,
-    ORDER_BY,
-    EQUAL_TO,
-    NOT_NULL,
-    LESS_THAN,
-    IS_NOT_NULL,
-    GREATER_THAN,
-    NOT_EQUAL_TO,
-    QUESTION_MARK,
-    AUTO_INCREMENT,
-    DOUBLE_QUESTION_MARK,
-    LESS_THAN_OR_EQUAL_TO,
-    GREATER_THAN_OR_EQUAL_TO
-} = require('./SqlKeyword');
+        IN,
+        OR,
+        AND,
+        ASC,
+        STAR,
+        DESC,
+        COMMA,
+        LIMIT,
+        COUNT,
+        OFFSET,
+        ORDER_BY,
+        IS_NOT_NULL,
+        QUESTION_MARK,
+        AUTO_INCREMENT,
+        DOUBLE_QUESTION_MARK,
+    } = require('./SqlKeyword'),
+    {
+        LIKE,
+        WHERE,
+        BETWEEN,
+        EQUAL_TO,
+        NOT_NULL,
+        LESS_THAN,
+        GREATER_THAN,
+        NOT_EQUAL_TO,
+        LESS_THAN_OR_EQUAL_TO,
+        GREATER_THAN_OR_EQUAL_TO
+    } = require('./QueryUtilities');
 
 
 let stringOfQuestionMarkAndEqual,
@@ -91,7 +93,7 @@ function generateArrayOfKeyAndValueForEditField(jsonObject) {
 }
 
 
-function splitValueInString(str) {
+function splitValueOfSpaceKeywordInString(str) {
     return str.split(' ')[1];
 }
 
@@ -124,11 +126,11 @@ function removeSpaceWordInString(str) {
 }
 
 let arrayOfValidOperatorQuery = [
-    OR,
-    AND,
-    LIKE,
-    BETWEEN,
-    OPERATOR_IN
+    OR.toLowerCase(),
+    AND.toLowerCase(),
+    LIKE.toLowerCase(),
+    BETWEEN.toLowerCase(),
+    OPERATOR_IN.toLowerCase()
 ];
 
 
@@ -157,20 +159,43 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
         arrayOfEqualAndQuestionMarks = [];
 
     for (let key in jsonObject) {
-        let value = jsonObject[key];
-        let isFirstIndex = (index === 0);
-        let isOperatorBetween = (key === BETWEEN);
-        let isCharacter = (key.length === 1);
-        let isOperatorLike = (key === LIKE);
-        let keyword = removeUnderscoreInString(key);
-        let isOperatorAnd = (keyword === AND);
-        let checkSpaceWordInString = value.toString().search('SPACE') > -1;
+        let value = jsonObject[key],
+            arrayOfOperatorAndValue = jsonObject.op[0],
+            isFirstIndex = (index === 0),
+            isOperatorBetween = (key === 'between'),
+            isCharacter = (key.length === 1),
+            isDefinedArrayOfOperatorAndValue = Array.isArray(jsonObject[key]),
+            isOperatorLike = (key === 'like'),
+            keyword = removeUnderscoreInString(key),
+            isOperatorAnd = (keyword === 'and'),
+            isSpaceWordInString = value.toString().search('SPACE') > -1,
+            newValue = (isSpaceWordInString) ? splitValueOfSpaceKeywordInString(removeSpaceWordInString(value)) :
+                splitValueOfSpaceKeywordInString(`${EQUAL_TO} ${value}`),
+            isOperatorIn = ('in' === keyword),
+            isValidOperatorForUpdateSqlQueryInArray = arrayOfValidOperatorQuery.includes(keyword),
+            arrayOfSpecialQueryUtilitiesOperator = [],
+            isAccessToCheckOtherCondition = false;
 
-        let newValue = (checkSpaceWordInString) ? splitValueInString(removeSpaceWordInString(value)) :
-            splitValueInString(`${EQUAL_TO} ${value}`);
 
-        let isOperatorIn = (OPERATOR_IN === keyword);
-        let isValidOperatorForUpdateSqlQueryInArray = arrayOfValidOperatorQuery.includes(keyword);
+        if (isDefinedArrayOfOperatorAndValue) {
+            arrayOfOperatorAndValue.forEach((item, index) => { // defualt = <= ...
+                let isAndOperator = item === AND;
+                let isOrOperator = item === OR;
+
+                if (isAndOperator || isOrOperator) {
+                    arrayOfSpecialQueryUtilitiesOperator.push(item);
+                    arrayOfOperatorAndValue.splice(index, 1);
+                }
+
+            });
+            console.log(arrayOfOperatorAndValue);
+            delete jsonObject['op'];
+            isAccessToCheckOtherCondition = true;
+        }
+
+
+        if (!isAccessToCheckOtherCondition)
+            continue;
 
 
         if (!isCharacter && !isValidOperatorForUpdateSqlQueryInArray) {
@@ -195,8 +220,8 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
         }
 
         if (isOperatorLike || isOperatorBetween) {
-            arrayOfKeyAndValueDataForQuery.push(splitColumnNameFromString(value));
-            arrayOfKeyAndValueDataForQuery.push(splitValueFromString(value));
+            arrayOfKeyAndValueDataForQuery.push(value); // this not okay
+            arrayOfKeyAndValueDataForQuery.push(value); // this not okay
         }
 
         if (isOperatorAnd)
@@ -239,7 +264,7 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
         }
 
 
-        let operator = (checkSpaceWordInString) ? splitOperatorInString(removeSpaceWordInString(value)) :
+        let operator = (isSpaceWordInString) ? splitOperatorInString(removeSpaceWordInString(value)) :
             splitOperatorInString(`${EQUAL_TO} ${value}`);
 
 
@@ -386,13 +411,13 @@ module.exports = {
 
 
         jsonArray.optionKeyword.forEach((item, index, arrayOfKeyword) => {
-            let isFirstIndex = (index === 0);
-            let nextKeyword = arrayOfKeyword[index + 1];
-            let isItemInOperators = arrayOfOperator.includes(item);
-            let isOptionKeyword = arrayOfValidOptionKeyword.includes(nextKeyword);
-            let isNextKeywordUndefined = (nextKeyword !== undefined);
-            let isNextItemOffset = (isNextKeywordUndefined && nextKeyword === OFFSET) ? `${OFFSET} ${QUESTION_MARK}` : '';
-            let nextItemUndefinedToNullOrValue = (isNextKeywordUndefined && !isOptionKeyword) ? nextKeyword : '';
+            let isFirstIndex = (index === 0),
+                nextKeyword = arrayOfKeyword[index + 1],
+                isItemInOperators = arrayOfOperator.includes(item),
+                isOptionKeyword = arrayOfValidOptionKeyword.includes(nextKeyword),
+                isNextKeywordUndefined = (nextKeyword !== undefined),
+                isNextItemOffset = (isNextKeywordUndefined && nextKeyword === OFFSET) ? `${OFFSET} ${QUESTION_MARK}` : '',
+                nextItemUndefinedToNullOrValue = (isNextKeywordUndefined && !isOptionKeyword) ? nextKeyword : '';
 
 
             if (isFirstIndex && isItemInOperators)
@@ -500,6 +525,7 @@ module.exports = {
 
         module.exports.arrayOfDataForUpdateOrDeleteQuery = arrayOfKeyAndValueDataForQuery;
 
+
         arrayOfKeyAndValueDataForQuery = [];
     },
 
@@ -560,9 +586,9 @@ module.exports = {
 
 
     removeFieldDataInSelect(jsonArray) {
-        let index = jsonArray.optionKeyword[0];
-        let isPointField = /X\(/.test(index);
-        let optionKeywordArray = jsonArray.optionKeyword;
+        let index = jsonArray.optionKeyword[0],
+            isPointField = /X\(/.test(index),
+            optionKeywordArray = jsonArray.optionKeyword;
 
         if (index !== STAR && COUNT && !isPointField) {
             fieldData = DOUBLE_QUESTION_MARK;

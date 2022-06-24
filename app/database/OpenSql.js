@@ -3,7 +3,6 @@ const {
         sqlQueryResult
     } = require('app/database/DatabaseConnection'),
     {
-        WHERE,
         QUESTION_MARK,
         IF_NOT_EXISTS,
         DOUBLE_QUESTION_MARK
@@ -110,9 +109,11 @@ module.exports = {
         generateUpdateSqlQueryWithData(jsonObject);
 
         realSql = USE_DATABASE + ' UPDATE ' + DOUBLE_QUESTION_MARK +
-            `SET ${util.stringOfDataForForSet} ${WHERE} ${DOUBLE_QUESTION_MARK} ` + util.sqlQuery;
+            `SET ${util.stringOfDataForForSet} WHERE ${DOUBLE_QUESTION_MARK} ` + util.sqlQuery;
 
-        query(realSql, util.arrayOfDataForUpdateOrDeleteQuery);
+      //  console.log( util.arrayOfDataForUpdateOrDeleteQuery);
+        console.log( util.sqlQuery);
+     //   query(realSql, util.arrayOfDataForUpdateOrDeleteQuery);
 
         removeSqlQuery();
         removeStringOfDataForForSet();
