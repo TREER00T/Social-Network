@@ -1,6 +1,6 @@
 const {
         POINT
-    } = require('./SqlKeyword'),
+    } = require('app/database/util/KeywordHelper'),
     {
         addDataTypeForFieldInFirstItemOfArray
     } = require('./Utilites');

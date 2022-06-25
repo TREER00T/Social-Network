@@ -1,6 +1,6 @@
 let {
     NULL
-} = require('app/database/util/SqlKeyword');
+} = require('app/database/util/KeywordHelper');
 
 const IN_VALID_MESSAGE_TYPE = 'IN_VALID_MESSAGE_TYPE',
     IN_VALID_OBJECT_KEY = 'IN_VALID_OBJECT_KEY';

@@ -6,7 +6,7 @@ const {
         QUESTION_MARK,
         IF_NOT_EXISTS,
         DOUBLE_QUESTION_MARK
-    } = require('./util/SqlKeyword'),
+    } = require('app/database/util/KeywordHelper'),
     {
         getData,
         removeSqlQuery,
@@ -111,9 +111,9 @@ module.exports = {
         realSql = USE_DATABASE + ' UPDATE ' + DOUBLE_QUESTION_MARK +
             `SET ${util.stringOfDataForForSet} WHERE ${DOUBLE_QUESTION_MARK} ` + util.sqlQuery;
 
-      //  console.log( util.arrayOfDataForUpdateOrDeleteQuery);
-        console.log( util.sqlQuery);
-     //   query(realSql, util.arrayOfDataForUpdateOrDeleteQuery);
+        console.log(util.arrayOfDataForUpdateOrDeleteQuery);
+        console.log(util.sqlQuery);
+        //   query(realSql, util.arrayOfDataForUpdateOrDeleteQuery);
 
         removeSqlQuery();
         removeStringOfDataForForSet();

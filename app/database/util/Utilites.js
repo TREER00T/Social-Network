@@ -5,28 +5,28 @@ const {
         ASC,
         STAR,
         DESC,
+        LIKE,
         COMMA,
         LIMIT,
         COUNT,
         OFFSET,
+        BETWEEN,
         ORDER_BY,
-        IS_NOT_NULL,
         QUESTION_MARK,
         AUTO_INCREMENT,
         DOUBLE_QUESTION_MARK,
-    } = require('./SqlKeyword'),
+    } = require('app/database/util/KeywordHelper'),
     {
-        LIKE,
         WHERE,
-        BETWEEN,
         EQUAL_TO,
         NOT_NULL,
         LESS_THAN,
+        IS_NOT_NULL,
         GREATER_THAN,
         NOT_EQUAL_TO,
         LESS_THAN_OR_EQUAL_TO,
         GREATER_THAN_OR_EQUAL_TO
-    } = require('./QueryUtilities');
+    } = require('app/database/util/QueryHelper');
 
 
 let stringOfQuestionMarkAndEqual,
@@ -101,25 +101,19 @@ function splitOperatorInString(str) {
     return str.split(' ')[0];
 }
 
-function splitDataFormOperatorInAndPutOnArray(str) {
-    let newArray;
-    newArray = str.split(' ');
-    newArray.splice(0, 1);
-    newArray.slice();
-    return newArray;
+function arrayOfValueForInOperator(str) {
+    return str.replace('in ', '').split(',');
 }
 
 function removeUnderscoreInString(str) {
     return str.replaceAll('_', ' ').toUpperCase();
 }
 
-function splitValueFromString(str) {
-    return str.split(' ')[1];
+function isInOperatorInString(str) {
+    if (typeof str === 'string')
+        return /in/.test(str);
 }
 
-function splitColumnNameFromString(str) {
-    return str.split(' ')[0];
-}
 
 function removeSpaceWordInString(str) {
     return str.replace('SPACE', ' ');
@@ -160,62 +154,42 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
 
     for (let key in jsonObject) {
         let value = jsonObject[key],
-            arrayOfOperatorAndValue = jsonObject.op[0],
+            arrayOfOperatorAndValue2d = jsonObject.op,
             isFirstIndex = (index === 0),
-            isOperatorBetween = (key === 'between'),
-            isCharacter = (key.length === 1),
-            isDefinedArrayOfOperatorAndValue = Array.isArray(jsonObject[key]),
+            isOperatorBetween = (value === 'between'),
+            isDefinedArrayOfOperatorAndValue = Array.isArray(value),
             isOperatorLike = (key === 'like'),
             keyword = removeUnderscoreInString(key),
             isOperatorAnd = (keyword === 'and'),
             isSpaceWordInString = value.toString().search('SPACE') > -1,
             newValue = (isSpaceWordInString) ? splitValueOfSpaceKeywordInString(removeSpaceWordInString(value)) :
                 splitValueOfSpaceKeywordInString(`${EQUAL_TO} ${value}`),
-            isOperatorIn = ('in' === keyword),
+            isOperatorIn = isInOperatorInString(value),
             isValidOperatorForUpdateSqlQueryInArray = arrayOfValidOperatorQuery.includes(keyword),
             arrayOfSpecialQueryUtilitiesOperator = [],
-            isAccessToCheckOtherCondition = false;
+            isAccessToCheckOtherCondition = false,
+            newArrayForOperatorAndValue2d = [];
 
 
-        if (isDefinedArrayOfOperatorAndValue) {
-            arrayOfOperatorAndValue.forEach((item, index) => { // defualt = <= ...
-                let isAndOperator = item === AND;
-                let isOrOperator = item === OR;
-
-                if (isAndOperator || isOrOperator) {
-                    arrayOfSpecialQueryUtilitiesOperator.push(item);
-                    arrayOfOperatorAndValue.splice(index, 1);
-                }
-
-            });
-            console.log(arrayOfOperatorAndValue);
-            delete jsonObject['op'];
-            isAccessToCheckOtherCondition = true;
-        }
-
-
-        if (!isAccessToCheckOtherCondition)
-            continue;
-
-
-        if (!isCharacter && !isValidOperatorForUpdateSqlQueryInArray) {
+        if (!isAccessToCheckOtherCondition && !isOperatorIn &&
+            !isValidOperatorForUpdateSqlQueryInArray && !isDefinedArrayOfOperatorAndValue) { // this
             arrayOfKeyAndValueDataForQuery.push(key);
             arrayOfKeyAndValueDataForQuery.push(`${newValue}`);
         }
 
 
         if (isOperatorIn && isFirstIndex) {
-            arrayOfEqualAndQuestionMarks.push(`${keyword} (?) `);
-            arrayOfKeyAndValueDataForQuery.push(splitColumnNameFromString(value));
-            arrayOfKeyAndValueDataForQuery.push(splitDataFormOperatorInAndPutOnArray(value));
+            arrayOfKeyAndValueDataForQuery.push(key);
+            arrayOfEqualAndQuestionMarks.push(`IN (?) `);
+            arrayOfKeyAndValueDataForQuery.push(arrayOfValueForInOperator(value));
             index++;
         }
 
 
         if (isOperatorIn && !isFirstIndex) {
-            arrayOfEqualAndQuestionMarks.push(`${DOUBLE_QUESTION_MARK} ${keyword} (?) `);
-            arrayOfKeyAndValueDataForQuery.push(splitColumnNameFromString(value));
-            arrayOfKeyAndValueDataForQuery.push(splitDataFormOperatorInAndPutOnArray(value));
+            arrayOfKeyAndValueDataForQuery.push(key);
+            arrayOfEqualAndQuestionMarks.push(`${DOUBLE_QUESTION_MARK} IN (?) `);
+            arrayOfKeyAndValueDataForQuery.push(arrayOfValueForInOperator(value));
             index++;
         }
 
@@ -264,26 +238,62 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
         }
 
 
+        if (!isDefinedArrayOfOperatorAndValue)
+            continue;
+
+
+        arrayOfOperatorAndValue2d.forEach(item2d => { // defualt = <= ...
+
+            item2d.forEach((item, index) => {
+
+                let isAndOperator = item === AND;
+                let isOrOperator = item === OR;
+
+                if (isAndOperator || isOrOperator) {
+                    arrayOfSpecialQueryUtilitiesOperator.push(item);
+                    item2d.splice(index, 1);
+                }
+
+            });
+
+            arrayOfKeyAndValueDataForQuery = arrayOfKeyAndValueDataForQuery.concat(item2d);
+            newArrayForOperatorAndValue2d = newArrayForOperatorAndValue2d.concat(item2d);
+
+        });
+        delete jsonObject['op'];
+        let isArrayFor2dHaveOneKeyAndValue = (newArrayForOperatorAndValue2d.length === 2),
+            isArrayFor2dHaveMoreThanOneKeyAndValue = (newArrayForOperatorAndValue2d.length > 2);
+
+
         let operator = (isSpaceWordInString) ? splitOperatorInString(removeSpaceWordInString(value)) :
             splitOperatorInString(`${EQUAL_TO} ${value}`);
 
 
         let initPlaceHolder = `${DOUBLE_QUESTION_MARK} ${operator} ${QUESTION_MARK}`;
 
-        if (isFirstIndex && !isCharacter) {
+        if (isFirstIndex && (isArrayFor2dHaveOneKeyAndValue || isArrayFor2dHaveMoreThanOneKeyAndValue)) { // this
             arrayOfEqualAndQuestionMarks.push(`${operator} ${QUESTION_MARK} `);
             index++;
         }
 
-        if (!isFirstIndex && isCharacter) {
-            arrayOfEqualAndQuestionMarks.push(`${value}`);
+
+        if (isArrayFor2dHaveOneKeyAndValue || isArrayFor2dHaveMoreThanOneKeyAndValue) { // this
+
+            arrayOfSpecialQueryUtilitiesOperator.forEach(item => {
+
+                arrayOfEqualAndQuestionMarks.push(`${item}`);
+                arrayOfEqualAndQuestionMarks.push(`${initPlaceHolder} `);
+
+            });
+
             index++;
         }
 
-        if (!isFirstIndex && !isCharacter) {
-            arrayOfEqualAndQuestionMarks.push(`${initPlaceHolder} `);
-            index++;
-        }
+
+        // if (!isFirstIndex && !isAccessToCheckOtherCondition && isArrayFor2dHaveMoreThanOneKeyAndValue) { // this
+        //     arrayOfEqualAndQuestionMarks.push(`${initPlaceHolder} `);
+        //     index++;
+        // }
 
 
     }

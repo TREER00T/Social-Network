@@ -3,9 +3,11 @@ let openSql = require('app/database/OpenSql'),
         OR,
         AND,
         STAR,
-        EQUAL_TO,
+        EQUAL_TO
+    } = require('app/database/util/KeywordHelper'),
+    {
         IS_NOT_NULL
-    } = require('app/database/util/SqlKeyword'),
+    } = require('app/database/util/QueryHelper'),
     {
         DataBaseException
     } = require('app/exception/DataBaseException');

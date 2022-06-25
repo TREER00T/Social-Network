@@ -1,7 +1,7 @@
 let openSql = require('app/database/OpenSql'),
     {
         EQUAL_TO
-    } = require('app/database/util/SqlKeyword'),
+    } = require('app/database/util/KeywordHelper'),
     {
         DataBaseException
     } = require('app/exception/DataBaseException');

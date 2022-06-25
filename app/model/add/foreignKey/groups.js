@@ -1,7 +1,7 @@
 let openSql = require('app/database/OpenSql'),
     {
         CASCADE
-    } = require('app/database/util/SqlKeyword');
+    } = require('app/database/util/KeywordHelper');
 
 
 module.exports = {

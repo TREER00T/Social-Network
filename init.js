@@ -5,9 +5,10 @@ require('app-module-path').addPath(__dirname);
 //
 // Router.initialization();
 
-const {getOperatorAndValue} = require("app/database/util/FieldUtilities");
+const {getOperatorAndValue} = require("app/database/util/FieldHelper");
+const keyHelper = require("app/database/util/KeywordHelper");
 const {update} = require("app/database/OpenSql");
-const {OR, AND} = require("app/database/util/QueryUtilities");
+const {OR, IN, AND} = require("app/database/util/QueryHelper");
 
 
 update(
@@ -21,33 +22,19 @@ update(
             isblock: true,
             op: [
                 OR({
-                    phone: '09030207892',
+                    phonde: '09030207892',
                 }, AND({
-                    admin: true
+                    admidn: true
+                })),
+                OR({
+                    phondej: '055',
+                }, AND({
+                    admidhghn: false
                 }))
-            ]
+            ],
+            id: IN([0, 50])
         }
     }
 )
 
-// where isblock =  true and (phoneNumber = 045555 or phoneNumberd = 09030207892) or (phoneNumber = 045555 and phoneNumberd = 09030207892)
 // in , betwwen , other
-
-// {
-//     table: 'users',
-//         editField: {
-//     verificationCode: 122875,
-//         username: 'ali'
-// },
-//     where: {
-//         phoneNumber: '045555',
-//             a: 'AND',
-//             phoneNumberd: '09030207892',
-//             phoneNumberddd: '09',
-//             NOT_IN: 'id 0 5 7',
-//             BETWEEN: 57,
-//             AND: 58,
-//             b: 'AND',
-//             LIKE: 12
-//     }
-// }

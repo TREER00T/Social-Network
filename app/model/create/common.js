@@ -6,7 +6,7 @@ let openSql = require('app/database/OpenSql'),
     {
         NOT_NULL,
         AUTO_INCREMENT
-    } = require('app/database/util/SqlKeyword');
+    } = require('app/database/util/KeywordHelper');
 
 
 module.exports = {
