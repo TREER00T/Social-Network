@@ -165,11 +165,11 @@ module.exports = {
     },
 
 
-    customQuery(sqlQuery) {
+    customQuery(sqlQuery, data = null) {
 
         realSql = USE_DATABASE + ` ${sqlQuery}`;
 
-        query(realSql, null);
+        query(realSql, data);
 
         return this;
     },

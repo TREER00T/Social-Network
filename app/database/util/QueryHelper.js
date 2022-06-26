@@ -83,14 +83,15 @@ module.exports = {
     GREATER_THAN_OR_EQUAL_TO: GREATER_THAN_OR_EQUAL_TO,
 
 
-    getOperatorAndValue(operator, value) {
+    setOperator(operator, value, op) {
         let itemInArrayOfOperator = arrayOfOperator.includes(operator);
 
         if (!itemInArrayOfOperator)
             throw  new Error('Invalid data type');
 
-        return `${operator}SPACE${value}`;
-
+        if (op !== undefined)
+            return `${op.toLowerCase()} ${operator} SPACE ${value}`;
+        return `${operator} SPACE ${value}`;
     },
 
     OR(jsonObject, operator) {
@@ -103,15 +104,21 @@ module.exports = {
     },
 
     IN(arr, op) {
-        return `${op} in ${arr}`;
+        if (op !== undefined)
+            return `${op.toLowerCase()} in ${arr}`;
+        return `in ${arr}`;
     },
 
     BETWEEN(first, second, op) {
-        return `${op} between ${first} and ${second}`;
+        if (op !== undefined)
+            return `${op.toLowerCase()} between ${first} and ${second}`;
+        return `between ${first} and ${second}`;
     },
 
     LIKE(str, op) {
-        return `${op} ${str}`;
+        if (op !== undefined)
+            return `${op.toLowerCase()} like ${str}`;
+        return `like ${str}`;
     }
 
 }
