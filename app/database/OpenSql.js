@@ -111,9 +111,7 @@ module.exports = {
         realSql = USE_DATABASE + ' UPDATE ' + DOUBLE_QUESTION_MARK +
             `SET ${util.stringOfDataForForSet} WHERE ${DOUBLE_QUESTION_MARK} ` + util.sqlQuery;
 
-        console.log(util.arrayOfDataForUpdateOrDeleteQuery);
-        console.log(util.sqlQuery);
-        //   query(realSql, util.arrayOfDataForUpdateOrDeleteQuery);
+        query(realSql, util.arrayOfDataForUpdateOrDeleteQuery);
 
         removeSqlQuery();
         removeStringOfDataForForSet();
