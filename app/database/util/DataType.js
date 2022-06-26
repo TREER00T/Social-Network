@@ -1,7 +1,4 @@
 const {
-        POINT
-    } = require('app/database/util/KeywordHelper'),
-    {
         addDataTypeForFieldInFirstItemOfArray
     } = require('./Utilites');
 
@@ -10,7 +7,8 @@ let int = 'int',
     char = 'char',  // 0 - 255
     date = 'date',  // 2022-03-20
     time = 'time',  // 23:55:54
-    BOOLEAN = 'boolean',
+    point = 'point',
+    boolean = 'boolean',
     varchar = 'varchar',
     datetime = 'datetime';  // 2022-03-20 20:32:42
 
@@ -45,11 +43,11 @@ module.exports = {
     },
 
     BOOLEAN(data) {
-        return addDataTypeForFieldInFirstItemOfArray(BOOLEAN, data);
+        return addDataTypeForFieldInFirstItemOfArray(boolean, data);
     },
 
     POINT(data) {
-        return addDataTypeForFieldInFirstItemOfArray(POINT, data);
+        return addDataTypeForFieldInFirstItemOfArray(point, data);
     }
 
 }
