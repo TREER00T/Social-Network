@@ -113,8 +113,9 @@ function getOperatorInSpaceString(str) {
 
 
 function splitOperatorAndOrInSpaceWord(str) {
-    if (isSpaceWordInString(str))
+    if (isSpaceWordInString(str) && (isOrOperator(str) || isAndOperator(str)))
         return str.split(' ')[0];
+    return AND;
 }
 
 
@@ -155,11 +156,11 @@ function removeOrOperatorInString(str) {
 }
 
 function isAndOperator(str) {
-    return /and /.test(str);
+    return str.search('and') === 0;
 }
 
 function isOrOperator(str) {
-    return /or /.test(str);
+    return str.search('or') === 0;
 }
 
 function getValidValue(str) {
@@ -196,25 +197,26 @@ function getValueOfLikeOperator(str) {
 
 function getOp(str) {
     let operator;
-    if (isAndOperator || isOrOperator) {
+    if (isAndOperator(str) || isOrOperator(str)) {
         operator = str.split(' ')[0];
         str.replace(`${operator} `, '').trim();
+        return operator.toUpperCase();
     }
-    return operator.toUpperCase();
+    return AND;
 }
 
 
-function removeAndOpOrBetweenOpInSting(str) {
-    return str.replace(/and |or |between /gi, '').trim().split('').filter(v => {
-        if (v.trim().length !== 0)
-            return v;
-    });
+function getValueOfBetweenAndOperator(str) {
+    let newStr = str.split(' ');
+    if (isAndOperator(str) || isOrOperator(str))
+        newStr.shift();
+    return [newStr[1], newStr[3]];
 }
 
 
-function splitStringToCharacterForBetweenOperator(str) {
+function splitStringToArrayOfCharactersForBetweenOperator(str) {
     if (typeof str === 'string')
-        return removeAndOpOrBetweenOpInSting(str);
+        return getValueOfBetweenAndOperator(str);
 }
 
 
@@ -273,15 +275,21 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
             index++;
         }
 
+        if (isNotOperator) {
+            arrayOfEqualAndQuestionMarks.push(AND);
+        }
+
 
         if (!isAccessToCheckOtherCondition && isFirstIndex && isNotOperator) {
             arrayOfKeyAndValueDataForQuery.push(key);
+            arrayOfKeyAndValueDataForQuery.push(value);
             arrayOfEqualAndQuestionMarks.push(`${operator} ${QUESTION_MARK}`);
             index++;
         }
 
         if (!isAccessToCheckOtherCondition && !isFirstIndex && isNotOperator) {
             arrayOfKeyAndValueDataForQuery.push(key);
+            arrayOfKeyAndValueDataForQuery.push(value);
             arrayOfEqualAndQuestionMarks.push(`${initPlaceHolder}`);
             index++;
         }
@@ -317,18 +325,20 @@ function getQueryAndCheckOtherConditionInWhereObject(jsonObject) {
         }
 
         if (isBetweenOperator) {
-            arrayOfKeyAndValueDataForQuery = arrayOfKeyAndValueDataForQuery.concat(splitStringToCharacterForBetweenOperator(value));
+            arrayOfKeyAndValueDataForQuery = arrayOfKeyAndValueDataForQuery.concat(splitStringToArrayOfCharactersForBetweenOperator(value));
             index++;
         }
 
         if (isLikeOperator && !isFirstIndex) {
             arrayOfEqualAndQuestionMarks.push(getOp(value));
+            arrayOfKeyAndValueDataForQuery.push(key);
             arrayOfKeyAndValueDataForQuery.push(getValueOfLikeOperator(getValidValue(value)));
             arrayOfEqualAndQuestionMarks.push(`${DOUBLE_QUESTION_MARK} ${LIKE} ${QUESTION_MARK} `);
             index++;
         }
 
         if (isLikeOperator && isFirstIndex) {
+            arrayOfKeyAndValueDataForQuery.push(key);
             arrayOfKeyAndValueDataForQuery.push(getValueOfLikeOperator(getValidValue(value)));
             arrayOfEqualAndQuestionMarks.push(`${LIKE} ${QUESTION_MARK} `);
             index++;
