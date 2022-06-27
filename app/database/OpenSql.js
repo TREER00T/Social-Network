@@ -195,7 +195,7 @@ module.exports = {
         realSql = 'SELECT TABLE_NAME ' +
             'FROM INFORMATION_SCHEMA.TABLES ' +
             'WHERE TABLE_NAME = ' + "'" + tableName + "' " +
-            'and TABLE_SCHEMA = ' + "'" + DAtABASE_NAME + "'";
+            'AND TABLE_SCHEMA = ' + "'" + DAtABASE_NAME + "'";
 
         query(realSql, null);
 
