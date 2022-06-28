@@ -1,6 +1,5 @@
 const {
-    COMMA,
-    POINT,
+    COMMA
 } = require('app/database/util/KeywordHelper');
 
 
@@ -10,7 +9,7 @@ module.exports = {
 
 
     POINT(Lat, Lon) {
-        return `${POINT}(${Lat} ${Lon})`;
+        return `POINT(${Lat} ${Lon})`;
     },
 
     fieldPoint(field){
