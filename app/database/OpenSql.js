@@ -63,9 +63,9 @@ module.exports = {
 
         generateValueWithComma(data);
 
-        realSql = USE_DATABASE + 'Drop Table IF EXISTS ' + util.stringOfValueWithComma;
+        realSql = USE_DATABASE + 'DROP TABLE IF EXISTS ' + util.stringOfValueWithComma;
 
-        query(realSql, {});
+        query(realSql, null);
 
         removeStringOfValueWithComma();
 
