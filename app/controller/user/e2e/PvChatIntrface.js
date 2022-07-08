@@ -127,7 +127,11 @@ exports.listOfMessage = (req, res) => {
     Json.initializationRes(res);
 
 
-    let {to, size} = req.query;
+    let {to, limit, page} = req.query;
+
+    let getLimit = (limit !== undefined) ? limit : 15;
+
+    let startFrom = (page - 1) * limit;
 
     getAccessTokenPayLoad(data => {
 
@@ -139,12 +143,28 @@ exports.listOfMessage = (req, res) => {
                 return Json.builder(Response.HTTP_User_NOT_FOUND);
 
 
-            Find.getListOfMessage(data);
+            Find.getCountOfListMessage(data, count => {
+
+                let totalPages = Math.ceil(count / getLimit);
+
+                Find.getListOfMessage(data, startFrom, getLimit, result => {
+
+
+                    return Json.builder(
+                        Response.HTTP_OK,
+                        result, {
+                            totalPages: totalPages
+                        }
+                    );
+
+                });
+
+            });
+
         });
 
 
     });
-
 
 
 }

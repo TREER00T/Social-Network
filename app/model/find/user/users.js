@@ -3,7 +3,11 @@ let openSql = require('opensql'),
         OR,
         AND,
         STAR,
-        EQUAL_TO
+        DESC,
+        COUNT,
+        LIMIT,
+        EQUAL_TO,
+        ORDER_BY
     } = openSql.keywordHelper,
     {
         IS_NOT_NULL
@@ -227,17 +231,37 @@ module.exports = {
     },
 
 
-    getListOfMessage(tableName, cb) {
+    getListOfMessage(tableName, startFrom, limit, cb) {
         openSql.find({
             optKey: [
-                STAR
+                STAR,
+                ORDER_BY,
+                DESC,
+                LIMIT
+            ],
+            data: [
+                `${tableName}`, 'id', [startFrom, limit]
+            ]
+        }).result(result => {
+            try {
+                cb(result);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    getCountOfListMessage(tableName, cb) {
+        openSql.find({
+            optKey: [
+                COUNT
             ],
             data: [
                 `${tableName}`
             ]
         }).result(result => {
             try {
-                cb(result[1][0]);
+                cb(result[0].size);
             } catch (e) {
                 DataBaseException(e);
             }
