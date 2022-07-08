@@ -13,8 +13,8 @@
     "express": "^4.17.2",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
-    "mysql": "^2.18.1",
     "node-jose": "^2.1.0",
+    "opensql": "^1.2.250",
     "socket.io": "^4.4.1"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-let openSql = require('app/database/OpenSql'),
+let openSql = require('opensql'),
     {
         DataBaseException
     } = require('app/exception/DataBaseException');

@@ -1,7 +1,7 @@
-let openSql = require('app/database/OpenSql'),
+let openSql = require('opensql'),
     {
         EQUAL_TO
-    } = require('app/database/util/KeywordHelper'),
+    } = openSql.keywordHelper,
     {
         DataBaseException
     } = require('app/exception/DataBaseException');
@@ -13,7 +13,7 @@ module.exports = {
 
     groupId(id, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO
             ],
             data: ['id', 'groups', 'id', `${id}`],
