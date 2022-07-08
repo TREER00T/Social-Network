@@ -1,4 +1,4 @@
-let openSql = require('app/database/OpenSql'),
+let openSql = require('opensql'),
     {
         DataBaseException
     } = require('app/exception/DataBaseException');
@@ -9,7 +9,7 @@ module.exports = {
     authCode(phone, authCode, cb) {
         openSql.update({
             table: 'users',
-            editField: {
+            edit: {
                 authCode: authCode
             },
             where: {
@@ -28,7 +28,7 @@ module.exports = {
     apikey(phone, key, cb) {
         openSql.update({
             table: 'users',
-            editField: {
+            edit: {
                 apiKey: `${key}`
             },
             where: {
@@ -47,7 +47,7 @@ module.exports = {
     userOnline(phone, status) {
         openSql.update({
             table: 'users',
-            editField: {
+            edit: {
                 isActive: `${status}`
             },
             where: {

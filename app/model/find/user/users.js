@@ -1,13 +1,13 @@
-let openSql = require('app/database/OpenSql'),
+let openSql = require('opensql'),
     {
         OR,
         AND,
         STAR,
         EQUAL_TO
-    } = require('app/database/util/KeywordHelper'),
+    } = openSql.keywordHelper,
     {
         IS_NOT_NULL
-    } = require('app/database/util/QueryHelper'),
+    } = openSql.queryHelper,
     {
         DataBaseException
     } = require('app/exception/DataBaseException');
@@ -17,7 +17,7 @@ module.exports = {
 
     userPhone(phone, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO
             ],
             data: ['phone', 'users', 'phone', `${phone}`],
@@ -33,7 +33,7 @@ module.exports = {
 
     isValidAuthCode(phone, authCode, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO,
                 AND,
                 EQUAL_TO
@@ -44,6 +44,7 @@ module.exports = {
             ],
             where: true
         }).result(result => {
+            console.log(result)
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {
@@ -54,7 +55,7 @@ module.exports = {
 
     password(phone, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO,
                 AND,
                 IS_NOT_NULL
@@ -77,7 +78,7 @@ module.exports = {
 
     isValidPassword(phone, password, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO,
                 AND,
                 EQUAL_TO
@@ -99,7 +100,7 @@ module.exports = {
 
     getApiKey(phone, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO
             ],
             data: [
@@ -118,7 +119,7 @@ module.exports = {
 
     getUserId(phone, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO
             ],
             data: [
@@ -137,7 +138,7 @@ module.exports = {
 
     isGroupIdInUserList(groupId, userId, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO,
                 AND,
                 EQUAL_TO
@@ -159,7 +160,7 @@ module.exports = {
 
     isExistChatRoom(data, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO,
                 AND,
                 EQUAL_TO,
@@ -185,7 +186,7 @@ module.exports = {
 
     isExistUser(userId, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO
             ],
             data: ['id', 'users', 'id', `${userId}`],
@@ -202,7 +203,7 @@ module.exports = {
 
     getTableNameForListOfE2EMessage(fromUser, toUser, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 EQUAL_TO,
                 AND,
                 EQUAL_TO,
@@ -228,7 +229,7 @@ module.exports = {
 
     getListOfMessage(tableName, cb) {
         openSql.find({
-            optionKeyword: [
+            optKey: [
                 STAR
             ],
             data: [

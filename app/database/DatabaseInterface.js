@@ -1,11 +1,16 @@
 let create = require('app/model/create/CreateTableInterface'),
     add = require('app/model/add/foreignKey/AddForiegnKeyInterface'),
-    openSql = require('app/database/OpenSql');
+    Database = require('app/database/DatabaseConnection'),
+    openSql = require('opensql'),
+    dotenv = require('dotenv');
+
+dotenv.config();
 
 module.exports = {
 
     initialization() {
-        openSql.createDatabase();
+        Database.connect();
+        openSql.createDatabase(process.env.DATABASE);
         create.tables();
         add.foreignKeys();
     }

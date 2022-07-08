@@ -1,6 +1,6 @@
 let {
     NULL
-} = require('app/database/util/KeywordHelper');
+} = require('opensql').keywordHelper;
 
 const IN_VALID_MESSAGE_TYPE = 'IN_VALID_MESSAGE_TYPE',
     IN_VALID_OBJECT_KEY = 'IN_VALID_OBJECT_KEY';

@@ -1,12 +1,12 @@
-let openSql = require('app/database/OpenSql'),
+let openSql = require('opensql'),
     {
         INT,
         ENUM
-    } = require('app/database/util/DataType'),
+    } = openSql.dataType,
     {
         NOT_NULL,
         AUTO_INCREMENT
-    } = require('app/database/util/KeywordHelper');
+    } = openSql.keywordHelper;
 
 
 module.exports = {
