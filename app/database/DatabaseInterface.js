@@ -11,8 +11,12 @@ module.exports = {
     initialization() {
         Database.connect();
         openSql.createDatabase(process.env.DATABASE);
+    },
+
+    create() {
         create.tables();
         add.foreignKeys();
+        return true;
     }
 
 }

@@ -169,7 +169,7 @@ module.exports = {
                 OR,
                 EQUAL_TO,
                 AND,
-                EQUAL_TO,
+                EQUAL_TO
             ],
             data: [
                 'tblChatId', 'listofusere2es', 'toUser', `${data['toUser']}`,
@@ -203,20 +203,25 @@ module.exports = {
     },
 
 
-    getTableNameForListOfE2EMessage(fromUser, toUser, cb) {
+    getTableNameForListOfE2EMessage(fromUser, toUser, userId, cb) {
         openSql.find({
             optKey: [
+                EQUAL_TO,
+                AND,
                 EQUAL_TO,
                 AND,
                 EQUAL_TO,
                 OR,
                 EQUAL_TO,
                 AND,
+                EQUAL_TO,
+                AND,
                 EQUAL_TO
             ],
             data: [
                 'tblChatId', 'listOfUserE2Es', 'toUser', `${toUser}`,
-                'fromUser', `${fromUser}`, 'toUser', `${fromUser}`, 'fromUser', `${toUser}`
+                'fromUser', `${fromUser}`, 'userId', `${userId}`,
+                'toUser', `${fromUser}`, 'fromUser', `${toUser}`, 'userId', `${userId}`
             ],
             where: true
         }).result(result => {

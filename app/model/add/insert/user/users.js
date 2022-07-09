@@ -17,12 +17,13 @@ module.exports = {
     },
 
 
-    chatIdInListOfUserE2Es(fromUser, toUser, tableName) {
+    chatIdInListOfUserE2Es(fromUser, toUser, userId, tableName) {
         openSql.addOne({
             table: 'listOfUserE2Es',
             data: {
                 toUser: toUser,
                 fromUser: fromUser,
+                userId: userId,
                 tblChatId: tableName
             }
         });
