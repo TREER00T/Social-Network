@@ -31,6 +31,15 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+    removeUserInUsersBlockList(id) {
+        openSql.remove({
+            table: 'userBlockList',
+            where: {
+                id: id
+            }
+        });
     }
 
 }

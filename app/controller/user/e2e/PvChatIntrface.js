@@ -3,7 +3,6 @@ let Json = require('app/util/ReturnJson'),
     Create = require('app/model/create/users'),
     Add = require('app/model/add/foreignKey/users'),
     Find = require('app/model/find/user/users'),
-    PipeLine = require('app/middleware/ApiPipeline'),
     multer = require('multer'),
     Insert = require('app/model/add/insert/user/users'),
     Delete = require('app/model/remove/users/user'),
@@ -265,5 +264,38 @@ exports.deleteForUs = (req, res) => {
 
     });
 
+
+}
+
+
+exports.blockUser = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+    let id = req.body.id;
+
+
+    getAccessTokenPayLoad(() => {
+
+        let from = data.userId;
+
+        Find.isExistUser(id, isUserInDb => {
+            if (!isUserInDb)
+                return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+            Find.isUserInListOfBlockUser(from, id, result => {
+                if (!result) {
+                    Insert.addUserToUsersBlockList(from, id);
+                    return Json.builder(Response.HTTP_OK);
+                }
+
+                Delete.removeUserInUsersBlockList(id);
+                return Json.builder(Response.HTTP_OK);
+            });
+
+        });
+
+    });
 
 }

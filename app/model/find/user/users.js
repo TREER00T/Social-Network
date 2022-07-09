@@ -29,7 +29,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(true) : cb(false);
+                cb(result[1].length !== 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -50,7 +50,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(true) : cb(false);
+                cb(result[1].length !== 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -71,9 +71,9 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length === 0) ? cb(true) : cb(false);
+                cb(result[1].length === 0);
                 let password = result[1][0].password.trim();
-                (password.length === 0) ? cb(true) : cb(false);
+                cb(password.length === 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -94,7 +94,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (typeof result[1][0] !== 'undefined') ? cb(true) : cb(false);
+                cb(typeof result[1][0] !== 'undefined');
             } catch (e) {
                 DataBaseException(e);
             }
@@ -154,7 +154,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(true) : cb(false);
+                cb(result[1].length !== 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -197,7 +197,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(true) : cb(false);
+                cb(result[1].length !== 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -338,6 +338,23 @@ module.exports = {
             } catch (e) {
                 DataBaseException(e);
             }
+        });
+    },
+
+    isUserInListOfBlockUser(from, targetId, cb) {
+        openSql.find({
+            optKey: [
+                STAR,
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'userBlockList', 'userId', `${from}`, 'userTargetId', `${targetId}`
+            ],
+            where: true
+        }).result(result => {
+            (result[1].length !== 0) ? result[1][0].id : cb(false);
         });
     }
 

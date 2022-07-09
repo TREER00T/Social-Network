@@ -12,7 +12,7 @@ module.exports = {
                 defaultColor: defaultColor
             }
         }).result(result => {
-            (result) ? cb(true) : cb(false);
+            cb(result);
         });
     },
 
@@ -25,6 +25,17 @@ module.exports = {
                 fromUser: fromUser,
                 userId: userId,
                 tblChatId: tableName
+            }
+        });
+    },
+
+
+    addUserToUsersBlockList(userId, userTargetId) {
+        openSql.addOne({
+            table: 'userBlockList',
+            data: {
+                userId: userId,
+                userTargetId: userTargetId
             }
         });
     }
