@@ -341,6 +341,27 @@ module.exports = {
         });
     },
 
+
+    getPersonalUserDetails(userId, cb) {
+        openSql.find({
+            optKey: [
+                STAR,
+                EQUAL_TO
+            ],
+            data: [
+                'users', 'id', userId
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
     isUserInListOfBlockUser(from, targetId, cb) {
         openSql.find({
             optKey: [
@@ -354,7 +375,28 @@ module.exports = {
             ],
             where: true
         }).result(result => {
-            (result[1].length !== 0) ? result[1][0].id : cb(false);
+            try {
+                (result[1].length !== 0) ? result[1][0].id : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    isUsernameUsed(id, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: ['username', 'users', 'username', `${id}`],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1][0].username === undefined);
+            } catch (e) {
+                DataBaseException(e);
+            }
         });
     }
 
