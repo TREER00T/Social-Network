@@ -20,7 +20,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(true) : cb(false);
+                cb(result[1].length !== 0);
             } catch (e) {
                 DataBaseException(e);
             }

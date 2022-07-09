@@ -4,6 +4,7 @@ let openSql = require('opensql'),
         AND,
         STAR,
         DESC,
+        LIKE,
         COUNT,
         LIMIT,
         ORDER_BY
@@ -28,7 +29,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(true) : cb(false);
+                cb(result[1].length !== 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -49,7 +50,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(true) : cb(false);
+                cb(result[1].length !== 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -70,9 +71,9 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length === 0) ? cb(true) : cb(false);
+                cb(result[1].length === 0);
                 let password = result[1][0].password.trim();
-                (password.length === 0) ? cb(true) : cb(false);
+                cb(password.length === 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -93,7 +94,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (typeof result[1][0] !== 'undefined') ? cb(true) : cb(false);
+                cb(typeof result[1][0] !== 'undefined');
             } catch (e) {
                 DataBaseException(e);
             }
@@ -153,7 +154,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(true) : cb(false);
+                cb(result[1].length !== 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -170,7 +171,7 @@ module.exports = {
                 OR,
                 EQUAL_TO,
                 AND,
-                EQUAL_TO,
+                EQUAL_TO
             ],
             data: [
                 'tblChatId', 'listofusere2es', 'toUser', `${data['toUser']}`,
@@ -196,7 +197,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(true) : cb(false);
+                cb(result[1].length !== 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -204,20 +205,25 @@ module.exports = {
     },
 
 
-    getTableNameForListOfE2EMessage(fromUser, toUser, cb) {
+    getTableNameForListOfE2EMessage(fromUser, toUser, userId, cb) {
         openSql.find({
             optKey: [
+                EQUAL_TO,
+                AND,
                 EQUAL_TO,
                 AND,
                 EQUAL_TO,
                 OR,
                 EQUAL_TO,
                 AND,
+                EQUAL_TO,
+                AND,
                 EQUAL_TO
             ],
             data: [
                 'tblChatId', 'listOfUserE2Es', 'toUser', `${toUser}`,
-                'fromUser', `${fromUser}`, 'toUser', `${fromUser}`, 'fromUser', `${toUser}`
+                'fromUser', `${fromUser}`, 'userId', `${userId}`,
+                'toUser', `${fromUser}`, 'fromUser', `${toUser}`, 'userId', `${userId}`
             ],
             where: true
         }).result(result => {
@@ -230,16 +236,63 @@ module.exports = {
     },
 
 
-    getListOfMessage(tableName, startFrom, limit, cb) {
+    getListOfMessage(tableName, startFrom, limit, order, sort, type, search, cb) {
+        if (type !== undefined) {
+            openSql.find({
+                optKey: [
+                    STAR,
+                    EQUAL_TO,
+                    ORDER_BY,
+                    sort,
+                    LIMIT
+                ],
+                data: [
+                    `${tableName}`, 'type', type, order, [startFrom, limit]
+                ],
+                where: true
+            }).result(result => {
+                try {
+                    cb(result);
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+            return;
+        }
+
+        if (search !== undefined) {
+            openSql.find({
+                optKey: [
+                    STAR,
+                    LIKE,
+                    ORDER_BY,
+                    DESC,
+                    LIMIT
+                ],
+                data: [
+                    `${tableName}`, 'test', `%${search}`, order, [startFrom, limit]
+                ],
+                where: true
+            }).result(result => {
+                try {
+                    cb(result);
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+            return;
+        }
+
+
         openSql.find({
             optKey: [
                 STAR,
                 ORDER_BY,
-                DESC,
+                sort,
                 LIMIT
             ],
             data: [
-                `${tableName}`, 'id', [startFrom, limit]
+                `${tableName}`, order, [startFrom, limit]
             ]
         }).result(result => {
             try {
@@ -265,7 +318,44 @@ module.exports = {
                 DataBaseException(e);
             }
         });
-    }
+    },
 
+    getUserPvDetails(userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                ['img', 'bio', 'isActive',
+                    'username', 'lastName',
+                    'firstName', 'defaultColor'],
+                'users', 'id', userId
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    isUserInListOfBlockUser(from, targetId, cb) {
+        openSql.find({
+            optKey: [
+                STAR,
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'userBlockList', 'userId', `${from}`, 'userTargetId', `${targetId}`
+            ],
+            where: true
+        }).result(result => {
+            (result[1].length !== 0) ? result[1][0].id : cb(false);
+        });
+    }
 
 }

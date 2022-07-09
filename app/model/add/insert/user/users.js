@@ -12,18 +12,30 @@ module.exports = {
                 defaultColor: defaultColor
             }
         }).result(result => {
-            (result) ? cb(true) : cb(false);
+            cb(result);
         });
     },
 
 
-    chatIdInListOfUserE2Es(fromUser, toUser, tableName) {
+    chatIdInListOfUserE2Es(fromUser, toUser, userId, tableName) {
         openSql.addOne({
             table: 'listOfUserE2Es',
             data: {
                 toUser: toUser,
                 fromUser: fromUser,
+                userId: userId,
                 tblChatId: tableName
+            }
+        });
+    },
+
+
+    addUserToUsersBlockList(userId, userTargetId) {
+        openSql.addOne({
+            table: 'userBlockList',
+            data: {
+                userId: userId,
+                userTargetId: userTargetId
             }
         });
     }

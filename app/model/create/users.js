@@ -70,6 +70,7 @@ module.exports = {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 toUser: INT(),
                 fromUser: INT(),
+                userId: INT(),
                 tblChatId: VARCHAR(100)
             },
             primaryKey: 'id'

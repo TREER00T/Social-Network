@@ -10,7 +10,7 @@ module.exports = {
 
         openSql.findTable(tableName).result(result => {
             try {
-                (result.length === 0) ? cb(false) : cb(true);
+                cb(result.length === 0);
             } catch (e) {
                 DataBaseException(e);
             }

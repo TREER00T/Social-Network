@@ -17,7 +17,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1].changedRows !== 0) ? cb(true) : cb(false);
+                cb(result[1].changedRows !== 0);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -36,7 +36,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1].changedRows !== 0) ? cb(true) : cb(false);
+                cb(result[1].changedRows !== 0);
             } catch (e) {
                 DataBaseException(e);
             }

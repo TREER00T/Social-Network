@@ -134,6 +134,14 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         }).result(()=>{});
+        openSql.addForeignKey({
+            table: 'listOfUserE2Es',
+            foreignKey: 'userId',
+            referenceTable: 'users',
+            field: 'id',
+            onDelete: CASCADE,
+            onUpdate: CASCADE
+        }).result(()=>{});
     }
 
 }

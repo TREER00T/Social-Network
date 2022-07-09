@@ -3,16 +3,16 @@
 const {
         program
     } = require('commander'),
-    DB = require('app/database/DatabaseConnection')
     Database = require('app/database/DatabaseInterface');
 
-DB.connect();
 
 program
     .command('db')
     .description('Create database and tables')
-    .action(function () {
+    .action(() => {
         Database.initialization();
-        console.log('Exist');
+        let isFinished = Database.create();
+        if (isFinished)
+            console.log('Created.');
     })
     .parse();

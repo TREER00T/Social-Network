@@ -3,9 +3,9 @@ let Json = require('app/util/ReturnJson'),
     Create = require('app/model/create/users'),
     Add = require('app/model/add/foreignKey/users'),
     Find = require('app/model/find/user/users'),
-    PipeLine = require('app/middleware/ApiPipeline'),
     multer = require('multer'),
     Insert = require('app/model/add/insert/user/users'),
+    Delete = require('app/model/remove/users/user'),
     CommonInsert = require('app/model/add/insert/common/index'),
     Util = require('app/util/Util'),
     File = require('app/util/File'),
@@ -34,28 +34,31 @@ exports.createE2EChat = (req, res) => {
             return Json.builder(Response.HTTP_User_NOT_FOUND);
 
 
-        let phone = PipeLine.token.at.phoneNumber;
+        getAccessTokenPayLoad(data => {
+
+            let tokenUserId = data.userId;
+
+            Create.e2eContents(tokenUserId, userId, result => {
 
 
-        Create.e2eContents(phone, userId, result => {
+                if (!result)
+                    return Json.builder(Response.HTTP_CONFLICT);
 
 
-            if (!result)
-                return Json.builder(Response.HTTP_CONFLICT);
+                Add.e2eContents(tokenUserId, userId);
+
+                Json.builder(Response.HTTP_CREATED);
 
 
-            Add.e2eContents(phone, userId);
+                let tableName = tokenUserId + 'And' + userId + 'E2EContents';
 
-            Json.builder(Response.HTTP_CREATED);
+                Insert.chatIdInListOfUserE2Es(tokenUserId, userId, tokenUserId, tableName);
+                Insert.chatIdInListOfUserE2Es(userId, tokenUserId, userId, tableName);
 
 
-            let tableName = phone + 'And' + userId + 'E2EContents';
-
-            Insert.chatIdInListOfUserE2Es(phone, userId, tableName);
-
+            });
 
         });
-
 
     });
 
@@ -127,9 +130,11 @@ exports.listOfMessage = (req, res) => {
     Json.initializationRes(res);
 
 
-    let {to, limit, page} = req.query;
+    let {to, limit, page, order, sort, type, search} = req.query;
 
     let getLimit = (limit !== undefined) ? limit : 15;
+    let getSort = (sort !== undefined) ? sort : 'DESC';
+    let getOrder = (order !== undefined) ? order : 'id';
 
     let startFrom = (page - 1) * limit;
 
@@ -137,7 +142,7 @@ exports.listOfMessage = (req, res) => {
 
         let from = data.userId;
 
-        Find.getTableNameForListOfE2EMessage(from, to, data => {
+        Find.getTableNameForListOfE2EMessage(from, to, from, data => {
 
             if (!data)
                 return Json.builder(Response.HTTP_User_NOT_FOUND);
@@ -147,8 +152,7 @@ exports.listOfMessage = (req, res) => {
 
                 let totalPages = Math.ceil(count / getLimit);
 
-                Find.getListOfMessage(data, startFrom, getLimit, result => {
-
+                Find.getListOfMessage(data, startFrom, getLimit, getOrder, getSort, type, search, result => {
 
                     return Json.builder(
                         Response.HTTP_OK,
@@ -166,5 +170,132 @@ exports.listOfMessage = (req, res) => {
 
     });
 
+
+}
+
+
+exports.user = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+    let id = req.query.id;
+
+    Find.isExistUser(id, isUserInDb => {
+        if (!isUserInDb)
+            return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+        Find.getUserPvDetails(id, result => {
+            return Json.builder(Response.HTTP_OK, result);
+        });
+    });
+
+
+}
+
+exports.deleteForMe = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+    let id = req.params.id;
+
+    getAccessTokenPayLoad(() => {
+
+        let from = data.userId;
+
+        Find.isExistUser(id, isUserInDb => {
+            if (!isUserInDb)
+                return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+            Find.getTableNameForListOfE2EMessage(from, id, from, data => {
+                if (!data)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
+
+
+                Delete.chatInListOfChatsForUser(from, id, from, result => {
+                    return Json.builder(Response.HTTP_OK, result);
+                });
+
+            });
+
+        });
+
+    });
+
+
+}
+
+exports.deleteForUs = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+    let id = req.params.id;
+
+
+    getAccessTokenPayLoad(() => {
+
+        let from = data.userId;
+
+        Find.isExistUser(id, isUserInDb => {
+            if (!isUserInDb)
+                return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+            Find.getTableNameForListOfE2EMessage(from, id, from, data => {
+                if (!data)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
+
+
+                Delete.chat(data, () => {
+
+                    Delete.chatInListOfChatsForUser(from, id, from, () => {
+
+                        Delete.chatInListOfChatsForUser(from, id, id);
+
+                        return Json.builder(Response.HTTP_OK);
+                    });
+
+                });
+
+            });
+
+        });
+
+    });
+
+
+}
+
+
+exports.blockUser = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+    let id = req.body.id;
+
+
+    getAccessTokenPayLoad(() => {
+
+        let from = data.userId;
+
+        Find.isExistUser(id, isUserInDb => {
+            if (!isUserInDb)
+                return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+            Find.isUserInListOfBlockUser(from, id, result => {
+                if (!result) {
+                    Insert.addUserToUsersBlockList(from, id);
+                    return Json.builder(Response.HTTP_OK);
+                }
+
+                Delete.removeUserInUsersBlockList(id);
+                return Json.builder(Response.HTTP_OK);
+            });
+
+        });
+
+    });
 
 }
