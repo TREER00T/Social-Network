@@ -6,6 +6,7 @@ let express = require('express'),
 router.post('/room/create', PvChat.createE2EChat);
 router.post('/room/uploadFile', PvChat.uploadFile);
 router.get('/room/chats', PvChat.listOfMessage);
+router.get('/room/user', PvChat.user);
 
 
 module.exports = router;

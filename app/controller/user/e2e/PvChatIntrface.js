@@ -169,3 +169,23 @@ exports.listOfMessage = (req, res) => {
 
 
 }
+
+
+exports.user = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+    let id = req.query;
+
+    Find.isExistUser(id, isUserInDb => {
+        if (!isUserInDb)
+            return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+        Find.getUserPvDetails(id, result => {
+            return Json.builder(Response.HTTP_OK, result);
+        });
+    });
+
+
+}

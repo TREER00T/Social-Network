@@ -287,7 +287,27 @@ module.exports = {
                 DataBaseException(e);
             }
         });
-    }
+    },
 
+    getUserPvDetails(userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                ['img', 'bio', 'isActive',
+                    'username', 'lastName',
+                    'firstName', 'defaultColor'],
+                'users', 'id', userId
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    }
 
 }
