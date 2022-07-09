@@ -8,9 +8,11 @@ let openSql = require('opensql'),
         DATETIME
     } = openSql.dataType,
     {
-        NOT_NULL,
         AUTO_INCREMENT
     } = openSql.keywordHelper,
+    {
+        NOT_NULL
+    } = openSql.queryHelper,
     {
         DataBaseException
     } = require('app/exception/DataBaseException');

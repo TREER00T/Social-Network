@@ -6,10 +6,10 @@ let openSql = require('opensql'),
         DESC,
         COUNT,
         LIMIT,
-        EQUAL_TO,
         ORDER_BY
     } = openSql.keywordHelper,
     {
+        EQUAL_TO,
         IS_NOT_NULL
     } = openSql.queryHelper,
     {
@@ -48,7 +48,6 @@ module.exports = {
             ],
             where: true
         }).result(result => {
-            console.log(result)
             try {
                 (result[1].length !== 0) ? cb(true) : cb(false);
             } catch (e) {

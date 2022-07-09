@@ -4,7 +4,9 @@ let openSql = require('opensql'),
         ENUM
     } = openSql.dataType,
     {
-        NOT_NULL,
+        NOT_NULL
+    } = openSql.queryHelper,
+    {
         AUTO_INCREMENT
     } = openSql.keywordHelper;
 
