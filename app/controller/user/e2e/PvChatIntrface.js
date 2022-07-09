@@ -131,7 +131,7 @@ exports.listOfMessage = (req, res) => {
     Json.initializationRes(res);
 
 
-    let {to, limit, page, order, sort, type} = req.query;
+    let {to, limit, page, order, sort, type, search} = req.query;
 
     let getLimit = (limit !== undefined) ? limit : 15;
     let getSort = (sort !== undefined) ? sort : 'DESC';
@@ -153,7 +153,7 @@ exports.listOfMessage = (req, res) => {
 
                 let totalPages = Math.ceil(count / getLimit);
 
-                Find.getListOfMessage(data, startFrom, getLimit, getOrder, getSort, type, result => {
+                Find.getListOfMessage(data, startFrom, getLimit, getOrder, getSort, type, search, result => {
 
                     return Json.builder(
                         Response.HTTP_OK,
