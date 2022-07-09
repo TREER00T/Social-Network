@@ -3,7 +3,6 @@ let openSql = require('opensql'),
         OR,
         AND,
         STAR,
-        DESC,
         COUNT,
         LIMIT,
         ORDER_BY
@@ -230,16 +229,39 @@ module.exports = {
     },
 
 
-    getListOfMessage(tableName, startFrom, limit, cb) {
+    getListOfMessage(tableName, startFrom, limit, order, sort, type, cb) {
+        if (type !== undefined) {
+            openSql.find({
+                optKey: [
+                    STAR,
+                    EQUAL_TO,
+                    ORDER_BY,
+                    sort,
+                    LIMIT
+                ],
+                data: [
+                    `${tableName}`, 'type', type, order, [startFrom, limit]
+                ],
+                where: true
+            }).result(result => {
+                try {
+                    cb(result);
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+            return;
+        }
+
         openSql.find({
             optKey: [
                 STAR,
                 ORDER_BY,
-                DESC,
+                sort,
                 LIMIT
             ],
             data: [
-                `${tableName}`, 'id', [startFrom, limit]
+                `${tableName}`, order, [startFrom, limit]
             ]
         }).result(result => {
             try {
