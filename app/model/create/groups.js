@@ -8,7 +8,9 @@ let openSql = require('opensql'),
         DATETIME
     } = openSql.dataType,
     {
-        NOT_NULL,
+        NOT_NULL
+    } = openSql.queryHelper,
+    {
         AUTO_INCREMENT
     } = openSql.keywordHelper;
 
