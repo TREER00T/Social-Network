@@ -1,6 +1,7 @@
 let openSql = require('opensql'),
     {
         OR,
+        IN,
         AND,
         STAR,
         DESC,
@@ -252,7 +253,7 @@ module.exports = {
                 where: true
             }).result(result => {
                 try {
-                    cb(result);
+                    cb(result[1][0]);
                 } catch (e) {
                     DataBaseException(e);
                 }
@@ -275,7 +276,7 @@ module.exports = {
                 where: true
             }).result(result => {
                 try {
-                    cb(result);
+                    cb(result[1][0]);
                 } catch (e) {
                     DataBaseException(e);
                 }
@@ -296,7 +297,7 @@ module.exports = {
             ]
         }).result(result => {
             try {
-                cb(result);
+                cb(result[1][0]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -334,12 +335,36 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                cb(result);
+                cb(result[1][0]);
             } catch (e) {
                 DataBaseException(e);
             }
         });
     },
+
+
+    getPersonalUserDetails(userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                ['img', 'bio', 'isActive',
+                    'username', 'lastName',
+                    'phone', 'email',
+                    'firstName', 'defaultColor'],
+                'users', 'id', userId
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1][0]);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
 
     isUserInListOfBlockUser(from, targetId, cb) {
         openSql.find({
@@ -354,8 +379,97 @@ module.exports = {
             ],
             where: true
         }).result(result => {
-            (result[1].length !== 0) ? result[1][0].id : cb(false);
+            try {
+                (result[1].length !== 0) ? result[1][0].id : cb(false);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    isUsernameUsed(id, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: ['username', 'users', 'username', `${id}`],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1][0].username === undefined);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    getListOfBlockUsers(id, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                'userTargetId', 'userBlockList', 'userId', `${id}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0].userTargetId === undefined) ? cb(null) : cb(result[1][0].userTargetId);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    getUserDetailsInUsersTable(array, cb) {
+        let arrayOfUserId = [];
+
+        array.forEach(item => {
+
+            arrayOfUserId.push(item['userTargetId']);
+
+        });
+
+        openSql.find({
+            optKey: [
+                IN
+            ],
+            data: [
+                ['img', 'firstName', 'username', 'id'], 'users', 'id', arrayOfUserId
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+
+    },
+
+
+    getListOfDevices(id, cb) {
+        openSql.find({
+            optKey: [
+                STAR,
+                EQUAL_TO
+            ],
+            data: [
+                'devices', 'userId', `${id}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            } catch (e) {
+                DataBaseException(e);
+            }
         });
     }
+
 
 }

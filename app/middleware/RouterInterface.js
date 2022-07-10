@@ -8,6 +8,7 @@ let express = require('express'),
     Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
     authRouter = require('app/routes/AuthRoutes'),
+    personalRouter = require('app/routes/PersonalRoutes'),
     e2eRouter = require('app/routes/PvChatRoutes');
 
 
@@ -61,6 +62,7 @@ module.exports = {
 
         app.use('/auth', authRouter);
         app.use('/e2e', e2eRouter);
+        app.use('/personal', personalRouter);
 
         app.listen(process.env.EXPRESS_PORT, () => {
             console.log('Server are running...');

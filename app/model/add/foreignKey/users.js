@@ -45,18 +45,6 @@ module.exports = {
     },
 
 
-    devices() {
-        openSql.addForeignKey({
-            table: 'devices',
-            foreignKey: 'userId',
-            referenceTable: 'users',
-            field: 'id',
-            onDelete: CASCADE,
-            onUpdate: CASCADE
-        }).result(()=>{});
-    },
-
-
     savedMessages(phone) {
         openSql.addForeignKey({
             table: phone + 'SavedMessages',

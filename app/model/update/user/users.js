@@ -54,6 +54,120 @@ module.exports = {
                 phone: `${phone}`
             }
         });
+    },
+
+
+    username(phone, username, cb) {
+        openSql.update({
+            table: 'users',
+            edit: {
+                username: `${username}`
+            },
+            where: {
+                phone: `${phone}`
+            }
+        }).result(result => {
+            try {
+                cb(result[1].changedRows > 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    bio(phone, bio, cb) {
+        openSql.update({
+            table: 'users',
+            edit: {
+                bio: `${bio}`
+            },
+            where: {
+                phone: `${phone}`
+            }
+        }).result(result => {
+            try {
+                cb(result[1].changedRows > 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    name(phone, firstName, lastName, cb) {
+        openSql.update({
+            table: 'users',
+            edit: {
+                firstName: `${firstName}`,
+                lastName: `${lastName}`
+            },
+            where: {
+                phone: `${phone}`
+            }
+        }).result(result => {
+            try {
+                cb(result[1].changedRows > 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    passwordAndEmail(phone, password, email, cb) {
+        openSql.update({
+            table: 'users',
+            edit: {
+                password: `${password}`,
+                email: `${email}`
+            },
+            where: {
+                phone: `${phone}`
+            }
+        }).result(result => {
+            try {
+                cb(result[1].changedRows > 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    password(phone, password, cb) {
+        openSql.update({
+            table: 'users',
+            edit: {
+                password: `${password}`
+            },
+            where: {
+                phone: `${phone}`
+            }
+        }).result(result => {
+            try {
+                cb(result[1].changedRows > 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    img(phone, url, cb) {
+        openSql.update({
+            table: 'users',
+            edit: {
+                img: `${url}`
+            },
+            where: {
+                phone: `${phone}`
+            }
+        }).result(result => {
+            try {
+                cb(result[1].changedRows > 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
+
 
 }

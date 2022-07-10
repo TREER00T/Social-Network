@@ -1,4 +1,5 @@
 let openSql = require('opensql');
+const {DataBaseException} = require("app/exception/DataBaseException");
 
 
 module.exports = {
@@ -36,6 +37,19 @@ module.exports = {
             data: {
                 userId: userId,
                 userTargetId: userTargetId
+            }
+        });
+    },
+
+
+    userDeviceInformation(user) {
+        openSql.addOne({
+            table: 'devices',
+            data: {
+                userId: user['id'],
+                deviceIp: user['ip'],
+                deviceName: user['name'],
+                deviceLocation: user['location']
             }
         });
     }

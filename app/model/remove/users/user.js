@@ -9,7 +9,7 @@ module.exports = {
         openSql.dropTable(tableName)
             .result(result => {
                 try {
-                    cb(result[1].warningCount !== 0)
+                    cb(result[1].affectedRows !== 0)
                 } catch (e) {
                     DataBaseException(e);
                 }
@@ -26,7 +26,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].warningCount !== 0)
+                cb(result[1].affectedRows !== 0)
             } catch (e) {
                 DataBaseException(e);
             }
