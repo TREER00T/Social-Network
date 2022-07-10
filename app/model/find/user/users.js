@@ -449,6 +449,26 @@ module.exports = {
             }
         });
 
+    },
+
+
+    getListOfDevices(id, cb) {
+        openSql.find({
+            optKey: [
+                STAR,
+                EQUAL_TO
+            ],
+            data: [
+                'devices', 'userId', `${id}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
 
 

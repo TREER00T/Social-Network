@@ -282,3 +282,22 @@ exports.listOfBlockUsers = (req, res) => {
     });
 
 }
+
+
+exports.listOfDevices = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+
+    getAccessTokenPayLoad(data => {
+
+        let id = data.id;
+
+        Find.getListOfDevices(id, result => {
+            return Json.builder(Response.HTTP_OK, result);
+        });
+
+    });
+
+}
