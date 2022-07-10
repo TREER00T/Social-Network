@@ -7,6 +7,10 @@ router.get('/user', Personal.user);
 router.put('/username/:id', Personal.editUsername);
 router.put('/bio/:bio', Personal.editBio);
 router.put('/name', Personal.editName);
+router.put('/twoAuth', Personal.twoAuth);
+router.put('/twoAuth/disable', Personal.disableTwoAuth);
+router.put('/twoAuth/rest/password', Personal.restPassword);
+router.put('/uploadAvatar', Personal.uploadAvatar);
 
 
 module.exports = router;

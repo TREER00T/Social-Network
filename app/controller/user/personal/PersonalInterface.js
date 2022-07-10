@@ -4,7 +4,18 @@ let Json = require('app/util/ReturnJson'),
     } = require('app/middleware/ApiPipeline'),
     Response = require('app/util/Response'),
     Update = require('app/model/update/user/users'),
-    Find = require('app/model/find/user/users');
+    Find = require('app/model/find/user/users'),
+    multer = require('multer'),
+    openSql = require('opensql'),
+    {
+        NULL
+    } = openSql.queryHelper,
+    multerImage = multer().single('image'),
+    {
+        getHashData
+    } = require('app/util/Generate'),
+    File = require('app/util/File'),
+    Util = require('app/util/Util');
 
 
 exports.user = (req, res) => {
@@ -36,7 +47,7 @@ exports.editUsername = (req, res) => {
 
     let username = req.params.id;
 
-    if (username.toString().trim().length < 1)
+    if (username < 1 || username === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getAccessTokenPayLoad(data => {
@@ -71,7 +82,7 @@ exports.editBio = (req, res) => {
 
     let bio = req.params.bio;
 
-    if (bio.toString().trim().length < 1)
+    if (bio < 1 || bio === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getAccessTokenPayLoad(data => {
@@ -106,7 +117,7 @@ exports.editName = (req, res) => {
 
     let {lastName, firstName} = req.body;
 
-    if (firstName.toString().trim().length < 1)
+    if (firstName < 1 || firstName === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getAccessTokenPayLoad(data => {
@@ -123,5 +134,128 @@ exports.editName = (req, res) => {
 
     });
 
+
+}
+
+
+exports.twoAuth = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+    let {password, email} = req.body;
+
+    if (email === undefined && (password === undefined || password < 6))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
+    getAccessTokenPayLoad(data => {
+
+        let phone = data.phoneNumber;
+
+
+        Update.passwordAndEmail(phone, getHashData(password, phone), email, result => {
+            if (!result)
+                return Json.builder(Response.HTTP_BAD_REQUEST);
+
+            return Json.builder(Response.HTTP_OK);
+        });
+
+    });
+
+}
+
+
+
+exports.disableTwoAuth = (req, res) => {
+
+    Json.initializationRes(res);
+
+
+    getAccessTokenPayLoad(data => {
+
+        let phone = data.phoneNumber;
+
+        Update.passwordAndEmail(phone, NULL, NULL, result => {
+            if (!result)
+                return Json.builder(Response.HTTP_BAD_REQUEST);
+
+            return Json.builder(Response.HTTP_OK);
+        });
+
+    });
+
+}
+
+
+
+exports.restPassword = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+    let oldPassword = req.body.old;
+    let newPassword = req.body.new;
+
+
+    if (oldPassword === undefined && newPassword === undefined)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
+
+    getAccessTokenPayLoad(data => {
+
+        let phone = data.phoneNumber;
+
+        Find.isValidPassword(phone, getHashData(oldPassword, phone), result => {
+
+            if (!result)
+                return Json.builder(Response.HTTP_FORBIDDEN);
+
+            Update.password(phone, getHashData(newPassword, phone), result => {
+                if (!result)
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                return Json.builder(Response.HTTP_OK);
+            });
+
+        });
+
+    });
+
+}
+
+
+exports.uploadAvatar = (req, res) => {
+
+
+    Json.initializationRes(res);
+
+
+    getAccessTokenPayLoad(data => {
+
+        let phone = data.phoneNumber;
+
+
+        multerImage(req, res, () => {
+
+
+            let file = req.image;
+
+            if (file === undefined)
+                return Json.builder(Response.HTTP_BAD_REQUEST);
+
+            let {
+                fileUrl
+            } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+
+            Update.img(phone, fileUrl, result => {
+                if (!result)
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                return Json.builder(Response.HTTP_OK);
+            });
+
+        });
+
+    });
 
 }

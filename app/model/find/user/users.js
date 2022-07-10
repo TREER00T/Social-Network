@@ -345,10 +345,13 @@ module.exports = {
     getPersonalUserDetails(userId, cb) {
         openSql.find({
             optKey: [
-                STAR,
                 EQUAL_TO
             ],
             data: [
+                ['img', 'bio', 'isActive',
+                    'username', 'lastName',
+                    'phone', 'email',
+                    'firstName', 'defaultColor'],
                 'users', 'id', userId
             ],
             where: true
