@@ -7,8 +7,6 @@ let openSql = require('opensql'),
     } = require('app/exception/DataBaseException');
 
 
-
-
 module.exports = {
 
     groupId(id, cb) {
@@ -24,6 +22,16 @@ module.exports = {
             } catch (e) {
                 DataBaseException(e);
             }
+        });
+    },
+
+    group(id, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: ['groups'],
+            where: true
         });
     }
 

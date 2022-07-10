@@ -7,7 +7,7 @@ let app = require('express')(),
     Insert = require('app/model/add/insert/common/index'),
     Response = require('app/util/Response'),
     Pipeline = require('app/io/middleware/SocketIoPipeline'),
-    FindGroup = require('app/model/find/group/group'),
+    FindGroup = require('app/model/find/groups/group'),
     FindUser = require('app/model/find/user/users'),
     Json = require('app/util/ReturnJson'),
     FindInUser = require('app/model/find/user/users');
@@ -190,7 +190,7 @@ io.use((socket, next) => {
     });
 
 
-    // group
+    // groups
 
     socket.on('groupInit', data => {
 

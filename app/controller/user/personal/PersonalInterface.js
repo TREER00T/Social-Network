@@ -212,7 +212,7 @@ exports.uploadAvatar = (req, res) => {
         multerImage(req, res, () => {
 
 
-            let file = req.image;
+            let file = req.file;
 
             if (file === undefined)
                 return Json.builder(Response.HTTP_BAD_REQUEST);

@@ -1,5 +1,4 @@
 let openSql = require('opensql');
-const {DataBaseException} = require("app/exception/DataBaseException");
 
 
 module.exports = {

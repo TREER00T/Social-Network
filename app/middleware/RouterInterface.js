@@ -64,7 +64,7 @@ module.exports = {
         app.use('/auth', authRouter);
         app.use('/e2e', e2eRouter);
         app.use('/personal', personalRouter);
-        app.use('/group', groupRouter);
+        app.use('/groups', groupRouter);
 
         app.listen(process.env.EXPRESS_PORT, () => {
             console.log('Server are running...');

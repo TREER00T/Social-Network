@@ -77,7 +77,7 @@ module.exports = {
     getFileHashName() {
         const rand = crypto.randomBytes(30);
 
-        let formatValidString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        let formatValidString = '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
 
         let chars = formatValidString.repeat(5);
 
@@ -89,6 +89,17 @@ module.exports = {
         }
 
         return str.trim();
+    },
+
+    makeId() {
+        let result = '';
+        let characters = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
+        let charactersLength = characters.length;
+        for (let i = 0; i < 20; i++) {
+            result += characters.charAt(Math.floor(Math.random() *
+                charactersLength));
+        }
+        return result;
     }
 
 
