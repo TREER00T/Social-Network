@@ -16,9 +16,7 @@ let Json = require('app/util/ReturnJson'),
     } = require('app/middleware/ApiPipeline');
 
 
-exports.createE2EChat = (req, res) => {
-
-    Json.initializationRes(res);
+exports.createE2EChat = (req) => {
 
     let userId = Number(req.body.userId);
     let isNumber = Number.isInteger(userId);
@@ -66,9 +64,6 @@ exports.createE2EChat = (req, res) => {
 
 
 exports.uploadFile = (req, res) => {
-
-
-    Json.initializationRes(res);
 
 
     multerFile(req, res, () => {
@@ -124,10 +119,7 @@ exports.uploadFile = (req, res) => {
 };
 
 
-exports.listOfMessage = (req, res) => {
-
-
-    Json.initializationRes(res);
+exports.listOfMessage = (req) => {
 
 
     let {to, limit, page, order, sort, type, search} = req.query;
@@ -174,10 +166,7 @@ exports.listOfMessage = (req, res) => {
 }
 
 
-exports.user = (req, res) => {
-
-
-    Json.initializationRes(res);
+exports.user = (req) => {
 
     let id = req.query.id;
 
@@ -193,10 +182,7 @@ exports.user = (req, res) => {
 
 }
 
-exports.deleteForMe = (req, res) => {
-
-
-    Json.initializationRes(res);
+exports.deleteForMe = (req) => {
 
     let id = req.params.id;
 
@@ -226,10 +212,8 @@ exports.deleteForMe = (req, res) => {
 
 }
 
-exports.deleteForUs = (req, res) => {
+exports.deleteForUs = (req) => {
 
-
-    Json.initializationRes(res);
 
     let id = req.params.id;
 
@@ -268,10 +252,8 @@ exports.deleteForUs = (req, res) => {
 }
 
 
-exports.blockUser = (req, res) => {
+exports.blockUser = (req) => {
 
-
-    Json.initializationRes(res);
 
     let id = req.body.id;
 
