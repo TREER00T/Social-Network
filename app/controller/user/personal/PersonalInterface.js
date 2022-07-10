@@ -6,10 +6,9 @@ let Json = require('app/util/ReturnJson'),
     Update = require('app/model/update/user/users'),
     Find = require('app/model/find/user/users'),
     multer = require('multer'),
-    openSql = require('opensql'),
     {
         NULL
-    } = openSql.queryHelper,
+    } = require('opensql').queryHelper,
     multerImage = multer().single('image'),
     {
         getHashData
@@ -26,7 +25,7 @@ exports.user = (req, res) => {
 
     getAccessTokenPayLoad(data => {
 
-        let userId = data.userId;
+        let userId = data.id;
 
         Find.getPersonalUserDetails(userId, result => {
 
@@ -165,7 +164,6 @@ exports.twoAuth = (req, res) => {
 }
 
 
-
 exports.disableTwoAuth = (req, res) => {
 
     Json.initializationRes(res);
@@ -185,7 +183,6 @@ exports.disableTwoAuth = (req, res) => {
     });
 
 }
-
 
 
 exports.restPassword = (req, res) => {
@@ -252,6 +249,32 @@ exports.uploadAvatar = (req, res) => {
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 return Json.builder(Response.HTTP_OK);
+            });
+
+        });
+
+    });
+
+}
+
+
+exports.listOfBlockUsers = (req, res) => {
+
+    Json.initializationRes(res);
+
+
+    getAccessTokenPayLoad(data => {
+
+        let id = data.id;
+
+        Find.getListOfBlockUsers(id, data => {
+            if (data === null)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            Find.getUserDetailsInUsersTable(data, result => {
+
+                return Json.builder(Response.HTTP_OK, result);
+
             });
 
         });

@@ -1,6 +1,7 @@
 let openSql = require('opensql'),
     {
         OR,
+        IN,
         AND,
         STAR,
         DESC,
@@ -252,7 +253,7 @@ module.exports = {
                 where: true
             }).result(result => {
                 try {
-                    cb(result);
+                    cb(result[1][0]);
                 } catch (e) {
                     DataBaseException(e);
                 }
@@ -275,7 +276,7 @@ module.exports = {
                 where: true
             }).result(result => {
                 try {
-                    cb(result);
+                    cb(result[1][0]);
                 } catch (e) {
                     DataBaseException(e);
                 }
@@ -296,7 +297,7 @@ module.exports = {
             ]
         }).result(result => {
             try {
-                cb(result);
+                cb(result[1][0]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -334,7 +335,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                cb(result);
+                cb(result[1][0]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -357,7 +358,7 @@ module.exports = {
             where: true
         }).result(result => {
             try {
-                cb(result);
+                cb(result[1][0]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -401,6 +402,54 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+
+    getListOfBlockUsers(id, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                'userTargetId', 'userBlockList', 'userId', `${id}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0].userTargetId === undefined) ? cb(null) : cb(result[1][0].userTargetId);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    getUserDetailsInUsersTable(array, cb) {
+        let arrayOfUserId = [];
+
+        array.forEach(item => {
+
+            arrayOfUserId.push(item['userTargetId']);
+
+        });
+
+        openSql.find({
+            optKey: [
+                IN
+            ],
+            data: [
+                ['img', 'firstName', 'username', 'id'], 'users', 'id', arrayOfUserId
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+
     }
+
 
 }

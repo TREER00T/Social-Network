@@ -1,9 +1,11 @@
 let {
-    NULL
-} = require('opensql').keywordHelper;
+        NULL
+    } = require('opensql').queryHelper;
+
 
 const IN_VALID_MESSAGE_TYPE = 'IN_VALID_MESSAGE_TYPE',
     IN_VALID_OBJECT_KEY = 'IN_VALID_OBJECT_KEY';
+
 
 module.exports = {
 
@@ -134,6 +136,6 @@ module.exports = {
 
 
         cb(jsonObject);
-    },
+    }
 
 }

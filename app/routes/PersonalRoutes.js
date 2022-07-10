@@ -11,6 +11,7 @@ router.put('/twoAuth', Personal.twoAuth);
 router.put('/twoAuth/disable', Personal.disableTwoAuth);
 router.put('/twoAuth/rest/password', Personal.restPassword);
 router.put('/uploadAvatar', Personal.uploadAvatar);
+router.get('/blockUsers', Personal.listOfBlockUsers);
 
 
 module.exports = router;

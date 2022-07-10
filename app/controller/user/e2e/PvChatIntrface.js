@@ -36,7 +36,7 @@ exports.createE2EChat = (req, res) => {
 
         getAccessTokenPayLoad(data => {
 
-            let tokenUserId = data.userId;
+            let tokenUserId = data.id;
 
             Create.e2eContents(tokenUserId, userId, result => {
 
@@ -140,7 +140,7 @@ exports.listOfMessage = (req, res) => {
 
     getAccessTokenPayLoad(data => {
 
-        let from = data.userId;
+        let from = data.id;
 
         Find.getTableNameForListOfE2EMessage(from, to, from, data => {
 
@@ -202,7 +202,7 @@ exports.deleteForMe = (req, res) => {
 
     getAccessTokenPayLoad(() => {
 
-        let from = data.userId;
+        let from = data.id;
 
         Find.isExistUser(id, isUserInDb => {
             if (!isUserInDb)
@@ -236,7 +236,7 @@ exports.deleteForUs = (req, res) => {
 
     getAccessTokenPayLoad(() => {
 
-        let from = data.userId;
+        let from = data.id;
 
         Find.isExistUser(id, isUserInDb => {
             if (!isUserInDb)
@@ -278,7 +278,7 @@ exports.blockUser = (req, res) => {
 
     getAccessTokenPayLoad(() => {
 
-        let from = data.userId;
+        let from = data.id;
 
         Find.isExistUser(id, isUserInDb => {
             if (!isUserInDb)
