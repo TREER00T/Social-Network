@@ -4,6 +4,7 @@ let express = require('express'),
 
 
 router.post('/create', Group.create);
+router.delete('/:id', Group.deleteGroup);
 
 
 module.exports = router;

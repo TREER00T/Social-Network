@@ -4,7 +4,9 @@ let Json = require('app/util/ReturnJson'),
     Insert = require('app/model/add/insert/groups/group'),
     Create = require('app/model/create/groups'),
     Find = require('app/model/find/groups/group'),
+    FindInUser = require('app/model/find/user/users'),
     Delete = require('app/model/remove/groups/group'),
+    DeleteInUser = require('app/model/remove/users/user'),
     multerImage = multer().single('image'),
     {
         getAccessTokenPayLoad
@@ -54,5 +56,45 @@ exports.create = (req, res) => {
 
     });
 
+
+}
+
+
+exports.deleteGroup = (req) => {
+
+
+    let id = req.params.id;
+
+
+    getAccessTokenPayLoad(data => {
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+                Find.isOwnerOfGroup(userId, id, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_FORBIDDEN);
+
+                    Delete.group(id);
+                    Delete.groupAdmins(id);
+                    Delete.groupUsers(id);
+                    DeleteInUser.groupInListOfUserGroups(id);
+                });
+
+            });
+
+        });
+
+    });
 
 }

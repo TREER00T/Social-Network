@@ -40,6 +40,15 @@ module.exports = {
                 id: id
             }
         });
+    },
+
+    groupInListOfUserGroups(id) {
+        openSql.remove({
+            table: 'listOfUserGroups',
+            where: {
+                groupId: id
+            }
+        });
     }
 
 }
