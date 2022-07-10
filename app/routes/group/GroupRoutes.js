@@ -5,6 +5,7 @@ let express = require('express'),
 
 router.post('/create', Group.create);
 router.delete('/:id', Group.deleteGroup);
+router.put('/uploadAvatar', Group.uploadAvatar);
 
 
 module.exports = router;

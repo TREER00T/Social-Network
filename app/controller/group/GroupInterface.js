@@ -6,6 +6,7 @@ let Json = require('app/util/ReturnJson'),
     Find = require('app/model/find/groups/group'),
     FindInUser = require('app/model/find/user/users'),
     Delete = require('app/model/remove/groups/group'),
+    Update = require('app/model/update/groups/group'),
     DeleteInUser = require('app/model/remove/users/user'),
     multerImage = multer().single('image'),
     {
@@ -96,5 +97,61 @@ exports.deleteGroup = (req) => {
         });
 
     });
+
+}
+
+
+
+exports.uploadAvatar = (req, res) => {
+
+    let id = req.body.id;
+
+    getAccessTokenPayLoad(data => {
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+                Find.isOwnerOfGroup(userId, id, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_FORBIDDEN);
+
+                    multerImage(req, res, () => {
+
+                        let file = req.file;
+
+                        if (file === undefined)
+                            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                        let {
+                            fileUrl
+                        } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+
+                        Update.img(id, fileUrl, result => {
+                            if (!result)
+                                return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                            return Json.builder(Response.HTTP_OK);
+                        });
+
+                    });
+
+                });
+
+            });
+
+        });
+
+    });
+
 
 }
