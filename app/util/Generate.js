@@ -3,8 +3,10 @@ const jwt = require('jsonwebtoken'),
         JWK,
         JWE
     } = require('node-jose'),
-    crypto = require('crypto');
+    crypto = require('crypto'),
+    dotenv = require('dotenv');
 
+dotenv.config();
 
 module.exports = {
 
@@ -91,7 +93,7 @@ module.exports = {
         return str.trim();
     },
 
-    makeId() {
+    makeIdForInviteLink() {
         let result = '';
         let characters = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
         let charactersLength = characters.length;
@@ -99,7 +101,11 @@ module.exports = {
             result += characters.charAt(Math.floor(Math.random() *
                 charactersLength));
         }
-        return result;
+        return `+` + result;
+    },
+
+    makeIdForPublicLink(id) {
+        return `+` + id;
     }
 
 

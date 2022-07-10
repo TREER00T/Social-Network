@@ -28,6 +28,22 @@ module.exports = {
         });
     },
 
+    isPublicKeyUsed(publicLink, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: ['id', 'groups', 'publicLink', `${publicLink}`],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1].length !== 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
     group(id, cb) {
         openSql.find({
             optKey: [

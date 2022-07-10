@@ -41,7 +41,7 @@ exports.create = (req, res) => {
                 fileUrl = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname)).fileUrl;
             }
 
-            Insert.group(name.toString().trim(), Generate.makeId(), Util.getRandomHexColor(), fileUrl, id => {
+            Insert.group(name.toString().trim(), Generate.makeIdForInviteLink(), Util.getRandomHexColor(), fileUrl, id => {
 
                 if (id === null)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
@@ -101,6 +101,89 @@ exports.deleteGroup = (req) => {
 }
 
 
+exports.changeName = (req) => {
+
+    let {id, name} = req.body;
+
+    if (name < 1 || name === undefined)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
+    getAccessTokenPayLoad(data => {
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+                Find.isOwnerOfGroup(userId, id, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_FORBIDDEN);
+
+                    Update.name(id, name.toString().trim(), result => {
+                        if (!result)
+                            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                        return Json.builder(Response.HTTP_OK);
+                    });
+
+                });
+
+            });
+
+        });
+
+    });
+
+}
+
+
+exports.changeDescription = (req) => {
+
+    let {id, description} = req.body;
+
+    getAccessTokenPayLoad(data => {
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+                Find.isOwnerOfGroup(userId, id, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_FORBIDDEN);
+
+                    Update.description(id, description, result => {
+                        if (!result)
+                            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                        return Json.builder(Response.HTTP_OK);
+                    });
+
+                });
+
+            });
+
+        });
+
+    });
+
+}
 
 exports.uploadAvatar = (req, res) => {
 
@@ -153,5 +236,96 @@ exports.uploadAvatar = (req, res) => {
 
     });
 
+
+}
+
+
+exports.changeToInviteLink = (req) => {
+
+    let id = req.body.id;
+
+    getAccessTokenPayLoad(data => {
+
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+                Find.isOwnerOfGroup(userId, id, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_FORBIDDEN);
+
+                    Update.inviteLink(id, Generate.makeIdForInviteLink(), result => {
+                        if (!result)
+                            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                        return Json.builder(Response.HTTP_OK);
+                    });
+
+                });
+
+            });
+
+        });
+
+    });
+
+}
+
+exports.changeToPublicLink = (req) => {
+
+    let {id, publicLink} = req.body;
+
+    getAccessTokenPayLoad(data => {
+
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+
+                Find.isOwnerOfGroup(userId, id, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_FORBIDDEN);
+
+                    let publicLink = Generate.makeIdForPublicLink(publicLink);
+
+                    Find.isPublicKeyUsed(publicLink, result => {
+                        if (!result)
+                            return Json.builder(Response.HTTP_CONFLICT);
+
+                        Update.publicLink(id, publicLink, result => {
+                            if (!result)
+                                return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                            return Json.builder(Response.HTTP_OK);
+                        });
+
+                    });
+
+                });
+
+            });
+
+        });
+
+    });
 
 }

@@ -71,27 +71,18 @@ exports.editBio = (req) => {
 
     let bio = req.params.bio;
 
-    if (bio < 1 || bio === undefined)
-        return Json.builder(Response.HTTP_BAD_REQUEST);
-
     getAccessTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
-        Find.isUsernameUsed(bio.toString().trim(), result => {
 
-            if (result) {
-                Update.bio(phone, bio.toString().trim(), result => {
-                    if (!result)
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
+        Update.bio(phone, bio, result => {
+            if (!result)
+                return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                    return Json.builder(Response.HTTP_OK);
-                });
-            }
-
-            return Json.builder(Response.HTTP_CONFLICT);
-
+            return Json.builder(Response.HTTP_OK);
         });
+
 
     });
 
