@@ -41,16 +41,20 @@ exports.gvc = (req, res) => {
             AddUserForeignKey.savedMessages(phone);
 
             Insert.phoneAndAuthCode(phone, getVerificationCode(), Util.getRandomHexColor(), isAdded => {
-                if (isAdded)
-                    return Json.builder(Response.HTTP_CREATED);
+                if (!isAdded)
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                return Json.builder(Response.HTTP_CREATED);
             });
 
         }
 
         if (isInDb) {
             Update.authCode(phone, getVerificationCode(), isUpdated => {
-                if (isUpdated)
-                    return Json.builder(Response.HTTP_OK);
+                if (!isUpdated)
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                return Json.builder(Response.HTTP_OK);
             });
         }
 
@@ -65,10 +69,11 @@ exports.isValidAuthCode = (req, res) => {
 
     Json.initializationRes(res);
 
-    let {phone, authCode} = req.body;
+    let {phone, authCode, name, ip, location} = req.body;
 
-    if (!isPhoneNumber(phone) && !isVerificationCode(authCode))
-        return Json.builder(Response.HTTP_BAD_REQUEST)
+    if (!isPhoneNumber(phone) && !isVerificationCode(authCode) ||
+        (name === undefined || ip === undefined || location === undefined))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     Find.isValidAuthCode(phone, authCode, result => {
 
@@ -83,6 +88,13 @@ exports.isValidAuthCode = (req, res) => {
                 return Find.getUserId(phone, id => {
 
                     Find.getApiKey(phone, result => {
+
+                        Insert.userDeviceInformation({
+                            id: id,
+                            ip: ip,
+                            name: name,
+                            location: location
+                        });
 
                         (async () => {
 
@@ -117,14 +129,15 @@ exports.isValidAuthCode = (req, res) => {
 
                     return Update.apikey(phone, getApiKey(), result => {
 
-                        if (result)
-                            Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
+                        if (!result)
+                            return Json.builder(Response.HTTP_BAD_REQUEST);
 
+                        return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
                     });
 
                 }
 
-                Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
+                return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
 
             });
 
@@ -141,11 +154,15 @@ exports.isValidPassword = (req, res) => {
 
     Json.initializationRes(res);
 
+    let {ip, name, location, password} = req.body;
+
+    if (name === undefined || ip === undefined || location === undefined)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
     getAccessTokenPayLoad(data => {
 
 
         let phone = data.phoneNumber;
-        let password = req.body.password;
 
         let iPasswordNull = (password === undefined || password?.length === 0);
 
@@ -161,12 +178,22 @@ exports.isValidPassword = (req, res) => {
 
             Find.getApiKey(phone, result => {
 
+                Find.getUserId(phone, id => {
+
+                    Insert.userDeviceInformation({
+                        id: id,
+                        ip: ip,
+                        name: name,
+                        location: location
+                    });
+
+                });
+
                 return Json.builder(Response.HTTP_ACCEPTED, {
                     apiKey: result
                 });
 
             });
-
 
         });
 
