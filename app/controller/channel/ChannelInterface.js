@@ -8,6 +8,7 @@ let Json = require('app/util/ReturnJson'),
     FindInUser = require('app/model/find/user/users'),
     Delete = require('app/model/remove/channels/channel'),
     Update = require('app/model/update/channels/channel'),
+    AddChannelForeignKey = require('app/model/add/foreignKey/channels'),
     DeleteInUser = require('app/model/remove/users/user'),
     multerImage = multer().single('image'),
     {
@@ -48,6 +49,7 @@ exports.create = (req, res) => {
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 Create.channelContents(id);
+                AddChannelForeignKey.channelContents(id);
                 Insert.userIntoChannelsAdmins(userId, id, isOwner);
                 Insert.userIntoChannel(userId, id);
 

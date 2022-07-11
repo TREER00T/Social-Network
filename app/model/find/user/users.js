@@ -539,6 +539,17 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+    isSavedMessageCreated(phone, cb) {
+        openSql.findTable(phone + 'SavedMessages')
+            .result(result => {
+                try {
+                    cb(typeof result[0] === 'object');
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
     }
 
 
