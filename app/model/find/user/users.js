@@ -490,6 +490,27 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+    getTableNameForListOfUserChannels(channelId, userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'id', 'listOfUserChannels', 'userId',
+                `${userId}`, 'channelId', `${channelId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1].length !== 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
 
 

@@ -1,13 +1,13 @@
 let Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
     multer = require('multer'),
-    Insert = require('app/model/add/insert/groups/group'),
+    Insert = require('app/model/add/insert/channels/channel'),
     InsertInUser = require('app/model/add/insert/user/users'),
-    Create = require('app/model/create/groups'),
-    Find = require('app/model/find/groups/group'),
+    Create = require('app/model/create/channels'),
+    Find = require('app/model/find/channels/channel'),
     FindInUser = require('app/model/find/user/users'),
-    Delete = require('app/model/remove/groups/group'),
-    Update = require('app/model/update/groups/group'),
+    Delete = require('app/model/remove/channels/channel'),
+    Update = require('app/model/update/channels/channel'),
     DeleteInUser = require('app/model/remove/users/user'),
     multerImage = multer().single('image'),
     {
@@ -42,14 +42,14 @@ exports.create = (req, res) => {
                 fileUrl = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname)).fileUrl;
             }
 
-            Insert.group(name.toString().trim(), Generate.makeIdForInviteLink(), Util.getRandomHexColor(), fileUrl, id => {
+            Insert.channel(name.toString().trim(), Generate.makeIdForInviteLink(), Util.getRandomHexColor(), fileUrl, id => {
 
                 if (id === null)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Create.groupContents(id);
-                Insert.userIntoGroupAdmins(userId, id, isOwner);
-                Insert.userIntoGroup(userId, id);
+                Create.channelContents(id);
+                Insert.userIntoChannelsAdmins(userId, id, isOwner);
+                Insert.userIntoChannel(userId, id);
 
                 return Json.builder(Response.HTTP_CREATED);
             });
@@ -62,7 +62,7 @@ exports.create = (req, res) => {
 }
 
 
-exports.deleteGroup = (req) => {
+exports.deleteChannel = (req) => {
 
 
     let id = req.params.id;
@@ -72,7 +72,7 @@ exports.deleteGroup = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -82,15 +82,15 @@ exports.deleteGroup = (req) => {
                 if (!result)
                     return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                Find.isOwnerOfGroup(userId, id, result => {
+                Find.isOwnerOfChannel(userId, id, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_FORBIDDEN);
 
-                    Delete.group(id);
-                    Delete.groupAdmins(id);
-                    Delete.groupUsers(id);
-                    DeleteInUser.groupInListOfUserGroups(id);
+                    Delete.channel(id);
+                    Delete.channelAdmins(id);
+                    Delete.channelUsers(id);
+                    DeleteInUser.channelInListOfUserChannels(id);
                 });
 
             });
@@ -113,7 +113,7 @@ exports.changeName = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -123,7 +123,7 @@ exports.changeName = (req) => {
                 if (!result)
                     return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                Find.isOwnerOfGroup(userId, id, result => {
+                Find.isOwnerOfChannel(userId, id, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_FORBIDDEN);
@@ -154,7 +154,7 @@ exports.changeDescription = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -164,7 +164,7 @@ exports.changeDescription = (req) => {
                 if (!result)
                     return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                Find.isOwnerOfGroup(userId, id, result => {
+                Find.isOwnerOfChannel(userId, id, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_FORBIDDEN);
@@ -194,7 +194,7 @@ exports.uploadAvatar = (req, res) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -204,7 +204,7 @@ exports.uploadAvatar = (req, res) => {
                 if (!result)
                     return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                Find.isOwnerOfGroup(userId, id, result => {
+                Find.isOwnerOfChannel(userId, id, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_FORBIDDEN);
@@ -250,7 +250,7 @@ exports.changeToInviteLink = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -260,7 +260,7 @@ exports.changeToInviteLink = (req) => {
                 if (!result)
                     return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                Find.isOwnerOfGroup(userId, id, result => {
+                Find.isOwnerOfChannel(userId, id, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_FORBIDDEN);
@@ -291,7 +291,7 @@ exports.changeToPublicLink = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -301,7 +301,7 @@ exports.changeToPublicLink = (req) => {
                 if (!result)
                     return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                Find.isOwnerOfGroup(userId, id, result => {
+                Find.isOwnerOfChannel(userId, id, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_FORBIDDEN);
@@ -342,7 +342,7 @@ exports.joinUser = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -352,13 +352,13 @@ exports.joinUser = (req) => {
                 if (!result)
                     return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                Find.isJoinedInGroup(id, userId, result => {
+                Find.isJoinedInChannel(id, userId, result => {
 
                     if (result)
                         return Json.builder(Response.HTTP_CONFLICT);
 
-                    Insert.userIntoGroup(id, userId);
-                    InsertInUser.groupIntoListOfUserGroups(id, userId);
+                    Insert.userIntoChannel(id, userId);
+                    InsertInUser.channelIntoListOfUserChannels(id, userId);
 
 
                     return Json.builder(Response.HTTP_CREATED);
@@ -384,7 +384,7 @@ exports.addAdmin = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -400,23 +400,23 @@ exports.addAdmin = (req) => {
                         return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
-                    Find.isOwnerOfGroup(userId, id, result => {
+                    Find.isOwnerOfChannel(userId, id, result => {
 
                         if (!result)
                             return Json.builder(Response.HTTP_FORBIDDEN);
 
-                        Find.isJoinedInGroup(id, userIdForNewAdmin, result => {
+                        Find.isJoinedInChannel(id, userIdForNewAdmin, result => {
 
                             if (!result)
                                 return Json.builder(Response.HTTP_NOT_FOUND);
 
-                            Find.isUserAdminOfGroup(id, userIdForNewAdmin, result => {
+                            Find.isUserAdminOfChannel(id, userIdForNewAdmin, result => {
 
                                 if (result)
                                     return Json.builder(Response.HTTP_CONFLICT);
 
                                 let isNotOwner = 0;
-                                Insert.userIntoGroupAdmins(userIdForNewAdmin, id, isNotOwner);
+                                Insert.userIntoChannelsAdmins(userIdForNewAdmin, id, isNotOwner);
 
 
                                 return Json.builder(Response.HTTP_CREATED);
@@ -446,7 +446,7 @@ exports.deleteAdmin = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -462,18 +462,18 @@ exports.deleteAdmin = (req) => {
                         return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
-                    Find.isOwnerOfGroup(userId, id, result => {
+                    Find.isOwnerOfChannel(userId, id, result => {
 
                         if (!result)
                             return Json.builder(Response.HTTP_FORBIDDEN);
 
 
-                        Find.isUserAdminOfGroup(id, userIdForDeleteAdmin, result => {
+                        Find.isUserAdminOfChannel(id, userIdForDeleteAdmin, result => {
 
                             if (!result)
                                 return Json.builder(Response.HTTP_NOT_FOUND);
 
-                            Delete.userIntoGroupAdmins(id, userIdForDeleteAdmin);
+                            Delete.userIntoChannelAdmins(id, userIdForDeleteAdmin);
 
 
                             return Json.builder(Response.HTTP_OK);
@@ -501,7 +501,7 @@ exports.leaveUser = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -511,13 +511,13 @@ exports.leaveUser = (req) => {
                 if (!result)
                     return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                Find.isJoinedInGroup(id, userId, result => {
+                Find.isJoinedInChannel(id, userId, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    Delete.userIntoGroup(id, userId);
-                    DeleteInUser.groupIntoListOfUserGroups(id, userId);
+                    Delete.userIntoChannel(id, userId);
+                    DeleteInUser.channelIntoListOfUserChannels(id, userId);
 
 
                     return Json.builder(Response.HTTP_OK);
@@ -549,7 +549,7 @@ exports.listOfMessage = (req) => {
 
         let userId = data.id;
 
-        FindInUser.getTableNameForListOfUserGroups(id, userId, result => {
+        FindInUser.getTableNameForListOfUserChannels(id, userId, result => {
 
             if (!result)
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
@@ -559,7 +559,7 @@ exports.listOfMessage = (req) => {
 
                 let totalPages = Math.ceil(count / getLimit);
 
-                FindInUser.getListOfMessage('`' + id + 'GroupContents`', startFrom, getLimit, getOrder, getSort, type, search, result => {
+                FindInUser.getListOfMessage( '`' + id + 'ChannelContents`', startFrom, getLimit, getOrder, getSort, type, search, result => {
 
                     return Json.builder(
                         Response.HTTP_OK,
@@ -588,15 +588,15 @@ exports.info = (req) => {
     getAccessTokenPayLoad(() => {
 
 
-        Find.groupId(id, isDefined => {
+        Find.channelId(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
 
 
-            Find.getGroupInfo(id, result => {
+            Find.getChannelInfo(id, result => {
 
-                Find.getCountOfUserInGroup(id, count => {
+                Find.getCountOfUserInChannel(id, count => {
 
                     return Json.builder(Response.HTTP_OK, result, {
                         memberSize: count
