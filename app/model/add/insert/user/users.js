@@ -1,5 +1,4 @@
 let openSql = require('opensql');
-const {DataBaseException} = require("app/exception/DataBaseException");
 
 
 module.exports = {
@@ -50,6 +49,16 @@ module.exports = {
                 deviceIp: user['ip'],
                 deviceName: user['name'],
                 deviceLocation: user['location']
+            }
+        });
+    },
+
+    groupIntoListOfUserGroups(groupId, userId) {
+        openSql.addOne({
+            table: 'listOfUserGroups',
+            data: {
+                userId: userId,
+                groupId: groupId
             }
         });
     }

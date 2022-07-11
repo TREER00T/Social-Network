@@ -1,7 +1,10 @@
 let openSql = require('opensql'),
     {
         DataBaseException
-    } = require('app/exception/DataBaseException');
+    } = require('app/exception/DataBaseException'),
+    {
+        NULL
+    } = openSql.queryHelper;
 
 
 module.exports = {
@@ -76,7 +79,7 @@ module.exports = {
     },
 
 
-    bio(phone, bio, cb) {
+    bio(phone, bio = NULL, cb) {
         openSql.update({
             table: 'users',
             edit: {

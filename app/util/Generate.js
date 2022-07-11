@@ -3,8 +3,10 @@ const jwt = require('jsonwebtoken'),
         JWK,
         JWE
     } = require('node-jose'),
-    crypto = require('crypto');
+    crypto = require('crypto'),
+    dotenv = require('dotenv');
 
+dotenv.config();
 
 module.exports = {
 
@@ -77,7 +79,7 @@ module.exports = {
     getFileHashName() {
         const rand = crypto.randomBytes(30);
 
-        let formatValidString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        let formatValidString = '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
 
         let chars = formatValidString.repeat(5);
 
@@ -89,6 +91,21 @@ module.exports = {
         }
 
         return str.trim();
+    },
+
+    makeIdForInviteLink() {
+        let result = '';
+        let characters = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
+        let charactersLength = characters.length;
+        for (let i = 0; i < 20; i++) {
+            result += characters.charAt(Math.floor(Math.random() *
+                charactersLength));
+        }
+        return `+` + result;
+    },
+
+    makeIdForPublicLink(id) {
+        return `+` + id;
     }
 
 

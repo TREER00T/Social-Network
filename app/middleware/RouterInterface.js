@@ -7,9 +7,10 @@ let express = require('express'),
     Pipeline = require('app/middleware/ApiPipeline'),
     Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
-    authRouter = require('app/routes/AuthRoutes'),
-    personalRouter = require('app/routes/PersonalRoutes'),
-    e2eRouter = require('app/routes/PvChatRoutes');
+    authRouter = require('app/routes/user/AuthRoutes'),
+    personalRouter = require('app/routes/user/PersonalRoutes'),
+    groupRouter = require('app/routes/group/GroupRoutes'),
+    e2eRouter = require('app/routes/user/PvChatRoutes');
 
 
 module.exports = {
@@ -63,6 +64,7 @@ module.exports = {
         app.use('/auth', authRouter);
         app.use('/e2e', e2eRouter);
         app.use('/personal', personalRouter);
+        app.use('/groups', groupRouter);
 
         app.listen(process.env.EXPRESS_PORT, () => {
             console.log('Server are running...');

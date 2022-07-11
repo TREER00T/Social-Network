@@ -24,9 +24,8 @@ let Json = require('app/util/ReturnJson'),
     AddUserForeignKey = require('app/model/add/foreignKey/users');
 
 
-exports.gvc = (req, res) => {
+exports.gvc = (req) => {
 
-    Json.initializationRes(res);
 
     let phone = req.body.phone;
 
@@ -65,9 +64,8 @@ exports.gvc = (req, res) => {
 }
 
 
-exports.isValidAuthCode = (req, res) => {
+exports.isValidAuthCode = (req) => {
 
-    Json.initializationRes(res);
 
     let {phone, authCode, name, ip, location} = req.body;
 
@@ -150,9 +148,8 @@ exports.isValidAuthCode = (req, res) => {
 }
 
 
-exports.isValidPassword = (req, res) => {
+exports.isValidPassword = (req) => {
 
-    Json.initializationRes(res);
 
     let {ip, name, location, password} = req.body;
 
@@ -203,10 +200,7 @@ exports.isValidPassword = (req, res) => {
 }
 
 
-exports.refreshToken = (req, res) => {
-
-
-    Json.initializationRes(res);
+exports.refreshToken = () => {
 
 
     getRefreshTokenPayLoad(data => {

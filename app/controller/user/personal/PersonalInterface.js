@@ -17,11 +17,7 @@ let Json = require('app/util/ReturnJson'),
     Util = require('app/util/Util');
 
 
-exports.user = (req, res) => {
-
-
-    Json.initializationRes(res);
-
+exports.user = () => {
 
     getAccessTokenPayLoad(data => {
 
@@ -39,10 +35,7 @@ exports.user = (req, res) => {
 }
 
 
-exports.editUsername = (req, res) => {
-
-    Json.initializationRes(res);
-
+exports.editUsername = (req) => {
 
     let username = req.params.id;
 
@@ -74,34 +67,22 @@ exports.editUsername = (req, res) => {
 }
 
 
-exports.editBio = (req, res) => {
-
-    Json.initializationRes(res);
-
+exports.editBio = (req) => {
 
     let bio = req.params.bio;
-
-    if (bio < 1 || bio === undefined)
-        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getAccessTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
-        Find.isUsernameUsed(bio.toString().trim(), result => {
 
-            if (result) {
-                Update.bio(phone, bio.toString().trim(), result => {
-                    if (!result)
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
+        Update.bio(phone, bio, result => {
+            if (!result)
+                return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                    return Json.builder(Response.HTTP_OK);
-                });
-            }
-
-            return Json.builder(Response.HTTP_CONFLICT);
-
+            return Json.builder(Response.HTTP_OK);
         });
+
 
     });
 
@@ -109,10 +90,7 @@ exports.editBio = (req, res) => {
 }
 
 
-exports.editName = (req, res) => {
-
-    Json.initializationRes(res);
-
+exports.editName = (req) => {
 
     let {lastName, firstName} = req.body;
 
@@ -137,10 +115,7 @@ exports.editName = (req, res) => {
 }
 
 
-exports.twoAuth = (req, res) => {
-
-
-    Json.initializationRes(res);
+exports.twoAuth = (req) => {
 
     let {password, email} = req.body;
 
@@ -164,9 +139,7 @@ exports.twoAuth = (req, res) => {
 }
 
 
-exports.disableTwoAuth = (req, res) => {
-
-    Json.initializationRes(res);
+exports.disableTwoAuth = () => {
 
 
     getAccessTokenPayLoad(data => {
@@ -185,10 +158,8 @@ exports.disableTwoAuth = (req, res) => {
 }
 
 
-exports.restPassword = (req, res) => {
+exports.restPassword = (req) => {
 
-
-    Json.initializationRes(res);
 
     let oldPassword = req.body.old;
     let newPassword = req.body.new;
@@ -224,9 +195,6 @@ exports.restPassword = (req, res) => {
 exports.uploadAvatar = (req, res) => {
 
 
-    Json.initializationRes(res);
-
-
     getAccessTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
@@ -235,7 +203,7 @@ exports.uploadAvatar = (req, res) => {
         multerImage(req, res, () => {
 
 
-            let file = req.image;
+            let file = req.file;
 
             if (file === undefined)
                 return Json.builder(Response.HTTP_BAD_REQUEST);
@@ -258,10 +226,7 @@ exports.uploadAvatar = (req, res) => {
 }
 
 
-exports.listOfBlockUsers = (req, res) => {
-
-    Json.initializationRes(res);
-
+exports.listOfBlockUsers = () => {
 
     getAccessTokenPayLoad(data => {
 
@@ -284,11 +249,7 @@ exports.listOfBlockUsers = (req, res) => {
 }
 
 
-exports.listOfDevices = (req, res) => {
-
-
-    Json.initializationRes(res);
-
+exports.listOfDevices = () => {
 
     getAccessTokenPayLoad(data => {
 

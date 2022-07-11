@@ -18,25 +18,6 @@ let openSql = require('opensql'),
 module.exports = {
 
 
-    reportGroups() {
-
-        openSql.createTable({
-            table: 'reportGroups',
-            field: {
-                id: INT([NOT_NULL, AUTO_INCREMENT]),
-                note: VARCHAR(255),
-                type: ENUM(['Spam', 'Fake Account', 'Violence', 'Child Abuse',
-                    'Illegal Drugs', 'Personal Details', 'Pornography', 'Other']),
-                status: ENUM(['accept', 'pending', 'decline']),
-                userId: INT(),
-                groupId: INT(),
-                acceptAt: VARCHAR(16)
-            },
-            primaryKey: 'id'
-        });
-
-    },
-
     groups() {
 
         openSql.createTable({

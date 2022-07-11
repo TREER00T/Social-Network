@@ -16,9 +16,7 @@ let Json = require('app/util/ReturnJson'),
     } = require('app/middleware/ApiPipeline');
 
 
-exports.createE2EChat = (req, res) => {
-
-    Json.initializationRes(res);
+exports.createE2EChat = (req) => {
 
     let userId = Number(req.body.userId);
     let isNumber = Number.isInteger(userId);
@@ -31,7 +29,7 @@ exports.createE2EChat = (req, res) => {
     Find.isExistUser(userId, isInDb => {
 
         if (!isInDb)
-            return Json.builder(Response.HTTP_User_NOT_FOUND);
+            return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
         getAccessTokenPayLoad(data => {
@@ -66,9 +64,6 @@ exports.createE2EChat = (req, res) => {
 
 
 exports.uploadFile = (req, res) => {
-
-
-    Json.initializationRes(res);
 
 
     multerFile(req, res, () => {
@@ -124,10 +119,7 @@ exports.uploadFile = (req, res) => {
 };
 
 
-exports.listOfMessage = (req, res) => {
-
-
-    Json.initializationRes(res);
+exports.listOfMessage = (req) => {
 
 
     let {to, limit, page, order, sort, type, search} = req.query;
@@ -145,7 +137,7 @@ exports.listOfMessage = (req, res) => {
         Find.getTableNameForListOfE2EMessage(from, to, from, data => {
 
             if (!data)
-                return Json.builder(Response.HTTP_User_NOT_FOUND);
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
             Find.getCountOfListMessage(data, count => {
@@ -174,16 +166,13 @@ exports.listOfMessage = (req, res) => {
 }
 
 
-exports.user = (req, res) => {
-
-
-    Json.initializationRes(res);
+exports.user = (req) => {
 
     let id = req.query.id;
 
     Find.isExistUser(id, isUserInDb => {
         if (!isUserInDb)
-            return Json.builder(Response.HTTP_User_NOT_FOUND);
+            return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
         Find.getUserPvDetails(id, result => {
             return Json.builder(Response.HTTP_OK, result);
@@ -193,10 +182,7 @@ exports.user = (req, res) => {
 
 }
 
-exports.deleteForMe = (req, res) => {
-
-
-    Json.initializationRes(res);
+exports.deleteForMe = (req) => {
 
     let id = req.params.id;
 
@@ -206,7 +192,7 @@ exports.deleteForMe = (req, res) => {
 
         Find.isExistUser(id, isUserInDb => {
             if (!isUserInDb)
-                return Json.builder(Response.HTTP_User_NOT_FOUND);
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
             Find.getTableNameForListOfE2EMessage(from, id, from, data => {
                 if (!data)
@@ -226,10 +212,8 @@ exports.deleteForMe = (req, res) => {
 
 }
 
-exports.deleteForUs = (req, res) => {
+exports.deleteForUs = (req) => {
 
-
-    Json.initializationRes(res);
 
     let id = req.params.id;
 
@@ -240,7 +224,7 @@ exports.deleteForUs = (req, res) => {
 
         Find.isExistUser(id, isUserInDb => {
             if (!isUserInDb)
-                return Json.builder(Response.HTTP_User_NOT_FOUND);
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
             Find.getTableNameForListOfE2EMessage(from, id, from, data => {
                 if (!data)
@@ -268,10 +252,8 @@ exports.deleteForUs = (req, res) => {
 }
 
 
-exports.blockUser = (req, res) => {
+exports.blockUser = (req) => {
 
-
-    Json.initializationRes(res);
 
     let id = req.body.id;
 
@@ -282,7 +264,7 @@ exports.blockUser = (req, res) => {
 
         Find.isExistUser(id, isUserInDb => {
             if (!isUserInDb)
-                return Json.builder(Response.HTTP_User_NOT_FOUND);
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
             Find.isUserInListOfBlockUser(from, id, result => {
                 if (!result) {
