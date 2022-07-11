@@ -78,6 +78,10 @@ module.exports = {
                 userId: userId
             }
         });
+    },
+
+    savedMessage(phone) {
+        openSql.dropTable(phone + 'SavedMessages');
     }
 
 }

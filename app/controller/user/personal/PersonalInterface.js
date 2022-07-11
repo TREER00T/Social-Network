@@ -14,7 +14,11 @@ let Json = require('app/util/ReturnJson'),
         getHashData
     } = require('app/util/Generate'),
     File = require('app/util/File'),
-    Util = require('app/util/Util');
+    Util = require('app/util/Util'),
+    Create = require('app/model/create/users'),
+    FindInUser = require('app/model/find/user/users'),
+    AddUserForeignKey = require('app/model/add/foreignKey/users'),
+    Delete = require('app/model/remove/users/user');
 
 
 exports.user = () => {
@@ -257,6 +261,104 @@ exports.listOfDevices = () => {
 
         Find.getListOfDevices(id, result => {
             return Json.builder(Response.HTTP_OK, result);
+        });
+
+    });
+
+}
+
+
+exports.listOfMessage = (req) => {
+
+
+    let {limit, page, order, sort, type, search} = req.query;
+
+    let getLimit = (limit !== undefined) ? limit : 15;
+    let getSort = (sort !== undefined) ? sort : 'DESC';
+    let getOrder = (order !== undefined) ? order : 'id';
+
+    let startFrom = (page - 1) * limit;
+
+
+    getAccessTokenPayLoad(data => {
+
+
+        let phone = data.phoneNumber;
+
+        FindInUser.isSavedMessageCreated(phone, result => {
+
+            if (!result)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+
+            Find.getCountOfListMessage(phone + 'SavedMessages', count => {
+
+                let totalPages = Math.ceil(count / getLimit);
+
+                FindInUser.getListOfMessage(phone + 'SavedMessages', startFrom, getLimit, getOrder, getSort, type, search, result => {
+
+                    return Json.builder(
+                        Response.HTTP_OK,
+                        result, {
+                            totalPages: totalPages
+                        }
+                    );
+
+                });
+
+            });
+
+        });
+
+    });
+
+
+}
+
+
+exports.deleteSavedMessage = () => {
+
+
+    getAccessTokenPayLoad(data => {
+
+
+        let phone = data.phoneNumber;
+
+        FindInUser.isSavedMessageCreated(phone, result => {
+
+            if (!result)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            Delete.savedMessage(phone);
+
+            return Json.builder(Response.HTTP_OK);
+
+        });
+
+    });
+
+}
+
+
+
+exports.createSavedMessage = () => {
+
+
+    getAccessTokenPayLoad(data => {
+
+
+        let phone = data.phoneNumber;
+
+        FindInUser.isSavedMessageCreated(phone, result => {
+
+            if (result)
+                return Json.builder(Response.HTTP_CONFLICT);
+
+            Create.savedMessages(phone);
+            AddUserForeignKey.savedMessages(phone);
+
+            return Json.builder(Response.HTTP_CREATED);
+
         });
 
     });

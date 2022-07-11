@@ -1,7 +1,7 @@
 let Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
     Create = require('app/model/create/users'),
-    Add = require('app/model/add/foreignKey/users'),
+    AddUserForeignKey = require('app/model/add/foreignKey/users'),
     Find = require('app/model/find/user/users'),
     multer = require('multer'),
     Insert = require('app/model/add/insert/user/users'),
@@ -43,7 +43,7 @@ exports.createE2EChat = (req) => {
                     return Json.builder(Response.HTTP_CONFLICT);
 
 
-                Add.e2eContents(tokenUserId, userId);
+                AddUserForeignKey.e2eContents(tokenUserId, userId);
 
                 Json.builder(Response.HTTP_CREATED);
 

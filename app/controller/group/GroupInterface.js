@@ -8,6 +8,7 @@ let Json = require('app/util/ReturnJson'),
     FindInUser = require('app/model/find/user/users'),
     Delete = require('app/model/remove/groups/group'),
     Update = require('app/model/update/groups/group'),
+    AddGroupForeignKey = require('app/model/add/foreignKey/groups'),
     DeleteInUser = require('app/model/remove/users/user'),
     multerImage = multer().single('image'),
     {
@@ -48,6 +49,7 @@ exports.create = (req, res) => {
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 Create.groupContents(id);
+                AddGroupForeignKey.groupContents(id);
                 Insert.userIntoGroupAdmins(userId, id, isOwner);
                 Insert.userIntoGroup(userId, id);
 

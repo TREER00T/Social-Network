@@ -13,6 +13,9 @@ router.put('/twoAuth/rest/password', Personal.restPassword);
 router.put('/uploadAvatar', Personal.uploadAvatar);
 router.get('/blockUsers', Personal.listOfBlockUsers);
 router.get('/devices', Personal.listOfDevices);
+router.get('/savedMessage', Personal.listOfMessage);
+router.delete('/savedMessage', Personal.deleteSavedMessage);
+router.post('/savedMessage', Personal.createSavedMessage);
 
 
 module.exports = router;
