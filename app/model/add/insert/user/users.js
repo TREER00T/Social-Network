@@ -61,6 +61,16 @@ module.exports = {
                 groupId: groupId
             }
         });
+    },
+
+    channelIntoListOfUserChannels(channelId, userId) {
+        openSql.addOne({
+            table: 'listOfUserChannels',
+            data: {
+                userId: userId,
+                channelId: channelId
+            }
+        });
     }
 
 }

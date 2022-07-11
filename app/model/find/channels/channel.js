@@ -14,12 +14,12 @@ let openSql = require('opensql'),
 
 module.exports = {
 
-    groupId(id, cb) {
+    channelId(id, cb) {
         openSql.find({
             optKey: [
                 EQUAL_TO
             ],
-            data: ['id', 'groups', 'id', `${id}`],
+            data: ['id', 'channels', 'id', `${id}`],
             where: true
         }).result(result => {
             try {
@@ -35,7 +35,7 @@ module.exports = {
             optKey: [
                 EQUAL_TO
             ],
-            data: ['id', 'groups', 'publicLink', `${publicLink}`],
+            data: ['id', 'channels', 'publicLink', `${publicLink}`],
             where: true
         }).result(result => {
             try {
@@ -46,7 +46,7 @@ module.exports = {
         });
     },
 
-    isOwnerOfGroup(adminId, groupId, cb) {
+    isOwnerOfChannel(adminId, channelId, cb) {
         let isOwner = 1;
         openSql.find({
             optKey: [
@@ -57,9 +57,9 @@ module.exports = {
                 EQUAL_TO
             ],
             data: [
-                'id', 'groupsAdmins',
+                'id', 'channelsAdmins',
                 'adminId', `${adminId}`,
-                'groupId', `${groupId}`,
+                'channelId', `${channelId}`,
                 'isOwner', isOwner
             ],
             where: true
@@ -72,16 +72,17 @@ module.exports = {
         });
     },
 
-    isJoinedInGroup(groupId, userId, cb) {
+    isOwnerOrAdminOfChannel(adminId, channelId, cb) {
         openSql.find({
             optKey: [
                 EQUAL_TO,
                 AND,
-                EQUAL_TO
+                EQUAL_TO,
             ],
             data: [
-                'id', 'groupsUsers', 'userId',
-                `${userId}`, 'groupId', `${groupId}`
+                'id', 'channelsAdmins',
+                'adminId', `${adminId}`,
+                'channelId', `${channelId}`
             ],
             where: true
         }).result(result => {
@@ -93,7 +94,7 @@ module.exports = {
         });
     },
 
-    isUserAdminOfGroup(groupId, userId, cb) {
+    isJoinedInChannel(channelId, userId, cb) {
         openSql.find({
             optKey: [
                 EQUAL_TO,
@@ -101,8 +102,8 @@ module.exports = {
                 EQUAL_TO
             ],
             data: [
-                'id', 'groupsAdmins', 'userId',
-                `${userId}`, 'groupId', `${groupId}`
+                'id', 'channelsUsers', 'userId',
+                `${userId}`, 'channelId', `${channelId}`
             ],
             where: true
         }).result(result => {
@@ -114,13 +115,34 @@ module.exports = {
         });
     },
 
-    getCountOfListMessage(groupId, cb) {
+    isUserAdminOfChannel(channelId, userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'id', 'channelsAdmins', 'userId',
+                `${userId}`, 'channelId', `${channelId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1].length !== 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    getCountOfListMessage(channelId, cb) {
         openSql.find({
             optKey: [
                 COUNT
             ],
             data: [
-                '`' + groupId + 'GroupContents`'
+                '`' + channelId + 'ChannelContents`'
             ]
         }).result(result => {
             try {
@@ -132,13 +154,13 @@ module.exports = {
     },
 
 
-    getGroupInfo(groupId, cb) {
+    getChannelInfo(channelId, cb) {
         openSql.find({
             optKey: [
                 STAR,
                 EQUAL_TO
             ],
-            data: ['groups', 'id', `${groupId}`],
+            data: ['channels', 'id', `${channelId}`],
             where: true
         }).result(result => {
             try {
@@ -150,14 +172,14 @@ module.exports = {
     },
 
 
-    getCountOfUserInGroup(groupId, cb) {
+    getCountOfUserInChannel(channelId, cb) {
         openSql.find({
             optKey: [
                 COUNT,
                 EQUAL_TO
             ],
             data: [
-                'groups', 'id', `${groupId}`
+                'channels', 'id', `${channelId}`
             ],
             where: true
         }).result(result => {
@@ -169,13 +191,13 @@ module.exports = {
         });
     },
 
-    getAllUsersForGroup(groupId, cb) {
+    getAllUsersForChannel(channelId, cb) {
         openSql.find({
             optKey: [
                 EQUAL_TO
             ],
             data: [
-                'userId', 'groupsUsers', 'groupId', `${groupId}`
+                'userId', 'channelsUsers', 'channelId', `${channelId}`
             ],
             where: true
         }).result(result => {
@@ -186,5 +208,4 @@ module.exports = {
             }
         });
     }
-
 }

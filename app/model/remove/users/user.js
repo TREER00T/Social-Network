@@ -51,11 +51,30 @@ module.exports = {
         });
     },
 
+    channelInListOfUserChannels(id) {
+        openSql.remove({
+            table: 'listOfUserChannels',
+            where: {
+                channelId: id
+            }
+        });
+    },
+
     groupIntoListOfUserGroups(groupId, userId) {
         openSql.remove({
             table: 'listOfUserGroups',
             where: {
                 groupId: groupId,
+                userId: userId
+            }
+        });
+    },
+
+    channelIntoListOfUserChannels(channelId, userId) {
+        openSql.remove({
+            table: 'listOfUserChannels',
+            where: {
+                channelId: channelId,
                 userId: userId
             }
         });

@@ -15,6 +15,8 @@ router.post('/addAdmin', Group.addAdmin);
 router.delete('/deleteAdmin', Group.deleteAdmin);
 router.delete('/leaveUser', Group.leaveUser);
 router.get('/chats', Group.listOfMessage);
+router.get('/info', Group.info);
+router.get('/users', Group.allUsers);
 
 
 module.exports = router;
