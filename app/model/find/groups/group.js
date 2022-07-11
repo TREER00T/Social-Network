@@ -167,6 +167,24 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+    getAllUsersForGroup(groupId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                'userId', 'groupsUsers', 'groupId', `${groupId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1].length !== 0) ? cb(result[1]) : cb(null);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
 
 }

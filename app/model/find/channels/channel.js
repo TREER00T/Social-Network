@@ -72,6 +72,28 @@ module.exports = {
         });
     },
 
+    isOwnerOrAdminOfChannel(adminId, channelId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO,
+            ],
+            data: [
+                'id', 'channelsAdmins',
+                'adminId', `${adminId}`,
+                'channelId', `${channelId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1].length !== 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
     isJoinedInChannel(channelId, userId, cb) {
         openSql.find({
             optKey: [
@@ -167,6 +189,23 @@ module.exports = {
                 DataBaseException(e);
             }
         });
-    }
+    },
 
+    getAllUsersForChannel(channelId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                'userId', 'channelsUsers', 'channelId', `${channelId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1].length !== 0) ? cb(result[1]) : cb(null);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    }
 }

@@ -616,3 +616,54 @@ exports.info = (req) => {
     });
 
 }
+
+
+exports.allUsers = (req) => {
+
+    let id = req.body.id;
+
+
+    getAccessTokenPayLoad(data => {
+
+        let userId = data.id;
+
+        Find.channelId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+
+                Find.isOwnerOrAdminOfChannel(userId, id, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_FORBIDDEN);
+
+                    Find.getAllUsersForChannel(id, data => {
+
+                        if (data === null)
+                            return Json.builder(Response.HTTP_NOT_FOUND);
+
+                        FindInUser.getUserDetailsInUsersTableForMember(data, result => {
+
+                            return Json.builder(Response.HTTP_OK, result);
+
+                        });
+
+                    });
+
+                });
+
+            });
+
+        });
+
+
+    });
+
+}

@@ -616,3 +616,38 @@ exports.info = (req) => {
     });
 
 }
+
+
+exports.allUsers = (req) => {
+
+    let id = req.body.id;
+
+
+    getAccessTokenPayLoad(() => {
+
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+
+            Find.getAllUsersForGroup(id, data => {
+
+                if (data === null)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
+
+                FindInUser.getUserDetailsInUsersTableForMember(data, result => {
+
+                    return Json.builder(Response.HTTP_OK, result);
+
+                });
+
+            });
+
+        });
+
+
+    });
+
+}

@@ -452,6 +452,34 @@ module.exports = {
     },
 
 
+    getUserDetailsInUsersTableForMember(array, cb) {
+        let arrayOfUserId = [];
+
+        array.forEach(item => {
+
+            arrayOfUserId.push(item['userId']);
+
+        });
+
+        openSql.find({
+            optKey: [
+                IN
+            ],
+            data: [
+                ['img', 'firstName', 'username', 'id'], 'users', 'id', arrayOfUserId
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+
+    },
+
+
     getListOfDevices(id, cb) {
         openSql.find({
             optKey: [
