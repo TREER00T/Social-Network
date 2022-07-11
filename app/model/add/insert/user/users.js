@@ -51,6 +51,16 @@ module.exports = {
                 deviceLocation: user['location']
             }
         });
+    },
+
+    groupIntoListOfUserGroups(groupId, userId) {
+        openSql.addOne({
+            table: 'listOfUserGroups',
+            data: {
+                userId: userId,
+                groupId: groupId
+            }
+        });
     }
 
 }

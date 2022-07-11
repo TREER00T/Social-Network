@@ -29,7 +29,7 @@ exports.createE2EChat = (req) => {
     Find.isExistUser(userId, isInDb => {
 
         if (!isInDb)
-            return Json.builder(Response.HTTP_User_NOT_FOUND);
+            return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
         getAccessTokenPayLoad(data => {
@@ -137,7 +137,7 @@ exports.listOfMessage = (req) => {
         Find.getTableNameForListOfE2EMessage(from, to, from, data => {
 
             if (!data)
-                return Json.builder(Response.HTTP_User_NOT_FOUND);
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
             Find.getCountOfListMessage(data, count => {
@@ -172,7 +172,7 @@ exports.user = (req) => {
 
     Find.isExistUser(id, isUserInDb => {
         if (!isUserInDb)
-            return Json.builder(Response.HTTP_User_NOT_FOUND);
+            return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
         Find.getUserPvDetails(id, result => {
             return Json.builder(Response.HTTP_OK, result);
@@ -192,7 +192,7 @@ exports.deleteForMe = (req) => {
 
         Find.isExistUser(id, isUserInDb => {
             if (!isUserInDb)
-                return Json.builder(Response.HTTP_User_NOT_FOUND);
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
             Find.getTableNameForListOfE2EMessage(from, id, from, data => {
                 if (!data)
@@ -224,7 +224,7 @@ exports.deleteForUs = (req) => {
 
         Find.isExistUser(id, isUserInDb => {
             if (!isUserInDb)
-                return Json.builder(Response.HTTP_User_NOT_FOUND);
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
             Find.getTableNameForListOfE2EMessage(from, id, from, data => {
                 if (!data)
@@ -264,7 +264,7 @@ exports.blockUser = (req) => {
 
         Find.isExistUser(id, isUserInDb => {
             if (!isUserInDb)
-                return Json.builder(Response.HTTP_User_NOT_FOUND);
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
             Find.isUserInListOfBlockUser(from, id, result => {
                 if (!result) {

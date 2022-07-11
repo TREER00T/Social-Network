@@ -3,7 +3,8 @@ let openSql = require('opensql'),
         EQUAL_TO
     } = openSql.queryHelper,
     {
-        AND
+        AND,
+        COUNT
     } = openSql.keywordHelper,
     {
         DataBaseException
@@ -84,6 +85,65 @@ module.exports = {
                 DataBaseException(e);
             }
         });
-    }
+    },
+
+    isJoinedInGroup(groupId, userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'id', 'groupsUsers', 'userId',
+                `${userId}`, 'groupId', `${groupId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1].length !== 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    isUserAdminOfGroup(groupId, userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'id', 'groupsAdmins', 'userId',
+                `${userId}`, 'groupId', `${groupId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1].length !== 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    getCountOfListMessage(groupId, cb) {
+        openSql.find({
+            optKey: [
+                COUNT
+            ],
+            data: [
+                '`' + groupId + 'GroupContents`'
+            ]
+        }).result(result => {
+            try {
+                cb(result[0].size);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
 
 }

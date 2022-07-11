@@ -268,7 +268,7 @@ module.exports = {
         code: 802,
         message: 'In valid json object key'
     },
-    HTTP_User_NOT_FOUND: {
+    HTTP_USER_NOT_FOUND: {
         code: 803,
         message: 'User Not Found'
     },

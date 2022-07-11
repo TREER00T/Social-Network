@@ -17,25 +17,6 @@ let openSql = require('opensql'),
 
 module.exports = {
 
-    reportChannels() {
-
-        openSql.createTable({
-            table: 'reportChannels',
-            field: {
-                id: INT([NOT_NULL, AUTO_INCREMENT]),
-                note: VARCHAR(255),
-                type: ENUM(['Spam', 'Fake Account', 'Violence', 'Child Abuse',
-                    'Illegal Drugs', 'Personal Details', 'Pornography', 'Other']),
-                userId: INT(),
-                status: ENUM(['accept', 'pending', 'decline']),
-                channelId: INT(),
-                acceptAt: VARCHAR(16)
-            },
-            primaryKey: 'id'
-        });
-
-    },
-
 
     channelContents(channelId) {
 

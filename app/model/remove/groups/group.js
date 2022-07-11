@@ -23,6 +23,26 @@ module.exports = {
                 groupId: groupId
             }
         });
+    },
+
+    userIntoGroup(groupId, userId) {
+        openSql.remove({
+            table: 'groupsUsers',
+            where: {
+                groupId: groupId,
+                userId: userId
+            }
+        });
+    },
+
+    userIntoGroupAdmins(groupId, userId) {
+        openSql.remove({
+            table: 'groupsAdmins',
+            where: {
+                groupId: groupId,
+                userId: userId
+            }
+        });
     }
 
 }

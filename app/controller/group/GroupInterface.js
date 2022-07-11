@@ -2,6 +2,7 @@ let Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
     multer = require('multer'),
     Insert = require('app/model/add/insert/groups/group'),
+    InsertInUser = require('app/model/add/insert/user/users'),
     Create = require('app/model/create/groups'),
     Find = require('app/model/find/groups/group'),
     FindInUser = require('app/model/find/user/users'),
@@ -47,8 +48,8 @@ exports.create = (req, res) => {
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 Create.groupContents(id);
-                Insert.groupAdmin(userId, id, isOwner);
-                Insert.groupIdInListOfUserGroup(userId, id);
+                Insert.userIntoGroupAdmins(userId, id, isOwner);
+                Insert.userIntoGroup(userId, id);
 
                 return Json.builder(Response.HTTP_CREATED);
             });
@@ -79,7 +80,7 @@ exports.deleteGroup = (req) => {
             FindInUser.isExistUser(userId, result => {
 
                 if (!result)
-                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
                 Find.isOwnerOfGroup(userId, id, result => {
 
@@ -120,7 +121,7 @@ exports.changeName = (req) => {
             FindInUser.isExistUser(userId, result => {
 
                 if (!result)
-                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
                 Find.isOwnerOfGroup(userId, id, result => {
 
@@ -161,7 +162,7 @@ exports.changeDescription = (req) => {
             FindInUser.isExistUser(userId, result => {
 
                 if (!result)
-                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
                 Find.isOwnerOfGroup(userId, id, result => {
 
@@ -201,7 +202,7 @@ exports.uploadAvatar = (req, res) => {
             FindInUser.isExistUser(userId, result => {
 
                 if (!result)
-                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
                 Find.isOwnerOfGroup(userId, id, result => {
 
@@ -257,7 +258,7 @@ exports.changeToInviteLink = (req) => {
             FindInUser.isExistUser(userId, result => {
 
                 if (!result)
-                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
                 Find.isOwnerOfGroup(userId, id, result => {
 
@@ -298,7 +299,7 @@ exports.changeToPublicLink = (req) => {
             FindInUser.isExistUser(userId, result => {
 
                 if (!result)
-                    return Json.builder(Response.HTTP_User_NOT_FOUND);
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
                 Find.isOwnerOfGroup(userId, id, result => {
 
@@ -327,5 +328,253 @@ exports.changeToPublicLink = (req) => {
         });
 
     });
+
+}
+
+
+exports.joinUser = (req) => {
+
+
+    let id = req.body.id;
+
+    getAccessTokenPayLoad(data => {
+
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+                Find.isJoinedInGroup(id, userId, result => {
+
+                    if (result)
+                        return Json.builder(Response.HTTP_CONFLICT);
+
+                    Insert.userIntoGroup(id, userId);
+                    InsertInUser.groupIntoListOfUserGroups(id, userId);
+
+
+                    return Json.builder(Response.HTTP_CREATED);
+                });
+
+            });
+
+        });
+
+    });
+
+}
+
+
+exports.addAdmin = (req) => {
+
+
+    let id = req.body.id;
+    let userIdForNewAdmin = req.body.userId;
+
+    getAccessTokenPayLoad(data => {
+
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+                FindInUser.isExistUser(userIdForNewAdmin, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+
+                    Find.isOwnerOfGroup(userId, id, result => {
+
+                        if (!result)
+                            return Json.builder(Response.HTTP_FORBIDDEN);
+
+                        Find.isJoinedInGroup(id, userIdForNewAdmin, result => {
+
+                            if (!result)
+                                return Json.builder(Response.HTTP_NOT_FOUND);
+
+                            Find.isUserAdminOfGroup(id, userIdForNewAdmin, result => {
+
+                                if (result)
+                                    return Json.builder(Response.HTTP_CONFLICT);
+
+                                let isNotOwner = 0;
+                                Insert.userIntoGroupAdmins(userIdForNewAdmin, id, isNotOwner);
+
+
+                                return Json.builder(Response.HTTP_CREATED);
+                            });
+
+                        });
+
+                    });
+
+                });
+            });
+
+        });
+
+    });
+
+}
+
+exports.deleteAdmin = (req) => {
+
+
+    let id = req.body.id;
+    let userIdForDeleteAdmin = req.body.userId;
+
+    getAccessTokenPayLoad(data => {
+
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+                FindInUser.isExistUser(userIdForDeleteAdmin, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+
+                    Find.isOwnerOfGroup(userId, id, result => {
+
+                        if (!result)
+                            return Json.builder(Response.HTTP_FORBIDDEN);
+
+
+                        Find.isUserAdminOfGroup(id, userIdForDeleteAdmin, result => {
+
+                            if (!result)
+                                return Json.builder(Response.HTTP_NOT_FOUND);
+
+                            Delete.userIntoGroupAdmins(id, userIdForDeleteAdmin);
+
+
+                            return Json.builder(Response.HTTP_OK);
+                        });
+
+                    });
+
+                });
+            });
+
+        });
+
+    });
+
+}
+
+
+exports.leaveUser = (req) => {
+
+
+    let id = req.body.id;
+
+    getAccessTokenPayLoad(data => {
+
+
+        let userId = data.id;
+
+        Find.groupId(id, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+                Find.isJoinedInGroup(id, userId, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_NOT_FOUND);
+
+                    Delete.userIntoGroup(id, userId);
+                    DeleteInUser.groupIntoListOfUserGroups(id, userId);
+
+
+                    return Json.builder(Response.HTTP_OK);
+                });
+
+            });
+
+        });
+
+    });
+
+}
+
+
+exports.listOfMessage = (req) => {
+
+
+    let {id, limit, page, order, sort, type, search} = req.query;
+
+    let getLimit = (limit !== undefined) ? limit : 15;
+    let getSort = (sort !== undefined) ? sort : 'DESC';
+    let getOrder = (order !== undefined) ? order : 'id';
+
+    let startFrom = (page - 1) * limit;
+
+
+    getAccessTokenPayLoad(data => {
+
+
+        let userId = data.id;
+
+        FindInUser.getTableNameForListOfUserGroups(id, userId, result => {
+
+            if (!result)
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+
+            Find.getCountOfListMessage(id, count => {
+
+                let totalPages = Math.ceil(count / getLimit);
+
+                FindInUser.getListOfMessage( '`' + id + 'GroupContents`', startFrom, getLimit, getOrder, getSort, type, search, result => {
+
+                    return Json.builder(
+                        Response.HTTP_OK,
+                        result, {
+                            totalPages: totalPages
+                        }
+                    );
+
+                });
+
+            });
+
+        });
+
+    });
+
 
 }

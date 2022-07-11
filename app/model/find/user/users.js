@@ -469,6 +469,27 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+    getTableNameForListOfUserGroups(groupId, userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO,
+                AND,
+                EQUAL_TO
+            ],
+            data: [
+                'id', 'listOfUserGroups', 'userId',
+                `${userId}`, 'groupId', `${groupId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                cb(result[1].length !== 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
 
 

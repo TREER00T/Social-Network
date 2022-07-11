@@ -9,14 +9,12 @@ let {
     {
         groups,
         groupsUsers,
-        groupsAdmins,
-        reportGroups
+        groupsAdmins
     } = require('./groups'),
     {
         channels,
         channelsUsers,
-        channelsAdmins,
-        reportChannels
+        channelsAdmins
     } = require('./channels'),
     {
         forwardContents
@@ -33,12 +31,10 @@ module.exports = {
         channels();
         groupsUsers();
         groupsAdmins();
-        reportGroups();
         channelsUsers();
         userBlockList();
         listOfUserE2Es();
         channelsAdmins();
-        reportChannels();
         forwardContents();
         listOfUserGroups();
         listOfUserChannels();

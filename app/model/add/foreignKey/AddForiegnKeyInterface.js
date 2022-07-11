@@ -7,13 +7,11 @@ let {
     } = require('./users'),
     {
         groupsUsers,
-        groupsAdmins,
-        reportGroups
+        groupsAdmins
     } = require('./groups'),
     {
         channelsUsers,
-        channelsAdmins,
-        reportChannels
+        channelsAdmins
     } = require('./channels');
 
 
@@ -23,10 +21,8 @@ module.exports = {
         devices();
         groupsUsers();
         groupsAdmins();
-        reportGroups();
         userBlockList();
         channelsUsers();
-        reportChannels();
         channelsAdmins();
         listOfUserE2Es();
         listOfUserGroups();

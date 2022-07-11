@@ -63,26 +63,6 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         }).result(()=>{});
-    },
-
-
-    reportGroups() {
-        openSql.addForeignKey({
-            table: 'reportGroups',
-            foreignKey: 'userId',
-            referenceTable: 'users',
-            field: 'id',
-            onDelete: CASCADE,
-            onUpdate: CASCADE
-        }).result(()=>{});
-        openSql.addForeignKey({
-            table: 'reportGroups',
-            foreignKey: 'groupId',
-            referenceTable: 'groups',
-            field: 'id',
-            onDelete: CASCADE,
-            onUpdate: CASCADE
-        }).result(()=>{});
     }
 
 
