@@ -265,11 +265,15 @@ exports.changeToInviteLink = (req) => {
                     if (!result)
                         return Json.builder(Response.HTTP_FORBIDDEN);
 
-                    Update.inviteLink(id, Generate.makeIdForInviteLink(), result => {
+                    let link = Generate.makeIdForInviteLink();
+                    Update.inviteLink(id, link, result => {
                         if (!result)
                             return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                        return Json.builder(Response.HTTP_OK);
+                        return Json.builder(Response.HTTP_OK, {
+                            inviteLink: link
+                        });
+
                     });
 
                 });
@@ -559,7 +563,7 @@ exports.listOfMessage = (req) => {
 
                 let totalPages = Math.ceil(count / getLimit);
 
-                FindInUser.getListOfMessage( '`' + id + 'ChannelContents`', startFrom, getLimit, getOrder, getSort, type, search, result => {
+                FindInUser.getListOfMessage('`' + id + 'ChannelContents`', startFrom, getLimit, getOrder, getSort, type, search, result => {
 
                     return Json.builder(
                         Response.HTTP_OK,
