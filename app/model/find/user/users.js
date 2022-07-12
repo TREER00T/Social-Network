@@ -550,6 +550,65 @@ module.exports = {
                     DataBaseException(e);
                 }
             });
+    },
+
+
+    getListOfUserE2Es(userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                'tblChatId', 'listOfUserE2Es', 'userId',
+                `${userId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    getListOfUserGroup(userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                'groupId', 'listOfUserGroups', 'userId',
+                `${userId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    getListOfUserChannel(userId, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                'channelId', 'listOfUserChannels', 'userId',
+                `${userId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
 
 
