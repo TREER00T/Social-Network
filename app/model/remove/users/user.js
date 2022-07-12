@@ -33,11 +33,12 @@ module.exports = {
         });
     },
 
-    removeUserInUsersBlockList(id) {
+    removeUserInUsersBlockList(userId, id) {
         openSql.remove({
             table: 'userBlockList',
             where: {
-                id: id
+                userTargetId: id,
+                userId: userId
             }
         });
     },
@@ -82,6 +83,87 @@ module.exports = {
 
     savedMessage(phone) {
         openSql.dropTable(phone + 'SavedMessages');
+    },
+
+    userInAllUsersBlockList(id) {
+        openSql.remove({
+            table: 'userBlockList',
+            where: {
+                userId: id
+            }
+        });
+    },
+
+    userInUsersTable(id) {
+        openSql.remove({
+            table: 'users',
+            where: {
+                id: id
+            }
+        });
+    },
+
+    userInAllUsersGroup(array, id) {
+        let arrayOfTable = [];
+
+        array.forEach(item => {
+
+            arrayOfTable.push(item['groupId']);
+
+        });
+
+        openSql.dropTable(arrayOfTable);
+        openSql.remove({
+            table: 'listOfUserGroups',
+            where: {
+                userId: id
+            }
+        });
+    },
+
+    userInAllUsersChannel(array,id) {
+        let arrayOfTable = [];
+
+        array.forEach(item => {
+
+            arrayOfTable.push(item['channelId']);
+
+        });
+
+        openSql.dropTable(arrayOfTable);
+        openSql.remove({
+            table: 'listOfUserChannels',
+            where: {
+                userId: id
+            }
+        });
+    },
+
+    userInAllUsersE2E(array, id) {
+        let arrayOfTable = [];
+
+        array.forEach(item => {
+
+            arrayOfTable.push(item['tblChatId']);
+
+        });
+
+        openSql.dropTable(arrayOfTable);
+        openSql.remove({
+            table: 'listOfUserE2Es',
+            where: {
+                userId: id
+            }
+        });
+    },
+
+    userInDevices(id) {
+        openSql.remove({
+            table: 'devices',
+            where: {
+                userId: id
+            }
+        });
     }
 
 }

@@ -363,3 +363,35 @@ exports.createSavedMessage = () => {
     });
 
 }
+
+
+exports.account = () => {
+
+
+    getAccessTokenPayLoad(data => {
+
+
+        let phone = data.phoneNumber;
+        let userId = data.id;
+
+        Delete.savedMessage(phone);
+        Delete.userInAllUsersBlockList(userId);
+        Delete.userInUsersTable(userId);
+        Delete.userInDevices(userId);
+        FindInUser.getListOfUserE2Es(userId, result => {
+            if (result !== null)
+                Delete.userInAllUsersE2E(result, userId);
+        });
+        FindInUser.getListOfUserGroup(userId, result => {
+            if (result !== null)
+                Delete.userInAllUsersGroup(result, userId);
+        });
+        FindInUser.getListOfUserChannel(userId, result => {
+            if (result !== null)
+                Delete.userInAllUsersChannel(result, userId);
+        });
+
+
+    });
+
+}

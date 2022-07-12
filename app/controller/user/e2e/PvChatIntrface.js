@@ -272,7 +272,7 @@ exports.blockUser = (req) => {
                     return Json.builder(Response.HTTP_OK);
                 }
 
-                Delete.removeUserInUsersBlockList(id);
+                Delete.removeUserInUsersBlockList(from, id);
                 return Json.builder(Response.HTTP_OK);
             });
 
