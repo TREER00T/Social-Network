@@ -67,10 +67,13 @@ exports.gvc = (req) => {
 exports.isValidAuthCode = (req) => {
 
 
-    let {phone, authCode, name, ip, location} = req.body;
+    let {phone, authCode} = req.body;
+    let deviceName = req.body.name;
+    let deviceIp = req.body.ip;
+    let deviceLocation = req.body.location;
 
     if (!isPhoneNumber(phone) && !isVerificationCode(authCode) ||
-        (name === undefined || ip === undefined || location === undefined))
+        (deviceName === undefined || deviceIp === undefined || deviceLocation === undefined))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     Find.isValidAuthCode(phone, authCode, result => {
@@ -89,9 +92,9 @@ exports.isValidAuthCode = (req) => {
 
                         Insert.userDeviceInformation({
                             id: id,
-                            ip: ip,
-                            name: name,
-                            location: location
+                            ip: deviceIp,
+                            name: deviceName,
+                            location: deviceLocation
                         });
 
                         (async () => {
@@ -151,9 +154,12 @@ exports.isValidAuthCode = (req) => {
 exports.isValidPassword = (req) => {
 
 
-    let {ip, name, location, password} = req.body;
+    let password = req.body.password;
+    let deviceName = req.body.name;
+    let deviceIp = req.body.ip;
+    let deviceLocation = req.body.location;
 
-    if (name === undefined || ip === undefined || location === undefined)
+    if (deviceName === undefined || deviceIp === undefined || deviceLocation === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getAccessTokenPayLoad(data => {
@@ -179,9 +185,9 @@ exports.isValidPassword = (req) => {
 
                     Insert.userDeviceInformation({
                         id: id,
-                        ip: ip,
-                        name: name,
-                        location: location
+                        ip: deviceIp,
+                        name: deviceName,
+                        location: deviceLocation
                     });
 
                 });

@@ -28,6 +28,7 @@ module.exports = {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 img: VARCHAR(130),
                 bio: VARCHAR(70),
+                name: VARCHAR(20),
                 email: VARCHAR(255),
                 phone: VARCHAR(20),
                 apiKey: VARCHAR(255),
@@ -36,7 +37,6 @@ module.exports = {
                 username: VARCHAR(32),
                 password: VARCHAR(255),
                 lastName: VARCHAR(20),
-                firstName: VARCHAR(20),
                 isBlocked: BOOLEAN(),
                 defaultColor: VARCHAR(7)
             },

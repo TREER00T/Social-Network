@@ -102,7 +102,7 @@ module.exports = {
         openSql.update({
             table: 'users',
             edit: {
-                firstName: `${firstName}`,
+                name: `${firstName}`,
                 lastName: `${lastName}`
             },
             where: {
