@@ -329,7 +329,7 @@ module.exports = {
             data: [
                 ['img', 'bio', 'isActive',
                     'username', 'lastName',
-                    'firstName', 'defaultColor'],
+                    'name', 'defaultColor'],
                 'users', 'id', userId
             ],
             where: true
@@ -352,7 +352,7 @@ module.exports = {
                 ['img', 'bio', 'isActive',
                     'username', 'lastName',
                     'phone', 'email',
-                    'firstName', 'defaultColor'],
+                    'name', 'defaultColor'],
                 'users', 'id', userId
             ],
             where: true
@@ -438,7 +438,7 @@ module.exports = {
                 IN
             ],
             data: [
-                ['img', 'firstName', 'username', 'id'], 'users', 'id', arrayOfUserId
+                ['img', 'name', 'username', 'id'], 'users', 'id', arrayOfUserId
             ],
             where: true
         }).result(result => {
@@ -466,7 +466,7 @@ module.exports = {
                 IN
             ],
             data: [
-                ['img', 'firstName', 'username', 'id'], 'users', 'id', arrayOfUserId
+                ['img', 'name', 'username', 'id'], 'users', 'id', arrayOfUserId
             ],
             where: true
         }).result(result => {

@@ -11,6 +11,7 @@ let express = require('express'),
     personalRouter = require('app/routes/user/PersonalRoutes'),
     groupRouter = require('app/routes/group/GroupRoutes'),
     channelRouter = require('app/routes/channel/ChannelRoutes'),
+    commonRouter = require('app/routes/common/CommonRoutes'),
     e2eRouter = require('app/routes/user/PvChatRoutes');
 
 
@@ -62,11 +63,12 @@ module.exports = {
         });
 
 
-        app.use('/auth', authRouter);
-        app.use('/e2e', e2eRouter);
-        app.use('/personal', personalRouter);
-        app.use('/group', groupRouter);
-        app.use('/channel', channelRouter);
+        app.use('/api/auth', authRouter);
+        app.use('/api/e2e', e2eRouter);
+        app.use('/api/personal', personalRouter);
+        app.use('/api/group', groupRouter);
+        app.use('/api/channel', channelRouter);
+        app.use('/api/common', commonRouter);
 
         app.listen(process.env.EXPRESS_PORT, () => {
             console.log('Server are running...');
