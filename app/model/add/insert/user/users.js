@@ -71,6 +71,19 @@ module.exports = {
                 channelId: channelId
             }
         });
+    },
+
+    messageIntoUserSavedMessage(phone, message) {
+        openSql.addOne({
+            text: message['text'],
+            type: 'None',
+            senderId: message['senderId'],
+            isReply: message['isReply'],
+            location: message['location'],
+            isForward: message['isForward'],
+            forwardDataId: message['forwardDataId'],
+            targetReplyId: message['targetReplyId']
+        });
     }
 
 }

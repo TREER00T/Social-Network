@@ -17,6 +17,9 @@ router.get('/savedMessage', Personal.listOfMessage);
 router.delete('/savedMessage', Personal.deleteSavedMessage);
 router.post('/savedMessage', Personal.createSavedMessage);
 router.delete('/account', Personal.account);
+router.post('/message', Personal.addMessage);
+router.delete('/message', Personal.deleteMessage);
+router.put('/message', Personal.editMessage);
 
 
 module.exports = router;

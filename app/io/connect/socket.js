@@ -5,10 +5,12 @@ let app = require('express')(),
     IoUtil = require('app/io/util/util'),
     RestFulUtil = require('app/util/Util'),
     Insert = require('app/model/add/insert/common/index'),
+    UpdateInCommon = require('app/model/update/common/common'),
+    DeleteInCommon = require('app/model/remove/common/common'),
     Response = require('app/util/Response'),
     Pipeline = require('app/io/middleware/SocketIoPipeline'),
-    FindGroup = require('app/model/find/groups/group'),
-    FindUser = require('app/model/find/user/users'),
+    FindInGroup = require('app/model/find/groups/group'),
+    FindInChannel = require('app/model/find/channels/channel'),
     Json = require('app/util/ReturnJson'),
     FindInUser = require('app/model/find/user/users');
 require('dotenv').config();
@@ -23,8 +25,7 @@ const IN_VALID_USER_ID = 'IN_VALID_USER_ID';
 
 
 let port = process.env.SOCKET_IO_PORT,
-    allUsers = {},
-    state;
+    allUsers = {};
 
 
 http.listen(port, () => {
@@ -124,7 +125,7 @@ io.use((socket, next) => {
             if (receiverId === IN_VALID_USER_ID)
                 return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
 
-            FindUser.isExistChatRoom({
+            FindInUser.isExistChatRoom({
                 toUser: `${receiverId}`,
                 fromUser: `${socketUserId}`
             }, result => {
@@ -137,7 +138,106 @@ io.use((socket, next) => {
                 delete data['receiverId'];
                 data['senderId'] = socketUserId;
 
-                io.to(user).emit('isPvTyping', data);
+                io.to(user).emit('emitPvTyping', data);
+
+            });
+
+        });
+
+    });
+
+
+    socket.on('onPvOnlineUser', data => {
+        let receiverId = data['receiverId'];
+
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+
+            if (receiverId === IN_VALID_USER_ID)
+                return socket.emit('emitPvOnlineUserError', Response.HTTP_NOT_FOUND);
+
+
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitPvOnlineUserError', Response.HTTP_NOT_FOUND);
+
+                let user = allUsers[receiverId];
+
+                delete data['receiverId'];
+                data['senderId'] = socketUserId;
+
+                io.to(user).emit('emitPvOnlineUser', data);
+
+            });
+
+        });
+
+    });
+
+
+    socket.on('onPvMessageSeen', data => {
+        let receiverId = data['receiverId'];
+
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+
+            if (receiverId === IN_VALID_USER_ID)
+                return socket.emit('emitPvMessageSeenError', Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitPvMessageSeenError', Response.HTTP_NOT_FOUND);
+
+                let user = allUsers[receiverId];
+
+                delete data['receiverId'];
+                data['senderId'] = socketUserId;
+
+                io.to(user).emit('emitPvMessageSeen', data);
+
+            });
+
+        });
+
+    });
+
+
+    socket.on('onPvUploadedFile', data => {
+        let receiverId = data['receiverId'];
+
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+
+            if (receiverId === IN_VALID_USER_ID)
+                return socket.emit('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
+
+                FindInUser.getTableNameForListOfE2EMessage(data['senderId'], receiverId, dbData => {
+
+                    if (!data)
+                        return socket.emit('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
+                    let user = allUsers[receiverId];
+
+                    delete data['receiverId'];
+                    data['senderId'] = socketUserId;
+
+                    FindInUser.getDataForE2EContentWithId(dbData, data['id'], result => {
+                        io.to(user).emit('emitPvUploadedFile', Object.assign({}, result, data));
+                    });
+
+                });
 
             });
 
@@ -156,29 +256,133 @@ io.use((socket, next) => {
                 if (receiverSocketId === IN_VALID_USER_ID)
                     return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
 
-                FindUser.isExistChatRoom({
+                FindInUser.isExistChatRoom({
                     toUser: `${receiverId}`,
                     fromUser: `${socketUserId}`
                 }, result => {
 
                     if (!result)
-                        return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
+                        return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
+
+                    FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                        if (!result)
+                            return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
+
+
+                        let user = allUsers[receiverSocketId];
+
+                        RestFulUtil.validateMessage(data, result => {
+
+                            if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                                return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+
+                            let toUser = data['receiverId'];
+                            delete data['receiverId'];
+                            data['senderId'] = socketUserId;
+
+                            io.to(user).emit('emitPvMessage', result);
+
+                            Insert.message(socketUserId + 'And' + toUser + 'E2EContents', data);
+
+                        });
+
+                    });
+
+                });
+
+            });
+
+
+    });
+
+    socket.on('onPvEditMessage', data => {
+        let receiverId = data['receiverId'];
+
+
+        if (data !== undefined)
+
+            IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
+
+                if (receiverSocketId === IN_VALID_USER_ID)
+                    return socket.emit('emitPvEditMessageError', Response.HTTP_NOT_FOUND);
+
+                FindInUser.isExistChatRoom({
+                    toUser: `${receiverId}`,
+                    fromUser: `${socketUserId}`
+                }, result => {
+
+                    if (!result)
+                        return socket.emit('emitPvEditMessageError', Response.HTTP_NOT_FOUND);
+
+                    FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                        if (!result)
+                            return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
+
+                        let user = allUsers[receiverSocketId];
+
+                        RestFulUtil.validateMessage(data, result => {
+
+                            if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                                return socket.emit('emitPvEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+
+                            let toUser = data['receiverId'];
+                            delete data['receiverId'];
+                            data['senderId'] = socketUserId;
+
+                            io.to(user).emit('emitPvEditMessage', result);
+
+                            UpdateInCommon.message(socketUserId + 'And' + toUser + 'E2EContents', data, {
+                                id: data['id']
+                            });
+
+                        });
+
+                    });
+
+                });
+
+            });
+
+
+    });
+
+
+    socket.on('onPvDeleteMessage', data => {
+        let receiverId = data['receiverId'];
+
+
+        if (data !== undefined)
+
+            IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
+
+                if (receiverSocketId === IN_VALID_USER_ID)
+                    return socket.emit('emitPvDeleteMessageError', Response.HTTP_NOT_FOUND);
+
+                FindInUser.isExistChatRoom({
+                    toUser: `${receiverId}`,
+                    fromUser: `${socketUserId}`
+                }, result => {
+
+                    if (!result)
+                        return socket.emit('emitPvDeleteMessageError', Response.HTTP_NOT_FOUND);
 
                     let user = allUsers[receiverSocketId];
 
                     RestFulUtil.validateMessage(data, result => {
 
                         if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                            return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+                            return socket.emit('emitPvDeleteMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
                         let toUser = data['receiverId'];
                         delete data['receiverId'];
                         data['senderId'] = socketUserId;
 
-                        io.to(user).emit('emitPvMessage', result);
+                        io.to(user).emit('emitPvDeleteMessage', result);
 
-                        Insert.message(socketUserId + 'And' + toUser + 'E2EContents', data);
+                        DeleteInCommon.message(socketUserId + 'And' + toUser + 'E2EContents', data['listOfId']);
 
                     });
 
@@ -192,32 +396,28 @@ io.use((socket, next) => {
 
     // groups
 
-    socket.on('groupInit', data => {
+    socket.on('onGroupMessage', data => {
 
         let groupId = data.id;
         let userId = allUsers[socketId].data.userId;
 
-        FindGroup.groupId(groupId, result => {
+        FindInGroup.groupId(groupId, result => {
 
             if (!result)
-                return socket.emit('groupInitError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitGroupMessageError', Json.builder(Response.HTTP_NOT_FOUND));
 
 
-            FindInUser.isGroupIdInUserList(groupId, userId, result => {
+            FindInGroup.isJoinedInGroup(groupId, userId, result => {
 
-                if (!result) {
-                    state['isGroupInUserList'] = false;
-                    return socket.emit('groupInitError',
-                        Json.builder(Response.HTTP_BAD_REQUEST));
-                }
+                if (!result)
+                    return socket.emit('emitGroupMessageError',
+                        Json.builder(Response.HTTP_NOT_FOUND));
 
-                state['isGroupInUserList'] = true;
 
-                allUsers[socketId] = {
-                    data: {
-                        groupId: groupId
-                    }
-                };
+                socket.join(groupId);
+
+                Insert.message('`' + groupId + 'GroupContents`', data);
+                io.to(groupId).emit('emitGroupMessage', data);
 
             });
 
@@ -226,11 +426,246 @@ io.use((socket, next) => {
     });
 
 
-    // socket.on('onGroupTyping', data => {
-    //     Server.io.broadcast.emit('isGroupTyping', Json.builder({
-    //         'isUserTypingInGroup': data['user']
-    //     }));
-    // });
+    socket.on('onGroupUploadedFile', data => {
+
+        let groupId = data.id;
+        let userId = allUsers[socketId].data.userId;
+
+        FindInGroup.groupId(groupId, result => {
+
+            if (!result)
+                return socket.emit('emitGroupUploadedFileError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+            FindInGroup.isJoinedInGroup(groupId, userId, result => {
+
+                if (!result)
+                    return socket.emit('emitGroupUploadedFileError',
+                        Json.builder(Response.HTTP_NOT_FOUND));
+
+
+                socket.join(groupId);
+
+                FindInGroup.getDataForGroupContentWithId(groupId, data['id'], result => {
+                    io.to(groupId).emit('emitGroupUploadedFile', Object.assign({}, result, data));
+                });
+
+
+            });
+
+        });
+
+
+    });
+
+
+    socket.on('onGroupEditMessage', data => {
+
+        let groupId = data.id;
+        let userId = allUsers[socketId].data.userId;
+
+        FindInGroup.groupId(groupId, result => {
+
+            if (!result)
+                return socket.emit('emitGroupEditMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+            FindInGroup.isJoinedInGroup(groupId, userId, result => {
+
+                if (!result)
+                    return socket.emit('emitGroupEditMessageError',
+                        Json.builder(Response.HTTP_NOT_FOUND));
+
+
+                socket.join(groupId);
+
+                UpdateInCommon.message('`' + groupId + 'GroupContents`', data, data['id']);
+                io.to(groupId).emit('emitGroupEditMessage', data);
+
+            });
+
+        });
+
+    });
+
+    socket.on('onGroupDeleteMessage', data => {
+
+        let groupId = data.id;
+        let userId = allUsers[socketId].data.userId;
+
+        FindInGroup.groupId(groupId, result => {
+
+            if (!result)
+                return socket.emit('emitGroupDeleteMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+            FindInGroup.isJoinedInGroup(groupId, userId, result => {
+
+                if (!result)
+                    return socket.emit('emitGroupDeleteMessageError',
+                        Json.builder(Response.HTTP_NOT_FOUND));
+
+
+                socket.join(groupId);
+
+                DeleteInCommon.message('`' + groupId + 'GroupContents`', data['listOfId']);
+                io.to(groupId).emit('emitGroupDeleteMessage', data);
+
+            });
+
+        });
+
+    });
+
+
+    socket.on('onTypingGroupMessage', data => {
+
+        let groupId = data.id;
+        let userId = allUsers[socketId].data.userId;
+
+        FindInGroup.groupId(groupId, result => {
+
+            if (!result)
+                return socket.emit('emitGroupTypingMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+            FindInGroup.isJoinedInGroup(groupId, userId, result => {
+
+                if (!result)
+                    return socket.emit('emitGroupTypingMessageError',
+                        Json.builder(Response.HTTP_NOT_FOUND));
+
+
+                socket.join(groupId);
+
+                io.to(groupId).emit('emitTypingGroupMessage', data);
+
+            });
+
+        });
+
+    });
+
+
+    // channel
+
+    socket.on('onChanelMessage', data => {
+
+        let channelId = data.id;
+        let userId = allUsers[socketId].data.userId;
+
+        FindInChannel.channelId(channelId, result => {
+
+            if (!result)
+                return socket.emit('emitChannelMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+            FindInChannel.isJoinedInChannel(channelId, userId, result => {
+
+                if (!result)
+                    return socket.emit('emitChannelMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+                socket.join(channelId);
+
+                Insert.message('`' + channelId + 'ChannelContents`', data);
+                io.to(channelId).emit('emitChannelMessage', data);
+
+
+            });
+
+        });
+
+    });
+
+    socket.on('onChanelUploadedFile', data => {
+
+        let channelId = data.id;
+        let userId = allUsers[socketId].data.userId;
+
+        FindInChannel.channelId(channelId, result => {
+
+            if (!result)
+                return socket.emit('emitChannelUploadedFileError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+            FindInChannel.isJoinedInChannel(channelId, userId, result => {
+
+                if (!result)
+                    return socket.emit('emitChannelUploadedFileError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+                socket.join(channelId);
+
+
+                FindInChannel.getDataForChannelContentWithId(channelId, data['id'], result => {
+                    io.to(channelId).emit('emitChannelUploadedFile', Object.assign({}, result, data));
+                });
+
+
+            });
+
+        });
+
+    });
+
+    socket.on('onChanelEditMessage', data => {
+
+        let channelId = data.id;
+        let userId = allUsers[socketId].data.userId;
+
+        FindInChannel.channelId(channelId, result => {
+
+            if (!result)
+                return socket.emit('emitChannelEditMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+            FindInChannel.isJoinedInChannel(channelId, userId, result => {
+
+                if (!result)
+                    return socket.emit('emitChannelEditMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+                socket.join(channelId);
+
+                UpdateInCommon.message('`' + channelId + 'ChannelContents`', data, data['id']);
+                io.to(channelId).emit('emitChannelEditMessage', data);
+
+
+            });
+
+        });
+
+    });
+
+    socket.on('onChanelDeleteMessage', data => {
+
+        let channelId = data.id;
+        let userId = allUsers[socketId].data.userId;
+
+        FindInChannel.channelId(channelId, result => {
+
+            if (!result)
+                return socket.emit('emitChannelDeleteMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+            FindInChannel.isJoinedInChannel(channelId, userId, result => {
+
+                if (!result)
+                    return socket.emit('emitChannelDeleteMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+
+
+                socket.join(channelId);
+
+                DeleteInCommon.message('`' + channelId + 'ChannelContents`', data['listOfId']);
+                io.to(channelId).emit('emitChannelDeleteMessage', data);
+
+
+            });
+
+        });
+
+    });
 
 
 });

@@ -207,5 +207,25 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+    getDataForChannelContentWithId(id, cb) {
+        openSql.find({
+            optKey: [
+                STAR,
+                EQUAL_TO
+            ],
+            data: [
+                '`' + id + 'ChannelContents`', 'id', `${id}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] !== undefined) ? cb(result[1][0]) : cb(null);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
+
 }

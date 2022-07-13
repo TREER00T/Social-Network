@@ -170,7 +170,15 @@ module.exports = {
                 DataBaseException(e);
             }
         });
-    }
+    },
 
+    itemInSavedMessage(phone, id) {
+        openSql.update({
+            table: phone + 'SavedMessages',
+            where: {
+                id: id
+            }
+        });
+    }
 
 }

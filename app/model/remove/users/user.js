@@ -1,5 +1,8 @@
 let openSql = require('opensql'),
     {
+        IN
+    } = openSql.queryHelper,
+    {
         DataBaseException
     } = require('app/exception/DataBaseException');
 
@@ -121,7 +124,7 @@ module.exports = {
         });
     },
 
-    userInAllUsersChannel(array,id) {
+    userInAllUsersChannel(array, id) {
         let arrayOfTable = [];
 
         array.forEach(item => {
@@ -162,6 +165,15 @@ module.exports = {
             table: 'devices',
             where: {
                 userId: id
+            }
+        });
+    },
+
+    itemInSavedMessage(phone, id) {
+        openSql.remove({
+            table: phone + 'SavedMessages',
+            where: {
+                id: IN(id)
             }
         });
     }

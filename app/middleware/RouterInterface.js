@@ -21,8 +21,7 @@ module.exports = {
 
         dotenv.config();
 
-        app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json());
-
+        app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json(), express.raw());
         app.use((req, res, next) => {
 
             Json.initializationRes(res);
@@ -42,21 +41,21 @@ module.exports = {
             let isSetPhone = (req.body.phone !== undefined);
 
 
-            if ((!isSetUserApiKey && !isSetUserAccessToken && !isSetPhone && !isSetUserRefreshToken) ||
-                (isSetUserApiKey && !isSetUserAccessToken && !isSetPhone) ||
-                (!isSetUserApiKey && isSetUserAccessToken && !isSetPhone))
-                return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
+                if ((!isSetUserApiKey && !isSetUserAccessToken && !isSetPhone && !isSetUserRefreshToken) ||
+                    (isSetUserApiKey && !isSetUserAccessToken && !isSetPhone) ||
+                    (!isSetUserApiKey && isSetUserAccessToken && !isSetPhone))
+                    return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
 
 
-            if (isSetPhone && isSetUserApiKey && isSetUserAccessToken) {
-                return Pipeline.isValidApiKey(apiKey, phone, result => {
-                    if (!result) {
-                        return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
-                    }
-                    app.use(router);
-                    next();
-                });
-            }
+                if (isSetPhone && isSetUserApiKey && isSetUserAccessToken) {
+                    return Pipeline.isValidApiKey(apiKey, phone, result => {
+                        if (!result) {
+                            return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+                        }
+                        app.use(router);
+                        next();
+                    });
+                }
 
             app.use(router);
             next();
@@ -69,6 +68,7 @@ module.exports = {
         app.use('/api/group', groupRouter);
         app.use('/api/channel', channelRouter);
         app.use('/api/common', commonRouter);
+
 
         app.listen(process.env.EXPRESS_PORT, () => {
             console.log('Server are running...');
