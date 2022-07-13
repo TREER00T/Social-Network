@@ -16,6 +16,7 @@ let openSql = require('opensql'),
     {
         DataBaseException
     } = require('app/exception/DataBaseException');
+const {NULL} = require("opensql/src/util/QueryHelper");
 
 
 module.exports = {
@@ -108,7 +109,7 @@ module.exports = {
                 senderId: INT(),
                 fileName: VARCHAR(15),
                 fileSize: VARCHAR(15),
-                location: POINT(),
+                location: POINT([NULL]),
                 isForward: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()
@@ -166,7 +167,7 @@ module.exports = {
                 senderId: INT(),
                 fileSize: VARCHAR(15),
                 fileName: VARCHAR(15),
-                location: POINT(),
+                location: POINT([NULL]),
                 isForward: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()

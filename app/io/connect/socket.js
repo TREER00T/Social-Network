@@ -25,8 +25,7 @@ const IN_VALID_USER_ID = 'IN_VALID_USER_ID';
 
 
 let port = process.env.SOCKET_IO_PORT,
-    allUsers = {},
-    state;
+    allUsers = {};
 
 
 http.listen(port, () => {
@@ -383,7 +382,7 @@ io.use((socket, next) => {
 
                         io.to(user).emit('emitPvDeleteMessage', result);
 
-                        DeleteInCommon.message(socketUserId + 'And' + toUser + 'E2EContents', data['id']);
+                        DeleteInCommon.message(socketUserId + 'And' + toUser + 'E2EContents', data['listOfId']);
 
                     });
 
@@ -509,7 +508,7 @@ io.use((socket, next) => {
 
                 socket.join(groupId);
 
-                DeleteInCommon.message('`' + groupId + 'GroupContents`', data['id']);
+                DeleteInCommon.message('`' + groupId + 'GroupContents`', data['listOfId']);
                 io.to(groupId).emit('emitGroupDeleteMessage', data);
 
             });
@@ -658,7 +657,7 @@ io.use((socket, next) => {
 
                 socket.join(channelId);
 
-                DeleteInCommon.message('`' + channelId + 'ChannelContents`', data['id']);
+                DeleteInCommon.message('`' + channelId + 'ChannelContents`', data['listOfId']);
                 io.to(channelId).emit('emitChannelDeleteMessage', data);
 
 

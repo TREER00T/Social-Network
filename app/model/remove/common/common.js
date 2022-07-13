@@ -1,13 +1,16 @@
-let openSql = require('opensql');
+let openSql = require('opensql'),
+    {
+        IN
+    } = openSql.queryHelper;
 
 
 module.exports = {
 
-    message(tableName, id) {
+    message(tableName, listOfId) {
         openSql.remove({
             table: tableName,
             where: {
-                id: id
+                id: IN(listOfId)
             }
         })
     }

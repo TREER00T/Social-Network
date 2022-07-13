@@ -3,6 +3,9 @@ let Json = require('app/util/ReturnJson'),
         getAccessTokenPayLoad
     } = require('app/middleware/ApiPipeline'),
     Response = require('app/util/Response'),
+    {
+        InputException
+    } = require('app/exception/InputException'),
     Update = require('app/model/update/user/users'),
     Find = require('app/model/find/user/users'),
     multer = require('multer'),
@@ -16,6 +19,7 @@ let Json = require('app/util/ReturnJson'),
     File = require('app/util/File'),
     Util = require('app/util/Util'),
     Create = require('app/model/create/users'),
+    Insert = require('app/model/add/insert/user/users'),
     FindInUser = require('app/model/find/user/users'),
     AddUserForeignKey = require('app/model/add/foreignKey/users'),
     Delete = require('app/model/remove/users/user');
@@ -391,6 +395,81 @@ exports.account = () => {
                 Delete.userInAllUsersChannel(result, userId);
         });
 
+
+    });
+
+}
+
+
+exports.addMessage = (req) => {
+
+    let {text, senderId, isReply, targetReplyId, isForward, forwardDataId, location} = req.body;
+    let getIsReplay = (isReply !== undefined) ? 1 : 0;
+    let getIsForward = (isForward !== undefined) ? 1 : 0;
+    let getTargetReplayId = (targetReplyId !== undefined) ? targetReplyId : NULL;
+    let getForwardDataId = (forwardDataId !== undefined) ? forwardDataId : NULL;
+    let getLocation = (location !== undefined) ? location : NULL;
+
+    let message = {
+        senderId: senderId,
+        text: text,
+        isReply: getIsReplay,
+        location: getLocation,
+        isForward: getIsForward,
+        forwardDataId: getForwardDataId,
+        targetReplyId: getTargetReplayId
+    };
+
+    getAccessTokenPayLoad(data => {
+
+        let phone = data.phoneNumber;
+
+        Insert.messageIntoUserSavedMessage(phone, message);
+
+        return Json.builder(Response.HTTP_CREATED);
+    });
+
+}
+
+
+exports.deleteMessage = (req) => {
+
+    let listOfId;
+
+    try {
+        listOfId = JSON.parse(req.body.toString())['listOfId'];
+    } catch (e) {
+        InputException(e);
+    }
+
+
+    getAccessTokenPayLoad(data => {
+
+        let phone = data.phoneNumber;
+
+        if (listOfId === undefined)
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        Delete.itemInSavedMessage(phone, listOfId);
+
+        return Json.builder(Response.HTTP_OK);
+
+    });
+
+}
+
+
+exports.editMessage = (req) => {
+
+    let id = req.body.id;
+
+    getAccessTokenPayLoad(data => {
+
+        let phone = data.phoneNumber;
+
+        Update.itemInSavedMessage(phone, id);
+
+        return Json.builder(Response.HTTP_OK);
 
     });
 

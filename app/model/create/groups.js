@@ -13,6 +13,7 @@ let openSql = require('opensql'),
     {
         AUTO_INCREMENT
     } = openSql.keywordHelper;
+const {NULL} = require("opensql/src/util/QueryHelper");
 
 
 module.exports = {
@@ -82,7 +83,7 @@ module.exports = {
                 senderId: INT(),
                 fileName: VARCHAR(15),
                 fileSize: VARCHAR(15),
-                location: POINT(),
+                location: POINT([NULL]),
                 isForward: BOOLEAN(),
                 targetReplyId: INT(),
                 forwardDataId: INT()
