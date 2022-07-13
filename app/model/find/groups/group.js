@@ -185,6 +185,27 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+
+    getDataForGroupContentWithId(id, cb) {
+        openSql.find({
+            optKey: [
+                STAR,
+                EQUAL_TO
+            ],
+            data: [
+                '`' + id + 'GroupContents`', 'id', `${id}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] !== undefined) ? cb(result[1][0]) : cb(null);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
+
 
 }

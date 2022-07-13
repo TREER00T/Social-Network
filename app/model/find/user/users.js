@@ -141,28 +141,6 @@ module.exports = {
     },
 
 
-    isGroupIdInUserList(groupId, userId, cb) {
-        openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'groupId', 'listofusergroups', 'groupId', `${groupId}`,
-                'userId', `${userId}`
-            ],
-            where: true
-        }).result(result => {
-            try {
-                cb(result[1].length !== 0);
-            } catch (e) {
-                DataBaseException(e);
-            }
-        });
-    },
-
-
     isExistChatRoom(data, cb) {
         openSql.find({
             optKey: [
@@ -223,8 +201,8 @@ module.exports = {
             ],
             data: [
                 'tblChatId', 'listOfUserE2Es', 'toUser', `${toUser}`,
-                'fromUser', `${fromUser}`, 'userId', `${userId}`,
-                'toUser', `${fromUser}`, 'fromUser', `${toUser}`, 'userId', `${userId}`
+                'fromUser', `${fromUser}`, 'userId', `${fromUser}`,
+                'toUser', `${fromUser}`, 'fromUser', `${toUser}`, 'userId', `${fromUser}`
             ],
             where: true
         }).result(result => {
@@ -372,10 +350,15 @@ module.exports = {
                 STAR,
                 EQUAL_TO,
                 AND,
+                EQUAL_TO,
+                OR,
+                EQUAL_TO,
+                AND,
                 EQUAL_TO
             ],
             data: [
-                'userBlockList', 'userId', `${from}`, 'userTargetId', `${targetId}`
+                'userBlockList', 'userId', `${from}`, 'userTargetId', `${targetId}`,
+                'userId', `${targetId}`, 'userTargetId', `${from}`
             ],
             where: true
         }).result(result => {
@@ -605,6 +588,26 @@ module.exports = {
         }).result(result => {
             try {
                 (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
+    getDataForE2EContentWithId(tableName, id, cb) {
+        openSql.find({
+            optKey: [
+                STAR,
+                EQUAL_TO
+            ],
+            data: [
+                `${tableName}`, 'id', `${id}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] !== undefined) ? cb(result[1][0]) : cb(null);
             } catch (e) {
                 DataBaseException(e);
             }

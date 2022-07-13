@@ -134,7 +134,7 @@ exports.listOfMessage = (req) => {
 
         let from = data.id;
 
-        Find.getTableNameForListOfE2EMessage(from, to, from, data => {
+        Find.getTableNameForListOfE2EMessage(from, to, data => {
 
             if (!data)
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
@@ -194,7 +194,7 @@ exports.deleteForMe = (req) => {
             if (!isUserInDb)
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-            Find.getTableNameForListOfE2EMessage(from, id, from, data => {
+            Find.getTableNameForListOfE2EMessage(from, id, data => {
                 if (!data)
                     return Json.builder(Response.HTTP_NOT_FOUND);
 
@@ -226,7 +226,7 @@ exports.deleteForUs = (req) => {
             if (!isUserInDb)
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-            Find.getTableNameForListOfE2EMessage(from, id, from, data => {
+            Find.getTableNameForListOfE2EMessage(from, id, data => {
                 if (!data)
                     return Json.builder(Response.HTTP_NOT_FOUND);
 
