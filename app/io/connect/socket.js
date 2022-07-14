@@ -7,6 +7,7 @@ let app = require('express')(),
     Insert = require('app/model/add/insert/common/index'),
     UpdateInCommon = require('app/model/update/common/common'),
     DeleteInCommon = require('app/model/remove/common/common'),
+    CommonFind = require('app/model/find/common/common'),
     Response = require('app/util/Response'),
     Pipeline = require('app/io/middleware/SocketIoPipeline'),
     FindInGroup = require('app/model/find/groups/group'),
@@ -95,6 +96,17 @@ io.use((socket, next) => {
 
 
     // user
+
+
+    socket.on('onUserActivities', () => {
+
+        CommonFind.getListOfUsersActivity(socketUserId, result => {
+
+            socket.emit('emitUserActivities', result);
+
+        });
+
+    });
 
 
     socket.on('setOnListOfUsersChat', arrayOfUser => {
