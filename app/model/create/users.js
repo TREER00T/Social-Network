@@ -15,8 +15,10 @@ let openSql = require('opensql'),
     } = openSql.queryHelper,
     {
         DataBaseException
-    } = require('app/exception/DataBaseException');
-const {NULL} = require("opensql/src/util/QueryHelper");
+    } = require('app/exception/DataBaseException'),
+    {
+        NULL
+    } = require('opensql/src/util/QueryHelper');
 
 
 module.exports = {
