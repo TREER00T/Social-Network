@@ -98,7 +98,20 @@ io.use((socket, next) => {
     // user
 
 
-    socket.on('onUserActivities', () => {
+    socket.on('onUserActivities', (type) => {
+        if (type === 'e2e')
+            return CommonFind.getListOfUserE2esActivity(socketUserId, type, result => {
+
+                socket.emit('emitUserActivities', result);
+
+            });
+
+        if (type === 'group' || 'channel')
+            return CommonFind.getListOfUserGroupsOrChannelsActivity(socketUserId, type, result => {
+
+                socket.emit('emitUserActivities', result);
+
+            });
 
         CommonFind.getListOfUsersActivity(socketUserId, result => {
 

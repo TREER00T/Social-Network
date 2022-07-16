@@ -6,27 +6,19 @@ let openSql = require('opensql'),
         AND
     } = openSql.keywordHelper,
     {
+        SOURCE,
         IS_NOT_NULL
     } = openSql.queryHelper,
     {
         DataBaseException
-    } = require('app/exception/DataBaseException');
-const {EQUAL_TO} = require("opensql/src/util/QueryHelper");
+    } = require('app/exception/DataBaseException'),
+    {
+        EQUAL_TO
+    } = openSql.keywordHelper;
 
 
 module.exports = {
 
-    isExistTable(tableName, cb) {
-
-        openSql.findTable(tableName).result(result => {
-            try {
-                cb(result.length === 0);
-            } catch (e) {
-                DataBaseException(e);
-            }
-        });
-
-    },
 
     searchWithNameInTableUsersGroupsAndChannels(value, cb) {
 
@@ -46,19 +38,61 @@ module.exports = {
             ],
             where: true
         }).result(result => {
-            (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            } catch (e) {
+                DataBaseException(e);
+            }
         });
 
     },
 
+    getListOfUserGroupsOrChannelsActivity(userId, type, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                [`${type}s.id`, `${type}s.name`, `${type}s.img`, `${type}s.defaultColor`], [`listOfUser${type}s`, type], `listOfUser${type}s.userId`, `${userId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+    getListOfUserE2esActivity(userId, type, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO
+            ],
+            data: [
+                ['users.id', 'users.name', 'users.img', 'users.defaultColor'], [`listOfUser${type}s`, 'users'], `listOfUser${type}s.userId`, `${userId}`
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
 
     getListOfUsersActivity(userId, cb) {
         openSql.find({
             optKey: [
+                SOURCE('user', 'type'),
                 EQUAL_TO,
                 UNION_ALL,
+                SOURCE('group', 'type'),
                 EQUAL_TO,
                 UNION_ALL,
+                SOURCE('channel', 'type'),
                 EQUAL_TO
             ],
             data: [
@@ -68,7 +102,11 @@ module.exports = {
             ],
             where: true
         }).result(result => {
-            (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+            } catch (e) {
+                DataBaseException(e);
+            }
         });
     }
 

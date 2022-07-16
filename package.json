@@ -14,7 +14,7 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "node-jose": "^2.1.0",
-    "opensql": "^1.2.32",
+    "opensql": "^1.2.35",
     "socket.io": "^4.4.1"
   },
   "devDependencies": {
