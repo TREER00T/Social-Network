@@ -100,6 +100,68 @@ io.use((socket, next) => {
 
     // user
 
+    socket.on('onNotificationForVoiceCall', data => {
+
+        let receiverId = data['receiverId'];
+
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+
+            if (receiverId === IN_VALID_USER_ID)
+                return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_NOT_FOUND);
+
+                let user = allUsers[receiverId];
+
+                delete data['receiverId'];
+                data['senderId'] = socketUserId;
+
+                io.to(user).emit('emitNotificationForVoiceCall', data);
+
+            });
+
+        });
+
+
+    });
+
+    socket.on('onVoiceCall', data => {
+
+        let receiverId = data['receiverId'];
+
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+
+            if (receiverId === IN_VALID_USER_ID)
+                return socket.emit('emitVoiceCallError', Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitVoiceCallError', Response.HTTP_NOT_FOUND);
+
+                let user = allUsers[receiverId];
+
+                delete data['receiverId'];
+                data['senderId'] = socketUserId;
+
+                io.to(user).emit('emitVoiceCall', data);
+
+            });
+
+        });
+
+
+    });
+
 
     socket.on('onUserActivities', (type) => {
         if (type === 'e2e')
