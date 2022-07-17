@@ -74,13 +74,16 @@ io.use((socket, next) => {
     let socketId = socket.id;
     let phone = allUsers[socketId].data.phone;
     let socketUserId = allUsers[socketId].data.userId;
+    let listOfUser = allUsers[socketId].listOfSocketIdForPvChat;
     let isActive = 1;
 
     Update.userOnline(phone, isActive);
+    let isOnline = true;
+
+    IoUtil.sendUserOnlineStatusForSpecificUsers(listOfUser, isOnline);
 
     socket.on('disconnect', () => {
 
-        let listOfUser = allUsers[socketId].listOfSocketIdForPvChat;
 
         let isOnline = false;
 
