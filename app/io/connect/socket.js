@@ -74,13 +74,16 @@ io.use((socket, next) => {
     let socketId = socket.id;
     let phone = allUsers[socketId].data.phone;
     let socketUserId = allUsers[socketId].data.userId;
+    let listOfUser = allUsers[socketId].listOfSocketIdForPvChat;
     let isActive = 1;
 
     Update.userOnline(phone, isActive);
+    let isOnline = true;
+
+    IoUtil.sendUserOnlineStatusForSpecificUsers(listOfUser, isOnline);
 
     socket.on('disconnect', () => {
 
-        let listOfUser = allUsers[socketId].listOfSocketIdForPvChat;
 
         let isOnline = false;
 
@@ -96,6 +99,68 @@ io.use((socket, next) => {
 
 
     // user
+
+    socket.on('onNotificationForVoiceCall', data => {
+
+        let receiverId = data['receiverId'];
+
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+
+            if (receiverId === IN_VALID_USER_ID)
+                return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_NOT_FOUND);
+
+                let user = allUsers[receiverId];
+
+                delete data['receiverId'];
+                data['senderId'] = socketUserId;
+
+                io.to(user).emit('emitNotificationForVoiceCall', data);
+
+            });
+
+        });
+
+
+    });
+
+    socket.on('onVoiceCall', data => {
+
+        let receiverId = data['receiverId'];
+
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+
+            if (receiverId === IN_VALID_USER_ID)
+                return socket.emit('emitVoiceCallError', Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitVoiceCallError', Response.HTTP_NOT_FOUND);
+
+                let user = allUsers[receiverId];
+
+                delete data['receiverId'];
+                data['senderId'] = socketUserId;
+
+                io.to(user).emit('emitVoiceCall', data);
+
+            });
+
+        });
+
+
+    });
 
 
     socket.on('onUserActivities', (type) => {
@@ -438,8 +503,9 @@ io.use((socket, next) => {
                     return socket.emit('emitGroupMessageError',
                         Json.builder(Response.HTTP_NOT_FOUND));
 
-
-                socket.join(groupId);
+                if (socket.adapter.rooms.has(groupId) === false) {
+                    socket.join(groupId);
+                }
 
                 Insert.message('`' + groupId + 'GroupContents`', data);
                 io.to(groupId).emit('emitGroupMessage', data);
@@ -469,7 +535,9 @@ io.use((socket, next) => {
                         Json.builder(Response.HTTP_NOT_FOUND));
 
 
-                socket.join(groupId);
+                if (socket.adapter.rooms.has(groupId) === false) {
+                    socket.join(groupId);
+                }
 
                 FindInGroup.getDataForGroupContentWithId(groupId, data['id'], result => {
                     io.to(groupId).emit('emitGroupUploadedFile', Object.assign({}, result, data));
@@ -502,7 +570,9 @@ io.use((socket, next) => {
                         Json.builder(Response.HTTP_NOT_FOUND));
 
 
-                socket.join(groupId);
+                if (socket.adapter.rooms.has(groupId) === false) {
+                    socket.join(groupId);
+                }
 
                 UpdateInCommon.message('`' + groupId + 'GroupContents`', data, data['id']);
                 io.to(groupId).emit('emitGroupEditMessage', data);
@@ -531,7 +601,9 @@ io.use((socket, next) => {
                         Json.builder(Response.HTTP_NOT_FOUND));
 
 
-                socket.join(groupId);
+                if (socket.adapter.rooms.has(groupId) === false) {
+                    socket.join(groupId);
+                }
 
                 DeleteInCommon.message('`' + groupId + 'GroupContents`', data['listOfId']);
                 io.to(groupId).emit('emitGroupDeleteMessage', data);
@@ -561,7 +633,9 @@ io.use((socket, next) => {
                         Json.builder(Response.HTTP_NOT_FOUND));
 
 
-                socket.join(groupId);
+                if (socket.adapter.rooms.has(groupId) === false) {
+                    socket.join(groupId);
+                }
 
                 io.to(groupId).emit('emitTypingGroupMessage', data);
 
@@ -591,7 +665,9 @@ io.use((socket, next) => {
                     return socket.emit('emitChannelMessageError', Json.builder(Response.HTTP_NOT_FOUND));
 
 
-                socket.join(channelId);
+                if (socket.adapter.rooms.has(channelId) === false) {
+                    socket.join(channelId);
+                }
 
                 Insert.message('`' + channelId + 'ChannelContents`', data);
                 io.to(channelId).emit('emitChannelMessage', data);
@@ -619,9 +695,9 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitChannelUploadedFileError', Json.builder(Response.HTTP_NOT_FOUND));
 
-
-                socket.join(channelId);
-
+                if (socket.adapter.rooms.has(channelId) === false) {
+                    socket.join(channelId);
+                }
 
                 FindInChannel.getDataForChannelContentWithId(channelId, data['id'], result => {
                     io.to(channelId).emit('emitChannelUploadedFile', Object.assign({}, result, data));
@@ -650,8 +726,9 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitChannelEditMessageError', Json.builder(Response.HTTP_NOT_FOUND));
 
-
-                socket.join(channelId);
+                if (socket.adapter.rooms.has(channelId) === false) {
+                    socket.join(channelId);
+                }
 
                 UpdateInCommon.message('`' + channelId + 'ChannelContents`', data, data['id']);
                 io.to(channelId).emit('emitChannelEditMessage', data);
@@ -679,8 +756,9 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitChannelDeleteMessageError', Json.builder(Response.HTTP_NOT_FOUND));
 
-
-                socket.join(channelId);
+                if (socket.adapter.rooms.has(channelId) === false) {
+                    socket.join(channelId);
+                }
 
                 DeleteInCommon.message('`' + channelId + 'ChannelContents`', data['listOfId']);
                 io.to(channelId).emit('emitChannelDeleteMessage', data);
