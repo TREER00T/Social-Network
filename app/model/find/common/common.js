@@ -108,6 +108,25 @@ module.exports = {
                 DataBaseException(e);
             }
         });
+    },
+
+    isForwardData(tableName, id, cb) {
+        openSql.find({
+            optKey: [
+                EQUAL_TO,
+                IS_NOT_NULL
+            ],
+            data: [
+                'forwardDataId', tableName, 'id', id, 'forwardDataId'
+            ],
+            where: true
+        }).result(result => {
+            try {
+                (result[1][0] === undefined) ? cb(null) : cb(result[1].forwardDataId);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
     }
 
 }

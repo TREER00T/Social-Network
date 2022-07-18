@@ -4,7 +4,9 @@ let openSql = require('opensql'),
     } = openSql.queryHelper,
     {
         DataBaseException
-    } = require('app/exception/DataBaseException');
+    } = require('app/exception/DataBaseException'),
+    FindInCommon = require('app/model/find/common/common'),
+    DeleteInCommon = require('app/model/remove/common/common');
 
 module.exports = {
 
@@ -169,11 +171,17 @@ module.exports = {
         });
     },
 
-    itemInSavedMessage(phone, id) {
+    itemInSavedMessage(phone, listOfId) {
+        listOfId.forEach(item => {
+            FindInCommon.isForwardData(phone + 'SavedMessages', item, id => {
+                if (id !== null)
+                    DeleteInCommon.forwardMessage(id);
+            });
+        });
         openSql.remove({
             table: phone + 'SavedMessages',
             where: {
-                id: IN(id)
+                id: IN(listOfId)
             }
         });
     }

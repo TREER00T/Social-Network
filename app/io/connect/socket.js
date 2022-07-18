@@ -373,7 +373,9 @@ io.use((socket, next) => {
 
                             io.to(user).emit('emitPvMessage', result);
 
-                            Insert.message(socketUserId + 'And' + toUser + 'E2EContents', data);
+                            Insert.message(socketUserId + 'And' + toUser + 'E2EContents', data, {
+                                conversationType: 'E2E'
+                            });
 
                         });
 
@@ -507,7 +509,9 @@ io.use((socket, next) => {
                     socket.join(groupId);
                 }
 
-                Insert.message('`' + groupId + 'GroupContents`', data);
+                Insert.message('`' + groupId + 'GroupContents`', data, {
+                    conversationType: 'Group'
+                });
                 io.to(groupId).emit('emitGroupMessage', data);
 
             });
@@ -669,7 +673,9 @@ io.use((socket, next) => {
                     socket.join(channelId);
                 }
 
-                Insert.message('`' + channelId + 'ChannelContents`', data);
+                Insert.message('`' + channelId + 'ChannelContents`', data, {
+                    conversationType: 'Channel'
+                });
                 io.to(channelId).emit('emitChannelMessage', data);
 
 

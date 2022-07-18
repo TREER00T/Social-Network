@@ -1,4 +1,8 @@
-let openSql = require('opensql');
+let openSql = require('opensql'),
+    UpdateInCommon = require('app/model/update/common/common'),
+    {
+        DataBaseException
+    } = require('app/exception/DataBaseException');
 
 
 module.exports = {
@@ -74,15 +78,39 @@ module.exports = {
     },
 
     messageIntoUserSavedMessage(phone, message) {
+        if (message['forwardDataId'] !== undefined || null) {
+            openSql.addOne({
+                table: 'forwardContents',
+                data: {
+                    conversationId: phone + 'SavedMessages',
+                    conversationType: 'Personal'
+                }
+            }).result(result => {
+                try {
+                    message['forwardDataId'] = result[1].insertId;
+                    message['isForward'] = 1;
+                    openSql.addOne({
+                        table: phone + 'SavedMessages',
+                        data: message
+                    }).result(result => {
+                        try {
+                            let messageId = result[1].insertId;
+                            UpdateInCommon.messageIdFromTableForwardContents(message['forwardDataId'], messageId);
+                        } catch (e) {
+                            DataBaseException(e);
+                        }
+                    });
+
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+            return;
+        }
+
         openSql.addOne({
-            text: message['text'],
-            type: 'None',
-            senderId: message['senderId'],
-            isReply: message['isReply'],
-            location: message['location'],
-            isForward: message['isForward'],
-            forwardDataId: message['forwardDataId'],
-            targetReplyId: message['targetReplyId']
+            table: phone + 'SavedMessages',
+            data: message
         });
     }
 
