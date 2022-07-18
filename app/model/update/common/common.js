@@ -11,6 +11,18 @@ module.exports = {
                 id: id
             }
         });
+    },
+
+    messageIdFromTableForwardContents(id, messageId) {
+        openSql.update({
+            table: 'forwardContents',
+            edit: {
+                messageId: messageId
+            },
+            where: {
+                id: id
+            }
+        });
     }
 
 }

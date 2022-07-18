@@ -1,10 +1,12 @@
 let openSql = require('opensql'),
     {
         INT,
-        ENUM
+        ENUM,
+        LONGTEXT
     } = openSql.dataType,
     {
-        NOT_NULL
+        NOT_NULL,
+        NULL
     } = openSql.queryHelper,
     {
         AUTO_INCREMENT
@@ -20,8 +22,8 @@ module.exports = {
             table: `forwardContents`,
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
-                messageId: INT(),
-                conversationId: INT(),
+                messageId: INT([NULL]),
+                conversationId: LONGTEXT(),
                 conversationType: ENUM(['Group', 'Channel', 'E2E', 'Personal'])
             },
             primaryKey: 'id'
