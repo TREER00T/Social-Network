@@ -1,7 +1,7 @@
 {
   "name": "treer00t",
-  "version": "1.0.0",
-  "description": "Chat Application",
+  "version": "1.0.0-alpha",
+  "description": "Social Network Application",
   "main": "init.js",
   "scripts": {
     "start": "nodemon init.js"
