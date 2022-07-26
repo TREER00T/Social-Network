@@ -1,6 +1,6 @@
 {
   "name": "treer00t",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0",
   "description": "Social Network Application",
   "main": "init.js",
   "scripts": {
