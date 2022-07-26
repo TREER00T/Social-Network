@@ -56,4 +56,4 @@ npm start
 
 ## Licensing
 
-The code in this project is licensed under the [Apache License](https://github.com/TREER00T/Social-Network-ServerSocial-Network-Server/blob/main/License)
+The code in this project is licensed under the [Apache License](https://github.com/TREER00T/Social-Network-Server/blob/main/LICENSE)
