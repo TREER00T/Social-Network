@@ -106,6 +106,11 @@ module.exports = {
 
     makeIdForPublicLink(id) {
         return `+` + id;
+    },
+
+    objectListOfUserActivityForWhereCondition(type, userId) {
+        let objectForWhereCondition = {};
+        return objectForWhereCondition['listOfUser' + type + 's.userId'] = `${userId}`;
     }
 
 
