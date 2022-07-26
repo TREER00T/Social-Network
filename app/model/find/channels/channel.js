@@ -1,9 +1,5 @@
 let openSql = require('opensql'),
     {
-        EQUAL_TO
-    } = openSql.queryHelper,
-    {
-        AND,
         STAR,
         COUNT
     } = openSql.keywordHelper,
@@ -16,11 +12,11 @@ module.exports = {
 
     channelId(id, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: ['id', 'channels', 'id', `${id}`],
-            where: true
+            get: 'id',
+            from: 'channels',
+            where: {
+                id: `${id}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -32,11 +28,11 @@ module.exports = {
 
     isPublicKeyUsed(publicLink, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: ['id', 'channels', 'publicLink', `${publicLink}`],
-            where: true
+            get: 'id',
+            from: 'channels',
+            where: {
+                publicLink: `${publicLink}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -49,20 +45,13 @@ module.exports = {
     isOwnerOfChannel(adminId, channelId, cb) {
         let isOwner = 1;
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'id', 'channelsAdmins',
-                'adminId', `${adminId}`,
-                'channelId', `${channelId}`,
-                'isOwner', isOwner
-            ],
-            where: true
+            get: 'id',
+            from: 'channelsAdmins',
+            where: {
+                adminId: `${adminId}`,
+                channelId: `${channelId}`,
+                isOwner: isOwner
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -74,17 +63,12 @@ module.exports = {
 
     isOwnerOrAdminOfChannel(adminId, channelId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO,
-            ],
-            data: [
-                'id', 'channelsAdmins',
-                'adminId', `${adminId}`,
-                'channelId', `${channelId}`
-            ],
-            where: true
+            get: 'id',
+            from: 'channelsAdmins',
+            where: {
+                adminId: `${adminId}`,
+                channelId: `${channelId}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -96,16 +80,12 @@ module.exports = {
 
     isJoinedInChannel(channelId, userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'id', 'channelsUsers', 'userId',
-                `${userId}`, 'channelId', `${channelId}`
-            ],
-            where: true
+            get: 'id',
+            from: 'channelsUsers',
+            where: {
+                userId: `${userId}`,
+                channelId: `${channelId}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -117,16 +97,12 @@ module.exports = {
 
     isUserAdminOfChannel(channelId, userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'id', 'channelsAdmins', 'userId',
-                `${userId}`, 'channelId', `${channelId}`
-            ],
-            where: true
+            get: 'id',
+            from: 'channelsAdmins',
+            where: {
+                userId: `${userId}`,
+                channelId: `${channelId}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -138,12 +114,8 @@ module.exports = {
 
     getCountOfListMessage(channelId, cb) {
         openSql.find({
-            optKey: [
-                COUNT
-            ],
-            data: [
-                '`' + channelId + 'ChannelContents`'
-            ]
+            get: COUNT,
+            from: '`' + channelId + 'ChannelContents`'
         }).result(result => {
             try {
                 cb(result[0].size);
@@ -156,12 +128,11 @@ module.exports = {
 
     getChannelInfo(channelId, cb) {
         openSql.find({
-            optKey: [
-                STAR,
-                EQUAL_TO
-            ],
-            data: ['channels', 'id', `${channelId}`],
-            where: true
+            get: STAR,
+            from: 'channels',
+            where: {
+                id: `${channelId}`
+            }
         }).result(result => {
             try {
                 cb(result[1][0]);
@@ -174,14 +145,11 @@ module.exports = {
 
     getCountOfUserInChannel(channelId, cb) {
         openSql.find({
-            optKey: [
-                COUNT,
-                EQUAL_TO
-            ],
-            data: [
-                'channels', 'id', `${channelId}`
-            ],
-            where: true
+            get: COUNT,
+            from: 'channels',
+            where: {
+                id: `${channelId}`
+            }
         }).result(result => {
             try {
                 cb(result[0].size);
@@ -193,13 +161,11 @@ module.exports = {
 
     getAllUsersForChannel(channelId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: [
-                'userId', 'channelsUsers', 'channelId', `${channelId}`
-            ],
-            where: true
+            get: 'userId',
+            from: 'channelsUsers',
+            where: {
+                channelId: `${channelId}`
+            }
         }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(result[1]) : cb(null);
@@ -211,14 +177,11 @@ module.exports = {
 
     getDataForChannelContentWithId(id, cb) {
         openSql.find({
-            optKey: [
-                STAR,
-                EQUAL_TO
-            ],
-            data: [
-                '`' + id + 'ChannelContents`', 'id', `${id}`
-            ],
-            where: true
+            get: STAR,
+            from:   '`' + id + 'ChannelContents`',
+            where: {
+                channelId: `${id}`
+            }
         }).result(result => {
             try {
                 (result[1][0] !== undefined) ? cb(result[1][0]) : cb(null);

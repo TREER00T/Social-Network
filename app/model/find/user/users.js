@@ -1,33 +1,30 @@
 let openSql = require('opensql'),
     {
-        OR,
-        IN,
-        AND,
         STAR,
-        DESC,
-        LIKE,
         COUNT,
-        LIMIT,
-        ORDER_BY
     } = openSql.keywordHelper,
     {
+        IN,
+        ATTACH,
         EQUAL_TO,
-        IS_NOT_NULL
+        IS_NOT_NULL,
+        setOperator
     } = openSql.queryHelper,
     {
         DataBaseException
-    } = require('app/exception/DataBaseException');
+    } = require('app/exception/DataBaseException'),
+    keyHelper = openSql.keywordHelper;
 
 
 module.exports = {
 
     userPhone(phone, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: ['phone', 'users', 'phone', `${phone}`],
-            where: true
+            get: 'phone',
+            from: 'users',
+            where: {
+                phone: `${phone}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -39,16 +36,12 @@ module.exports = {
 
     isValidAuthCode(phone, authCode, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                ['phone', 'authCode'], 'users', 'phone',
-                `${phone}`, 'authCode', `${authCode}`
-            ],
-            where: true
+            get: ['phone', 'authCode'],
+            from: 'users',
+            where: {
+                phone: `${phone}`,
+                authCode: `${authCode}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -60,16 +53,12 @@ module.exports = {
 
     password(phone, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                IS_NOT_NULL
-            ],
-            data: [
-                'password', 'users', 'phone', `${phone}`,
-                'password'
-            ],
-            where: true
+            get: 'password',
+            from: 'users',
+            where: {
+                phone: `${phone}`,
+                password: IS_NOT_NULL
+            }
         }).result(result => {
             try {
                 cb(result[1].length === 0);
@@ -83,16 +72,12 @@ module.exports = {
 
     isValidPassword(phone, password, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'password', 'users', 'phone',
-                `${phone}`, 'password', `${password}`
-            ],
-            where: true
+            get: 'password',
+            from: 'users',
+            where: {
+                phone: `${phone}`,
+                password: `${password}`
+            }
         }).result(result => {
             try {
                 cb(typeof result[1][0] !== 'undefined');
@@ -105,13 +90,11 @@ module.exports = {
 
     getApiKey(phone, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: [
-                'apiKey', 'users', 'phone', `${phone}`
-            ],
-            where: true
+            get: 'apiKey',
+            from: 'users',
+            where: {
+                phone: `${phone}`
+            }
         }).result(result => {
             try {
                 cb(result[1][0].apiKey);
@@ -124,13 +107,11 @@ module.exports = {
 
     getUserId(phone, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: [
-                'id', 'users', 'phone', `${phone}`
-            ],
-            where: true
+            get: 'id',
+            from: 'users',
+            where: {
+                phone: `${phone}`
+            }
         }).result(result => {
             try {
                 cb(result[1][0].id);
@@ -143,21 +124,18 @@ module.exports = {
 
     isExistChatRoom(data, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO,
-                OR,
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'tblChatId', 'listofusere2es', 'toUser', `${data['toUser']}`,
-                'fromUser', `${data['fromUser']}`, 'toUser', `${data['fromUser']}`,
-                'fromUser', `${data['toUser']}`
-            ],
-            where: true
+            get: 'tblChatId',
+            from: 'listofusere2es',
+            where: {
+                toUser: ATTACH([
+                    setOperator(EQUAL_TO, `${data['toUser']}`),
+                    setOperator(EQUAL_TO, `${data['fromUser']}`)
+                ]),
+                fromUser: ATTACH([
+                    setOperator(EQUAL_TO, `${data['toUser']}`),
+                    setOperator(EQUAL_TO, `${data['fromUser']}`)
+                ], keyHelper.OR)
+            }
         }).result(result => {
             try {
                 (result.length === 0) ? cb(false) : cb(result[0].tblChatId);
@@ -169,11 +147,11 @@ module.exports = {
 
     isExistUser(userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: ['id', 'users', 'id', `${userId}`],
-            where: true
+            get: 'id',
+            from: 'users',
+            where: {
+                id: `${userId}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -186,25 +164,18 @@ module.exports = {
 
     getTableNameForListOfE2EMessage(fromUser, toUser, userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO,
-                AND,
-                EQUAL_TO,
-                OR,
-                EQUAL_TO,
-                AND,
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'tblChatId', 'listOfUserE2Es', 'toUser', `${toUser}`,
-                'fromUser', `${fromUser}`, 'userId', `${fromUser}`,
-                'toUser', `${fromUser}`, 'fromUser', `${toUser}`, 'userId', `${fromUser}`
-            ],
-            where: true
+            get: 'tblChatId',
+            from: 'listOfUserE2Es',
+            where: {
+                toUser: ATTACH([
+                    setOperator(EQUAL_TO, `${data['toUser']}`),
+                    setOperator(EQUAL_TO, `${data['fromUser']}`)
+                ]),
+                fromUser: ATTACH([
+                    setOperator(EQUAL_TO, `${data['toUser']}`),
+                    setOperator(EQUAL_TO, `${data['fromUser']}`)
+                ], keyHelper.OR)
+            }
         }).result(result => {
             try {
                 (result[1][0].tblChatId !== undefined) ? cb(result[1][0].tblChatId) : cb(false);
@@ -218,17 +189,15 @@ module.exports = {
     getListOfMessage(tableName, startFrom, limit, order, sort, type, search, cb) {
         if (type !== undefined) {
             openSql.find({
-                optKey: [
-                    STAR,
-                    EQUAL_TO,
-                    ORDER_BY,
-                    sort,
-                    LIMIT
-                ],
-                data: [
-                    `${tableName}`, 'type', type, order, [startFrom, limit]
-                ],
-                where: true
+                get: STAR,
+                from: `${tableName}`,
+                where: {
+                    type: type
+                },
+                option: {
+                    order: [[order], sort],
+                    limit: [startFrom, limit]
+                }
             }).result(result => {
                 try {
                     cb(result[1][0]);
@@ -241,17 +210,15 @@ module.exports = {
 
         if (search !== undefined) {
             openSql.find({
-                optKey: [
-                    STAR,
-                    LIKE,
-                    ORDER_BY,
-                    DESC,
-                    LIMIT
-                ],
-                data: [
-                    `${tableName}`, 'test', `%${search}`, order, [startFrom, limit]
-                ],
-                where: true
+                get: STAR,
+                from: `${tableName}`,
+                where: {
+                    text: `%${search}`
+                },
+                option: {
+                    order: [[order], keyHelper.DESC],
+                    limit: [startFrom, limit]
+                }
             }).result(result => {
                 try {
                     cb(result[1][0]);
@@ -264,15 +231,12 @@ module.exports = {
 
 
         openSql.find({
-            optKey: [
-                STAR,
-                ORDER_BY,
-                sort,
-                LIMIT
-            ],
-            data: [
-                `${tableName}`, order, [startFrom, limit]
-            ]
+            get: STAR,
+            from: `${tableName}`,
+            option: {
+                order: [[order], sort],
+                limit: [startFrom, limit]
+            }
         }).result(result => {
             try {
                 cb(result[1][0]);
@@ -284,12 +248,8 @@ module.exports = {
 
     getCountOfListMessage(tableName, cb) {
         openSql.find({
-            optKey: [
-                COUNT
-            ],
-            data: [
-                `${tableName}`
-            ]
+            get: COUNT,
+            from: `${tableName}`
         }).result(result => {
             try {
                 cb(result[0].size);
@@ -301,16 +261,15 @@ module.exports = {
 
     getUserPvDetails(userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
+            get: [
+                'img', 'bio', 'isActive',
+                'username', 'lastName',
+                'name', 'defaultColor'
             ],
-            data: [
-                ['img', 'bio', 'isActive',
-                    'username', 'lastName',
-                    'name', 'defaultColor'],
-                'users', 'id', userId
-            ],
-            where: true
+            from: 'users',
+            where: {
+                id: userId
+            }
         }).result(result => {
             try {
                 cb(result[1][0]);
@@ -323,17 +282,16 @@ module.exports = {
 
     getPersonalUserDetails(userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
+            get: [
+                'img', 'bio', 'isActive',
+                'username', 'lastName',
+                'phone', 'email',
+                'name', 'defaultColor'
             ],
-            data: [
-                ['img', 'bio', 'isActive',
-                    'username', 'lastName',
-                    'phone', 'email',
-                    'name', 'defaultColor'],
-                'users', 'id', userId
-            ],
-            where: true
+            from: 'users',
+            where: {
+                id: userId
+            }
         }).result(result => {
             try {
                 cb(result[1][0]);
@@ -346,21 +304,18 @@ module.exports = {
 
     isUserInListOfBlockUser(from, targetId, cb) {
         openSql.find({
-            optKey: [
-                STAR,
-                EQUAL_TO,
-                AND,
-                EQUAL_TO,
-                OR,
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'userBlockList', 'userId', `${from}`, 'userTargetId', `${targetId}`,
-                'userId', `${targetId}`, 'userTargetId', `${from}`
-            ],
-            where: true
+            get: STAR,
+            from: 'userBlockList',
+            where: {
+                userId: ATTACH([
+                    setOperator(EQUAL_TO, `${from}`),
+                    setOperator(EQUAL_TO, `${targetId}`)
+                ]),
+                userTargetId: ATTACH([
+                    setOperator(EQUAL_TO, `${from}`),
+                    setOperator(EQUAL_TO, `${targetId}`)
+                ], keyHelper.OR)
+            }
         }).result(result => {
             try {
                 (result[1].length !== 0) ? result[1][0].id : cb(false);
@@ -373,11 +328,11 @@ module.exports = {
 
     isUsernameUsed(id, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: ['username', 'users', 'username', `${id}`],
-            where: true
+            get: 'username',
+            from: 'users',
+            where: {
+                username: `${id}`
+            }
         }).result(result => {
             try {
                 cb(result[1][0].username === undefined);
@@ -390,13 +345,11 @@ module.exports = {
 
     getListOfBlockUsers(id, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: [
-                'userTargetId', 'userBlockList', 'userId', `${id}`
-            ],
-            where: true
+            get: 'userTargetId',
+            from: 'userBlockList',
+            where: {
+                userId: `${id}`
+            }
         }).result(result => {
             try {
                 (result[1][0].userTargetId === undefined) ? cb(null) : cb(result[1][0].userTargetId);
@@ -417,13 +370,14 @@ module.exports = {
         });
 
         openSql.find({
-            optKey: [
-                IN
+            get: [
+                'img', 'name',
+                'username', 'id'
             ],
-            data: [
-                ['img', 'name', 'username', 'id'], 'users', 'id', arrayOfUserId
-            ],
-            where: true
+            from: 'users',
+            where: {
+                id: IN(arrayOfUserId)
+            }
         }).result(result => {
             try {
                 (result[1][0] === undefined) ? cb(null) : cb(result[1]);
@@ -445,13 +399,14 @@ module.exports = {
         });
 
         openSql.find({
-            optKey: [
-                IN
+            get: [
+                'img', 'name',
+                'username', 'id'
             ],
-            data: [
-                ['img', 'name', 'username', 'id'], 'users', 'id', arrayOfUserId
-            ],
-            where: true
+            from: 'users',
+            where: {
+                id: IN(arrayOfUserId)
+            }
         }).result(result => {
             try {
                 (result[1][0] === undefined) ? cb(null) : cb(result[1]);
@@ -465,14 +420,11 @@ module.exports = {
 
     getListOfDevices(id, cb) {
         openSql.find({
-            optKey: [
-                STAR,
-                EQUAL_TO
-            ],
-            data: [
-                'devices', 'userId', `${id}`
-            ],
-            where: true
+            get: STAR,
+            from: 'devices',
+            where: {
+                id: `${id}`
+            }
         }).result(result => {
             try {
                 (result[1][0] === undefined) ? cb(null) : cb(result[1]);
@@ -484,16 +436,12 @@ module.exports = {
 
     getTableNameForListOfUserGroups(groupId, userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'id', 'listOfUserGroups', 'userId',
-                `${userId}`, 'groupId', `${groupId}`
-            ],
-            where: true
+            get: 'id',
+            from: 'listOfUserGroups',
+            where: {
+                userId: `${userId}`,
+                groupId: `${groupId}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -505,16 +453,12 @@ module.exports = {
 
     getTableNameForListOfUserChannels(channelId, userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'id', 'listOfUserChannels', 'userId',
-                `${userId}`, 'channelId', `${channelId}`
-            ],
-            where: true
+            get: 'id',
+            from: 'listOfUserChannels',
+            where: {
+                userId: `${userId}`,
+                channelId: `${channelId}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -538,14 +482,11 @@ module.exports = {
 
     getListOfUserE2Es(userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: [
-                'tblChatId', 'listOfUserE2Es', 'userId',
-                `${userId}`
-            ],
-            where: true
+            get: 'tblChatId',
+            from: 'listOfUserE2Es',
+            where: {
+                userId: `${userId}`
+            }
         }).result(result => {
             try {
                 (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
@@ -558,14 +499,11 @@ module.exports = {
 
     getListOfUserGroup(userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: [
-                'groupId', 'listOfUserGroups', 'userId',
-                `${userId}`
-            ],
-            where: true
+            get: 'groupId',
+            from: 'listOfUserGroups',
+            where: {
+                userId: `${userId}`
+            }
         }).result(result => {
             try {
                 (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
@@ -577,14 +515,11 @@ module.exports = {
 
     getListOfUserChannel(userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: [
-                'channelId', 'listOfUserChannels', 'userId',
-                `${userId}`
-            ],
-            where: true
+            get: 'channelId',
+            from: 'listOfUserChannels',
+            where: {
+                userId: `${userId}`
+            }
         }).result(result => {
             try {
                 (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
@@ -597,14 +532,11 @@ module.exports = {
 
     getDataForE2EContentWithId(tableName, id, cb) {
         openSql.find({
-            optKey: [
-                STAR,
-                EQUAL_TO
-            ],
-            data: [
-                `${tableName}`, 'id', `${id}`
-            ],
-            where: true
+            get: STAR,
+            from: `${tableName}`,
+            where: {
+                id: `${id}`
+            }
         }).result(result => {
             try {
                 (result[1][0] !== undefined) ? cb(result[1][0]) : cb(null);

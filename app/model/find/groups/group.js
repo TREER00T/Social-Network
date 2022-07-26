@@ -1,9 +1,5 @@
 let openSql = require('opensql'),
     {
-        EQUAL_TO
-    } = openSql.queryHelper,
-    {
-        AND,
         STAR,
         COUNT
     } = openSql.keywordHelper,
@@ -16,11 +12,11 @@ module.exports = {
 
     groupId(id, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: ['id', 'groups', 'id', `${id}`],
-            where: true
+            get: 'id',
+            from: 'groups',
+            where: {
+                id: `${id}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -32,11 +28,11 @@ module.exports = {
 
     isPublicKeyUsed(publicLink, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: ['id', 'groups', 'publicLink', `${publicLink}`],
-            where: true
+            get: 'id',
+            from: 'groups',
+            where: {
+                publicLink: `${publicLink}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -49,20 +45,13 @@ module.exports = {
     isOwnerOfGroup(adminId, groupId, cb) {
         let isOwner = 1;
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'id', 'groupsAdmins',
-                'adminId', `${adminId}`,
-                'groupId', `${groupId}`,
-                'isOwner', isOwner
-            ],
-            where: true
+            get: 'id',
+            from: 'groupsAdmins',
+            where: {
+                adminId: `${adminId}`,
+                groupId: `${groupId}`,
+                isOwner: isOwner
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -74,16 +63,12 @@ module.exports = {
 
     isJoinedInGroup(groupId, userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'id', 'groupsUsers', 'userId',
-                `${userId}`, 'groupId', `${groupId}`
-            ],
-            where: true
+            get: 'id',
+            from: 'groupsUsers',
+            where: {
+                userId: `${userId}`,
+                groupId: `${groupId}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -95,16 +80,12 @@ module.exports = {
 
     isUserAdminOfGroup(groupId, userId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                AND,
-                EQUAL_TO
-            ],
-            data: [
-                'id', 'groupsAdmins', 'userId',
-                `${userId}`, 'groupId', `${groupId}`
-            ],
-            where: true
+            get: 'id',
+            from: 'groupsAdmins',
+            where: {
+                userId: `${userId}`,
+                groupId: `${groupId}`
+            }
         }).result(result => {
             try {
                 cb(result[1].length !== 0);
@@ -116,12 +97,8 @@ module.exports = {
 
     getCountOfListMessage(groupId, cb) {
         openSql.find({
-            optKey: [
-                COUNT
-            ],
-            data: [
-                '`' + groupId + 'GroupContents`'
-            ]
+            get: COUNT,
+            from: '`' + groupId + 'GroupContents`'
         }).result(result => {
             try {
                 cb(result[0].size);
@@ -134,12 +111,11 @@ module.exports = {
 
     getGroupInfo(groupId, cb) {
         openSql.find({
-            optKey: [
-                STAR,
-                EQUAL_TO
-            ],
-            data: ['groups', 'id', `${groupId}`],
-            where: true
+            get: STAR,
+            from: 'groups',
+            where: {
+                id: `${groupId}`
+            }
         }).result(result => {
             try {
                 cb(result[1][0]);
@@ -152,14 +128,11 @@ module.exports = {
 
     getCountOfUserInGroup(groupId, cb) {
         openSql.find({
-            optKey: [
-                COUNT,
-                EQUAL_TO
-            ],
-            data: [
-                'groups', 'id', `${groupId}`
-            ],
-            where: true
+            get: COUNT,
+            from: 'groups',
+            where: {
+                id: `${groupId}`
+            }
         }).result(result => {
             try {
                 cb(result[0].size);
@@ -171,13 +144,11 @@ module.exports = {
 
     getAllUsersForGroup(groupId, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
-            ],
-            data: [
-                'userId', 'groupsUsers', 'groupId', `${groupId}`
-            ],
-            where: true
+            get: 'userId',
+            from: 'groupsUsers',
+            where: {
+                groupId: `${groupId}`
+            }
         }).result(result => {
             try {
                 (result[1].length !== 0) ? cb(result[1]) : cb(null);
@@ -190,14 +161,11 @@ module.exports = {
 
     getDataForGroupContentWithId(id, cb) {
         openSql.find({
-            optKey: [
-                STAR,
-                EQUAL_TO
-            ],
-            data: [
-                '`' + id + 'GroupContents`', 'id', `${id}`
-            ],
-            where: true
+            get: STAR,
+            from: '`' + id + 'GroupContents`',
+            where: {
+                id: `${id}`
+            }
         }).result(result => {
             try {
                 (result[1][0] !== undefined) ? cb(result[1][0]) : cb(null);

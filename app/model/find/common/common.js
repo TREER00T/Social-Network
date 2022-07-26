@@ -1,12 +1,11 @@
 let openSql = require('opensql'),
+    Generate = require('app/util/Generate'),
     {
-        UNION_ALL,
         LIKE,
-        OR,
-        AND
-    } = openSql.keywordHelper,
-    {
         SOURCE,
+        ATTACH,
+        UNION_ALL,
+        setOperator,
         IS_NOT_NULL
     } = openSql.queryHelper,
     {
@@ -14,29 +13,48 @@ let openSql = require('opensql'),
     } = require('app/exception/DataBaseException'),
     {
         EQUAL_TO
-    } = openSql.keywordHelper;
+    } = openSql.keywordHelper,
+    keyHelper = openSql.keywordHelper;
 
 
 module.exports = {
 
 
     searchWithNameInTableUsersGroupsAndChannels(value, cb) {
-
         openSql.find({
-            optKey: [
-                LIKE, OR, LIKE, UNION_ALL,
-                LIKE, OR, LIKE, AND, IS_NOT_NULL, UNION_ALL,
-                LIKE, OR, LIKE, AND, IS_NOT_NULL,
+            get: [
+                'id', 'name',
+                'img', 'defaultColor'
             ],
-            data: [
-                ['id', 'name', 'img', 'defaultColor'], 'users',
-                'name', `%${value}`, 'username', `%${value}`,
-                ['id', 'name', 'img', 'defaultColor'], 'groups',
-                'name', `%${value}`, 'publicLink', `%${value}`, 'publicLink',
-                ['id', 'name', 'img', 'defaultColor'], 'channels',
-                'name', `%${value}`, 'publicLink', `%${value}`, 'publicLink',
-            ],
-            where: true
+            from: 'users',
+            where: {
+                name: LIKE(`%${value}`),
+                username: LIKE(`%${value}`, keyHelper.OR)
+            },
+            union: [
+                UNION_ALL({
+                    get: [
+                        'id', 'name',
+                        'img', 'defaultColor'
+                    ],
+                    from: 'groups',
+                    where: {
+                        name: LIKE(`%${value}`),
+                        publicLink: ATTACH([LIKE(`%${value}`), IS_NOT_NULL], keyHelper.OR)
+                    }
+                }),
+                UNION_ALL({
+                    get: [
+                        'id', 'name',
+                        'img', 'defaultColor'
+                    ],
+                    from: 'channels',
+                    where: {
+                        name: LIKE(`%${value}`),
+                        publicLink: ATTACH([LIKE(`%${value}`), IS_NOT_NULL], keyHelper.OR)
+                    }
+                })
+            ]
         }).result(result => {
             try {
                 (result[1][0] === undefined) ? cb(null) : cb(result[1]);
@@ -49,13 +67,12 @@ module.exports = {
 
     getListOfUserGroupsOrChannelsActivity(userId, type, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
+            get: [
+                `${type}s.id`, `${type}s.name`,
+                `${type}s.img`, `${type}s.defaultColor`
             ],
-            data: [
-                [`${type}s.id`, `${type}s.name`, `${type}s.img`, `${type}s.defaultColor`], [`listOfUser${type}s`, type], `listOfUser${type}s.userId`, `${userId}`
-            ],
-            where: true
+            from: [`listOfUser${type}s`, type],
+            where: Generate.objectListOfUserActivityForWhereCondition(type, userId)
         }).result(result => {
             try {
                 (result[1][0] === undefined) ? cb(null) : cb(result[1]);
@@ -67,13 +84,12 @@ module.exports = {
 
     getListOfUserE2esActivity(userId, type, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO
+            get: [
+                'users.id', 'users.name',
+                'users.img', 'users.defaultColor'
             ],
-            data: [
-                ['users.id', 'users.name', 'users.img', 'users.defaultColor'], [`listOfUser${type}s`, 'users'], `listOfUser${type}s.userId`, `${userId}`
-            ],
-            where: true
+            from: [`listOfUser${type}s`, 'users'],
+            where: Generate.objectListOfUserActivityForWhereCondition(type, userId)
         }).result(result => {
             try {
                 (result[1][0] === undefined) ? cb(null) : cb(result[1]);
@@ -85,22 +101,39 @@ module.exports = {
 
     getListOfUsersActivity(userId, cb) {
         openSql.find({
-            optKey: [
+            get: [
                 SOURCE('user', 'type'),
-                EQUAL_TO,
-                UNION_ALL,
-                SOURCE('group', 'type'),
-                EQUAL_TO,
-                UNION_ALL,
-                SOURCE('channel', 'type'),
-                EQUAL_TO
+                'users.id', 'users.name',
+                'users.img', 'users.defaultColor'
             ],
-            data: [
-                ['users.id', 'users.name', 'users.img', 'users.defaultColor'], ['users', 'listOfUserE2Es'], 'listOfUserE2Es.userId', `${userId}`,
-                ['groups.id', 'groups.name', 'groups.img', 'groups.defaultColor'], ['groups', 'listOfUserGroups'], 'listOfUserGroups.userId', `${userId}`,
-                ['channels.id', 'channels.name', 'channels.img', 'channels.defaultColor'], ['channels', 'listOfUserChannels'], 'listOfUserChannels.userId', `${userId}`
-            ],
-            where: true
+            from: ['users', 'listOfUserE2Es'],
+            where: {
+                'listOfUserE2Es.userId': `${userId}`
+            },
+            union: [
+                UNION_ALL({
+                    get: [
+                        SOURCE('group', 'type'),
+                        'groups.id', 'groups.name',
+                        'groups.img', 'groups.defaultColor'
+                    ],
+                    from: ['groups', 'listOfUserGroups'],
+                    where: {
+                        'listOfUserGroups.userId': `${userId}`
+                    },
+                }),
+                UNION_ALL({
+                    get: [
+                        SOURCE('channel', 'type'),
+                        'channels.id', 'channels.name',
+                        'channels.img', 'channels.defaultColor'
+                    ],
+                    from: ['channels', 'listOfUserChannels'],
+                    where: {
+                        'listOfUserChannels.userId': `${userId}`
+                    },
+                })
+            ]
         }).result(result => {
             try {
                 (result[1][0] === undefined) ? cb(null) : cb(result[1]);
@@ -112,14 +145,11 @@ module.exports = {
 
     isForwardData(tableName, id, cb) {
         openSql.find({
-            optKey: [
-                EQUAL_TO,
-                IS_NOT_NULL
-            ],
-            data: [
-                'forwardDataId', tableName, 'id', id, 'forwardDataId'
-            ],
-            where: true
+            get: 'forwardDataId',
+            from: tableName,
+            where: {
+                id: ATTACH([setOperator(EQUAL_TO, id), IS_NOT_NULL])
+            }
         }).result(result => {
             try {
                 (result[1][0] === undefined) ? cb(null) : cb(result[1].forwardDataId);
