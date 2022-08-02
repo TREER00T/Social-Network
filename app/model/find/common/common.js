@@ -1,6 +1,7 @@
 let openSql = require('opensql'),
     Generate = require('app/util/Generate'),
     {
+        IN,
         LIKE,
         SOURCE,
         ATTACH,
@@ -19,6 +20,22 @@ let openSql = require('opensql'),
 
 module.exports = {
 
+    isMessageBelongForThisUserInRoom(messageId, senderId, tableName, cb) {
+        openSql.find({
+            get: ['id', 'senderId'],
+            from: tableName,
+            where: {
+                id: IN(messageId),
+                senderId: senderId
+            }
+        }).result(result => {
+            try {
+                cb(result[1].length !== 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
 
     searchWithNameInTableUsersGroupsAndChannels(value, cb) {
         openSql.find({
