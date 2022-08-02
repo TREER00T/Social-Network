@@ -22,7 +22,7 @@ let Json = require('app/util/ReturnJson'),
 exports.create = (req, res) => {
 
 
-    let name = req.body.name;
+    let name = req.body?.name;
     let isUndefinedName = (name === undefined);
 
     if (isUndefinedName)
@@ -67,7 +67,7 @@ exports.create = (req, res) => {
 exports.deleteGroup = (req) => {
 
 
-    let id = req.params.id;
+    let id = req.params?.id;
 
 
     getAccessTokenPayLoad(data => {
@@ -190,7 +190,7 @@ exports.changeDescription = (req) => {
 
 exports.uploadAvatar = (req, res) => {
 
-    let id = req.body.id;
+    let id = req.body?.id;
 
     getAccessTokenPayLoad(data => {
 
@@ -245,7 +245,7 @@ exports.uploadAvatar = (req, res) => {
 
 exports.changeToInviteLink = (req) => {
 
-    let id = req.body.id;
+    let id = req.body?.id;
 
     getAccessTokenPayLoad(data => {
 
@@ -341,7 +341,7 @@ exports.changeToPublicLink = (req) => {
 exports.joinUser = (req) => {
 
 
-    let id = req.body.id;
+    let id = req.body?.id;
 
     getAccessTokenPayLoad(data => {
 
@@ -382,8 +382,8 @@ exports.joinUser = (req) => {
 exports.addAdmin = (req) => {
 
 
-    let id = req.body.id;
-    let userIdForNewAdmin = req.body.userId;
+    let id = req.body?.id;
+    let userIdForNewAdmin = req.body?.userId;
 
     getAccessTokenPayLoad(data => {
 
@@ -444,8 +444,8 @@ exports.addAdmin = (req) => {
 exports.deleteAdmin = (req) => {
 
 
-    let id = req.body.id;
-    let userIdForDeleteAdmin = req.body.userId;
+    let id = req.body?.id;
+    let userIdForDeleteAdmin = req.body?.userId;
 
     getAccessTokenPayLoad(data => {
 
@@ -500,7 +500,7 @@ exports.deleteAdmin = (req) => {
 exports.leaveUser = (req) => {
 
 
-    let id = req.body.id;
+    let id = req.body?.id;
 
     getAccessTokenPayLoad(data => {
 
@@ -588,7 +588,7 @@ exports.listOfMessage = (req) => {
 
 exports.info = (req) => {
 
-    let id = req.body.id;
+    let id = req.body?.id;
 
 
     getAccessTokenPayLoad(() => {
@@ -622,7 +622,7 @@ exports.info = (req) => {
 
 exports.allUsers = (req) => {
 
-    let id = req.body.id;
+    let id = req.body?.id;
 
 
     getAccessTokenPayLoad(() => {

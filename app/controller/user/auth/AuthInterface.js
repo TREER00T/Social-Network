@@ -27,7 +27,7 @@ let Json = require('app/util/ReturnJson'),
 exports.gvc = (req) => {
 
 
-    let phone = req.body.phone;
+    let phone = req.body?.phone;
 
     if (!isPhoneNumber(phone))
         return Json.builder(Response.HTTP_BAD_REQUEST);
@@ -67,10 +67,10 @@ exports.gvc = (req) => {
 exports.isValidAuthCode = (req) => {
 
 
-    let {phone, authCode} = req.body;
-    let deviceName = req.body.name;
-    let deviceIp = req.body.ip;
-    let deviceLocation = req.body.location;
+    let {phone, authCode} = req?.body;
+    let deviceName = req.body?.name;
+    let deviceIp = req.body?.ip;
+    let deviceLocation = req.body?.location;
 
     if (!isPhoneNumber(phone) && !isVerificationCode(authCode) ||
         (deviceName === undefined || deviceIp === undefined || deviceLocation === undefined))
@@ -154,10 +154,10 @@ exports.isValidAuthCode = (req) => {
 exports.isValidPassword = (req) => {
 
 
-    let password = req.body.password;
-    let deviceName = req.body.name;
-    let deviceIp = req.body.ip;
-    let deviceLocation = req.body.location;
+    let password = req.body?.password;
+    let deviceName = req.body?.name;
+    let deviceIp = req.body?.ip;
+    let deviceLocation = req.body?.location;
 
     if (deviceName === undefined || deviceIp === undefined || deviceLocation === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);

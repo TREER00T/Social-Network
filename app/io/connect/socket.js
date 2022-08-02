@@ -36,8 +36,8 @@ http.listen(port, () => {
 
 io.use((socket, next) => {
 
-    let accessToken = socket.handshake.headers.authorization;
-    let apiKey = socket.handshake.query.apiKey;
+    let accessToken = socket.handshake.headers?.authorization;
+    let apiKey = socket.handshake.query?.apiKey;
 
     Pipeline.accessTokenVerify(accessToken, result => {
 
@@ -71,10 +71,10 @@ io.use((socket, next) => {
 
 }).on('connection', socket => {
 
-    let socketId = socket.id;
-    let phone = allUsers[socketId].data.phone;
-    let socketUserId = allUsers[socketId].data.userId;
-    let listOfUser = allUsers[socketId].listOfSocketIdForPvChat;
+    let socketId = socket?.id;
+    let phone = allUsers[socketId]?.data?.phone;
+    let socketUserId = allUsers[socketId]?.data?.userId;
+    let listOfUser = allUsers[socketId]?.listOfSocketIdForPvChat;
     let isActive = 1;
 
     Update.userOnline(phone, isActive);
@@ -102,7 +102,7 @@ io.use((socket, next) => {
 
     socket.on('onNotificationForVoiceCall', data => {
 
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -140,7 +140,7 @@ io.use((socket, next) => {
 
     socket.on('onVoiceCall', data => {
 
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -177,7 +177,8 @@ io.use((socket, next) => {
     });
 
 
-    socket.on('onUserActivities', (type) => {
+    socket.on('onUserActivities', (data) => {
+        let type = data?.type;
         if (type === 'e2e')
             return CommonFind.getListOfUserE2esActivity(socketUserId, type, result => {
 
@@ -203,7 +204,7 @@ io.use((socket, next) => {
 
     socket.on('setOnListOfUsersChat', arrayOfUser => {
 
-        let listOfUsersArray = arrayOfUser['data'];
+        let listOfUsersArray = arrayOfUser?.data;
 
         IoUtil.searchAndReplaceInArrayOfUserIdToSocketId(listOfUsersArray, allUsers, result => {
 
@@ -222,7 +223,7 @@ io.use((socket, next) => {
 
 
     socket.on('onPvTyping', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -260,7 +261,7 @@ io.use((socket, next) => {
 
 
     socket.on('onPvOnlineUser', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -291,7 +292,7 @@ io.use((socket, next) => {
 
 
     socket.on('onPvMessageSeen', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -321,7 +322,7 @@ io.use((socket, next) => {
 
 
     socket.on('onPvUploadedFile', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -366,7 +367,7 @@ io.use((socket, next) => {
     });
 
     socket.on('onPvMessage', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
 
         if (data !== undefined)
@@ -419,7 +420,7 @@ io.use((socket, next) => {
     });
 
     socket.on('onPvEditMessage', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
 
         if (data !== undefined)
@@ -472,7 +473,7 @@ io.use((socket, next) => {
 
 
     socket.on('onPvDeleteMessage', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
 
         if (data !== undefined)
@@ -520,8 +521,8 @@ io.use((socket, next) => {
 
     socket.on('onGroupMessage', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let groupId = data?.id;
+        let userId = allUsers[socketId]?.data?.userId;
 
         FindInGroup.groupId(groupId, result => {
 
@@ -553,8 +554,8 @@ io.use((socket, next) => {
 
     socket.on('onGroupUploadedFile', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let groupId = data?.id;
+        let userId = allUsers[socketId]?.data?.userId;
 
         FindInGroup.groupId(groupId, result => {
 
@@ -588,8 +589,8 @@ io.use((socket, next) => {
 
     socket.on('onGroupEditMessage', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let groupId = data?.id;
+        let userId = allUsers[socketId]?.data?.userId;
 
         FindInGroup.groupId(groupId, result => {
 
@@ -619,8 +620,8 @@ io.use((socket, next) => {
 
     socket.on('onGroupDeleteMessage', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let groupId = data?.id;
+        let userId = allUsers[socketId]?.data?.userId;
 
         FindInGroup.groupId(groupId, result => {
 
@@ -651,8 +652,8 @@ io.use((socket, next) => {
 
     socket.on('onTypingGroupMessage', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let groupId = data?.id;
+        let userId = allUsers[socketId]?.data?.userId;
 
         FindInGroup.groupId(groupId, result => {
 
@@ -684,8 +685,8 @@ io.use((socket, next) => {
 
     socket.on('onChanelMessage', data => {
 
-        let channelId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let channelId = data?.id;
+        let userId = allUsers[socketId]?.data?.userId;
 
         FindInChannel.channelId(channelId, result => {
 
@@ -717,8 +718,8 @@ io.use((socket, next) => {
 
     socket.on('onChanelUploadedFile', data => {
 
-        let channelId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let channelId = data?.id;
+        let userId = allUsers[socketId]?.data?.userId;
 
         FindInChannel.channelId(channelId, result => {
 
@@ -748,8 +749,8 @@ io.use((socket, next) => {
 
     socket.on('onChanelEditMessage', data => {
 
-        let channelId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let channelId = data?.id;
+        let userId = allUsers[socketId]?.data?.userId;
 
         FindInChannel.channelId(channelId, result => {
 
@@ -778,8 +779,8 @@ io.use((socket, next) => {
 
     socket.on('onChanelDeleteMessage', data => {
 
-        let channelId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let channelId = data?.id;
+        let userId = allUsers[socketId]?.data?.userId;
 
         FindInChannel.channelId(channelId, result => {
 

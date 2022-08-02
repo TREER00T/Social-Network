@@ -18,7 +18,7 @@ let Json = require('app/util/ReturnJson'),
 
 exports.createE2EChat = (req) => {
 
-    let userId = Number(req.body.userId);
+    let userId = Number(req.body?.userId);
     let isNumber = Number.isInteger(userId);
 
 
@@ -168,7 +168,7 @@ exports.listOfMessage = (req) => {
 
 exports.user = (req) => {
 
-    let id = req.query.id;
+    let id = req.query?.id;
 
     Find.isExistUser(id, isUserInDb => {
         if (!isUserInDb)
@@ -184,7 +184,7 @@ exports.user = (req) => {
 
 exports.deleteForMe = (req) => {
 
-    let id = req.params.id;
+    let id = req.params?.id;
 
     getAccessTokenPayLoad(() => {
 
@@ -215,7 +215,7 @@ exports.deleteForMe = (req) => {
 exports.deleteForUs = (req) => {
 
 
-    let id = req.params.id;
+    let id = req.params?.id;
 
 
     getAccessTokenPayLoad(() => {
@@ -255,7 +255,7 @@ exports.deleteForUs = (req) => {
 exports.blockUser = (req) => {
 
 
-    let id = req.body.id;
+    let id = req.body?.id;
 
 
     getAccessTokenPayLoad(() => {

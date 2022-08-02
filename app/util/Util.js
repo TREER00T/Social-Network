@@ -78,15 +78,15 @@ module.exports = {
 
         const MESSAGE_WITHOUT_FILE = 'None';
         const MESSAGE_TYPE_LOCATION = 'Location';
-        let isReplyInJsonObject = jsonObject.isReply === true;
-        let isForwardInJsonObject = jsonObject.isForward === true;
-        let isNoneMessageType = jsonObject.type === MESSAGE_WITHOUT_FILE;
-        let isMessageTypeLocation = jsonObject.type === MESSAGE_TYPE_LOCATION;
-        let isMessageTypeNull = jsonObject.type?.length === 0 || undefined || null;
-        let isTextNull = jsonObject.text?.length === 0 || null;
-        let isSenderIdNull = jsonObject.senderId?.length === 0 || null;
-        let isLocationLatNull = jsonObject.locationLat?.length === 0 || null;
-        let isLocationLonNull = jsonObject.locationLon?.length === 0 || null;
+        let isReplyInJsonObject = jsonObject?.isReply === true;
+        let isForwardInJsonObject = jsonObject?.isForward === true;
+        let isNoneMessageType = jsonObject?.type === MESSAGE_WITHOUT_FILE;
+        let isMessageTypeLocation = jsonObject?.type === MESSAGE_TYPE_LOCATION;
+        let isMessageTypeNull = jsonObject?.type?.length === 0 || undefined || null;
+        let isTextNull = jsonObject?.text?.length === 0 || null;
+        let isSenderIdNull = jsonObject?.senderId?.length === 0 || null;
+        let isLocationLatNull = jsonObject?.locationLat?.length === 0 || null;
+        let isLocationLonNull = jsonObject?.locationLon?.length === 0 || null;
 
 
         if (isMessageTypeLocation || isLocationLonNull || isLocationLatNull) {
