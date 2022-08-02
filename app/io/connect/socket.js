@@ -12,7 +12,6 @@ let app = require('express')(),
     Pipeline = require('app/io/middleware/SocketIoPipeline'),
     FindInGroup = require('app/model/find/groups/group'),
     FindInChannel = require('app/model/find/channels/channel'),
-    Json = require('app/util/ReturnJson'),
     FindInUser = require('app/model/find/user/users');
 require('dotenv').config();
 
@@ -36,8 +35,8 @@ http.listen(port, () => {
 
 io.use((socket, next) => {
 
-    let accessToken = socket.handshake.headers.authorization;
-    let apiKey = socket.handshake.query.apiKey;
+    let accessToken = socket.handshake.headers?.authorization;
+    let apiKey = socket.handshake.query?.apiKey;
 
     Pipeline.accessTokenVerify(accessToken, result => {
 
@@ -71,11 +70,44 @@ io.use((socket, next) => {
 
 }).on('connection', socket => {
 
-    let socketId = socket.id;
-    let phone = allUsers[socketId].data.phone;
-    let socketUserId = allUsers[socketId].data.userId;
-    let listOfUser = allUsers[socketId].listOfSocketIdForPvChat;
+    let socketId = socket?.id;
+    let phone = allUsers[socketId]?.data?.phone;
+    let socketUserId = allUsers[socketId]?.data?.userId;
+    let listOfUser = allUsers[socketId]?.listOfSocketIdForPvChat;
     let isActive = 1;
+    let joinUserInRoom = (roomId, type) => {
+        if (socket.adapter.rooms.has(roomId + type) === false)
+            socket.join(roomId + type);
+    };
+    let addRoomIntoListOfUserRooms = (roomId, type) => {
+        if (allUsers[socketId][type + 'Rooms'] === undefined)
+            allUsers[socketId][type + 'Rooms'] = [];
+
+        let isRoomAddedInList = allUsers[socketId][type + 'Rooms']?.includes(roomId + type);
+
+        if (!isRoomAddedInList)
+            allUsers[socketId][type + 'Rooms'].push(roomId + type);
+    };
+    let leaveUserInRoom = (roomId, type) => {
+        let isRoomAddedInList = allUsers[socketId][type + 'Rooms']?.includes(roomId + type);
+
+        if (isRoomAddedInList) {
+            socket.leave(roomId + type);
+
+            let index = allUsers[socketId][type + 'Rooms']?.indexOf(5);
+
+            if (index > -1)
+                allUsers[socketId][type + 'Rooms']?.splice(index, 1);
+        }
+    };
+    let leaveUserInAllRooms = () => {
+        let arrayOfRoomTypes = ['channel', 'group'];
+        arrayOfRoomTypes.forEach(typeRoom => {
+            allUsers[socketId][typeRoom + 'Rooms']?.forEach(item => {
+                socket.leave(item + typeRoom);
+            });
+        });
+    }
 
     Update.userOnline(phone, isActive);
     let isOnline = true;
@@ -84,6 +116,7 @@ io.use((socket, next) => {
 
     socket.on('disconnect', () => {
 
+        leaveUserInAllRooms();
 
         let isOnline = false;
 
@@ -102,7 +135,7 @@ io.use((socket, next) => {
 
     socket.on('onNotificationForVoiceCall', data => {
 
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -119,7 +152,7 @@ io.use((socket, next) => {
 
                 FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
                     if (!result)
-                        return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
+                        return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_FORBIDDEN);
 
 
                     let user = allUsers[receiverId];
@@ -140,7 +173,7 @@ io.use((socket, next) => {
 
     socket.on('onVoiceCall', data => {
 
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -158,7 +191,7 @@ io.use((socket, next) => {
 
                 FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
                     if (!result)
-                        return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
+                        return socket.emit('emitVoiceCallError', Response.HTTP_FORBIDDEN);
 
                     let user = allUsers[receiverId];
 
@@ -177,7 +210,9 @@ io.use((socket, next) => {
     });
 
 
-    socket.on('onUserActivities', (type) => {
+    socket.on('onUserActivities', (data) => {
+        let type = data?.type;
+
         if (type === 'e2e')
             return CommonFind.getListOfUserE2esActivity(socketUserId, type, result => {
 
@@ -203,7 +238,7 @@ io.use((socket, next) => {
 
     socket.on('setOnListOfUsersChat', arrayOfUser => {
 
-        let listOfUsersArray = arrayOfUser['data'];
+        let listOfUsersArray = arrayOfUser?.data;
 
         IoUtil.searchAndReplaceInArrayOfUserIdToSocketId(listOfUsersArray, allUsers, result => {
 
@@ -222,7 +257,7 @@ io.use((socket, next) => {
 
 
     socket.on('onPvTyping', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -240,7 +275,7 @@ io.use((socket, next) => {
 
                 FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
                     if (!result)
-                        return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
+                        return socket.emit('emitPvTypingError', Response.HTTP_FORBIDDEN);
 
 
                     let user = allUsers[receiverId];
@@ -260,7 +295,7 @@ io.use((socket, next) => {
 
 
     socket.on('onPvOnlineUser', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -291,7 +326,7 @@ io.use((socket, next) => {
 
 
     socket.on('onPvMessageSeen', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -321,7 +356,7 @@ io.use((socket, next) => {
 
 
     socket.on('onPvUploadedFile', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -343,7 +378,7 @@ io.use((socket, next) => {
 
                     FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
                         if (!result)
-                            return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
+                            return socket.emit('emitPvUploadedFileError', Response.HTTP_FORBIDDEN);
 
 
                         let user = allUsers[receiverId];
@@ -366,151 +401,151 @@ io.use((socket, next) => {
     });
 
     socket.on('onPvMessage', data => {
-        let receiverId = data['receiverId'];
+        let receiverId = data?.receiverId;
 
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
 
-        if (data !== undefined)
+            if (receiverSocketId === IN_VALID_USER_ID)
+                return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
 
-            IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
 
-                if (receiverSocketId === IN_VALID_USER_ID)
+                if (!result)
                     return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
 
-                FindInUser.isExistChatRoom({
-                    toUser: `${receiverId}`,
-                    fromUser: `${socketUserId}`
-                }, result => {
-
+                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
                     if (!result)
-                        return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
+                        return socket.emit('emitPvMessageError', Response.HTTP_FORBIDDEN);
 
-                    FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
-                        if (!result)
-                            return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
-
-
-                        let user = allUsers[receiverSocketId];
-
-                        RestFulUtil.validateMessage(data, result => {
-
-                            if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                                return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-
-                            let toUser = data['receiverId'];
-                            delete data['receiverId'];
-                            data['senderId'] = socketUserId;
-
-                            io.to(user).emit('emitPvMessage', result);
-
-                            Insert.message(socketUserId + 'And' + toUser + 'E2EContents', data, {
-                                conversationType: 'E2E'
-                            });
-
-                        });
-
-                    });
-
-                });
-
-            });
-
-
-    });
-
-    socket.on('onPvEditMessage', data => {
-        let receiverId = data['receiverId'];
-
-
-        if (data !== undefined)
-
-            IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
-
-                if (receiverSocketId === IN_VALID_USER_ID)
-                    return socket.emit('emitPvEditMessageError', Response.HTTP_NOT_FOUND);
-
-                FindInUser.isExistChatRoom({
-                    toUser: `${receiverId}`,
-                    fromUser: `${socketUserId}`
-                }, result => {
-
-                    if (!result)
-                        return socket.emit('emitPvEditMessageError', Response.HTTP_NOT_FOUND);
-
-                    FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
-                        if (!result)
-                            return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
-
-                        let user = allUsers[receiverSocketId];
-
-                        RestFulUtil.validateMessage(data, result => {
-
-                            if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                                return socket.emit('emitPvEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-
-                            let toUser = data['receiverId'];
-                            delete data['receiverId'];
-                            data['senderId'] = socketUserId;
-
-                            io.to(user).emit('emitPvEditMessage', result);
-
-                            UpdateInCommon.message(socketUserId + 'And' + toUser + 'E2EContents', data, {
-                                id: data['id']
-                            });
-
-                        });
-
-                    });
-
-                });
-
-            });
-
-
-    });
-
-
-    socket.on('onPvDeleteMessage', data => {
-        let receiverId = data['receiverId'];
-
-
-        if (data !== undefined)
-
-            IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
-
-                if (receiverSocketId === IN_VALID_USER_ID)
-                    return socket.emit('emitPvDeleteMessageError', Response.HTTP_NOT_FOUND);
-
-                FindInUser.isExistChatRoom({
-                    toUser: `${receiverId}`,
-                    fromUser: `${socketUserId}`
-                }, result => {
-
-                    if (!result)
-                        return socket.emit('emitPvDeleteMessageError', Response.HTTP_NOT_FOUND);
 
                     let user = allUsers[receiverSocketId];
 
                     RestFulUtil.validateMessage(data, result => {
 
                         if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                            return socket.emit('emitPvDeleteMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+                            return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                        let toUser = data['receiverId'];
-                        delete data['receiverId'];
-                        data['senderId'] = socketUserId;
+                        result['senderId'] = socketUserId;
 
-                        io.to(user).emit('emitPvDeleteMessage', result);
+                        io.to(user).emit('emitPvMessage', result);
 
-                        DeleteInCommon.message(socketUserId + 'And' + toUser + 'E2EContents', data['listOfId']);
+                        Insert.message(socketUserId + 'And' + receiverId + 'E2EContents', result, {
+                            conversationType: 'E2E'
+                        });
 
                     });
 
                 });
 
             });
+
+        });
+
+
+    });
+
+    socket.on('onPvEditMessage', data => {
+        let receiverId = data?.receiverId;
+        let messageId = data?.messageId;
+
+
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
+
+            if (receiverSocketId === IN_VALID_USER_ID)
+                return socket.emit('emitPvEditMessageError', Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitPvEditMessageError', Response.HTTP_NOT_FOUND);
+
+                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                    if (!result)
+                        return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
+
+                    let user = allUsers[receiverSocketId];
+
+                    FindInUser.isMessageBelongForThisUserInE2E(messageId, socketUserId,
+                        socketUserId + 'And' + receiverId + 'E2EContents', result => {
+                            if (!result)
+                                return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
+
+
+                            RestFulUtil.validateMessage(data, result => {
+
+                                if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                                    return socket.emit('emitPvEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+
+                                result['senderId'] = socketUserId;
+
+                                io.to(user).emit('emitPvEditMessage', result);
+
+                                UpdateInCommon.message(socketUserId + 'And' + receiverId + 'E2EContents', result, {
+                                    messageId: data['messageId']
+                                });
+
+
+                            });
+
+
+                        });
+
+                });
+
+            });
+
+        });
+
+
+    });
+
+
+    socket.on('onPvDeleteMessage', data => {
+        let receiverId = data?.receiverId;
+
+
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
+
+            if (receiverSocketId === IN_VALID_USER_ID)
+                return socket.emit('emitPvDeleteMessageError', Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistChatRoom({
+                toUser: `${receiverId}`,
+                fromUser: `${socketUserId}`
+            }, result => {
+
+                if (!result)
+                    return socket.emit('emitPvDeleteMessageError', Response.HTTP_NOT_FOUND);
+
+                FindInUser.isMessageBelongForThisUserInE2E(data['listOfId'], socketUserId,
+                    socketUserId + 'And' + receiverId + 'E2EContents', result => {
+                        if (!result)
+                            return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
+
+
+                        let user = allUsers[receiverSocketId];
+
+                        delete data['receiverId'];
+                        data['senderId'] = socketUserId;
+
+                        io.to(user).emit('emitPvDeleteMessage', result);
+
+                        DeleteInCommon.message(socketUserId + 'And' + receiverId + 'E2EContents', data['listOfId']);
+
+                    });
+
+            });
+
+
+        });
 
 
     });
@@ -518,31 +553,57 @@ io.use((socket, next) => {
 
     // groups
 
-    socket.on('onGroupMessage', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+    socket.on('onLeaveGroup', data => {
+        let groupId = data?.id;
 
         FindInGroup.groupId(groupId, result => {
 
             if (!result)
-                return socket.emit('emitGroupMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitLeaveGroupError', Response.HTTP_NOT_FOUND);
+
+            leaveUserInRoom(groupId, 'group');
+        });
+
+    });
+
+    socket.on('onGroupMessage', data => {
+
+        let groupId = data?.groupId;
+
+        FindInGroup.groupId(groupId, result => {
+
+            if (!result)
+                return socket.emit('emitGroupMessageError', Response.HTTP_NOT_FOUND);
 
 
-            FindInGroup.isJoinedInGroup(groupId, userId, result => {
+            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
 
                 if (!result)
-                    return socket.emit('emitGroupMessageError',
-                        Json.builder(Response.HTTP_NOT_FOUND));
+                    return socket.emit('emitGroupMessageError', Response.HTTP_NOT_FOUND);
 
-                if (socket.adapter.rooms.has(groupId) === false) {
-                    socket.join(groupId);
-                }
+                joinUserInRoom(groupId, 'group');
+                addRoomIntoListOfUserRooms(groupId, 'group');
 
-                Insert.message('`' + groupId + 'GroupContents`', data, {
-                    conversationType: 'Group'
+                RestFulUtil.validateMessage(data, result => {
+
+                    if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                        return socket.emit('emitGroupMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+
+                    result['senderId'] = socketUserId;
+
+
+                    delete data?.groupId;
+
+                    Insert.message('`' + groupId + 'GroupContents`', result, {
+                        conversationType: 'Group'
+                    });
+
+
+                    io.to(groupId).emit('emitGroupMessage', result);
                 });
-                io.to(groupId).emit('emitGroupMessage', data);
+
 
             });
 
@@ -553,25 +614,25 @@ io.use((socket, next) => {
 
     socket.on('onGroupUploadedFile', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let groupId = data?.groupId;
 
         FindInGroup.groupId(groupId, result => {
 
             if (!result)
-                return socket.emit('emitGroupUploadedFileError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitGroupUploadedFileError', Response.HTTP_NOT_FOUND);
 
 
-            FindInGroup.isJoinedInGroup(groupId, userId, result => {
+            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
 
                 if (!result)
-                    return socket.emit('emitGroupUploadedFileError',
-                        Json.builder(Response.HTTP_NOT_FOUND));
+                    return socket.emit('emitGroupUploadedFileError', Response.HTTP_NOT_FOUND);
 
 
-                if (socket.adapter.rooms.has(groupId) === false) {
-                    socket.join(groupId);
-                }
+                joinUserInRoom(groupId, 'group');
+                addRoomIntoListOfUserRooms(groupId, 'group');
+
+                data['senderId'] = socketUserId;
+                delete data?.groupId;
 
                 FindInGroup.getDataForGroupContentWithId(groupId, data['id'], result => {
                     io.to(groupId).emit('emitGroupUploadedFile', Object.assign({}, result, data));
@@ -588,28 +649,49 @@ io.use((socket, next) => {
 
     socket.on('onGroupEditMessage', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let groupId = data?.groupId;
+        let messageId = data?.messageId;
 
         FindInGroup.groupId(groupId, result => {
 
             if (!result)
-                return socket.emit('emitGroupEditMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitGroupEditMessageError', Response.HTTP_NOT_FOUND);
 
 
-            FindInGroup.isJoinedInGroup(groupId, userId, result => {
+            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
 
                 if (!result)
-                    return socket.emit('emitGroupEditMessageError',
-                        Json.builder(Response.HTTP_NOT_FOUND));
+                    return socket.emit('emitGroupEditMessageError', Response.HTTP_NOT_FOUND);
+
+                CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, '`' + groupId + 'GroupContents`', result => {
+                    if (!result)
+                        return socket.emit('emitGroupEditMessageError', Response.HTTP_FORBIDDEN);
+
+                    joinUserInRoom(groupId, 'group');
+                    addRoomIntoListOfUserRooms(groupId, 'group');
+
+                    if (data?.messageId === undefined)
+                        return socket.emit('emitGroupEditMessageError', Response.HTTP_BAD_REQUEST);
+
+                    delete data?.groupId;
+                    delete data?.messageId;
+
+                    RestFulUtil.validateMessage(data, result => {
+
+                        if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                            return socket.emit('emitGroupEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                if (socket.adapter.rooms.has(groupId) === false) {
-                    socket.join(groupId);
-                }
+                        result['senderId'] = socketUserId;
 
-                UpdateInCommon.message('`' + groupId + 'GroupContents`', data, data['id']);
-                io.to(groupId).emit('emitGroupEditMessage', data);
+                        UpdateInCommon.message('`' + groupId + 'GroupContents`', result, groupId);
+
+                        io.to(groupId).emit('emitGroupEditMessage', result);
+
+                    });
+
+
+                });
 
             });
 
@@ -619,28 +701,36 @@ io.use((socket, next) => {
 
     socket.on('onGroupDeleteMessage', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let groupId = data?.groupId;
+        let lisOfId = data?.listOfId;
+        let messageId = data?.messageId;
 
         FindInGroup.groupId(groupId, result => {
 
             if (!result)
-                return socket.emit('emitGroupDeleteMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitGroupDeleteMessageError', Response.HTTP_NOT_FOUND);
 
 
-            FindInGroup.isJoinedInGroup(groupId, userId, result => {
+            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
 
                 if (!result)
-                    return socket.emit('emitGroupDeleteMessageError',
-                        Json.builder(Response.HTTP_NOT_FOUND));
+                    return socket.emit('emitGroupDeleteMessageError', Response.HTTP_NOT_FOUND);
 
+                CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, '`' + groupId + 'GroupContents`', result => {
+                    if (!result)
+                        return socket.emit('emitGroupDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-                if (socket.adapter.rooms.has(groupId) === false) {
-                    socket.join(groupId);
-                }
+                    joinUserInRoom(groupId, 'group');
+                    addRoomIntoListOfUserRooms(groupId, 'group');
 
-                DeleteInCommon.message('`' + groupId + 'GroupContents`', data['listOfId']);
-                io.to(groupId).emit('emitGroupDeleteMessage', data);
+                    if (data?.listOfId === undefined || data?.messageId === undefined)
+                        return socket.emit('emitGroupDeleteMessageError', Response.HTTP_BAD_REQUEST);
+
+                    DeleteInCommon.message('`' + groupId + 'GroupContents`', lisOfId);
+
+                    io.to(groupId).emit('emitGroupDeleteMessage', data);
+
+                });
 
             });
 
@@ -651,25 +741,23 @@ io.use((socket, next) => {
 
     socket.on('onTypingGroupMessage', data => {
 
-        let groupId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let groupId = data?.groupId;
 
         FindInGroup.groupId(groupId, result => {
 
             if (!result)
-                return socket.emit('emitGroupTypingMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitGroupTypingMessageError', Response.HTTP_NOT_FOUND);
 
 
-            FindInGroup.isJoinedInGroup(groupId, userId, result => {
+            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
 
                 if (!result)
-                    return socket.emit('emitGroupTypingMessageError',
-                        Json.builder(Response.HTTP_NOT_FOUND));
+                    return socket.emit('emitGroupTypingMessageError', Response.HTTP_NOT_FOUND);
 
 
-                if (socket.adapter.rooms.has(groupId) === false) {
-                    socket.join(groupId);
-                }
+                joinUserInRoom(groupId, 'group');
+                addRoomIntoListOfUserRooms(groupId, 'group');
+
 
                 io.to(groupId).emit('emitTypingGroupMessage', data);
 
@@ -682,32 +770,62 @@ io.use((socket, next) => {
 
     // channel
 
-    socket.on('onChanelMessage', data => {
 
-        let channelId = data.id;
-        let userId = allUsers[socketId].data.userId;
+    socket.on('onLeaveChannel', data => {
+        let channelId = data?.channelId;
 
         FindInChannel.channelId(channelId, result => {
 
             if (!result)
-                return socket.emit('emitChannelMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitLeaveChannelError', Response.HTTP_NOT_FOUND);
 
+            leaveUserInRoom(channelId, 'channel');
+        });
 
-            FindInChannel.isJoinedInChannel(channelId, userId, result => {
+    });
+
+    socket.on('onChanelMessage', data => {
+
+        let channelId = data?.channelId;
+
+        FindInChannel.channelId(channelId, result => {
+
+            if (!result)
+                return socket.emit('emitChannelMessageError', Response.HTTP_NOT_FOUND);
+
+            FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
 
                 if (!result)
-                    return socket.emit('emitChannelMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                    return socket.emit('emitChannelMessageError', Response.HTTP_FORBIDDEN);
+
+                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
+
+                    if (!result)
+                        return socket.emit('emitChannelMessageError', Response.HTTP_NOT_FOUND);
 
 
-                if (socket.adapter.rooms.has(channelId) === false) {
-                    socket.join(channelId);
-                }
+                    joinUserInRoom(channelId, 'channel');
+                    addRoomIntoListOfUserRooms(channelId, 'channel');
 
-                Insert.message('`' + channelId + 'ChannelContents`', data, {
-                    conversationType: 'Channel'
+                    delete data?.channelId;
+
+                    RestFulUtil.validateMessage(data, result => {
+
+                        if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                            return socket.emit('emitChannelMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+
+                        result['senderId'] = socketUserId;
+
+                        Insert.message('`' + channelId + 'ChannelContents`', result, {
+                            conversationType: 'Channel'
+                        });
+
+                        io.to(channelId).emit('emitChannelMessage', result);
+                    });
+
+
                 });
-                io.to(channelId).emit('emitChannelMessage', data);
-
 
             });
 
@@ -717,28 +835,35 @@ io.use((socket, next) => {
 
     socket.on('onChanelUploadedFile', data => {
 
-        let channelId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let channelId = data?.channelId;
 
         FindInChannel.channelId(channelId, result => {
 
             if (!result)
-                return socket.emit('emitChannelUploadedFileError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitChannelUploadedFileError', Response.HTTP_NOT_FOUND);
 
 
-            FindInChannel.isJoinedInChannel(channelId, userId, result => {
+            FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
 
                 if (!result)
-                    return socket.emit('emitChannelUploadedFileError', Json.builder(Response.HTTP_NOT_FOUND));
+                    return socket.emit('emitChannelUploadedFileError', Response.HTTP_FORBIDDEN);
 
-                if (socket.adapter.rooms.has(channelId) === false) {
-                    socket.join(channelId);
-                }
+                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
 
-                FindInChannel.getDataForChannelContentWithId(channelId, data['id'], result => {
-                    io.to(channelId).emit('emitChannelUploadedFile', Object.assign({}, result, data));
+                    if (!result)
+                        return socket.emit('emitChannelUploadedFileError', Response.HTTP_NOT_FOUND);
+
+                    joinUserInRoom(channelId, 'channel');
+                    addRoomIntoListOfUserRooms(channelId, 'channel');
+
+                    delete data?.channelId;
+
+                    FindInChannel.getDataForChannelContentWithId(channelId, result => {
+                        io.to(channelId).emit('emitChannelUploadedFile', Object.assign({}, result, data));
+                    });
+
+
                 });
-
 
             });
 
@@ -748,27 +873,47 @@ io.use((socket, next) => {
 
     socket.on('onChanelEditMessage', data => {
 
-        let channelId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let channelId = data?.channelId;
+        let messageId = data?.messageId;
 
         FindInChannel.channelId(channelId, result => {
 
             if (!result)
-                return socket.emit('emitChannelEditMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitChannelEditMessageError', Response.HTTP_NOT_FOUND);
 
 
-            FindInChannel.isJoinedInChannel(channelId, userId, result => {
+            FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
 
                 if (!result)
-                    return socket.emit('emitChannelEditMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                    return socket.emit('emitChannelEditMessageError', Response.HTTP_FORBIDDEN);
 
-                if (socket.adapter.rooms.has(channelId) === false) {
-                    socket.join(channelId);
-                }
+                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
 
-                UpdateInCommon.message('`' + channelId + 'ChannelContents`', data, data['id']);
-                io.to(channelId).emit('emitChannelEditMessage', data);
+                    if (!result)
+                        return socket.emit('emitChannelEditMessageError', Response.HTTP_NOT_FOUND);
 
+                    joinUserInRoom(channelId, 'channel');
+                    addRoomIntoListOfUserRooms(channelId, 'channel');
+                    if (data?.messageId === undefined)
+                        return socket.emit('emitChannelEditMessageError', Response.HTTP_BAD_REQUEST);
+
+                    delete data?.channelId;
+                    delete data?.messageId;
+
+                    RestFulUtil.validateMessage(data, result => {
+
+                        if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                            return socket.emit('emitChannelEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+
+                        result['senderId'] = socketUserId;
+
+                        UpdateInCommon.message('`' + channelId + 'ChannelContents`', result, messageId);
+                        io.to(channelId).emit('emitChannelEditMessage', result);
+
+                    });
+
+                });
 
             });
 
@@ -778,27 +923,32 @@ io.use((socket, next) => {
 
     socket.on('onChanelDeleteMessage', data => {
 
-        let channelId = data.id;
-        let userId = allUsers[socketId].data.userId;
+        let channelId = data?.channelId;
 
         FindInChannel.channelId(channelId, result => {
 
             if (!result)
-                return socket.emit('emitChannelDeleteMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                return socket.emit('emitChannelDeleteMessageError', Response.HTTP_NOT_FOUND);
 
 
-            FindInChannel.isJoinedInChannel(channelId, userId, result => {
+            FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
 
                 if (!result)
-                    return socket.emit('emitChannelDeleteMessageError', Json.builder(Response.HTTP_NOT_FOUND));
+                    return socket.emit('emitChannelDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-                if (socket.adapter.rooms.has(channelId) === false) {
-                    socket.join(channelId);
-                }
+                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
 
-                DeleteInCommon.message('`' + channelId + 'ChannelContents`', data['listOfId']);
-                io.to(channelId).emit('emitChannelDeleteMessage', data);
+                    if (!result)
+                        return socket.emit('emitChannelDeleteMessageError', Response.HTTP_NOT_FOUND);
 
+                    joinUserInRoom(channelId, 'channel');
+                    addRoomIntoListOfUserRooms(channelId, 'channel');
+
+                    DeleteInCommon.message('`' + channelId + 'ChannelContents`', data['listOfId']);
+                    io.to(channelId).emit('emitChannelDeleteMessage', data);
+
+
+                });
 
             });
 

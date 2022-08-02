@@ -6,7 +6,7 @@ let Json = require('app/util/ReturnJson'),
 exports.search = (req) => {
 
 
-    let value = req.query.v;
+    let value = req.query?.v;
 
 
     Find.searchWithNameInTableUsersGroupsAndChannels(value, result => {

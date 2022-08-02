@@ -18,6 +18,25 @@ let openSql = require('opensql'),
 
 module.exports = {
 
+
+    isMessageBelongForThisUserInE2E(messageId, senderId, e2eId, cb) {
+        openSql.find({
+            get: ['id', 'senderId'],
+            from: e2eId,
+            where: {
+                id: IN(messageId),
+                senderId: senderId
+            }
+        }).result(result => {
+            try {
+                cb(result[1].length !== 0);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
     userPhone(phone, cb) {
         openSql.find({
             get: 'phone',

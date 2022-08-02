@@ -45,7 +45,7 @@ exports.user = () => {
 
 exports.editUsername = (req) => {
 
-    let username = req.params.id;
+    let username = req.params?.id;
 
     if (username < 1 || username === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
@@ -77,7 +77,7 @@ exports.editUsername = (req) => {
 
 exports.editBio = (req) => {
 
-    let bio = req.params.bio;
+    let bio = req.params?.bio;
 
     getAccessTokenPayLoad(data => {
 
@@ -169,8 +169,8 @@ exports.disableTwoAuth = () => {
 exports.restPassword = (req) => {
 
 
-    let oldPassword = req.body.old;
-    let newPassword = req.body.new;
+    let oldPassword = req.body?.old;
+    let newPassword = req.body?.new;
 
 
     if (oldPassword === undefined && newPassword === undefined)
@@ -424,9 +424,16 @@ exports.addMessage = (req) => {
 
         let phone = data.phoneNumber;
 
-        Insert.messageIntoUserSavedMessage(phone, message);
+        FindInUser.isSavedMessageCreated(phone, result => {
 
-        return Json.builder(Response.HTTP_CREATED);
+            if (!result)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            Insert.messageIntoUserSavedMessage(phone, message);
+
+            return Json.builder(Response.HTTP_CREATED);
+        });
+
     });
 
 }
@@ -450,9 +457,17 @@ exports.deleteMessage = (req) => {
         if (listOfId === undefined)
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
-        Delete.itemInSavedMessage(phone, listOfId);
 
-        return Json.builder(Response.HTTP_OK);
+        FindInUser.isSavedMessageCreated(phone, result => {
+
+            if (!result)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            Delete.itemInSavedMessage(phone, listOfId);
+
+            return Json.builder(Response.HTTP_OK);
+
+        });
 
     });
 
@@ -461,15 +476,22 @@ exports.deleteMessage = (req) => {
 
 exports.editMessage = (req) => {
 
-    let id = req.body.id;
+    let id = req.body?.id;
 
     getAccessTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
-        Update.itemInSavedMessage(phone, id);
 
-        return Json.builder(Response.HTTP_OK);
+        FindInUser.isSavedMessageCreated(phone, result => {
+
+            if (!result)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+            Update.itemInSavedMessage(phone, id);
+
+            return Json.builder(Response.HTTP_OK);
+
+        });
 
     });
 
