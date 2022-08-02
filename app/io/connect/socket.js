@@ -117,12 +117,19 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_NOT_FOUND);
 
-                let user = allUsers[receiverId];
+                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                    if (!result)
+                        return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
 
-                delete data['receiverId'];
-                data['senderId'] = socketUserId;
 
-                io.to(user).emit('emitNotificationForVoiceCall', data);
+                    let user = allUsers[receiverId];
+
+                    delete data['receiverId'];
+                    data['senderId'] = socketUserId;
+
+                    io.to(user).emit('emitNotificationForVoiceCall', data);
+
+                });
 
             });
 
@@ -140,6 +147,7 @@ io.use((socket, next) => {
             if (receiverId === IN_VALID_USER_ID)
                 return socket.emit('emitVoiceCallError', Response.HTTP_NOT_FOUND);
 
+
             FindInUser.isExistChatRoom({
                 toUser: `${receiverId}`,
                 fromUser: `${socketUserId}`
@@ -148,12 +156,18 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitVoiceCallError', Response.HTTP_NOT_FOUND);
 
-                let user = allUsers[receiverId];
+                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                    if (!result)
+                        return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
 
-                delete data['receiverId'];
-                data['senderId'] = socketUserId;
+                    let user = allUsers[receiverId];
 
-                io.to(user).emit('emitVoiceCall', data);
+                    delete data['receiverId'];
+                    data['senderId'] = socketUserId;
+
+                    io.to(user).emit('emitVoiceCall', data);
+
+                });
 
             });
 
@@ -215,6 +229,7 @@ io.use((socket, next) => {
             if (receiverId === IN_VALID_USER_ID)
                 return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
 
+
             FindInUser.isExistChatRoom({
                 toUser: `${receiverId}`,
                 fromUser: `${socketUserId}`
@@ -223,12 +238,19 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
 
-                let user = allUsers[receiverId];
+                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                    if (!result)
+                        return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
 
-                delete data['receiverId'];
-                data['senderId'] = socketUserId;
 
-                io.to(user).emit('emitPvTyping', data);
+                    let user = allUsers[receiverId];
+
+                    delete data['receiverId'];
+                    data['senderId'] = socketUserId;
+
+                    io.to(user).emit('emitPvTyping', data);
+
+                });
 
             });
 
@@ -318,13 +340,21 @@ io.use((socket, next) => {
 
                     if (!data)
                         return socket.emit('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
-                    let user = allUsers[receiverId];
 
-                    delete data['receiverId'];
-                    data['senderId'] = socketUserId;
+                    FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                        if (!result)
+                            return socket.emit('emitPvOnlineUserError', Response.HTTP_FORBIDDEN);
 
-                    FindInUser.getDataForE2EContentWithId(dbData, data['id'], result => {
-                        io.to(user).emit('emitPvUploadedFile', Object.assign({}, result, data));
+
+                        let user = allUsers[receiverId];
+
+                        delete data['receiverId'];
+                        data['senderId'] = socketUserId;
+
+                        FindInUser.getDataForE2EContentWithId(dbData, data['id'], result => {
+                            io.to(user).emit('emitPvUploadedFile', Object.assign({}, result, data));
+                        });
+
                     });
 
                 });
