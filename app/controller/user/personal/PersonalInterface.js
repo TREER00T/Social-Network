@@ -1,6 +1,6 @@
 let Json = require('app/util/ReturnJson'),
     {
-        getAccessTokenPayLoad
+        getTokenPayLoad
     } = require('app/middleware/ApiPipeline'),
     Response = require('app/util/Response'),
     {
@@ -27,7 +27,7 @@ let Json = require('app/util/ReturnJson'),
 
 exports.user = () => {
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let userId = data.id;
 
@@ -50,7 +50,7 @@ exports.editUsername = (req) => {
     if (username < 1 || username === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
@@ -79,7 +79,7 @@ exports.editBio = (req) => {
 
     let bio = req.params?.bio;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
@@ -105,7 +105,7 @@ exports.editName = (req) => {
     if (firstName < 1 || firstName === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
@@ -130,7 +130,7 @@ exports.twoAuth = (req) => {
     if (email === undefined && (password === undefined || password < 6))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
@@ -150,7 +150,7 @@ exports.twoAuth = (req) => {
 exports.disableTwoAuth = () => {
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
@@ -177,7 +177,7 @@ exports.restPassword = (req) => {
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
@@ -203,7 +203,7 @@ exports.restPassword = (req) => {
 exports.uploadAvatar = (req, res) => {
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
@@ -236,7 +236,7 @@ exports.uploadAvatar = (req, res) => {
 
 exports.listOfBlockUsers = () => {
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let id = data.id;
 
@@ -259,7 +259,7 @@ exports.listOfBlockUsers = () => {
 
 exports.listOfDevices = () => {
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let id = data.id;
 
@@ -284,7 +284,7 @@ exports.listOfMessage = (req) => {
     let startFrom = (page - 1) * limit;
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let phone = data.phoneNumber;
@@ -323,7 +323,7 @@ exports.listOfMessage = (req) => {
 exports.deleteSavedMessage = () => {
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let phone = data.phoneNumber;
@@ -347,7 +347,7 @@ exports.deleteSavedMessage = () => {
 exports.createSavedMessage = () => {
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let phone = data.phoneNumber;
@@ -372,7 +372,7 @@ exports.createSavedMessage = () => {
 exports.account = () => {
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let phone = data.phoneNumber;
@@ -420,7 +420,7 @@ exports.addMessage = (req) => {
         targetReplyId: getTargetReplayId
     };
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
@@ -450,7 +450,7 @@ exports.deleteMessage = (req) => {
     }
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
@@ -478,7 +478,7 @@ exports.editMessage = (req) => {
 
     let id = req.body?.id;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 

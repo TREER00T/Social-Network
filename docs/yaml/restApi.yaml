@@ -1,0 +1,58 @@
+swagger: "2.0"
+info:
+  title: Social Network API
+  description: Social Network API Documentation
+  version: 1.0
+  contact:
+    email: treeroot.ir@gmail.com
+schemes: [ https,http ]
+
+paths:
+
+  /api/auth/generate/user:
+    post:
+      summary: Adds a new user
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: phone
+          schema:
+            name: ali
+            type: integer
+          required:
+            - phone
+          properties:
+            phone:
+              type: integer
+      responses:
+        '400':
+          description: Bad Request
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '201':
+          description: Created
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '200':
+          description: OK
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+
+components:
+  schemas:
+    Status:
+      type: object
+        properties:
+          code:
+            type: integer
+            description: Http Status Code.
+          message:
+            type: string
+            description: Http Status Message.

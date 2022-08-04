@@ -3,6 +3,8 @@ let express = require('express'),
     router = express.Router(),
     bodyParser = require('body-parser'),
     dotenv = require('dotenv'),
+    cors = require('cors'),
+    Swagger = require('../../docs/swagger'),
     Validation = require('app/util/Validation'),
     Pipeline = require('app/middleware/ApiPipeline'),
     Json = require('app/util/ReturnJson'),
@@ -21,41 +23,47 @@ module.exports = {
 
         dotenv.config();
 
-        app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json(), express.raw());
+        app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json(), express.raw(), cors());
         app.use((req, res, next) => {
 
             Json.initializationRes(res);
 
-            Validation.isValidHttpMethod(req.method);
+
+            if (!Validation.isValidHttpMethod(req.method))
+                return Json.builder(Response.HTTP_METHOD_NOT_ALLOWED);
 
 
-            let accessToken = req.headers['authorization-at'];
-            let refreshToken = req.headers['authorization-rt'];
-            let apiKey = (req.body.apiKey !== undefined) ? req.body.apiKey : req.query.apiKey;
-            let phone = req.body.phone;
+            let routeMsg = Validation.isRouteWithOutAuthentication(req.url, app).msg;
+
+            if (routeMsg !== 'RouteForWithOutAuth' && routeMsg !== 'NotFound') {
+                let token,
+                    apiKey;
+                try {
+                    token = req?.headers?.authorization;
+                    apiKey = (req?.body?.apiKey !== undefined) ? req?.body?.apiKey : req?.query?.apiKey;
+                } catch (e) {
+                }
+                let isAccessTokenVerify = Pipeline.tokenVerify(token);
 
 
-            let isSetUserAccessToken = Pipeline.accessTokenVerify(accessToken);
-            let isSetUserRefreshToken = Pipeline.refreshTokenVerify(refreshToken);
-            let isSetUserApiKey = Pipeline.isSetUserApiKey(apiKey);
-            let isSetPhone = (req.body.phone !== undefined);
+                let isSetUserToken = (!isAccessTokenVerify) ? isAccessTokenVerify : Pipeline.tokenVerify(token);
+                let isSetUserApiKey = Pipeline.isSetUserApiKey(apiKey);
 
+                if (!isSetUserApiKey || !isSetUserToken)
+                    return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
 
-                if ((!isSetUserApiKey && !isSetUserAccessToken && !isSetPhone && !isSetUserRefreshToken) ||
-                    (isSetUserApiKey && !isSetUserAccessToken && !isSetPhone) ||
-                    (!isSetUserApiKey && isSetUserAccessToken && !isSetPhone))
-                    return Json.builder(Response.HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND);
-
-
-                if (isSetPhone && isSetUserApiKey && isSetUserAccessToken) {
-                    return Pipeline.isValidApiKey(apiKey, phone, result => {
-                        if (!result) {
-                            return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
-                        }
-                        app.use(router);
-                        next();
+                if (isSetUserApiKey && isSetUserToken) {
+                    return Pipeline.getTokenPayLoad(data => {
+                        Pipeline.isValidApiKey(apiKey, data.phoneNumber, result => {
+                            if (!result) {
+                                return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+                            }
+                            app.use(router);
+                            next();
+                        });
                     });
                 }
+            }
 
             app.use(router);
             next();
@@ -74,6 +82,7 @@ module.exports = {
             console.log('Server are running...');
         });
 
+        Swagger.restApi(app);
     }
 
 }

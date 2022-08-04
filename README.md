@@ -4,6 +4,7 @@
 
 - [Install](#install)
 - [Introduction](#introduction)
+- [Database Schema](#database-schema)
 - [Configuration](#configuration)
 - [License](#license)
 
@@ -23,6 +24,11 @@ Now download and extract project
 ## Introduction
 
 A simple social network with socket.io and rest api
+
+
+## Database Schema
+
+For more information about the database structure, refer to [this](https://github.com/TREER00T/Social-Network-Database) repository
 
 ## Configuration
 

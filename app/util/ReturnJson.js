@@ -6,6 +6,7 @@ module.exports = {
     builder(obj, arr = null, option) {
         if (typeof res !== 'undefined') {
             let jsonContent = JSON.stringify(module.exports.jsonObject(obj, arr, option));
+            res.status(obj.code);
             res.end(jsonContent);
             return true;
         }

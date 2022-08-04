@@ -1,6 +1,6 @@
 let {
-        NULL
-    } = require('opensql').queryHelper;
+    NULL
+} = require('opensql').queryHelper;
 
 
 const IN_VALID_MESSAGE_TYPE = 'IN_VALID_MESSAGE_TYPE',
@@ -136,6 +136,22 @@ module.exports = {
 
 
         cb(jsonObject);
+    },
+
+
+    splitRoute(str) {
+        if (typeof str === 'string')
+            return str.split('/')
+
+        if (str.fast_slash)
+            return '';
+
+        let isMatch = str.toString()
+            .replace('\\/?', '')
+            .replace('(?=\\/|$)', '$')
+            .match(/^\/\^((?:\\[.*+?^${}()|[\]\\\/]|[^.*+?^${}()|[\]\\\/])*)\$\//);
+
+        return isMatch[1].replace(/\\(.)/g, '$1').split('/');
     }
 
 }

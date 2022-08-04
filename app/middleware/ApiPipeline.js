@@ -7,7 +7,7 @@ let {
         getApiKey
     } = require('app/model/find/user/users');
 
-let refreshTokenPayload, accessTokenPayload;
+let tokenPayload;
 
 module.exports = {
 
@@ -36,24 +36,24 @@ module.exports = {
     },
 
 
-    refreshTokenVerify(bearerHeader) {
+    tokenVerify(bearerHeader) {
 
-        let isSetUserRefreshToken = getSplitBearerJwt(bearerHeader);
+        let isSetUserToken = getSplitBearerJwt(bearerHeader);
 
-        if (typeof isSetUserRefreshToken === 'string') {
+        if (typeof isSetUserToken === 'string') {
 
             (async () => {
 
-                let token = await getJwtDecrypt(isSetUserRefreshToken);
+                let token = await getJwtDecrypt(isSetUserToken);
 
                 getJwtVerify(token, decode => {
 
-                    if (decode.type === 'rt') {
+                    if (decode.type === 'rt' || 'at') {
 
                         (function (cb) {
                             if (typeof cb === 'function')
                                 cb(decode)
-                        })(refreshTokenPayload);
+                        })(tokenPayload);
                     }
 
                 });
@@ -67,46 +67,8 @@ module.exports = {
     },
 
 
-    accessTokenVerify(bearerHeader) {
-
-        let isSetUserAccessToken = getSplitBearerJwt(bearerHeader);
-
-        if (typeof isSetUserAccessToken === 'string') {
-
-            (async () => {
-
-                let token = await getJwtDecrypt(isSetUserAccessToken);
-
-                getJwtVerify(token, decode => {
-
-                    if (decode.type === 'at') {
-
-                        (function (cb) {
-                            if (typeof cb === 'function')
-                                cb(decode)
-                        })(accessTokenPayload);
-
-                    }
-
-                });
-            })();
-
-            return true;
-        }
-
-        return false;
-    },
-
-
-    getRefreshTokenPayLoad(cb) {
-        refreshTokenPayload = (data => {
-            cb(data);
-        });
-    },
-
-
-    getAccessTokenPayLoad(cb) {
-        accessTokenPayload = (data => {
+    getTokenPayLoad(cb) {
+        tokenPayload = (data => {
             cb(data);
         });
     }

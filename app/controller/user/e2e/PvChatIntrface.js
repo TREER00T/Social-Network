@@ -12,7 +12,7 @@ let Json = require('app/util/ReturnJson'),
     multerFile = multer().single('file'),
     RestFulUtil = require('app/util/Util'),
     {
-        getAccessTokenPayLoad
+        getTokenPayLoad
     } = require('app/middleware/ApiPipeline');
 
 
@@ -32,7 +32,7 @@ exports.createE2EChat = (req) => {
             return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
-        getAccessTokenPayLoad(data => {
+        getTokenPayLoad(data => {
 
             let tokenUserId = data.id;
 
@@ -130,7 +130,7 @@ exports.listOfMessage = (req) => {
 
     let startFrom = (page - 1) * limit;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let from = data.id;
 
@@ -186,7 +186,7 @@ exports.deleteForMe = (req) => {
 
     let id = req.params?.id;
 
-    getAccessTokenPayLoad(() => {
+    getTokenPayLoad(() => {
 
         let from = data.id;
 
@@ -218,7 +218,7 @@ exports.deleteForUs = (req) => {
     let id = req.params?.id;
 
 
-    getAccessTokenPayLoad(() => {
+    getTokenPayLoad(() => {
 
         let from = data.id;
 
@@ -258,7 +258,7 @@ exports.blockUser = (req) => {
     let id = req.body?.id;
 
 
-    getAccessTokenPayLoad(() => {
+    getTokenPayLoad(() => {
 
         let from = data.id;
 

@@ -18,8 +18,7 @@ let Json = require('app/util/ReturnJson'),
         getVerificationCode
     } = require('app/util/Generate'),
     {
-        getAccessTokenPayLoad,
-        getRefreshTokenPayLoad
+        getTokenPayLoad
     } = require('app/middleware/ApiPipeline'),
     AddUserForeignKey = require('app/model/add/foreignKey/users');
 
@@ -162,7 +161,7 @@ exports.isValidPassword = (req) => {
     if (deviceName === undefined || deviceIp === undefined || deviceLocation === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let phone = data.phoneNumber;
@@ -209,7 +208,7 @@ exports.isValidPassword = (req) => {
 exports.refreshToken = () => {
 
 
-    getRefreshTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
         let id = data.id;
