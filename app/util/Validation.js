@@ -1,5 +1,6 @@
-const Json = require('./ReturnJson'),
+let Json = require('./ReturnJson'),
     Response = require('./Response'),
+    Util = require('./Util'),
     jwt = require('jsonwebtoken'),
     {
         JWK,
@@ -34,6 +35,68 @@ module.exports = {
     },
 
 
+    isRouteWithOutAuthentication(url, app) {
+
+        let arrayOfRouteWithOutAuth = [
+            '/apiDocs',
+            '/api/auth/generate/user',
+            '/api/auth/verify/authCode'
+        ];
+
+        let arrayOfRoute = [];
+
+
+        function print(path, layer) {
+            if (layer.route)
+                layer.route.stack.forEach(print.bind(null, path.concat(Util.splitRoute(layer.route.path))));
+
+
+            if (layer.name === 'router' && layer.handle.stack)
+                layer.handle.stack.forEach(print.bind(null, path.concat(Util.splitRoute(layer.regexp))));
+
+
+            if (layer.method)
+                arrayOfRoute.push('/' + path.concat(Util.splitRoute(layer.regexp)).filter(Boolean).join('/') + '/');
+        }
+
+        app._router.stack.forEach(print.bind(null, []));
+
+
+        let arr = [false, false],
+            statusAllAppRoute = () => arr[0],
+            statusForRouteWithOutAuth = () => arr[1]
+
+
+        for (let index in arrayOfRoute) {
+            let item = arrayOfRoute[index];
+            let isEqualRouteWithDoubleSlash = item === url + '/',
+                isEqualRoute = item === url;
+
+            if (isEqualRoute || isEqualRouteWithDoubleSlash) {
+                arr[0] = true;
+                break;
+            }
+
+        }
+
+        for (let index in arrayOfRouteWithOutAuth) {
+            let item = arrayOfRouteWithOutAuth[index];
+
+            let isEqualRoute = url === item,
+                isEqualRouteWithDoubleSlash = url === item + '/';
+
+            if (isEqualRoute || isEqualRouteWithDoubleSlash) {
+                arr[1] = true;
+                break;
+            }
+        }
+
+
+        return statusAllAppRoute() === true ? {msg: 'AllValidRoute'} :
+            statusForRouteWithOutAuth() === true ? {msg: 'RouteForWithOutAuth'} : {msg: 'NotFound'};
+    },
+
+
     // If http method not found in httpMethod array It should be return json response
     isValidHttpMethod(requestMethod) {
 
@@ -45,10 +108,7 @@ module.exports = {
             'DELETE'
         ];
 
-        if (!arrayOfHttpMethods.includes(requestMethod))
-            return Json.builder(Response.HTTP_METHOD_NOT_ALLOWED);
-
-
+        return arrayOfHttpMethods.includes(requestMethod);
     },
 
 
@@ -72,7 +132,6 @@ module.exports = {
         } catch (e) {
             ValidationException(e);
         }
-
     },
 
 

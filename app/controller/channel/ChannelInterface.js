@@ -12,7 +12,7 @@ let Json = require('app/util/ReturnJson'),
     DeleteInUser = require('app/model/remove/users/user'),
     multerImage = multer().single('image'),
     {
-        getAccessTokenPayLoad
+        getTokenPayLoad
     } = require('app/middleware/ApiPipeline'),
     File = require('app/util/File'),
     Util = require('app/util/Util'),
@@ -29,7 +29,7 @@ exports.create = (req, res) => {
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let userId = data.id;
 
@@ -70,7 +70,7 @@ exports.deleteChannel = (req) => {
     let id = req.params?.id;
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let userId = data.id;
 
@@ -111,7 +111,7 @@ exports.changeName = (req) => {
     if (name < 1 || name === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let userId = data.id;
 
@@ -152,7 +152,7 @@ exports.changeDescription = (req) => {
 
     let {id, description} = req.body;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let userId = data.id;
 
@@ -192,7 +192,7 @@ exports.uploadAvatar = (req, res) => {
 
     let id = req.body?.id;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let userId = data.id;
 
@@ -247,7 +247,7 @@ exports.changeToInviteLink = (req) => {
 
     let id = req.body?.id;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let userId = data.id;
@@ -292,7 +292,7 @@ exports.changeToPublicLink = (req) => {
 
     let {id, publicLink} = req.body;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let userId = data.id;
@@ -343,7 +343,7 @@ exports.joinUser = (req) => {
 
     let id = req.body?.id;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let userId = data.id;
@@ -385,7 +385,7 @@ exports.addAdmin = (req) => {
     let id = req.body?.id;
     let userIdForNewAdmin = req.body?.userId;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let userId = data.id;
@@ -447,7 +447,7 @@ exports.deleteAdmin = (req) => {
     let id = req.body?.id;
     let userIdForDeleteAdmin = req.body?.userId;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let userId = data.id;
@@ -502,7 +502,7 @@ exports.leaveUser = (req) => {
 
     let id = req.body?.id;
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let userId = data.id;
@@ -550,7 +550,7 @@ exports.listOfMessage = (req) => {
     let startFrom = (page - 1) * limit;
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
 
         let userId = data.id;
@@ -591,7 +591,7 @@ exports.info = (req) => {
     let id = req.body?.id;
 
 
-    getAccessTokenPayLoad(() => {
+    getTokenPayLoad(() => {
 
 
         Find.channelId(id, isDefined => {
@@ -625,7 +625,7 @@ exports.allUsers = (req) => {
     let id = req.body?.id;
 
 
-    getAccessTokenPayLoad(data => {
+    getTokenPayLoad(data => {
 
         let userId = data.id;
 
