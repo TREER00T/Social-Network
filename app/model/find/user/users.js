@@ -70,6 +70,24 @@ module.exports = {
         });
     },
 
+
+    getApiKeyAndUserId(phone, cb) {
+        openSql.find({
+            get: ['apiKey', 'id'],
+            from: 'users',
+            where: {
+                phone: `${phone}`
+            }
+        }).result(result => {
+            try {
+                cb(result[1][0]);
+            } catch (e) {
+                DataBaseException(e);
+            }
+        });
+    },
+
+
     password(phone, cb) {
         openSql.find({
             get: 'password',
@@ -124,27 +142,10 @@ module.exports = {
     },
 
 
-    getUserId(phone, cb) {
-        openSql.find({
-            get: 'id',
-            from: 'users',
-            where: {
-                phone: `${phone}`
-            }
-        }).result(result => {
-            try {
-                cb(result[1][0].id);
-            } catch (e) {
-                DataBaseException(e);
-            }
-        });
-    },
-
-
     isExistChatRoom(data, cb) {
         openSql.find({
             get: 'tblChatId',
-            from: 'listofusere2es',
+            from: 'listOfUserE2ES',
             where: {
                 toUser: ATTACH([
                     setOperator(EQUAL_TO, `${data['toUser']}`),

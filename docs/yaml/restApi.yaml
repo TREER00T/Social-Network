@@ -2,57 +2,274 @@ swagger: "2.0"
 info:
   title: Social Network API
   description: Social Network API Documentation
-  version: 1.0
+  version: 1.0.0
   contact:
     email: treeroot.ir@gmail.com
-schemes: [ https,http ]
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+host: http://localhost:3000/api
+
+tags:
+  - name: Auth
+    description: Operations about user authentication
+  - name: E2E
+    description: Operations about user end to end message settings
+  - name: Personal
+    description: Operations about user settings
+  - name: Group
+    description: Operations about group message settings
+  - name: Channel
+    description: Operations about channel message settings
+  - name: Common
+    description: Operations related to common items
+
+securityDefinitions:
+  apiKey:
+    description: REST API uses a persistent Api Key.
+    type: apiKey
+    in: header
+    name: apiKey
+  token:
+    description: REST API uses a persistent JWT Token.
+    type: apiKey
+    in: header
+    name: authorization
+
+schemes:
+  - http
 
 paths:
 
-  /api/auth/generate/user:
+  /auth/generate/user:
     post:
+      tags:
+        - Auth
       summary: Adds a new user
       consumes:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
           name: phone
-          schema:
-            name: ali
-            type: integer
-          required:
-            - phone
-          properties:
-            phone:
-              type: integer
+          type: integer
+          format: int32
+          required: true
       responses:
-        '400':
+        400:
           description: Bad Request
-          content:
-            aplication/json:
-              schema:
-                $ref: '#/components/schemas/Status'
-        '201':
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
           description: Created
-          content:
-            aplication/json:
-              schema:
-                $ref: '#/components/schemas/Status'
-        '200':
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
           description: OK
-          content:
-            aplication/json:
-              schema:
-                $ref: '#/components/schemas/Status'
 
-components:
-  schemas:
-    Status:
-      type: object
-        properties:
-          code:
-            type: integer
-            description: Http Status Code.
-          message:
-            type: string
-            description: Http Status Message.
+  /auth/refresh/token:
+    post:
+      tags:
+        - Auth
+      summary: Refreshes user token after expiration
+      parameters:
+        - in: header
+          name: authorization
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        202:
+          description: Accepted
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataObject'
+
+
+  /auth/verify/authCode:
+    post:
+      tags:
+        - Auth
+      summary: Validation Verification code
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: phone
+          type: string
+          required: true
+        - in: body
+          name: authCode
+          type: string
+          required: true
+        - in: body
+          name: deviceName
+          type: string
+          required: true
+        - in: body
+          name: deviceIp
+          type: string
+          required: true
+        - in: body
+          name: deviceLocation
+          type: string
+          required: true
+      responses:
+        209:
+          description: OK , But you need to two step verification
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        202:
+          description: Accepted
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataObject'
+
+
+  /auth/verify/twoStep:
+    post:
+      tags:
+        - Auth
+      summary: User Validation for 2-step verification
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: password
+          type: string
+          required: true
+        - in: body
+          name: deviceName
+          type: string
+          required: true
+        - in: body
+          name: deviceIp
+          type: string
+          required: true
+        - in: body
+          name: deviceLocation
+          type: string
+          required: true
+        - in: header
+          name: authorization
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        202:
+          description: Accepted
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataObject'
+
+definitions:
+  Status:
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+  StatusWithDataObject:
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      data:
+        type:
+          - object
+          - array
+  StatusWithDataAndOptionObject:
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      data:
+        type:
+          - object
+          - array
+      option:
+        type: object
+  RefreshTokenInDataObject:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+  TokenAndApiKeyInDataObject:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+      apiKey:
+        type: string
+  ApiKeyInDataObject:
+    properties:
+      apiKey:
+        type: string
