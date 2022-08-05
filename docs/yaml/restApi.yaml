@@ -52,7 +52,6 @@ paths:
         - in: body
           name: phone
           type: integer
-          format: int32
           required: true
       responses:
         400:
@@ -73,11 +72,6 @@ paths:
       tags:
         - Auth
       summary: Refreshes user token after expiration
-      parameters:
-        - in: header
-          name: authorization
-          type: string
-          required: true
       security:
         - apiKey: [ ]
         - token: [ ]
@@ -119,11 +113,11 @@ paths:
       parameters:
         - in: body
           name: phone
-          type: string
+          type: number
           required: true
         - in: body
           name: authCode
-          type: string
+          type: number
           required: true
         - in: body
           name: deviceName
@@ -184,12 +178,7 @@ paths:
           name: deviceLocation
           type: string
           required: true
-        - in: header
-          name: authorization
-          type: string
-          required: true
       security:
-        - apiKey: [ ]
         - token: [ ]
       responses:
         800:
@@ -223,7 +212,181 @@ paths:
             type: object
             $ref: '#/definitions/StatusWithDataObject'
 
+
+  /e2e/room/create:
+    post:
+      tags:
+        - E2E
+      summary: Create New end to end message room
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: userId
+          type: number
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        409:
+          description: Conflict
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
+          description: Created
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataObject'
+
+
+  /e2e/room/uploadFile:
+    post:
+      tags:
+        - E2E
+      summary: Upload File In end to end message room
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: receiverId
+          type: number
+          required: true
+        - in: formData
+          name: senderId
+          type: number
+          required: true
+        - in: formData
+          name: isReply
+          type: boolean
+          required: false
+        - in: formData
+          name: isForward
+          type: boolean
+          required: false
+        - in: formData
+          name: targetReplyId
+          type: number
+          required: false
+        - in: formData
+          name: forwardDataId
+          type: number
+          required: false
+        - in: formData
+          name: type
+          schema:
+            $ref: '#/definitions/FileType'
+          required: false
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        802:
+          description: In valid json object key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataObject'
+
+  /e2e/room/user/block:
+    post:
+      tags:
+        - E2E
+      summary: Block OR UnBlock User In end to end message room
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: id
+          type: number
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
 definitions:
+  FileType:
+    properties:
+      type:
+        type: string
+        default: Image
+        description: types -> Image , Document , Video , Voice
   Status:
     properties:
       code:
