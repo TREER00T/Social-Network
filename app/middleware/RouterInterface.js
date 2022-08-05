@@ -40,7 +40,7 @@ module.exports = {
                     apiKey;
                 try {
                     token = req?.headers?.authorization;
-                    apiKey = (req?.body?.apiKey !== undefined) ? req?.body?.apiKey : req?.query?.apiKey;
+                    apiKey = (req?.headers?.apiKey !== undefined) ? req?.headers?.apiKey : req?.query?.apiKey;
                 } catch (e) {
                 }
                 let isAccessTokenVerify = Pipeline.tokenVerify(token);
@@ -49,7 +49,7 @@ module.exports = {
                 let isSetUserToken = (!isAccessTokenVerify) ? isAccessTokenVerify : Pipeline.tokenVerify(token);
                 let isSetUserApiKey = Pipeline.isSetUserApiKey(apiKey);
 
-                if (!isSetUserApiKey || !isSetUserToken)
+                if ((!isSetUserApiKey && !isSetUserToken) || !isSetUserToken)
                     return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
 
                 if (isSetUserApiKey && isSetUserToken) {

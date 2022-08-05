@@ -66,12 +66,9 @@ exports.gvc = (req) => {
 exports.isValidAuthCode = (req) => {
 
 
-    let {phone, authCode} = req?.body;
-    let deviceName = req.body?.name;
-    let deviceIp = req.body?.ip;
-    let deviceLocation = req.body?.location;
+    let {phone, authCode, deviceName, deviceIp, deviceLocation} = req?.body;
 
-    if (!isPhoneNumber(phone) && !isVerificationCode(authCode) ||
+    if ((!isPhoneNumber(phone) && !isVerificationCode(authCode)) ||
         (deviceName === undefined || deviceIp === undefined || deviceLocation === undefined))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -85,39 +82,35 @@ exports.isValidAuthCode = (req) => {
 
             if (result) {
 
-                return Find.getUserId(phone, id => {
+                return Find.getApiKeyAndUserId(phone, result => {
 
-                    Find.getApiKey(phone, result => {
-
-                        Insert.userDeviceInformation({
-                            id: id,
-                            ip: deviceIp,
-                            name: deviceName,
-                            location: deviceLocation
-                        });
-
-                        (async () => {
-
-                            Json.builder(
-                                Response.HTTP_ACCEPTED,
-                                {
-                                    accessToken: await getJwtEncrypt(getJwtSign({
-                                        phoneNumber: `${phone}`,
-                                        id: `${id}`,
-                                        type: 'at'
-                                    }, phone)),
-                                    refreshToken: await getJwtEncrypt(getJwtRefresh({
-                                        phoneNumber: `${phone}`,
-                                        id: `${id}`,
-                                        type: 'rt'
-                                    }, phone)),
-                                    apiKey: result
-                                }
-                            )
-
-                        })();
-
+                    Insert.userDeviceInformation({
+                        id: result.id,
+                        ip: deviceIp,
+                        name: deviceName,
+                        location: deviceLocation
                     });
+
+                    (async () => {
+
+                        Json.builder(
+                            Response.HTTP_ACCEPTED,
+                            {
+                                accessToken: await getJwtEncrypt(getJwtSign({
+                                    phoneNumber: `${phone}`,
+                                    id: `${result.id}`,
+                                    type: 'at'
+                                }, phone)),
+                                refreshToken: await getJwtEncrypt(getJwtRefresh({
+                                    phoneNumber: `${phone}`,
+                                    id: `${result.id}`,
+                                    type: 'rt'
+                                }, phone)),
+                                apiKey: result.apiKey
+                            }
+                        )
+
+                    })();
 
                 });
 
@@ -153,10 +146,7 @@ exports.isValidAuthCode = (req) => {
 exports.isValidPassword = (req) => {
 
 
-    let password = req.body?.password;
-    let deviceName = req.body?.name;
-    let deviceIp = req.body?.ip;
-    let deviceLocation = req.body?.location;
+    let {password, deviceName, deviceIp, deviceLocation} = req?.body;
 
     if (deviceName === undefined || deviceIp === undefined || deviceLocation === undefined)
         return Json.builder(Response.HTTP_BAD_REQUEST);
@@ -178,21 +168,17 @@ exports.isValidPassword = (req) => {
                 return Json.builder(Response.HTTP_FORBIDDEN);
 
 
-            Find.getApiKey(phone, result => {
+            Find.getApiKeyAndUserId(phone, result => {
 
-                Find.getUserId(phone, id => {
-
-                    Insert.userDeviceInformation({
-                        id: id,
-                        ip: deviceIp,
-                        name: deviceName,
-                        location: deviceLocation
-                    });
-
+                Insert.userDeviceInformation({
+                    id: result.id,
+                    ip: deviceIp,
+                    name: deviceName,
+                    location: deviceLocation
                 });
 
                 return Json.builder(Response.HTTP_ACCEPTED, {
-                    apiKey: result
+                    apiKey: result.apiKey
                 });
 
             });

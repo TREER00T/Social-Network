@@ -3,33 +3,33 @@ let res;
 
 module.exports = {
 
-    builder(obj, arr = null, option) {
+    builder(obj, data = null, option) {
         if (typeof res !== 'undefined') {
-            let jsonContent = JSON.stringify(module.exports.jsonObject(obj, arr, option));
+            let jsonContent = JSON.stringify(module.exports.jsonObject(obj, data, option));
             res.status(obj.code);
             res.end(jsonContent);
             return true;
         }
-        return module.exports.jsonObject(obj, arr, option);
+        return module.exports.jsonObject(obj, data, option);
     },
 
     initializationRes(response) {
         res = response;
     },
 
-    jsonObject(obj, arr, option) {
+    jsonObject(obj, data, option) {
         if (option !== undefined)
-            return (arr != null) ? {
+            return (data != null) ? {
                 code: `${obj.code}`,
                 message: `${obj.message}`,
-                option: option,
-                data: arr
+                data: data,
+                option: option
             } : obj;
 
-        return (arr != null) ? {
+        return (data != null) ? {
             code: `${obj.code}`,
             message: `${obj.message}`,
-            data: arr
+            data: data
         } : obj;
     }
 
