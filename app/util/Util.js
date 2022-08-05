@@ -78,8 +78,8 @@ module.exports = {
 
         const MESSAGE_WITHOUT_FILE = 'None';
         const MESSAGE_TYPE_LOCATION = 'Location';
-        let isReplyInJsonObject = jsonObject?.isReply === true;
-        let isForwardInJsonObject = jsonObject?.isForward === true;
+        let isReplyInJsonObject = jsonObject?.isReply !== false && undefined && null;
+        let isForwardInJsonObject = jsonObject?.isForward !== false && undefined && null;
         let isNoneMessageType = jsonObject?.type === MESSAGE_WITHOUT_FILE;
         let isMessageTypeLocation = jsonObject?.type === MESSAGE_TYPE_LOCATION;
         let isMessageTypeNull = jsonObject?.type?.length === 0 || undefined || null;
@@ -123,16 +123,26 @@ module.exports = {
             jsonObject.text = NULL;
 
 
-        if (isMessageTypeNull)
+        if (isTextNull && isMessageTypeNull)
+            jsonObject.text = 'Image';
+
+
+        if (isMessageTypeNull && !isTextNull)
             jsonObject.type = MESSAGE_WITHOUT_FILE;
 
 
         if (isReplyInJsonObject)
             jsonObject.isReply = 1;
 
+        if (!isReplyInJsonObject)
+            jsonObject.isReply = 0;
+
 
         if (isForwardInJsonObject)
             jsonObject.isForward = 1;
+
+        if (!isForwardInJsonObject)
+            jsonObject.isForward = 0;
 
 
         cb(jsonObject);

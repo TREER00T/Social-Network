@@ -75,9 +75,9 @@ exports.uploadFile = (req, res) => {
             if (result === (RestFulUtil.IN_VALID_OBJECT_KEY || RestFulUtil.IN_VALID_MESSAGE_TYPE))
                 return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-            let toUser = data['receiverId'];
-            let fromUser = data['senderId'];
-            delete data['receiverId'];
+            let toUser = data?.receiverId;
+            let fromUser = data?.senderId;
+            delete data?.receiverId;
 
             if (toUser && fromUser !== undefined) {
 
