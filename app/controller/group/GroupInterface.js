@@ -546,8 +546,9 @@ exports.listOfMessage = (req) => {
     let getLimit = (limit !== undefined) ? limit : 15;
     let getSort = (sort !== undefined) ? sort : 'DESC';
     let getOrder = (order !== undefined) ? order : 'id';
+    let getPage = (page !== undefined) ? page : 1;
 
-    let startFrom = (page - 1) * limit;
+    let startFrom = (getPage - 1) * limit;
 
 
     getTokenPayLoad(data => {

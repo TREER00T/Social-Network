@@ -127,8 +127,9 @@ exports.listOfMessage = (req) => {
     let getLimit = (limit !== undefined) ? limit : 15;
     let getSort = (sort !== undefined) ? sort : 'DESC';
     let getOrder = (order !== undefined) ? order : 'id';
+    let getPage = (page !== undefined) ? page : 1;
 
-    let startFrom = (page - 1) * limit;
+    let startFrom = (getPage - 1) * limit;
 
     getTokenPayLoad(data => {
 
@@ -199,9 +200,9 @@ exports.deleteForMe = (req) => {
                     return Json.builder(Response.HTTP_NOT_FOUND);
 
 
-                Delete.chatInListOfChatsForUser(from, id, from, result => {
-                    return Json.builder(Response.HTTP_OK, result);
-                });
+                Delete.chatInListOfChatsForUser(from, id, from);
+
+                return Json.builder(Response.HTTP_OK);
 
             });
 
@@ -233,12 +234,11 @@ exports.deleteForUs = (req) => {
 
                 Delete.chat(data, () => {
 
-                    Delete.chatInListOfChatsForUser(from, id, from, () => {
+                    Delete.chatInListOfChatsForUser(from, id, from);
 
-                        Delete.chatInListOfChatsForUser(from, id, id);
+                    Delete.chatInListOfChatsForUser(from, id, id);
 
-                        return Json.builder(Response.HTTP_OK);
-                    });
+                    return Json.builder(Response.HTTP_OK);
 
                 });
 

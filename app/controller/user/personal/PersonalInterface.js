@@ -109,7 +109,7 @@ exports.editName = (req) => {
 
         let phone = data.phoneNumber;
 
-        Update.name(phone, firstName.toString().trim(), lastName.toString().trim(), result => {
+        Update.name(phone, firstName.toString().trim(), lastName, result => {
             if (!result)
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -280,8 +280,9 @@ exports.listOfMessage = (req) => {
     let getLimit = (limit !== undefined) ? limit : 15;
     let getSort = (sort !== undefined) ? sort : 'DESC';
     let getOrder = (order !== undefined) ? order : 'id';
+    let getPage = (page !== undefined) ? page : 1;
 
-    let startFrom = (page - 1) * limit;
+    let startFrom = (getPage - 1) * limit;
 
 
     getTokenPayLoad(data => {
@@ -378,6 +379,8 @@ exports.account = () => {
         let phone = data.phoneNumber;
         let userId = data.id;
 
+        Json.builder(Response.HTTP_OK);
+
         Delete.savedMessage(phone);
         Delete.userInAllUsersBlockList(userId);
         Delete.userInUsersTable(userId);
@@ -395,7 +398,6 @@ exports.account = () => {
                 Delete.userInAllUsersChannel(result, userId);
         });
 
-
     });
 
 }
@@ -403,36 +405,28 @@ exports.account = () => {
 
 exports.addMessage = (req) => {
 
-    let {text, senderId, isReply, targetReplyId, isForward, forwardDataId, location} = req.body;
-    let getIsReplay = (isReply !== undefined) ? 1 : 0;
-    let getIsForward = (isForward !== undefined) ? 1 : 0;
-    let getTargetReplayId = (targetReplyId !== undefined) ? targetReplyId : NULL;
-    let getForwardDataId = (forwardDataId !== undefined) ? forwardDataId : NULL;
-    let getLocation = (location !== undefined) ? location : NULL;
-
-    let message = {
-        senderId: senderId,
-        text: text,
-        isReply: getIsReplay,
-        location: getLocation,
-        isForward: getIsForward,
-        forwardDataId: getForwardDataId,
-        targetReplyId: getTargetReplayId
-    };
 
     getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
-        FindInUser.isSavedMessageCreated(phone, result => {
+        Util.validateMessage(req.body, data => {
 
-            if (!result)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+            if (data === Util.IN_VALID_MESSAGE_TYPE || Util.IN_VALID_OBJECT_KEY)
+                return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-            Insert.messageIntoUserSavedMessage(phone, message);
+            FindInUser.isSavedMessageCreated(phone, result => {
 
-            return Json.builder(Response.HTTP_CREATED);
+                if (!result)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
+
+                Insert.messageIntoUserSavedMessage(phone, data);
+
+                return Json.builder(Response.HTTP_CREATED);
+            });
+
         });
+
 
     });
 
@@ -476,20 +470,34 @@ exports.deleteMessage = (req) => {
 
 exports.editMessage = (req) => {
 
-    let id = req.body?.id;
+    let reqData = req.body,
+        id = reqData?.id,
+        dataWithOutIdObject;
+
+    if (id !== undefined) {
+        delete reqData?.id;
+        dataWithOutIdObject = reqData;
+    }
+
 
     getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
 
+        Util.validateMessage(dataWithOutIdObject, result => {
 
-        FindInUser.isSavedMessageCreated(phone, result => {
+            if (result === Util.IN_VALID_MESSAGE_TYPE || Util.IN_VALID_OBJECT_KEY)
+                return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-            if (!result)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-            Update.itemInSavedMessage(phone, id);
+            FindInUser.isSavedMessageCreated(phone, result => {
 
-            return Json.builder(Response.HTTP_OK);
+                if (!result)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
+                Update.itemInSavedMessage(phone, id);
+
+                return Json.builder(Response.HTTP_OK);
+
+            });
 
         });
 

@@ -1,6 +1,9 @@
 let {
-    NULL
-} = require('opensql').queryHelper;
+        NULL
+    } = require('opensql').queryHelper,
+    {
+        POINT
+    } = require('opensql').fieldHelper;
 
 
 const IN_VALID_MESSAGE_TYPE = 'IN_VALID_MESSAGE_TYPE',
@@ -47,7 +50,7 @@ module.exports = {
     validateMessage(jsonObject, cb) {
 
         let arrayOfValidJsonObjectKey = [
-            'text', 'type', 'isReply', 'receiverId', 'isForward',
+            'text', 'type', 'isReply', 'isForward',
             'targetReplyId', 'forwardDataId', 'locationLat', 'locationLon', 'senderId'
         ];
 
@@ -83,13 +86,13 @@ module.exports = {
         let isNoneMessageType = jsonObject?.type === MESSAGE_WITHOUT_FILE;
         let isMessageTypeLocation = jsonObject?.type === MESSAGE_TYPE_LOCATION;
         let isMessageTypeNull = jsonObject?.type?.length === 0 || undefined || null;
-        let isTextNull = jsonObject?.text?.length === 0 || null;
-        let isSenderIdNull = jsonObject?.senderId?.length === 0 || null;
-        let isLocationLatNull = jsonObject?.locationLat?.length === 0 || null;
-        let isLocationLonNull = jsonObject?.locationLon?.length === 0 || null;
+        let isTextNull = jsonObject?.text?.length === 0 || null || undefined;
+        let isSenderIdNull = jsonObject?.senderId?.length === 0 || null || undefined;
+        let isLocationLatNull = jsonObject?.locationLat?.length === 0 || null || undefined;
+        let isLocationLonNull = jsonObject?.locationLon?.length === 0 || null || undefined;
 
 
-        if (isMessageTypeLocation || isLocationLonNull || isLocationLatNull) {
+        if (isMessageTypeLocation && (isLocationLonNull || isLocationLatNull)) {
             cb(IN_VALID_OBJECT_KEY);
             return;
         }
@@ -116,6 +119,13 @@ module.exports = {
         if (isSenderIdNull) {
             cb(IN_VALID_OBJECT_KEY);
             return;
+        }
+
+
+        if (isMessageTypeLocation && !isLocationLonNull && !isLocationLatNull) {
+            jsonObject.location = POINT(jsonObject.locationLat, jsonObject.locationLon);
+            delete jsonObject.locationLat;
+            delete jsonObject.locationLon;
         }
 
 

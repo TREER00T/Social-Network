@@ -99,6 +99,11 @@ module.exports = {
 
 
     name(phone, firstName, lastName, cb) {
+        try {
+            if (typeof lastName === 'string')
+                lastName = lastName.toString().trim();
+        } catch (e) {
+        }
         openSql.update({
             table: 'users',
             edit: {
