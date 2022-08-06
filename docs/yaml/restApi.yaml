@@ -279,6 +279,10 @@ paths:
           type: number
           required: true
         - in: formData
+          name: file
+          type: file
+          required: true
+        - in: formData
           name: senderId
           type: number
           required: true
@@ -584,6 +588,804 @@ paths:
             $ref: '#/definitions/Status'
 
 
+  /personal/user:
+    get:
+      tags:
+        - Personal
+      summary: Return user personal information
+      consumes:
+        - application/json
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataObject'
+
+
+  /personal/username/{id}:
+    put:
+      tags:
+        - Personal
+      summary: Update username
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        409:
+          description: Conflict
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+  /personal/bio/{bio}:
+    put:
+      tags:
+        - Personal
+      summary: Update user bio
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: bio
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+
+  /personal/name:
+    put:
+      tags:
+        - Personal
+      summary: Update user first and last name
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: lastName
+          type: string
+          required: false
+        - in: body
+          name: firstName
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+
+
+  /personal/twoAuth:
+    put:
+      tags:
+        - Personal
+      summary: Update two auth
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: email
+          type: string
+          required: true
+        - in: body
+          name: password
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+
+  /personal/twoAuth/disable:
+    put:
+      tags:
+        - Personal
+      summary: Disable two auth
+      consumes:
+        - application/json
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+  /personal/twoAuth/rest/password:
+    put:
+      tags:
+        - Personal
+      summary: Reset password for twwo auth
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: old
+          type: string
+          required: true
+        - in: body
+          name: new
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+
+  /personal/uploadAvatar:
+    put:
+      tags:
+        - Personal
+      summary: Update avatar
+      consumes:
+        - application/json
+      parameters:
+        - in: formData
+          name: image
+          type: file
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+
+  /personal/blockUsers:
+    get:
+      tags:
+        - Personal
+      summary: Return list of block users
+      consumes:
+        - application/json
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataObject'
+
+
+  /personal/devices:
+    get:
+      tags:
+        - Personal
+      summary: Return list of logged devices
+      consumes:
+        - application/json
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+
+  /personal/savedMessage:
+    get:
+      tags:
+        - Personal
+      summary: Return list of user saved message
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: to
+          type: number
+          required: true
+        - in: query
+          name: search
+          type: number
+          required: true
+        - in: query
+          name: limit
+          type: number
+          required: false
+        - in: query
+          name: page
+          type: number
+          required: false
+        - in: query
+          name: sort
+          type: string
+          required: false
+        - in: query
+          name: order
+          type: string
+          required: false
+        - in: query
+          name: type
+          type: string
+          required: false
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataAndOptionObject'
+    delete:
+      tags:
+        - Personal
+      summary: Delete saved message
+      consumes:
+        - application/json
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+    post:
+      tags:
+        - Personal
+      summary: Create saved message
+      consumes:
+        - application/json
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
+          description: Created
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        409:
+          description: Conflict
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+
+  /personal/account:
+    delete:
+      tags:
+        - Personal
+      summary: Delete Account
+      consumes:
+        - application/json
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+  /personal/message:
+    post:
+      tags:
+        - Personal
+      summary: Insert message in saved message
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: text
+          type: string
+          required: false
+        - in: body
+          name: type
+          type: string
+          required: false
+        - in: body
+          name: isReply
+          type: boolean
+          required: false
+        - in: body
+          name: isForward
+          type: boolean
+          required: false
+        - in: body
+          name: targetReplyId
+          type: number
+          required: false
+        - in: body
+          name: forwardDataId
+          type: number
+          required: false
+        - in: body
+          name: locationLat
+          type: number
+          required: false
+        - in: body
+          name: locationLon
+          type: number
+          required: false
+        - in: body
+          name: senderId
+          type: number
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
+          description: Created
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        802:
+          description: In valid json object key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+    delete:
+      tags:
+        - Personal
+      summary: Delete message in saved message
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            $ref: '#/definitions/ListOfIdForDeleteMessage'
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+    put:
+      tags:
+        - Personal
+      summary: Update message in saved message
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: text
+          type: string
+          required: false
+        - in: body
+          name: type
+          type: string
+          required: false
+        - in: body
+          name: isReply
+          type: boolean
+          required: false
+        - in: body
+          name: isForward
+          type: boolean
+          required: false
+        - in: body
+          name: targetReplyId
+          type: number
+          required: false
+        - in: body
+          name: forwardDataId
+          type: number
+          required: false
+        - in: body
+          name: locationLat
+          type: number
+          required: false
+        - in: body
+          name: locationLon
+          type: number
+          required: false
+        - in: body
+          name: senderId
+          type: number
+          required: true
+        - in: body
+          name: id
+          type: number
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
+          description: Created
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        802:
+          description: In valid json object key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+
   /common/search:
     get:
       tags:
@@ -594,7 +1396,7 @@ paths:
       parameters:
         - in: query
           name: v
-          type: number
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -627,7 +1429,38 @@ paths:
             $ref: '#/definitions/StatusWithDataObject'
 
 
+
 definitions:
+  ListOfIdForDeleteMessage:
+    properties:
+      listOfId:
+        type:
+          - number
+          - array
+  ResponseListOfBlockUsersInDataObject:
+    properties:
+      userId:
+        type: number
+      deviceIp:
+        type: string
+      createdAt:
+        type: string
+      deviceName:
+        type: string
+      deviceLocation:
+        type: string
+      id:
+        type: number
+  ResponseListOfLoggedDevicesInDataObject:
+    properties:
+      img:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+      id:
+        type: number
   ReponseCommonSearchInDataObject:
     properties:
       id:
@@ -746,6 +1579,26 @@ definitions:
       name:
         type: string
       defaultColor:
+        type: string
+  ResponseUserPersonalInfromationInDataObject:
+    properties:
+      img:
+        type: string
+      bio:
+        type: string
+      isActive:
+        type: boolean
+      username:
+        type: string
+      lastName:
+        type: string
+      name:
+        type: string
+      defaultColor:
+        type: string
+      phone:
+        type: number
+      email:
         type: string
   ResponseListOfMessageForEachChatRoomInDataObject:
     properties:

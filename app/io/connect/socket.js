@@ -422,6 +422,8 @@ io.use((socket, next) => {
 
 
                     let user = allUsers[receiverSocketId];
+                    if (receiverId !== undefined)
+                        delete data?.receiverId;
 
                     RestFulUtil.validateMessage(data, result => {
 
@@ -477,6 +479,9 @@ io.use((socket, next) => {
                             if (!result)
                                 return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
+
+                            if (receiverId !== undefined)
+                                delete data?.receiverId;
 
                             RestFulUtil.validateMessage(data, result => {
 
@@ -585,6 +590,9 @@ io.use((socket, next) => {
                 joinUserInRoom(groupId, 'group');
                 addRoomIntoListOfUserRooms(groupId, 'group');
 
+
+                delete data?.groupId;
+
                 RestFulUtil.validateMessage(data, result => {
 
                     if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
@@ -593,8 +601,6 @@ io.use((socket, next) => {
 
                     result['senderId'] = socketUserId;
 
-
-                    delete data?.groupId;
 
                     Insert.message('`' + groupId + 'GroupContents`', result, {
                         conversationType: 'Group'
@@ -809,6 +815,8 @@ io.use((socket, next) => {
 
                     delete data?.channelId;
 
+
+
                     RestFulUtil.validateMessage(data, result => {
 
                         if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
@@ -899,6 +907,7 @@ io.use((socket, next) => {
 
                     delete data?.channelId;
                     delete data?.messageId;
+
 
                     RestFulUtil.validateMessage(data, result => {
 
