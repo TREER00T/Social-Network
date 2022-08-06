@@ -21,19 +21,13 @@ module.exports = {
             });
     },
 
-    chatInListOfChatsForUser(fromUser, toUser, userId, cb) {
+    chatInListOfChatsForUser(fromUser, toUser, userId) {
         openSql.remove({
             table: 'listOfUserE2Es',
             where: {
                 fromUser: fromUser,
                 toUser: toUser,
                 userId: userId
-            }
-        }).result(result => {
-            try {
-                cb(result[1].affectedRows !== 0)
-            } catch (e) {
-                DataBaseException(e);
             }
         });
     },
