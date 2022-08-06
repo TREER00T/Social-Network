@@ -40,6 +40,7 @@ module.exports = {
     searchWithNameInTableUsersGroupsAndChannels(value, cb) {
         openSql.find({
             get: [
+                SOURCE('user', 'type'),
                 'id', 'name',
                 'img', 'defaultColor'
             ],
@@ -51,6 +52,7 @@ module.exports = {
             union: [
                 UNION_ALL({
                     get: [
+                        SOURCE('group', 'type'),
                         'id', 'name',
                         'img', 'defaultColor'
                     ],
@@ -62,6 +64,7 @@ module.exports = {
                 }),
                 UNION_ALL({
                     get: [
+                        SOURCE('channel', 'type'),
                         'id', 'name',
                         'img', 'defaultColor'
                     ],

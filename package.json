@@ -15,7 +15,7 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "node-jose": "^2.1.0",
-    "opensql": "^1.2.41",
+    "opensql": "^1.2.42",
     "socket.io": "^4.4.1",
     "swagger-ui-express": "^4.5.0",
     "yamljs": "^0.3.0"
