@@ -1196,11 +1196,11 @@ paths:
           required: false
         - in: body
           name: isReply
-          type: boolean
+          type: string
           required: false
         - in: body
           name: isForward
-          type: boolean
+          type: string
           required: false
         - in: body
           name: targetReplyId
@@ -1320,11 +1320,11 @@ paths:
           required: false
         - in: body
           name: isReply
-          type: boolean
+          type: string
           required: false
         - in: body
           name: isForward
-          type: boolean
+          type: string
           required: false
         - in: body
           name: targetReplyId
