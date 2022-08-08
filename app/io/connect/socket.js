@@ -136,6 +136,8 @@ io.use((socket, next) => {
     socket.on('onNotificationForVoiceCall', data => {
 
         let receiverId = data?.receiverId;
+        if (receiverId === undefined || null)
+            return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -157,7 +159,7 @@ io.use((socket, next) => {
 
                     let user = allUsers[receiverId];
 
-                    delete data['receiverId'];
+                    delete data?.receiverId;
                     data['senderId'] = socketUserId;
 
                     io.to(user).emit('emitNotificationForVoiceCall', data);
@@ -174,6 +176,9 @@ io.use((socket, next) => {
     socket.on('onVoiceCall', data => {
 
         let receiverId = data?.receiverId;
+
+        if (receiverId === undefined || null)
+            return socket.emit('emitVoiceCallError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -195,7 +200,7 @@ io.use((socket, next) => {
 
                     let user = allUsers[receiverId];
 
-                    delete data['receiverId'];
+                    delete data?.receiverId;
                     data['senderId'] = socketUserId;
 
                     io.to(user).emit('emitVoiceCall', data);
@@ -240,6 +245,9 @@ io.use((socket, next) => {
 
         let listOfUsersArray = arrayOfUser?.data;
 
+        if (listOfUsersArray === undefined || null)
+            return socket.emit('emitListOfUserChatError', Response.HTTP_BAD_REQUEST);
+
         IoUtil.searchAndReplaceInArrayOfUserIdToSocketId(listOfUsersArray, allUsers, result => {
 
             if (result === IN_VALID_USER_ID)
@@ -258,6 +266,9 @@ io.use((socket, next) => {
 
     socket.on('onPvTyping', data => {
         let receiverId = data?.receiverId;
+
+        if (receiverId === undefined || null)
+            return socket.emit('emitPvTypingError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -280,7 +291,7 @@ io.use((socket, next) => {
 
                     let user = allUsers[receiverId];
 
-                    delete data['receiverId'];
+                    delete data?.receiverId;
                     data['senderId'] = socketUserId;
 
                     io.to(user).emit('emitPvTyping', data);
@@ -296,6 +307,10 @@ io.use((socket, next) => {
 
     socket.on('onPvOnlineUser', data => {
         let receiverId = data?.receiverId;
+
+
+        if (receiverId === undefined || null)
+            return socket.emit('emitPvOnlineUserError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -313,7 +328,7 @@ io.use((socket, next) => {
 
                 let user = allUsers[receiverId];
 
-                delete data['receiverId'];
+                delete data?.receiverId;
                 data['senderId'] = socketUserId;
 
                 io.to(user).emit('emitPvOnlineUser', data);
@@ -327,6 +342,9 @@ io.use((socket, next) => {
 
     socket.on('onPvMessageSeen', data => {
         let receiverId = data?.receiverId;
+
+        if (receiverId === undefined || null)
+            return socket.emit('emitPvMessageSeenError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -343,7 +361,7 @@ io.use((socket, next) => {
 
                 let user = allUsers[receiverId];
 
-                delete data['receiverId'];
+                delete data?.receiverId;
                 data['senderId'] = socketUserId;
 
                 io.to(user).emit('emitPvMessageSeen', data);
@@ -357,6 +375,11 @@ io.use((socket, next) => {
 
     socket.on('onPvUploadedFile', data => {
         let receiverId = data?.receiverId;
+        let senderId = data?.senderId;
+        let id = data?.id;
+
+        if ((receiverId === undefined || null) || (senderId === undefined || null) || (id === undefined || null))
+            return socket.emit('emitPvUploadedFileError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
 
@@ -371,22 +394,22 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
 
-                FindInUser.getTableNameForListOfE2EMessage(data['senderId'], receiverId, dbData => {
+                FindInUser.getTableNameForListOfE2EMessage(senderId, receiverId, dbData => {
 
-                    if (!data)
+                    if (!dbData)
                         return socket.emit('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
 
-                    FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                    FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
                         if (!result)
                             return socket.emit('emitPvUploadedFileError', Response.HTTP_FORBIDDEN);
 
 
                         let user = allUsers[receiverId];
 
-                        delete data['receiverId'];
-                        data['senderId'] = socketUserId;
+                        delete data?.receiverId;
+                        dbData['senderId'] = socketUserId;
 
-                        FindInUser.getDataForE2EContentWithId(dbData, data['id'], result => {
+                        FindInUser.getDataForE2EContentWithId(dbData, id, result => {
                             io.to(user).emit('emitPvUploadedFile', Object.assign({}, result, data));
                         });
 
@@ -402,6 +425,10 @@ io.use((socket, next) => {
 
     socket.on('onPvMessage', data => {
         let receiverId = data?.receiverId;
+        let senderId = data?.senderId;
+
+        if ((receiverId === undefined || null) || (senderId === undefined || null))
+            return socket.emit('emitPvMessageError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
 
@@ -416,14 +443,13 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
 
-                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
                     if (!result)
                         return socket.emit('emitPvMessageError', Response.HTTP_FORBIDDEN);
 
 
                     let user = allUsers[receiverSocketId];
-                    if (receiverId !== undefined)
-                        delete data?.receiverId;
+                    delete data?.receiverId;
 
                     RestFulUtil.validateMessage(data, result => {
 
@@ -453,7 +479,10 @@ io.use((socket, next) => {
     socket.on('onPvEditMessage', data => {
         let receiverId = data?.receiverId;
         let messageId = data?.messageId;
+        let senderId = data?.senderId;
 
+        if ((receiverId === undefined || null) || (messageId === undefined || null) || (senderId === undefined || null))
+            return socket.emit('emitPvEditMessageError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
 
@@ -468,7 +497,7 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitPvEditMessageError', Response.HTTP_NOT_FOUND);
 
-                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
                     if (!result)
                         return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
@@ -480,8 +509,8 @@ io.use((socket, next) => {
                                 return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
 
-                            if (receiverId !== undefined)
-                                delete data?.receiverId;
+                            delete data?.receiverId;
+                            delete data?.messageId;
 
                             RestFulUtil.validateMessage(data, result => {
 
@@ -494,7 +523,7 @@ io.use((socket, next) => {
                                 io.to(user).emit('emitPvEditMessage', result);
 
                                 UpdateInCommon.message(socketUserId + 'And' + receiverId + 'E2EContents', result, {
-                                    messageId: data['messageId']
+                                    messageId: messageId
                                 });
 
 
@@ -515,6 +544,10 @@ io.use((socket, next) => {
 
     socket.on('onPvDeleteMessage', data => {
         let receiverId = data?.receiverId;
+        let listOfId = data?.listOfId;
+
+        if ((receiverId === undefined || null) || (listOfId === undefined || null))
+            return socket.emit('emitPvDeleteMessageError', Response.HTTP_BAD_REQUEST);
 
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
@@ -530,7 +563,7 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitPvDeleteMessageError', Response.HTTP_NOT_FOUND);
 
-                FindInUser.isMessageBelongForThisUserInE2E(data['listOfId'], socketUserId,
+                FindInUser.isMessageBelongForThisUserInE2E(listOfId, socketUserId,
                     socketUserId + 'And' + receiverId + 'E2EContents', result => {
                         if (!result)
                             return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
@@ -560,7 +593,10 @@ io.use((socket, next) => {
 
 
     socket.on('onLeaveGroup', data => {
-        let groupId = data?.id;
+        let groupId = data?.groupId;
+
+        if (groupId === undefined || null)
+            return socket.emit('emitLeaveGroupError', Response.HTTP_BAD_REQUEST);
 
         FindInGroup.groupId(groupId, result => {
 
@@ -575,6 +611,9 @@ io.use((socket, next) => {
     socket.on('onGroupMessage', data => {
 
         let groupId = data?.groupId;
+
+        if (groupId === undefined || null)
+            return socket.emit('emitGroupMessageError', Response.HTTP_BAD_REQUEST);
 
         FindInGroup.groupId(groupId, result => {
 
@@ -621,6 +660,9 @@ io.use((socket, next) => {
     socket.on('onGroupUploadedFile', data => {
 
         let groupId = data?.groupId;
+        let id = data?.id;
+        if ((id === undefined || null) || (groupId === undefined || null))
+            return socket.emit('emitGroupUploadedFileError', Response.HTTP_BAD_REQUEST);
 
         FindInGroup.groupId(groupId, result => {
 
@@ -640,7 +682,7 @@ io.use((socket, next) => {
                 data['senderId'] = socketUserId;
                 delete data?.groupId;
 
-                FindInGroup.getDataForGroupContentWithId(groupId, data['id'], result => {
+                FindInGroup.getDataForGroupContentWithId(groupId, id, result => {
                     io.to(groupId).emit('emitGroupUploadedFile', Object.assign({}, result, data));
                 });
 
@@ -657,6 +699,9 @@ io.use((socket, next) => {
 
         let groupId = data?.groupId;
         let messageId = data?.messageId;
+
+        if ((messageId === undefined || null) || (groupId === undefined || null))
+            return socket.emit('emitGroupEditMessageError', Response.HTTP_BAD_REQUEST);
 
         FindInGroup.groupId(groupId, result => {
 
@@ -676,8 +721,6 @@ io.use((socket, next) => {
                     joinUserInRoom(groupId, 'group');
                     addRoomIntoListOfUserRooms(groupId, 'group');
 
-                    if (data?.messageId === undefined)
-                        return socket.emit('emitGroupEditMessageError', Response.HTTP_BAD_REQUEST);
 
                     delete data?.groupId;
                     delete data?.messageId;
@@ -711,6 +754,9 @@ io.use((socket, next) => {
         let lisOfId = data?.listOfId;
         let messageId = data?.messageId;
 
+        if ((lisOfId === undefined || null) || (messageId === undefined || null) || (groupId === undefined || null))
+            return socket.emit('emitGroupDeleteMessageError', Response.HTTP_BAD_REQUEST);
+
         FindInGroup.groupId(groupId, result => {
 
             if (!result)
@@ -729,8 +775,6 @@ io.use((socket, next) => {
                     joinUserInRoom(groupId, 'group');
                     addRoomIntoListOfUserRooms(groupId, 'group');
 
-                    if (data?.listOfId === undefined || data?.messageId === undefined)
-                        return socket.emit('emitGroupDeleteMessageError', Response.HTTP_BAD_REQUEST);
 
                     DeleteInCommon.message('`' + groupId + 'GroupContents`', lisOfId);
 
@@ -748,6 +792,8 @@ io.use((socket, next) => {
     socket.on('onTypingGroupMessage', data => {
 
         let groupId = data?.groupId;
+        if (groupId === undefined || null)
+            return socket.emit('emitGroupTypingMessageError', Response.HTTP_BAD_REQUEST);
 
         FindInGroup.groupId(groupId, result => {
 
@@ -780,6 +826,9 @@ io.use((socket, next) => {
     socket.on('onLeaveChannel', data => {
         let channelId = data?.channelId;
 
+        if (channelId === undefined || null)
+            return socket.emit('emitLeaveChannelError', Response.HTTP_BAD_REQUEST);
+
         FindInChannel.channelId(channelId, result => {
 
             if (!result)
@@ -793,6 +842,10 @@ io.use((socket, next) => {
     socket.on('onChanelMessage', data => {
 
         let channelId = data?.channelId;
+
+
+        if (channelId === undefined || null)
+            return socket.emit('emitChannelMessageError', Response.HTTP_BAD_REQUEST);
 
         FindInChannel.channelId(channelId, result => {
 
@@ -814,7 +867,6 @@ io.use((socket, next) => {
                     addRoomIntoListOfUserRooms(channelId, 'channel');
 
                     delete data?.channelId;
-
 
 
                     RestFulUtil.validateMessage(data, result => {
@@ -844,6 +896,9 @@ io.use((socket, next) => {
     socket.on('onChanelUploadedFile', data => {
 
         let channelId = data?.channelId;
+
+        if (channelId === undefined || null)
+            return socket.emit('emitChannelUploadedFileError', Response.HTTP_BAD_REQUEST);
 
         FindInChannel.channelId(channelId, result => {
 
@@ -884,6 +939,9 @@ io.use((socket, next) => {
         let channelId = data?.channelId;
         let messageId = data?.messageId;
 
+        if ((messageId === undefined || null) || (channelId === undefined || null))
+            return socket.emit('emitChannelEditMessageError', Response.HTTP_BAD_REQUEST);
+
         FindInChannel.channelId(channelId, result => {
 
             if (!result)
@@ -902,7 +960,7 @@ io.use((socket, next) => {
 
                     joinUserInRoom(channelId, 'channel');
                     addRoomIntoListOfUserRooms(channelId, 'channel');
-                    if (data?.messageId === undefined)
+                    if (messageId === undefined)
                         return socket.emit('emitChannelEditMessageError', Response.HTTP_BAD_REQUEST);
 
                     delete data?.channelId;
@@ -933,6 +991,9 @@ io.use((socket, next) => {
     socket.on('onChanelDeleteMessage', data => {
 
         let channelId = data?.channelId;
+        let listOfId = data?.listOfId;
+        if ((channelId === undefined || null) || (listOfId === undefined || null))
+            return socket.emit('emitChannelDeleteMessageError', Response.HTTP_BAD_REQUEST);
 
         FindInChannel.channelId(channelId, result => {
 
@@ -953,7 +1014,7 @@ io.use((socket, next) => {
                     joinUserInRoom(channelId, 'channel');
                     addRoomIntoListOfUserRooms(channelId, 'channel');
 
-                    DeleteInCommon.message('`' + channelId + 'ChannelContents`', data['listOfId']);
+                    DeleteInCommon.message('`' + channelId + 'ChannelContents`', listOfId);
                     io.to(channelId).emit('emitChannelDeleteMessage', data);
 
 

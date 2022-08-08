@@ -21,23 +21,22 @@ let Json = require('app/util/ReturnJson'),
 
 exports.create = (req, res) => {
 
-
-    let name = req.body?.name;
-    let isUndefinedName = (name === undefined);
-
-    if (isUndefinedName)
-        return Json.builder(Response.HTTP_BAD_REQUEST);
-
-
     getTokenPayLoad(data => {
 
         let userId = data.id;
 
         multerImage(req, res, () => {
 
+            let name = req.body?.name;
+            let isUndefinedName = (name === undefined);
+
+            if (isUndefinedName)
+                return Json.builder(Response.HTTP_BAD_REQUEST);
+
             let file = req.file;
             let fileUrl;
             let isOwner = 1;
+
 
             if (file !== undefined) {
                 fileUrl = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname)).fileUrl;
@@ -190,28 +189,30 @@ exports.changeDescription = (req) => {
 
 exports.uploadAvatar = (req, res) => {
 
-    let id = req.body?.id;
 
     getTokenPayLoad(data => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        multerImage(req, res, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+            let id = req.body?.id;
 
-            FindInUser.isExistUser(userId, result => {
 
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+            Find.groupId(id, isDefined => {
 
-                Find.isOwnerOfGroup(userId, id, result => {
+                if (!isDefined)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
+
+                FindInUser.isExistUser(userId, result => {
 
                     if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
+                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                    multerImage(req, res, () => {
+                    Find.isOwnerOfGroup(userId, id, result => {
+
+                        if (!result)
+                            return Json.builder(Response.HTTP_FORBIDDEN);
 
                         let file = req.file;
 
