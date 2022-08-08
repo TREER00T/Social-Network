@@ -6,6 +6,7 @@ let Json = require('app/util/ReturnJson'),
     Create = require('app/model/create/channels'),
     Find = require('app/model/find/channels/channel'),
     FindInUser = require('app/model/find/user/users'),
+    CommonInsert = require('app/model/add/insert/common/index'),
     Delete = require('app/model/remove/channels/channel'),
     Update = require('app/model/update/channels/channel'),
     AddChannelForeignKey = require('app/model/add/foreignKey/channels'),
@@ -116,52 +117,79 @@ exports.uploadFile = (req, res) => {
 
             let data = JSON.parse(JSON.stringify(req.body));
 
-            let isExistReceiverId = data?.receiverId;
-            if (isExistReceiverId)
+            let receiverId = data?.receiverId;
+            if (receiverId !== undefined)
                 delete data?.receiverId;
 
-            Util.validateMessage(data, result => {
+            let channelId = data?.channelId;
+            if (channelId === undefined)
+                return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                if (result === (Util.IN_VALID_OBJECT_KEY || Util.IN_VALID_MESSAGE_TYPE))
-                    return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+            delete data?.channelId;
 
-                let toUser = data?.receiverId;
-                let fromUser = data?.senderId;
-                delete data?.receiverId;
+            Find.channelId(channelId, isDefined => {
 
-                if (toUser && fromUser !== undefined) {
+                if (!isDefined)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    let file = req.file;
+                FindInUser.isExistUser(userId, result => {
 
-                    if (file !== undefined) {
+                    if (!result)
+                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                        let {
-                            fileUrl,
-                            fileSize
-                        } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+                    Find.isOwnerOrAdminOfChannel(userId, channelId, result => {
 
-                        data['fileUrl'] = fileUrl;
-                        data['fileSize'] = fileSize;
-                        data['fileName'] = file.originalname;
+                        if (!result)
+                            return Json.builder(Response.HTTP_FORBIDDEN);
+
+                        Find.isJoinedInChannel(channelId, userId, result => {
+
+                            if (!result)
+                                return Json.builder(Response.HTTP_NOT_FOUND);
 
 
-                        CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, result => {
+                            Util.validateMessage(data, result => {
 
-                            return Json.builder(Response.HTTP_OK, {
-                                insertId: result
+                                if (result === (Util.IN_VALID_OBJECT_KEY || Util.IN_VALID_MESSAGE_TYPE))
+                                    return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+
+                                data['senderId'] = userId;
+                                let file = req.file;
+
+                                if (file !== undefined) {
+
+                                    let {
+                                        fileUrl,
+                                        fileSize
+                                    } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+
+                                    data['fileUrl'] = fileUrl;
+                                    data['fileSize'] = fileSize;
+                                    data['fileName'] = file.originalname;
+
+
+                                    CommonInsert.message('`' + channelId + 'ChannelContents`', data, {
+                                        conversationType: 'Channel'
+                                    }, result => {
+                                        return Json.builder(Response.HTTP_CREATED, {
+                                            insertId: result
+                                        });
+                                    });
+
+                                }
+
+                                return Json.builder(Response.HTTP_BAD_REQUEST);
+
                             });
 
                         });
 
-                    }
+                    });
 
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+                });
 
-                }
-
-                return Json.builder(Response.HTTP_BAD_REQUEST);
             });
-
 
         });
 
@@ -296,7 +324,7 @@ exports.uploadAvatar = (req, res) => {
                             if (!result)
                                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                            return Json.builder(Response.HTTP_OK);
+                            return Json.builder(Response.HTTP_CREATED);
                         });
 
                     });
@@ -362,6 +390,9 @@ exports.changeToPublicLink = (req) => {
 
     let {id, publicLink} = req.body;
 
+    if ((id === undefined || null) || (publicLink === undefined || null))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
     getTokenPayLoad(data => {
 
 
@@ -412,6 +443,10 @@ exports.joinUser = (req) => {
 
 
     let id = req.body?.id;
+    let targetUserId = req.body?.userId;
+
+    if (targetUserId === undefined || null)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -431,10 +466,10 @@ exports.joinUser = (req) => {
                 Find.isJoinedInChannel(id, userId, result => {
 
                     if (result)
-                        return Json.builder(Response.HTTP_CONFLICT);
+                        return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    Insert.userIntoChannel(id, userId);
-                    InsertInUser.channelIntoListOfUserChannels(id, userId);
+                    Insert.userIntoChannel(id, targetUserId);
+                    InsertInUser.channelIntoListOfUserChannels(id, targetUserId);
 
 
                     return Json.builder(Response.HTTP_CREATED);
@@ -454,6 +489,9 @@ exports.addAdmin = (req) => {
 
     let id = req.body?.id;
     let userIdForNewAdmin = req.body?.userId;
+
+    if (userIdForNewAdmin === undefined || null)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -516,6 +554,9 @@ exports.deleteAdmin = (req) => {
 
     let id = req.body?.id;
     let userIdForDeleteAdmin = req.body?.userId;
+
+    if (userIdForDeleteAdmin === undefined || null)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 

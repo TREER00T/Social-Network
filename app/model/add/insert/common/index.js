@@ -8,7 +8,7 @@ let openSql = require('opensql'),
 module.exports = {
 
     message(tableName, data, forwardData, cb) {
-        if (data['forwardDataId'] !== undefined || null) {
+        if (data?.forwardDataId !== undefined || null) {
             openSql.addOne({
                 table: 'forwardContents',
                 data: {
@@ -25,7 +25,7 @@ module.exports = {
                     }).result(result => {
                         try {
                             let messageId = result[1].insertId;
-                            UpdateInCommon.messageIdFromTableForwardContents(data['forwardDataId'], messageId);
+                            UpdateInCommon.messageIdFromTableForwardContents(data?.forwardDataId, messageId);
                             cb(messageId);
                         } catch (e) {
                             DataBaseException(e);

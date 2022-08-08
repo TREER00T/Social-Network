@@ -4,6 +4,7 @@ let express = require('express'),
 
 
 router.post('/create', Group.create);
+router.post('/uploadFile', Group.uploadFile);
 router.delete('/:id', Group.deleteGroup);
 router.put('/name', Group.changeName);
 router.put('/description', Group.changeDescription);
