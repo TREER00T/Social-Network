@@ -5,6 +5,7 @@ let express = require('express'),
 
 router.post('/create', Channel.create);
 router.delete('/:id', Channel.deleteChannel);
+router.post('/uploadFile', Channel.uploadFile);
 router.put('/name', Channel.changeName);
 router.put('/description', Channel.changeDescription);
 router.put('/uploadAvatar', Channel.uploadAvatar);

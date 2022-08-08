@@ -11,6 +11,7 @@ let Json = require('app/util/ReturnJson'),
     AddChannelForeignKey = require('app/model/add/foreignKey/channels'),
     DeleteInUser = require('app/model/remove/users/user'),
     multerImage = multer().single('image'),
+    multerFile = multer().single('file'),
     {
         getTokenPayLoad
     } = require('app/middleware/ApiPipeline'),
@@ -22,13 +23,6 @@ let Json = require('app/util/ReturnJson'),
 exports.create = (req, res) => {
 
 
-    let name = req.body?.name;
-    let isUndefinedName = (name === undefined);
-
-    if (isUndefinedName)
-        return Json.builder(Response.HTTP_BAD_REQUEST);
-
-
     getTokenPayLoad(data => {
 
         let userId = data.id;
@@ -38,6 +32,13 @@ exports.create = (req, res) => {
             let file = req.file;
             let fileUrl;
             let isOwner = 1;
+
+
+            let name = req.body?.name;
+            let isUndefinedName = (name === undefined);
+
+            if (isUndefinedName)
+                return Json.builder(Response.HTTP_BAD_REQUEST);
 
             if (file !== undefined) {
                 fileUrl = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname)).fileUrl;
@@ -102,6 +103,72 @@ exports.deleteChannel = (req) => {
     });
 
 }
+
+
+exports.uploadFile = (req, res) => {
+
+
+    getTokenPayLoad(data => {
+
+        let userId = data.id;
+
+        multerFile(req, res, () => {
+
+            let data = JSON.parse(JSON.stringify(req.body));
+
+            let isExistReceiverId = data?.receiverId;
+            if (isExistReceiverId)
+                delete data?.receiverId;
+
+            Util.validateMessage(data, result => {
+
+                if (result === (Util.IN_VALID_OBJECT_KEY || Util.IN_VALID_MESSAGE_TYPE))
+                    return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+                let toUser = data?.receiverId;
+                let fromUser = data?.senderId;
+                delete data?.receiverId;
+
+                if (toUser && fromUser !== undefined) {
+
+                    let file = req.file;
+
+                    if (file !== undefined) {
+
+                        let {
+                            fileUrl,
+                            fileSize
+                        } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+
+                        data['fileUrl'] = fileUrl;
+                        data['fileSize'] = fileSize;
+                        data['fileName'] = file.originalname;
+
+
+                        CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, result => {
+
+                            return Json.builder(Response.HTTP_OK, {
+                                insertId: result
+                            });
+
+                        });
+
+                    }
+
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                }
+
+                return Json.builder(Response.HTTP_BAD_REQUEST);
+            });
+
+
+        });
+
+    });
+
+
+};
 
 
 exports.changeName = (req) => {
@@ -190,30 +257,33 @@ exports.changeDescription = (req) => {
 
 exports.uploadAvatar = (req, res) => {
 
-    let id = req.body?.id;
 
     getTokenPayLoad(data => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+        multerImage(req, res, () => {
 
-            FindInUser.isExistUser(userId, result => {
+            let id = req.body?.id;
 
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+            Find.channelId(id, isDefined => {
 
-                Find.isOwnerOfChannel(userId, id, result => {
+                if (!isDefined)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
+
+                FindInUser.isExistUser(userId, result => {
 
                     if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
+                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-                    multerImage(req, res, () => {
+                    Find.isOwnerOfChannel(userId, id, result => {
+
+                        if (!result)
+                            return Json.builder(Response.HTTP_FORBIDDEN);
 
                         let file = req.file;
+
 
                         if (file === undefined)
                             return Json.builder(Response.HTTP_BAD_REQUEST);
