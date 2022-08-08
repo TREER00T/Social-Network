@@ -126,7 +126,7 @@ exports.uploadFile = (req, res) => {
                                     CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, {
                                         conversationType: 'E2E'
                                     }, result => {
-                                        return Json.builder(Response.HTTP_OK, {
+                                        return Json.builder(Response.HTTP_CREATED, {
                                             insertId: result
                                         });
                                     });

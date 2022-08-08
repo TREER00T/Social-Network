@@ -105,7 +105,7 @@ module.exports = {
     },
 
     makeIdForPublicLink(id) {
-        return `+` + id;
+        return `+` + id.toString().trim();
     },
 
     objectListOfUserActivityForWhereCondition(type, userId) {

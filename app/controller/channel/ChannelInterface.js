@@ -154,7 +154,7 @@ exports.uploadFile = (req, res) => {
                                     return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                                data?.senderId = userId;
+                                data['senderId'] = userId;
                                 let file = req.file;
 
                                 if (file !== undefined) {
@@ -172,7 +172,7 @@ exports.uploadFile = (req, res) => {
                                     CommonInsert.message('`' + channelId + 'ChannelContents`', data, {
                                         conversationType: 'Channel'
                                     }, result => {
-                                        return Json.builder(Response.HTTP_OK, {
+                                        return Json.builder(Response.HTTP_CREATED, {
                                             insertId: result
                                         });
                                     });
@@ -324,7 +324,7 @@ exports.uploadAvatar = (req, res) => {
                             if (!result)
                                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                            return Json.builder(Response.HTTP_OK);
+                            return Json.builder(Response.HTTP_CREATED);
                         });
 
                     });
@@ -390,6 +390,9 @@ exports.changeToPublicLink = (req) => {
 
     let {id, publicLink} = req.body;
 
+    if ((id === undefined || null) || (publicLink === undefined || null))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
     getTokenPayLoad(data => {
 
 
@@ -440,6 +443,10 @@ exports.joinUser = (req) => {
 
 
     let id = req.body?.id;
+    let targetUserId = req.body?.userId;
+
+    if (targetUserId === undefined || null)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -459,10 +466,10 @@ exports.joinUser = (req) => {
                 Find.isJoinedInChannel(id, userId, result => {
 
                     if (result)
-                        return Json.builder(Response.HTTP_CONFLICT);
+                        return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    Insert.userIntoChannel(id, userId);
-                    InsertInUser.channelIntoListOfUserChannels(id, userId);
+                    Insert.userIntoChannel(id, targetUserId);
+                    InsertInUser.channelIntoListOfUserChannels(id, targetUserId);
 
 
                     return Json.builder(Response.HTTP_CREATED);
@@ -482,6 +489,9 @@ exports.addAdmin = (req) => {
 
     let id = req.body?.id;
     let userIdForNewAdmin = req.body?.userId;
+
+    if (userIdForNewAdmin === undefined || null)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -544,6 +554,9 @@ exports.deleteAdmin = (req) => {
 
     let id = req.body?.id;
     let userIdForDeleteAdmin = req.body?.userId;
+
+    if (userIdForDeleteAdmin === undefined || null)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
