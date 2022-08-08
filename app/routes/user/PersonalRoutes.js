@@ -18,6 +18,7 @@ router.delete('/savedMessage', Personal.deleteSavedMessage);
 router.post('/savedMessage', Personal.createSavedMessage);
 router.delete('/account', Personal.account);
 router.post('/message', Personal.addMessage);
+router.post('/uploadFile', Personal.uploadFile);
 router.delete('/message', Personal.deleteMessage);
 router.put('/message', Personal.editMessage);
 

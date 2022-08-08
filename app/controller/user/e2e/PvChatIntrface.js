@@ -66,52 +66,87 @@ exports.createE2EChat = (req) => {
 exports.uploadFile = (req, res) => {
 
 
-    multerFile(req, res, () => {
+    getTokenPayLoad(data => {
 
-        let data = JSON.parse(JSON.stringify(req.body));
+        let userId = data.id;
 
-        RestFulUtil.validateMessage(data, result => {
+        Find.isExistUser(userId, isInDb => {
 
-            if (result === (RestFulUtil.IN_VALID_OBJECT_KEY || RestFulUtil.IN_VALID_MESSAGE_TYPE))
-                return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-            let toUser = data?.receiverId;
-            let fromUser = data?.senderId;
-            delete data?.receiverId;
-
-            if (toUser && fromUser !== undefined) {
-
-                let file = req.file;
-
-                if (file !== undefined) {
-
-                    let {
-                        fileUrl,
-                        fileSize
-                    } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
-
-                    data['fileUrl'] = fileUrl;
-                    data['fileSize'] = fileSize;
-                    data['fileName'] = file.originalname;
+            if (!isInDb)
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
-                    CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, result => {
+            multerFile(req, res, () => {
 
-                        return Json.builder(Response.HTTP_OK, {
-                            insertId: result
+                let data = JSON.parse(JSON.stringify(req.body));
+                let receiverId = data?.receiverId;
+
+                if (receiverId === undefined)
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                delete data?.receiverId;
+
+                Find.isExistUser(receiverId, isInDb => {
+
+                    if (!isInDb)
+                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+                    Find.isExistChatRoom({
+                        toUser: `${receiverId}`,
+                        fromUser: `${userId}`
+                    }, result => {
+
+                        if (!result)
+                            return Json.builder(Response.HTTP_NOT_FOUND);
+
+                        RestFulUtil.validateMessage(data, result => {
+
+                            if (result === (RestFulUtil.IN_VALID_OBJECT_KEY || RestFulUtil.IN_VALID_MESSAGE_TYPE))
+                                return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+                            let toUser = receiverId;
+                            let fromUser = data?.senderId;
+
+                            if (toUser && fromUser !== undefined) {
+
+                                let file = req.file;
+
+                                if (file !== undefined) {
+
+                                    let {
+                                        fileUrl,
+                                        fileSize
+                                    } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+
+                                    data['fileUrl'] = fileUrl;
+                                    data['fileSize'] = fileSize;
+                                    data['fileName'] = file.originalname;
+
+
+                                    CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, {
+                                        conversationType: 'E2E'
+                                    }, result => {
+                                        return Json.builder(Response.HTTP_OK, {
+                                            insertId: result
+                                        });
+                                    });
+
+                                }
+
+                                return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                            }
+
+                            return Json.builder(Response.HTTP_BAD_REQUEST);
                         });
 
                     });
 
-                }
+                });
 
-                return Json.builder(Response.HTTP_BAD_REQUEST);
+            });
 
-            }
-
-            return Json.builder(Response.HTTP_BAD_REQUEST);
         });
-
 
     });
 

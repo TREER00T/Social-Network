@@ -13,11 +13,13 @@ let Json = require('app/util/ReturnJson'),
         NULL
     } = require('opensql').queryHelper,
     multerImage = multer().single('image'),
+    multerFile = multer().single('file'),
     {
         getHashData
     } = require('app/util/Generate'),
     File = require('app/util/File'),
     Util = require('app/util/Util'),
+    CommonInsert = require('app/model/add/insert/common/index'),
     Create = require('app/model/create/users'),
     Insert = require('app/model/add/insert/user/users'),
     FindInUser = require('app/model/find/user/users'),
@@ -431,6 +433,75 @@ exports.addMessage = (req) => {
     });
 
 }
+
+
+exports.uploadFile = (req, res) => {
+
+
+    getTokenPayLoad(data => {
+
+        let userId = data.id;
+        let phone = data.phoneNumber;
+
+        Find.isExistUser(userId, isInDb => {
+
+            if (!isInDb)
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+
+            multerFile(req, res, () => {
+
+                let data = JSON.parse(JSON.stringify(req.body));
+
+                Find.isSavedMessageCreated(phone, result => {
+
+                    if (!result)
+                        return Json.builder(Response.HTTP_NOT_FOUND);
+
+                    Util.validateMessage(data, result => {
+
+                        if (result === (Util.IN_VALID_OBJECT_KEY || Util.IN_VALID_MESSAGE_TYPE))
+                            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+
+                        let file = req.file;
+
+                        if (file !== undefined) {
+
+                            let {
+                                fileUrl,
+                                fileSize
+                            } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+
+                            data['fileUrl'] = fileUrl;
+                            data['fileSize'] = fileSize;
+                            data['fileName'] = file.originalname;
+
+
+                            CommonInsert.message('`' + phone + 'SavedMessages`', data, {
+                                conversationType: 'Personal'
+                            }, result => {
+                                return Json.builder(Response.HTTP_OK, {
+                                    insertId: result
+                                });
+                            });
+
+                        }
+
+                        return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                    });
+
+                });
+
+            });
+
+        });
+
+    });
+
+
+};
 
 
 exports.deleteMessage = (req) => {
