@@ -445,8 +445,6 @@ exports.joinUser = (req) => {
     let id = req.body?.id;
     let targetUserId = req.body?.userId;
 
-    if (targetUserId === undefined || null)
-        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -468,8 +466,10 @@ exports.joinUser = (req) => {
                     if (result)
                         return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    Insert.userIntoChannel(id, targetUserId);
-                    InsertInUser.channelIntoListOfUserChannels(id, targetUserId);
+                    let getUserId = targetUserId === undefined || null ? userId : targetUserId;
+
+                    Insert.userIntoChannel(id, getUserId);
+                    InsertInUser.channelIntoListOfUserChannels(id, getUserId);
 
 
                     return Json.builder(Response.HTTP_CREATED);
