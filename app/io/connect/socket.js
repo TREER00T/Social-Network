@@ -136,7 +136,8 @@ io.use((socket, next) => {
     socket.on('onNotificationForVoiceCall', data => {
 
         let receiverId = data?.receiverId;
-        if (receiverId === undefined || null)
+        let senderId = data?.senderId;
+        if ((receiverId === undefined || null) || (senderId === undefined || null))
             return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
@@ -152,7 +153,7 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_NOT_FOUND);
 
-                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
                     if (!result)
                         return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_FORBIDDEN);
 
@@ -176,8 +177,8 @@ io.use((socket, next) => {
     socket.on('onVoiceCall', data => {
 
         let receiverId = data?.receiverId;
-
-        if (receiverId === undefined || null)
+        let senderId = data?.senderId;
+        if ((receiverId === undefined || null) || (senderId === undefined || null))
             return socket.emit('emitVoiceCallError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
@@ -194,7 +195,7 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitVoiceCallError', Response.HTTP_NOT_FOUND);
 
-                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
                     if (!result)
                         return socket.emit('emitVoiceCallError', Response.HTTP_FORBIDDEN);
 
@@ -266,8 +267,8 @@ io.use((socket, next) => {
 
     socket.on('onPvTyping', data => {
         let receiverId = data?.receiverId;
-
-        if (receiverId === undefined || null)
+        let senderId = data?.senderId;
+        if ((receiverId === undefined || null) || (senderId === undefined || null))
             return socket.emit('emitPvTypingError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
@@ -284,7 +285,7 @@ io.use((socket, next) => {
                 if (!result)
                     return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
 
-                FindInUser.isUserInListOfBlockUser(data['senderId'], receiverId, result => {
+                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
                     if (!result)
                         return socket.emit('emitPvTypingError', Response.HTTP_FORBIDDEN);
 
