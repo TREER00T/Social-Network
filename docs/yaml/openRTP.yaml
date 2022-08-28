@@ -1,0 +1,506 @@
+info:
+  title: Social Network Application
+  version: 1.0.0
+  contact:
+    email: treeroot.ir@gmail.com
+    phone: '+989030207892'
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  description: A simple node.js app using rest api and socket.io
+
+baseUrl: http://localhost:4000
+
+tags:
+  - name: E2E
+    description: End-to-end data transfer operations
+  - name: Group
+    description: Group room for data transfer operations
+  - name: Channel
+    description: Channel room for data transfer operations
+
+securityDefinitions:
+  apiKey:
+    description: Socket.io uses a persistent Api Key.
+    type: apiKey
+    in: query
+    schema: all
+    name: apiKey
+  token:
+    description: Socket.io uses a persistent JWT Token.
+    type: apiKey
+    in: header
+    schema: all
+    name: authorization
+
+
+paths:
+
+  - on: connection
+    events:
+      - name: onlineStatus
+        description: By notifying all sockets known to the user.
+
+  - on: disconnect
+    events:
+      - name: onlineStatus
+        description: By notifying all sockets known to the user.
+
+  - on: onNotificationForVoiceCall
+    tags:
+      - E2E
+    parameters:
+      - $ref:
+          - components/ReceiverId
+          - components/SenderId
+    events:
+      - $ref:
+          - components/emitNotificationForVoiceCallError
+          - components/emitNotificationForVoiceCall
+
+  - on: onVoiceCall
+    tags:
+      - E2E
+    parameters:
+      - $ref:
+          - components/ReceiverId
+          - components/SenderId
+    events:
+      - $ref:
+          - components/emitVoiceCallError
+          - components/emitVoiceCall
+
+  - on: onUserActivities
+    description: Return list of user chats
+    tags:
+      - E2E
+    parameters:
+      - name: type
+        type: string
+        description: The room type and by defualt return all rooms => [ 'e2e' , 'channel', 'group' ]
+        required: true
+    events:
+      - name: emitUserActivities
+        description: Emitting list of rooms
+
+  - on: setOnListOfUsersChat
+    description: Help to send user online status for specific user
+    tags:
+      - E2E
+    parameters:
+      - name: data
+        type: array
+        description: List of users who chat with this person
+
+  - on: onPvTyping
+    tags:
+      - E2E
+    parameters:
+      - $ref:
+          - components/ReceiverId
+          - components/SenderId
+    events:
+      - $ref:
+          - components/emitPvTypingError
+          - components/emitPvTyping
+
+  - on: onPvOnlineUser
+    tags:
+      - E2E
+    parameters:
+      - $ref:
+          - components/ReceiverId
+          - components/SenderId
+    events:
+      - $ref:
+          - components/emitPvOnlineUserError
+          - components/emitPvOnlineUser
+
+  - on: onPvMessageSeen
+    tags:
+      - E2E
+    parameters:
+      - $ref:
+          - components/ReceiverId
+          - components/SenderId
+    events:
+      - $ref:
+          - components/emitPvMessageSeenError
+          - components/emitPvMessageSeen
+
+  - on: onPvUploadedFile
+    tags:
+      - E2E
+    parameters:
+      - $ref:
+          - components/ReceiverId
+          - components/SenderId
+          - components/UploadedId
+    events:
+      - $ref:
+          - components/emitPvUploadedFileError
+          - components/emitPvUploadedFile
+
+  - on: onPvMessage
+    tags:
+      - E2E
+    parameters:
+      - $ref:
+          - components/ReceiverId
+          - components/SenderId
+          - components/DataMessage
+    events:
+      - $ref:
+          - components/emitPvMessageError
+          - components/emitPvMessage
+
+  - on: onPvEditMessage
+    tags:
+      - E2E
+    parameters:
+      - $ref:
+          - components/ReceiverId
+          - components/SenderId
+          - components/DataMessage
+          - components/MessageId
+    events:
+      - $ref:
+          - components/emitPvEditMessageError
+          - components/emitPvEditMessage
+
+  - on: onPvDeleteMessage
+    tags:
+      - E2E
+    parameters:
+      - $ref:
+          - components/ReceiverId
+          - components/ListOfId
+    events:
+      - $ref:
+          - components/emitPvDeleteMessageError
+          - components/emitPvDeleteMessage
+
+  - on: onLeaveGroup
+    tags:
+      - Group
+    parameters:
+      - $ref:
+          - components/GroupId
+    events:
+      - $ref:
+          - components/emitLeaveGroupError
+
+  - on: onGroupMessage
+    tags:
+      - Group
+    parameters:
+      - $ref:
+          - components/GroupId
+          - components/DataMessage
+    events:
+      - $ref:
+          - components/emitGroupMessageError
+          - components/emitGroupMessage
+
+  - on: onGroupUploadedFile
+    tags:
+      - Group
+    parameters:
+      - $ref:
+          - components/GroupId
+          - components/UploadedId
+    events:
+      - $ref:
+          - components/emitGroupUploadedFileError
+          - components/emitGroupUploadedFile
+
+  - on: onGroupEditMessage
+    tags:
+      - Group
+    parameters:
+      - $ref:
+          - components/DataMessage
+          - components/GroupId
+          - components/MessageId
+    events:
+      - $ref:
+          - components/emitGroupEditMessageError
+          - components/emitGroupEditMessage
+
+  - on: onGroupDeleteMessage
+    tags:
+      - Group
+    parameters:
+      - $ref:
+          - components/GroupId
+          - components/ListOfId
+    events:
+      - $ref:
+          - components/emitGroupDeleteMessageError
+          - components/emitGroupDeleteMessage
+
+  - on: onTypingGroupMessage
+    tags:
+      - Group
+    parameters:
+      - $ref:
+          - components/GroupId
+    events:
+      - $ref:
+          - components/emitGroupTypingMessageError
+          - components/emitTypingGroupMessage
+
+  - on: onLeaveChannel
+    tags:
+      - Channel
+    parameters:
+      - $ref:
+          - components/ChannelId
+    events:
+      - $ref:
+          - components/emitLeaveChannelError
+
+  - on: onChanelMessage
+      tags:
+        - Channel
+      parameters:
+        - $ref:
+            - components/ChannelId
+            - components/DataMessage
+      events:
+        - $ref:
+            - components/emitChannelMessageError
+            - components/emitChannelMessage
+
+  - on: onChanelUploadedFile
+    tags:
+      - Channel
+    parameters:
+      - $ref:
+          - components/ChannelId
+          - components/UploadedId
+    events:
+      - $ref:
+          - components/emitChannelUploadedFileError
+          - components/emitChannelUploadedFile
+
+  - on: onChanelEditMessage
+    tags:
+      - Channel
+    parameters:
+      - $ref:
+          - components/DataMessage
+          - components/ChannelId
+          - components/MessageId
+    events:
+      - $ref:
+          - components/emitChannelEditMessageError
+          - components/emitChannelEditMessage
+
+  - on: onGroupDeleteMessage
+    tags:
+      - Channel
+    parameters:
+      - $ref:
+          - components/ChannelId
+          - components/ListOfId
+    events:
+      - $ref:
+          - components/emitChannelDeleteMessageError
+          - components/emitChannelDeleteMessage
+
+
+definitions:
+  Online Status:
+    - name: userId
+      type: integer
+    - name: isOnline
+      type: boolean
+  Status Code & Message:
+    - name: status
+      type: integer
+      description: Http status code
+    - name: message
+      type: string
+      description: Http status message
+
+
+
+components:
+  events:
+    emitNotificationForVoiceCallError:
+      - name: emitNotificationForVoiceCallError
+        description: Return error status code and message
+    emitNotificationForVoiceCall:
+      - name: emitNotificationForVoiceCall
+        description: Emitting notification voice call for specific user
+    emitVoiceCallError:
+      - name: emitVoiceCallError
+        description: Return error status code and message
+    emitVoiceCall:
+      - name: emitVoiceCall
+        description: Return voice call data
+    emitPvTypingError:
+      - name: emitPvTypingError
+        description: Return error status code and message
+    emitPvTyping:
+      - name: emitPvTyping
+        description: Emitting user pv typing
+    emitPvOnlineUserError:
+      - name: emitPvOnlineUserError
+        description: Return error status code and message
+    emitPvOnlineUser:
+      - name: emitPvOnlineUser
+        description: Emitting user pv online status
+    emitPvMessageSeenError:
+      - name: emitPvMessageSeenError
+        description: Return error status code and message
+    emitPvMessageSeen:
+      - name: emitPvMessageSeen
+        description: Emitting user pv message seen
+    emitPvUploadedFileError:
+      - name: emitPvUploadedFileError
+        description: Return error status code and message
+    emitPvUploadedFile:
+      - name: emitPvUploadedFile
+        description: Emitting uploaded file for specific user into pv chat
+    emitPvMessageError:
+      - name: emitPvMessageError
+        description: Return error status code and message
+    emitPvMessage:
+      - name: emitPvMessage
+        description: Emitting message for specific user into pv chat
+    emitPvEditMessageError:
+      - name: emitPvEditMessageError
+        description: Return error status code and message
+    emitPvEditMessage:
+      - name: emitPvEditMessage
+        description: Emitting message edited for specific user into pv chat
+    emitPvDeleteMessageError:
+      - name: emitPvDeleteMessageError
+        description: Return error status code and message
+    emitPvDeleteMessage:
+      - name: emitPvDeleteMessage
+        description: Emitting list of message id deleted for specific user into pv chat
+    emitLeaveGroupError:
+      - name: emitLeaveGroupError
+        description: Return error status code and message
+    emitGroupMessageError:
+      - name: emitGroupMessageError
+        description: Return error status code and message
+    emitGroupMessage:
+      - name: emitGroupMessage
+        description: Emitting message for specific group
+    emitGroupUploadedFileError:
+      - name: emitGroupUploadedFileError
+        description: Return error status code and message
+    emitGroupUploadedFile:
+      - name: emitGroupUploadedFile
+        description: Emitting file uploaded for specific group
+    emitGroupEditMessageError:
+      - name: emitGroupEditMessageError
+        description: Return error status code and message
+    emitGroupEditMessage:
+      - name: emitGroupEditMessage
+        description: Emitting message edited for specific group
+    emitGroupDeleteMessageError:
+      - name: emitGroupDeleteMessageError
+        description: Return error status code and message
+    emitGroupDeleteMessage:
+      - name: emitGroupDeleteMessage
+        description: Emitting list of message id deleted for specific group
+    emitGroupTypingMessageError:
+      - name: emitGroupTypingMessageError
+        description: Return error status code and message
+    emitTypingGroupMessage:
+      - name: emitTypingGroupMessage
+        description: Emitting message typing for specific group
+    emitLeaveChannelError:
+      - name: emitLeaveChannelError
+        description: Return error status code and message
+    emitChannelMessageError:
+      - name: emitChannelMessageError
+        description: Return error status code and message
+    emitChannelMessage:
+      - name: emitChannelMessage
+        description: Emitting message for specific channel
+    emitChannelUploadedFileError:
+      - name: emitChannelUploadedFileError
+        description: Return error status code and message
+    emitChannelUploadedFile:
+      - name: emitChannelUploadedFile
+        description: Emitting file uploaded for specific channel
+    emitChannelEditMessageError:
+      - name: emitChannelEditMessageError
+        description: Return error status code and message
+    emitChannelEditMessage:
+      - name: emitChannelEditMessage
+        description: Emitting message edited for specific channel
+    emitChannelDeleteMessageError:
+      - name: emitChannelDeleteMessageError
+        description: Return error status code and message
+    emitChannelDeleteMessage:
+      - name: emitChannelDeleteMessage
+        description: Emitting list of message id deleted for specific channel
+  parameters:
+    ReceiverId:
+      - in: param
+        name: receiverId
+        type: integer
+        required: true
+    UploadedId:
+      - in: param
+        name: id
+        type: integer
+        required: true
+    SenderId:
+      - in: param
+        name: senderId
+        type: integer
+        required: true
+    GroupId:
+      - in: param
+        name: groupId
+        type: integer
+        required: true
+    CahnnelId:
+      - in: param
+        name: channelId
+        type: integer
+        required: true
+    ListOfId:
+      - in: param
+        name: array
+        type: integer
+        required: true
+    MessageId:
+      - in: param
+        name: messageId
+        type: integer
+        required: true
+    DataMessage:
+      - in: param
+        name: text
+        type: string
+      - in: param
+        name: type
+        description: default is None, other type => ['None', 'Image', 'Location', 'Document', 'Video', 'Voice']
+        type: string
+      - in: param
+        name: targetReplyId
+        type: integer
+      - in: param
+        name: forwardDataId
+        type: integer
+      - in: param
+        name: locationLat
+        type: integer
+      - in: param
+        name: locationLon
+        type: integer
+      - in: param
+        name: isReply
+        type: boolean
+      - in: param
+        name: isForward
+        type: boolean

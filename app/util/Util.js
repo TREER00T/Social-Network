@@ -134,7 +134,7 @@ module.exports = {
 
 
         if (isTextNull && isMessageTypeNull)
-            jsonObject.text = 'Image';
+            jsonObject.type = 'Image';
 
 
         if (isMessageTypeNull && !isTextNull)

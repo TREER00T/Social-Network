@@ -1,6 +1,6 @@
 {
-  "name": "treer00t",
-  "version": "1.0.0",
+  "name": "social-network-server",
+  "version": "1.0.4",
   "description": "Social Network Application",
   "main": "init.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "node-jose": "^2.1.0",
+    "openrtp": "^1.0.2",
     "opensql": "^1.2.43",
     "socket.io": "^4.4.1",
     "swagger-ui-express": "^4.5.0",
