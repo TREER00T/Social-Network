@@ -33,9 +33,12 @@ module.exports = {
                 return Json.builder(Response.HTTP_METHOD_NOT_ALLOWED);
 
 
-            let routeMsg = Validation.isRouteWithOutAuthentication(req.url, app).msg;
+            let routeMsg = Validation.isRouteWithOutAuthentication(req.url, app);
 
-            if (routeMsg !== 'RouteForWithOutAuth' && routeMsg !== 'NotFound') {
+            if (routeMsg === 'NotFound')
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            if (routeMsg === 'AuthRoute') {
                 let token,
                     apiKey;
                 try {
