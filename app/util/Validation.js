@@ -38,7 +38,13 @@ module.exports = {
     isRouteWithOutAuthentication(url, app) {
 
         let arrayOfRouteWithOutAuth = [
-            '/apiDocs',
+            '/apiDocs/',
+            '/apiDocs/swagger-ui.css',
+            '/apiDocs/swagger-ui-bundle.js',
+            '/apiDocs/swagger-ui-standalone-preset.js',
+            '/apiDocs/swagger-ui-init.js',
+            '/apiDocs/favicon-32x32.png',
+            '/apiDocs/favicon-16x16.png',
             '/api/auth/generate/user',
             '/api/auth/verify/authCode'
         ];
@@ -56,44 +62,57 @@ module.exports = {
 
 
             if (layer.method)
-                arrayOfRoute.push('/' + path.concat(Util.splitRoute(layer.regexp)).filter(Boolean).join('/') + '/');
+                arrayOfRoute.push('/' + path.concat(Util.splitRoute(layer.regexp)).filter(Boolean).join('/'));
         }
 
         app._router.stack.forEach(print.bind(null, []));
 
+        arrayOfRoute = arrayOfRoute.filter((el) => !arrayOfRouteWithOutAuth.includes(el));
 
-        let arr = [false, false],
-            statusAllAppRoute = () => arr[0],
-            statusForRouteWithOutAuth = () => arr[1]
+        let isRouteWithoutAuth = arrayOfRouteWithOutAuth.includes(url);
 
+        if (isRouteWithoutAuth)
+            return '';
 
-        for (let index in arrayOfRoute) {
-            let item = arrayOfRoute[index];
-            let isEqualRouteWithDoubleSlash = item === url + '/',
-                isEqualRoute = item === url;
+        let urlArr = url.split('/').filter(e => e),
+            newUrl = [],
+            push = (data) => {
+                newUrl.push(data);
+            };
 
-            if (isEqualRoute || isEqualRouteWithDoubleSlash) {
-                arr[0] = true;
-                break;
-            }
+        for (let i = 0; i < arrayOfRoute.length; i++) {
+            let item = arrayOfRoute;
 
+            if (item === url)
+                return 'AuthRoute';
         }
 
-        for (let index in arrayOfRouteWithOutAuth) {
-            let item = arrayOfRouteWithOutAuth[index];
+        for (let i = 0; i < urlArr.length; i++) {
+            let item = urlArr[i],
+                isNumber = Number.isInteger(parseInt(item)),
+                iString = typeof item === 'string',
+                preItem = urlArr[i - 1],
+                isBio = iString && preItem === 'bio';
 
-            let isEqualRoute = url === item,
-                isEqualRouteWithDoubleSlash = url === item + '/';
-
-            if (isEqualRoute || isEqualRouteWithDoubleSlash) {
-                arr[1] = true;
-                break;
+            if (isBio) {
+                push(':bio');
+                continue;
             }
+
+            if (isNumber) {
+                push(':id');
+                continue;
+            }
+
+            push(item);
         }
 
+        let isRouteInAuthArr = arrayOfRoute.includes('/' + newUrl.join('/'));
 
-        return statusAllAppRoute() === true ? {msg: 'AllValidRoute'} :
-            statusForRouteWithOutAuth() === true ? {msg: 'RouteForWithOutAuth'} : {msg: 'NotFound'};
+        if (isRouteInAuthArr)
+            return 'AuthRoute';
+
+        return 'NotFound';
     },
 
 
