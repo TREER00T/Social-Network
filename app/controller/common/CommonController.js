@@ -1,5 +1,8 @@
 let Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
+    {
+        isUndefined
+    } = require('app/util/Util'),
     Find = require('app/model/find/common/common');
 
 
@@ -11,10 +14,10 @@ exports.search = (req) => {
 
     Find.searchWithNameInTableUsersGroupsAndChannels(value, result => {
 
-        if (result === null)
+        if (isUndefined(result))
             return Json.builder(Response.HTTP_NOT_FOUND);
 
-        return Json.builder(Response.HTTP_OK, result);
+        Json.builder(Response.HTTP_OK, result);
 
     });
 

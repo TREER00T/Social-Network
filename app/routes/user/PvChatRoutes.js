@@ -1,5 +1,4 @@
-let express = require('express'),
-    router = express.Router(),
+let router = require('express').Router(),
     PvChat = require('app/controller/user/e2e/PvChatIntrface');
 
 

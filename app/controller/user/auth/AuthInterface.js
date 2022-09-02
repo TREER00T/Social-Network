@@ -1,6 +1,6 @@
 let Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
-    Util = require('app/util/Util'),
+    Util, {isUndefined} = require('app/util/Util'),
     Update = require('app/model/update/user/users'),
     Insert = require('app/model/add/insert/user/users'),
     Find = require('app/model/find/user/users'),
@@ -42,7 +42,7 @@ exports.gvc = (req) => {
                 if (!isAdded)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                return Json.builder(Response.HTTP_CREATED);
+                Json.builder(Response.HTTP_CREATED);
             });
 
         }
@@ -52,7 +52,7 @@ exports.gvc = (req) => {
                 if (!isUpdated)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                return Json.builder(Response.HTTP_OK);
+                Json.builder(Response.HTTP_OK);
             });
         }
 
@@ -65,11 +65,15 @@ exports.gvc = (req) => {
 
 exports.isValidAuthCode = (req) => {
 
-
-    let {phone, authCode, deviceName, deviceIp, deviceLocation} = req?.body;
+    let bodyObject = req.body,
+        phone = bodyObject?.phone,
+        authCode = bodyObject?.authCode,
+        deviceName = bodyObject?.deviceName,
+        deviceIp = bodyObject?.deviceIp,
+        deviceLocation = bodyObject?.deviceLocation;
 
     if ((!isPhoneNumber(phone) && !isVerificationCode(authCode)) ||
-        (deviceName === undefined || deviceIp === undefined || deviceLocation === undefined))
+        (isUndefined(deviceName) || isUndefined(deviceIp) || isUndefined(deviceLocation)))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     Find.isValidAuthCode(phone, authCode, result => {
@@ -118,19 +122,18 @@ exports.isValidAuthCode = (req) => {
 
             Find.getApiKey(phone, result => {
 
-                if (result === undefined || result === null) {
+                if (!isUndefined(result))
+                    return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
 
-                    return Update.apikey(phone, getApiKey(), result => {
 
-                        if (!result)
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
+                Update.apikey(phone, getApiKey(), result => {
 
-                        return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
-                    });
+                    if (!result)
+                        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                }
+                    Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
+                });
 
-                return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
 
             });
 
@@ -145,21 +148,20 @@ exports.isValidAuthCode = (req) => {
 
 exports.isValidPassword = (req) => {
 
+    let bodyObject = req?.body,
+        deviceName = bodyObject?.deviceName,
+        password = bodyObject?.password,
+        deviceIp = bodyObject?.deviceIp,
+        deviceLocation = bodyObject?.deviceLocation;
 
-    let {password, deviceName, deviceIp, deviceLocation} = req?.body;
-
-    if (deviceName === undefined || deviceIp === undefined || deviceLocation === undefined)
+    if (isUndefined(password) || password?.length < 6 || isUndefined(deviceName) ||
+        isUndefined(deviceIp) || isUndefined(deviceLocation))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
 
         let phone = data.phoneNumber;
-
-        let iPasswordNull = (password === undefined || password?.length === 0);
-
-        if (iPasswordNull)
-            return Json.builder(Response.HTTP_BAD_REQUEST);
 
         Find.isValidPassword(phone, getHashData(password.trim(), phone), result => {
 
@@ -177,7 +179,7 @@ exports.isValidPassword = (req) => {
                     location: deviceLocation
                 });
 
-                return Json.builder(Response.HTTP_ACCEPTED, {
+                Json.builder(Response.HTTP_ACCEPTED, {
                     apiKey: result.apiKey
                 });
 
@@ -196,8 +198,8 @@ exports.refreshToken = () => {
 
     getTokenPayLoad(data => {
 
-        let phone = data.phoneNumber;
-        let id = data.id;
+        let phone = data.phoneNumber,
+            id = data.id;
 
 
         Find.userPhone(phone, isInDb => {

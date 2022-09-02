@@ -179,6 +179,10 @@ module.exports = {
             .match(/^\/\^((?:\\[.*+?^${}()|[\]\\\/]|[^.*+?^${}()|[\]\\\/])*)\$\//);
 
         return isMatch[1].replace(/\\(.)/g, '$1').split('/');
+    },
+
+    isUndefined(data) {
+        return data === undefined || data === null || typeof data === 'undefined' || data?.length < 1;
     }
 
 }

@@ -17,7 +17,7 @@ let Json = require('app/util/ReturnJson'),
         getTokenPayLoad
     } = require('app/middleware/ApiPipeline'),
     File = require('app/util/File'),
-    Util = require('app/util/Util'),
+    Util, {isUndefined} = require('app/util/Util'),
     Generate = require('app/util/Generate');
 
 
@@ -30,23 +30,22 @@ exports.create = (req, res) => {
         multerImage(req, res, () => {
 
             let name = req.body?.name;
-            let isUndefinedName = (name === undefined);
 
-            if (isUndefinedName)
+            if (isUndefined(name))
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            let file = req.file;
-            let fileUrl;
-            let isOwner = 1;
+            let file = req.file,
+                fileUrl,
+                isOwner = 1;
 
 
-            if (file !== undefined) {
+            if (!isUndefined(file))
                 fileUrl = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname)).fileUrl;
-            }
+
 
             Insert.group(name.toString().trim(), Generate.makeIdForInviteLink(), Util.getRandomHexColor(), fileUrl, id => {
 
-                if (id === null)
+                if (isUndefined(id))
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 Create.groupContents(id);
@@ -54,7 +53,7 @@ exports.create = (req, res) => {
                 Insert.userIntoGroupAdmins(userId, id, isOwner);
                 Insert.userIntoGroup(userId, id);
 
-                return Json.builder(Response.HTTP_CREATED);
+                Json.builder(Response.HTTP_CREATED);
             });
 
         });
@@ -74,15 +73,15 @@ exports.uploadFile = (req, res) => {
 
         multerFile(req, res, () => {
 
-            let data = JSON.parse(JSON.stringify(req.body));
+            let data = JSON.parse(JSON.stringify(req.body)),
+                groupId = data?.groupId,
+                receiverId = data?.receiverId;
 
-            let receiverId = data?.receiverId;
-            if (receiverId !== undefined)
-                delete data?.receiverId;
-
-            let groupId = data?.groupId;
-            if (groupId === undefined)
+            if (isUndefined(groupId))
                 return Json.builder(Response.HTTP_BAD_REQUEST);
+
+            if (!isUndefined(receiverId))
+                delete data?.receiverId;
 
             delete data?.groupId;
 
@@ -112,29 +111,26 @@ exports.uploadFile = (req, res) => {
                             let file = req.file;
 
                             data['senderId'] = userId;
-                            if (file !== undefined) {
+                            if (isUndefined(file))
+                                return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                                let {
-                                    fileUrl,
-                                    fileSize
-                                } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+                            let {
+                                fileUrl,
+                                fileSize
+                            } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
 
-                                data['fileUrl'] = fileUrl;
-                                data['fileSize'] = fileSize;
-                                data['fileName'] = file.originalname;
+                            data['fileUrl'] = fileUrl;
+                            data['fileSize'] = fileSize;
+                            data['fileName'] = file.originalname;
 
 
-                                CommonInsert.message('`' + groupId + 'GroupContents`', data, {
-                                    conversationType: 'Group'
-                                }, result => {
-                                    return Json.builder(Response.HTTP_CREATED, {
-                                        insertId: result
-                                    });
+                            CommonInsert.message('`' + groupId + 'GroupContents`', data, {
+                                conversationType: 'Group'
+                            }, result => {
+                                Json.builder(Response.HTTP_CREATED, {
+                                    insertId: result
                                 });
-
-                            }
-
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
+                            });
 
                         });
 
@@ -157,6 +153,8 @@ exports.deleteGroup = (req) => {
 
     let id = req.params?.id;
 
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -194,9 +192,11 @@ exports.deleteGroup = (req) => {
 
 exports.changeName = (req) => {
 
-    let {id, name} = req.body;
+    let bodyObject = req.body,
+        name = bodyObject?.name,
+        id = bodyObject?.id;
 
-    if (name < 1 || name === undefined)
+    if (isUndefined(name) || isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
@@ -222,7 +222,7 @@ exports.changeName = (req) => {
                         if (!result)
                             return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                        return Json.builder(Response.HTTP_OK);
+                        Json.builder(Response.HTTP_OK);
                     });
 
                 });
@@ -238,7 +238,12 @@ exports.changeName = (req) => {
 
 exports.changeDescription = (req) => {
 
-    let {id, description} = req.body;
+    let bodyObject = req.body,
+        id = bodyObject?.id,
+        description = bodyObject?.description;
+
+    if (isUndefined(id) || isUndefined(description))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -263,7 +268,7 @@ exports.changeDescription = (req) => {
                         if (!result)
                             return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                        return Json.builder(Response.HTTP_OK);
+                        Json.builder(Response.HTTP_OK);
                     });
 
                 });
@@ -287,6 +292,8 @@ exports.uploadAvatar = (req, res) => {
 
             let id = req.body?.id;
 
+            if (isUndefined(id))
+                return Json.builder(Response.HTTP_BAD_REQUEST);
 
             Find.groupId(id, isDefined => {
 
@@ -305,7 +312,7 @@ exports.uploadAvatar = (req, res) => {
 
                         let file = req.file;
 
-                        if (file === undefined)
+                        if (isUndefined(file))
                             return Json.builder(Response.HTTP_BAD_REQUEST);
 
                         let {
@@ -316,7 +323,7 @@ exports.uploadAvatar = (req, res) => {
                             if (!result)
                                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                            return Json.builder(Response.HTTP_CREATED);
+                            Json.builder(Response.HTTP_CREATED);
                         });
 
                     });
@@ -336,6 +343,9 @@ exports.uploadAvatar = (req, res) => {
 exports.changeToInviteLink = (req) => {
 
     let id = req.body?.id;
+
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -362,7 +372,7 @@ exports.changeToInviteLink = (req) => {
                         if (!result)
                             return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                        return Json.builder(Response.HTTP_OK, {
+                        Json.builder(Response.HTTP_OK, {
                             inviteLink: link
                         });
 
@@ -380,9 +390,11 @@ exports.changeToInviteLink = (req) => {
 
 exports.changeToPublicLink = (req) => {
 
-    let {id, publicLink} = req.body;
+    let bodyObject = req.body,
+        id = bodyObject?.id,
+        publicLink = bodyObject?.publicLink;
 
-    if ((id === undefined || null) || (publicLink === undefined || null))
+    if (isUndefined(id) || isUndefined(publicLink))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
@@ -416,7 +428,7 @@ exports.changeToPublicLink = (req) => {
                             if (!result)
                                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                            return Json.builder(Response.HTTP_OK);
+                            Json.builder(Response.HTTP_OK);
                         });
 
                     });
@@ -435,8 +447,13 @@ exports.changeToPublicLink = (req) => {
 exports.joinUser = (req) => {
 
 
-    let id = req.body?.id;
-    let targetUserId = req.body?.userId;
+    let bodyObject = req.body,
+        id = bodyObject?.id,
+        targetUserId = bodyObject?.userId;
+
+
+    if (isUndefined(id) || isUndefined(targetUserId))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
     getTokenPayLoad(data => {
@@ -459,13 +476,13 @@ exports.joinUser = (req) => {
                     if (result)
                         return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    let getUserId = targetUserId === undefined || null ? userId : targetUserId;
+                    let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
 
                     Insert.userIntoGroup(id, getUserId);
                     InsertInUser.groupIntoListOfUserGroups(id, getUserId);
 
 
-                    return Json.builder(Response.HTTP_CREATED);
+                    Json.builder(Response.HTTP_CREATED);
                 });
 
             });
@@ -479,11 +496,11 @@ exports.joinUser = (req) => {
 
 exports.addAdmin = (req) => {
 
+    let bodyObject = req.body,
+        id = bodyObject?.id,
+        userIdForNewAdmin = bodyObject?.userId;
 
-    let id = req.body?.id;
-    let userIdForNewAdmin = req.body?.userId;
-
-    if (userIdForNewAdmin === undefined || null)
+    if (isUndefined(userIdForNewAdmin) || isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
@@ -526,7 +543,7 @@ exports.addAdmin = (req) => {
                                 Insert.userIntoGroupAdmins(userIdForNewAdmin, id, isNotOwner);
 
 
-                                return Json.builder(Response.HTTP_CREATED);
+                                Json.builder(Response.HTTP_CREATED);
                             });
 
                         });
@@ -545,10 +562,11 @@ exports.addAdmin = (req) => {
 exports.deleteAdmin = (req) => {
 
 
-    let id = req.body?.id;
-    let userIdForDeleteAdmin = req.body?.userId;
+    let bodyObject = req.body,
+        id = bodyObject?.id,
+        userIdForDeleteAdmin = bodyObject?.userId;
 
-    if (userIdForDeleteAdmin === undefined || null)
+    if (isUndefined(id) || isUndefined(userIdForDeleteAdmin))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
@@ -586,7 +604,7 @@ exports.deleteAdmin = (req) => {
                             Delete.userIntoGroupAdmins(id, userIdForDeleteAdmin);
 
 
-                            return Json.builder(Response.HTTP_OK);
+                            Json.builder(Response.HTTP_OK);
                         });
 
                     });
@@ -605,6 +623,9 @@ exports.leaveUser = (req) => {
 
 
     let id = req.body?.id;
+
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -630,7 +651,7 @@ exports.leaveUser = (req) => {
                     DeleteInUser.groupIntoListOfUserGroups(id, userId);
 
 
-                    return Json.builder(Response.HTTP_OK);
+                    Json.builder(Response.HTTP_OK);
                 });
 
             });
@@ -644,16 +665,22 @@ exports.leaveUser = (req) => {
 
 exports.listOfMessage = (req) => {
 
+    let queryObject = req.query,
+        limit = queryObject?.limit,
+        page = queryObject?.page,
+        id = queryObject?.id,
+        order = queryObject?.order,
+        sort = queryObject?.sort,
+        type = queryObject?.type,
+        search = queryObject?.search,
+        getLimit = !isUndefined(limit) ? limit : 1,
+        getSort = !isUndefined(sort) ? sort : 'DESC',
+        getOrder = !isUndefined(order) ? order : 'id',
+        getPage = !isUndefined(page) ? page : 1,
+        startFrom = (getPage - 1) * limit;
 
-    let {id, limit, page, order, sort, type, search} = req.query;
-
-    let getLimit = (limit !== undefined) ? limit : 15;
-    let getSort = (sort !== undefined) ? sort : 'DESC';
-    let getOrder = (order !== undefined) ? order : 'id';
-    let getPage = (page !== undefined) ? page : 1;
-
-    let startFrom = (getPage - 1) * limit;
-
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
@@ -672,7 +699,7 @@ exports.listOfMessage = (req) => {
 
                 FindInUser.getListOfMessage('`' + id + 'GroupContents`', startFrom, getLimit, getOrder, getSort, type, search, result => {
 
-                    return Json.builder(
+                    Json.builder(
                         Response.HTTP_OK,
                         result, {
                             totalPages: totalPages
@@ -695,6 +722,8 @@ exports.info = (req) => {
 
     let id = req.body?.id;
 
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(() => {
 
@@ -709,7 +738,7 @@ exports.info = (req) => {
 
                 Find.getCountOfUserInGroup(id, count => {
 
-                    return Json.builder(Response.HTTP_OK, result, {
+                    Json.builder(Response.HTTP_OK, result, {
                         memberSize: count
                     });
 
@@ -729,6 +758,8 @@ exports.allUsers = (req) => {
 
     let id = req.body?.id;
 
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(() => {
 
@@ -741,12 +772,12 @@ exports.allUsers = (req) => {
 
             Find.getAllUsersForGroup(id, data => {
 
-                if (data === null)
+                if (isUndefined(data))
                     return Json.builder(Response.HTTP_NOT_FOUND);
 
                 FindInUser.getUserDetailsInUsersTableForMember(data, result => {
 
-                    return Json.builder(Response.HTTP_OK, result);
+                    Json.builder(Response.HTTP_OK, result);
 
                 });
 

@@ -1,5 +1,4 @@
-let express = require('express'),
-    router = express.Router(),
+let router = require('express').Router(),
     Personal = require('app/controller/user/personal/PersonalInterface');
 
 

@@ -13,7 +13,6 @@ let app = require('express')(),
     FindInGroup = require('app/model/find/groups/group'),
     FindInChannel = require('app/model/find/channels/channel'),
     FindInUser = require('app/model/find/user/users');
-const {use} = require("express/lib/router");
 require('dotenv').config();
 
 
