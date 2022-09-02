@@ -383,6 +383,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
   /e2e/room/chats:
     get:
@@ -449,6 +454,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataAndOptionObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
 
   /e2e/room/user:
@@ -492,6 +502,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
   /e2e/room/{id}/me:
     delete:
@@ -539,6 +554,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
   /e2e/room/{id}/us:
     delete:
@@ -583,6 +603,11 @@ paths:
             $ref: '#/definitions/Status'
         200:
           description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1074,6 +1099,7 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataAndOptionObject'
+
     delete:
       tags:
         - Personal
@@ -1109,6 +1135,7 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+
     post:
       tags:
         - Personal
@@ -1256,6 +1283,7 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+
     delete:
       tags:
         - Personal
@@ -1303,6 +1331,7 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+
     put:
       tags:
         - Personal
@@ -1381,6 +1410,11 @@ paths:
             $ref: '#/definitions/Status'
         802:
           description: In valid json object key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1650,6 +1684,11 @@ paths:
             $ref: '#/definitions/Status'
         403:
           description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2190,6 +2229,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
 
 
@@ -2258,6 +2302,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataAndOptionObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
 
   /group/info:
@@ -2301,6 +2350,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataAndOptionObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
 
 
@@ -2346,6 +2400,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataAndOptionObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
 
   /channel/create:
@@ -2528,6 +2587,11 @@ paths:
             $ref: '#/definitions/Status'
         403:
           description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3068,7 +3132,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
 
   /channel/chats:
@@ -3136,7 +3204,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataAndOptionObject'
-
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
   /channel/info:
     get:
@@ -3179,7 +3251,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataAndOptionObject'
-
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
 
 
@@ -3224,6 +3300,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataAndOptionObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
 
 
