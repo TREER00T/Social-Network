@@ -33,7 +33,7 @@ module.exports = {
                 return Json.builder(Response.HTTP_METHOD_NOT_ALLOWED);
 
 
-            let routeMsg = Validation.isRouteWithOutAuthentication(req.url, app);
+            let routeMsg = Validation.requestEndpointHandler(req.url, app);
 
             if (routeMsg === 'NotFound')
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -52,21 +52,20 @@ module.exports = {
                 let isSetUserToken = (!isAccessTokenVerify) ? isAccessTokenVerify : Pipeline.tokenVerify(token);
                 let isSetUserApiKey = Pipeline.isSetUserApiKey(apiKey);
 
-                if ((!isSetUserApiKey && !isSetUserToken) || !isSetUserToken)
+                if (!isSetUserApiKey || !isSetUserToken)
                     return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
 
-                if (isSetUserApiKey && isSetUserToken) {
-                    return Pipeline.getTokenPayLoad(data => {
-                        Pipeline.isValidApiKey(apiKey, data.phoneNumber, result => {
-                            if (!result) {
-                                return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
-                            }
-                            app.use(router);
-                            next();
-                        });
+                Pipeline.getTokenPayLoad(data => {
+                    Pipeline.isValidApiKey(apiKey, data.phoneNumber, result => {
+                        if (!result)
+                            return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+
+                        app.use(router);
+                        next();
                     });
-                }
+                });
             }
+
 
             app.use(router);
             next();

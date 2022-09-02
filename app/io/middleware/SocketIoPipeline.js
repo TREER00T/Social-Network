@@ -18,11 +18,7 @@ module.exports = {
 
         getApiKey(phone, result => {
 
-            if (result !== key) {
-                return cb(false);
-            }
-
-            cb(true);
+            cb(result === key);
 
             (function (cb) {
                 if (typeof cb === 'function')
@@ -37,9 +33,8 @@ module.exports = {
 
         let isSetUserAccessToken = getSplitBearerJwt(bearerHeader);
 
-        if (typeof isSetUserAccessToken !== 'string') {
+        if (typeof isSetUserAccessToken !== 'string')
             return cb(false);
-        }
 
         cb(true);
 
@@ -50,13 +45,13 @@ module.exports = {
             getJwtVerify(token, decode => {
 
 
-                if (decode === 'TOKEN_EXP') {
+                if (decode === 'TOKEN_EXP')
                     return cb('TOKEN_EXP');
-                }
 
-                if (decode === 'IN_VALID_TOKEN') {
+
+                if (decode === 'IN_VALID_TOKEN')
                     return cb('IN_VALID_TOKEN');
-                }
+
 
 
                 if (decode.type === 'at') {

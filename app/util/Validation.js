@@ -35,21 +35,20 @@ module.exports = {
     },
 
 
-    isRouteWithOutAuthentication(url, app) {
+    requestEndpointHandler(url, app) {
 
         let arrayOfRouteWithOutAuth = [
-            '/apiDocs/',
-            '/apiDocs/swagger-ui.css',
-            '/apiDocs/swagger-ui-bundle.js',
-            '/apiDocs/swagger-ui-standalone-preset.js',
-            '/apiDocs/swagger-ui-init.js',
-            '/apiDocs/favicon-32x32.png',
-            '/apiDocs/favicon-16x16.png',
-            '/api/auth/generate/user',
-            '/api/auth/verify/authCode'
-        ];
-
-        let arrayOfRoute = [];
+                '/apiDocs/',
+                '/apiDocs/swagger-ui.css',
+                '/apiDocs/swagger-ui-bundle.js',
+                '/apiDocs/swagger-ui-standalone-preset.js',
+                '/apiDocs/swagger-ui-init.js',
+                '/apiDocs/favicon-32x32.png',
+                '/apiDocs/favicon-16x16.png',
+                '/api/auth/generate/user',
+                '/api/auth/verify/authCode'
+            ],
+            arrayOfRoute = [];
 
 
         function print(path, layer) {
@@ -69,10 +68,16 @@ module.exports = {
 
         arrayOfRoute = arrayOfRoute.filter((el) => !arrayOfRouteWithOutAuth.includes(el));
 
+
         let isRouteWithoutAuth = arrayOfRouteWithOutAuth.includes(url);
 
         if (isRouteWithoutAuth)
             return '';
+
+        let isRouteInArr = arrayOfRoute.includes(url);
+
+        if (isRouteInArr)
+            return 'AuthRoute';
 
         let urlArr = url.split('/').filter(e => e),
             newUrl = [],
@@ -80,32 +85,24 @@ module.exports = {
                 newUrl.push(data);
             };
 
-        for (let i = 0; i < arrayOfRoute.length; i++) {
-            let item = arrayOfRoute;
-
-            if (item === url)
-                return 'AuthRoute';
-        }
-
-        for (let i = 0; i < urlArr.length; i++) {
-            let item = urlArr[i],
-                isNumber = Number.isInteger(parseInt(item)),
+        urlArr.forEach((item, index) => {
+            let isNumber = Number.isInteger(parseInt(item)),
                 iString = typeof item === 'string',
-                preItem = urlArr[i - 1],
+                preItem = urlArr[index - 1],
                 isBio = iString && preItem === 'bio';
 
             if (isBio) {
                 push(':bio');
-                continue;
+                return;
             }
 
             if (isNumber) {
                 push(':id');
-                continue;
+                return;
             }
 
             push(item);
-        }
+        });
 
         let isRouteInAuthArr = arrayOfRoute.includes('/' + newUrl.join('/'));
 
@@ -119,7 +116,7 @@ module.exports = {
     // If http method not found in httpMethod array It should be return json response
     isValidHttpMethod(requestMethod) {
 
-        const arrayOfHttpMethods = [
+        let arrayOfHttpMethods = [
             'GET',
             'PUT',
             'POST',
