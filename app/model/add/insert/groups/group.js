@@ -1,11 +1,14 @@
-let openSql = require('opensql');
+let openSql = require('opensql'),
+    {
+        isUndefined
+    } = require('app/util/Util');
 
 
 module.exports = {
 
     group(name, inviteLink, defaultColor, img, cb) {
 
-        if (img === undefined) {
+        if (isUndefined(img)) {
             openSql.addOne({
                 table: 'groups',
                 data: {
@@ -14,7 +17,7 @@ module.exports = {
                     defaultColor: defaultColor
                 }
             }).result(result => {
-                (result[1] !== undefined) ? cb(result[1].insertId) : cb(null);
+                !isUndefined(result[1]?.insertId) ? cb(result[1].insertId) : cb(null);
             });
             return;
         }
@@ -28,7 +31,7 @@ module.exports = {
                 defaultColor: defaultColor
             }
         }).result(result => {
-            (result[1] !== undefined) ? cb(result[1].insertId) : cb(null);
+            !isUndefined(result[1]?.insertId) ? cb(result[1].insertId) : cb(null);
         });
 
     },

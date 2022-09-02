@@ -4,6 +4,10 @@ let openSql = require('opensql'),
         COUNT
     } = openSql.keywordHelper,
     {
+        isUndefined,
+        isNotEmptyArr
+    } = require('app/util/Util'),
+    {
         DataBaseException
     } = require('app/exception/DataBaseException');
 
@@ -19,7 +23,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -35,7 +39,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -54,7 +58,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -71,7 +75,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -88,7 +92,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -105,7 +109,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -168,7 +172,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1].length !== 0) ? cb(result[1]) : cb(null);
+                isNotEmptyArr(result[1]) ? cb(result[1]) : cb(null);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -178,13 +182,13 @@ module.exports = {
     getDataForChannelContentWithId(id, cb) {
         openSql.find({
             get: STAR,
-            from:   '`' + id + 'ChannelContents`',
+            from: '`' + id + 'ChannelContents`',
             where: {
                 channelId: `${id}`
             }
         }).result(result => {
             try {
-                (result[1][0] !== undefined) ? cb(result[1][0]) : cb(null);
+                !isUndefined(result[1][0]) ? cb(result[1][0]) : cb(null);
             } catch (e) {
                 DataBaseException(e);
             }

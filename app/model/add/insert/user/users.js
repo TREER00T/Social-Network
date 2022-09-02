@@ -1,6 +1,9 @@
 let openSql = require('opensql'),
     UpdateInCommon = require('app/model/update/common/common'),
     {
+        isUndefined
+    } = require('app/util/Util'),
+    {
         DataBaseException
     } = require('app/exception/DataBaseException');
 
@@ -78,7 +81,7 @@ module.exports = {
     },
 
     messageIntoUserSavedMessage(phone, message) {
-        if (message['forwardDataId'] !== undefined || null) {
+        if (!isUndefined(message?.forwardDataId)) {
             openSql.addOne({
                 table: 'forwardContents',
                 data: {

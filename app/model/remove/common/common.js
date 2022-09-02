@@ -1,5 +1,8 @@
 let openSql = require('opensql'),
     {
+        isUndefined
+    } = require('app/util/Util'),
+    {
         IN
     } = openSql.queryHelper,
     FindInCommon = require('app/model/find/common/common');
@@ -11,7 +14,7 @@ module.exports = {
 
         listOfId.forEach(item => {
             FindInCommon.isForwardData(tableName, item, id => {
-                if (id !== null)
+                if (!isUndefined(id))
                     module.exports.forwardMessage(id);
             });
         });

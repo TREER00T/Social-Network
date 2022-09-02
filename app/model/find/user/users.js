@@ -4,6 +4,10 @@ let openSql = require('opensql'),
         COUNT,
     } = openSql.keywordHelper,
     {
+        isUndefined,
+        isNotEmptyArr
+    } = require('app/util/Util'),
+    {
         IN,
         ATTACH,
         EQUAL_TO,
@@ -29,7 +33,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -46,7 +50,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -63,7 +67,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -117,7 +121,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(typeof result[1][0] !== 'undefined');
+                cb(!isUndefined(result[1][0]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -158,7 +162,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result.length === 0) ? cb(false) : cb(result[0].tblChatId);
+                (!isNotEmptyArr(result)) ? cb(false) : cb(result[0].tblChatId);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -174,7 +178,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -198,7 +202,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0].tblChatId !== undefined) ? cb(result[1][0].tblChatId) : cb(false);
+                !isUndefined(result[1][0]?.tblChatId) ? cb(result[1][0].tblChatId) : cb(false);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -207,7 +211,7 @@ module.exports = {
 
 
     getListOfMessage(tableName, startFrom, limit, order, sort, type, search, cb) {
-        if (type !== undefined) {
+        if (!isUndefined(type)) {
             openSql.find({
                 get: STAR,
                 from: `${tableName}`,
@@ -228,7 +232,7 @@ module.exports = {
             return;
         }
 
-        if (search !== undefined) {
+        if (!isUndefined(search)) {
             openSql.find({
                 get: STAR,
                 from: `${tableName}`,
@@ -338,7 +342,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1].length !== 0) ? result[1][0].id : cb(false);
+                isNotEmptyArr(result[1]) ? result[1][0].id : cb(false);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -355,7 +359,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1][0].username === undefined);
+                cb(isUndefined(result[1][0].username));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -372,7 +376,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0].userTargetId === undefined) ? cb(null) : cb(result[1][0].userTargetId);
+                isUndefined(result[1][0]?.userTargetId) ? cb(null) : cb(result[1][0].userTargetId);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -400,7 +404,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+                isUndefined(result[1][0]) ? cb(null) : cb(result[1]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -429,7 +433,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+                isUndefined(result[1][0]) ? cb(null) : cb(result[1]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -447,7 +451,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+                isUndefined(result[1][0]) ? cb(null) : cb(result[1]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -464,7 +468,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -481,7 +485,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -509,7 +513,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
+                !isUndefined(result[1][0]) ? cb(result[1]) : cb(null);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -526,7 +530,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
+                !isUndefined(result[1][0]) ? cb(result[1]) : cb(null);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -542,7 +546,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0] !== undefined) ? cb(result[1]) : cb(null);
+                !isUndefined(result[1][0]) ? cb(result[1]) : cb(null);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -559,7 +563,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0] !== undefined) ? cb(result[1][0]) : cb(null);
+                !isUndefined(result[1][0]) ? cb(result[1][0]) : cb(null);
             } catch (e) {
                 DataBaseException(e);
             }

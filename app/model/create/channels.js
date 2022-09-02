@@ -8,12 +8,12 @@ let openSql = require('opensql'),
         DATETIME
     } = openSql.dataType,
     {
+        NULL,
         NOT_NULL
     } = openSql.queryHelper,
     {
         AUTO_INCREMENT
     } = openSql.keywordHelper;
-const {NULL} = require("opensql/src/util/QueryHelper");
 
 
 module.exports = {
