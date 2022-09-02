@@ -13,6 +13,7 @@ let app = require('express')(),
     FindInGroup = require('app/model/find/groups/group'),
     FindInChannel = require('app/model/find/channels/channel'),
     FindInUser = require('app/model/find/user/users');
+const {use} = require("express/lib/router");
 require('dotenv').config();
 
 
@@ -47,7 +48,7 @@ io.use((socket, next) => {
                 let phone = data.phoneNumber;
                 let userId = data.id;
 
-                Pipeline.userApiKey(phone, apiKey.trim(), result => {
+                Pipeline.userApiKey(phone, apiKey, result => {
 
                     if (result) {
                         let socketId = `${socket.id}`;
@@ -70,47 +71,50 @@ io.use((socket, next) => {
 
 }).on('connection', socket => {
 
-    let socketId = socket?.id;
-    let phone = allUsers[socketId]?.data?.phone;
-    let socketUserId = allUsers[socketId]?.data?.userId;
-    let listOfUser = allUsers[socketId]?.listOfSocketIdForPvChat;
-    let isActive = 1;
-    let joinUserInRoom = (roomId, type) => {
-        if (socket.adapter.rooms.has(roomId + type) === false)
-            socket.join(roomId + type);
-    };
-    let addRoomIntoListOfUserRooms = (roomId, type) => {
-        if (allUsers[socketId][type + 'Rooms'] === undefined)
-            allUsers[socketId][type + 'Rooms'] = [];
+    let isActive = 1,
+        isOnline = true,
+        socketId = socket?.id,
+        phone = allUsers[socketId]?.data?.phone,
+        socketUserId = allUsers[socketId]?.data?.userId,
+        listOfUser = allUsers[socketId]?.listOfSocketIdForPvChat,
+        emitToSocket = (emitName, data) => socket.emit(emitName, data),
+        emitToSpecificSocket = (where, emitName, data) => io.to(where).emit(emitName, data),
+        isUndefined = (data) => data === undefined || typeof data === 'undefined' || data === null,
+        joinUserInRoom = (roomId, type) => {
+            if (socket.adapter.rooms.has(roomId + type) === false)
+                socket.join(roomId + type);
+        },
+        addRoomIntoListOfUserRooms = (roomId, type) => {
+            if (allUsers[socketId][type + 'Rooms'] === undefined)
+                allUsers[socketId][type + 'Rooms'] = [];
 
-        let isRoomAddedInList = allUsers[socketId][type + 'Rooms']?.includes(roomId + type);
+            let isRoomAddedInList = allUsers[socketId][type + 'Rooms']?.includes(roomId + type);
 
-        if (!isRoomAddedInList)
-            allUsers[socketId][type + 'Rooms'].push(roomId + type);
-    };
-    let leaveUserInRoom = (roomId, type) => {
-        let isRoomAddedInList = allUsers[socketId][type + 'Rooms']?.includes(roomId + type);
+            if (!isRoomAddedInList)
+                allUsers[socketId][type + 'Rooms'].push(roomId + type);
+        },
+        leaveUserInRoom = (roomId, type) => {
+            let isRoomAddedInList = allUsers[socketId][type + 'Rooms']?.includes(roomId + type);
 
-        if (isRoomAddedInList) {
-            socket.leave(roomId + type);
+            if (isRoomAddedInList) {
+                socket.leave(roomId + type);
 
-            let index = allUsers[socketId][type + 'Rooms']?.indexOf(5);
+                let index = allUsers[socketId][type + 'Rooms']?.indexOf(5);
 
-            if (index > -1)
-                allUsers[socketId][type + 'Rooms']?.splice(index, 1);
-        }
-    };
-    let leaveUserInAllRooms = () => {
-        let arrayOfRoomTypes = ['channel', 'group'];
-        arrayOfRoomTypes.forEach(typeRoom => {
-            allUsers[socketId][typeRoom + 'Rooms']?.forEach(item => {
-                socket.leave(item + typeRoom);
+                if (index > -1)
+                    allUsers[socketId][type + 'Rooms']?.splice(index, 1);
+            }
+        },
+        leaveUserInAllRooms = () => {
+            let arrayOfRoomTypes = ['channel', 'group'];
+            arrayOfRoomTypes.forEach(typeRoom => {
+                allUsers[socketId][typeRoom + 'Rooms']?.forEach(item => {
+                    socket.leave(item + typeRoom);
+                });
             });
-        });
-    }
+        }
 
     Update.userOnline(phone, isActive);
-    let isOnline = true;
 
     IoUtil.sendUserOnlineStatusForSpecificUsers(listOfUser, isOnline);
 
@@ -133,17 +137,11 @@ io.use((socket, next) => {
 
     // user
 
-    socket.on('onNotificationForVoiceCall', data => {
-
-        let receiverId = data?.receiverId;
-        let senderId = data?.senderId;
-        if ((receiverId === undefined || null) || (senderId === undefined || null))
-            return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_BAD_REQUEST);
-
-        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+    let socketOnForE2eFullAuth = (receiverId, errEmitName, cb) => {
+        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
 
             if (receiverId === IN_VALID_USER_ID)
-                return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_NOT_FOUND);
+                return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
 
             FindInUser.isExistChatRoom({
                 toUser: `${receiverId}`,
@@ -151,70 +149,49 @@ io.use((socket, next) => {
             }, result => {
 
                 if (!result)
-                    return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_NOT_FOUND);
+                    return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
+
+                cb(receiverSocketId);
+            });
+
+        });
+    }
+
+
+    let socketOnForE2e = (endPointName, emitName, errEmitName) => {
+
+        socket.on(endPointName, data => {
+            let receiverId = data?.receiverId,
+                senderId = data?.senderId;
+
+            if (isUndefined(receiverId) || isUndefined(senderId))
+                return emitToSocket(errEmitName, Response.HTTP_BAD_REQUEST);
+
+            socketOnForE2eFullAuth(receiverId, errEmitName, receiverSocketId => {
 
                 FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
                     if (!result)
-                        return socket.emit('emitNotificationForVoiceCallError', Response.HTTP_FORBIDDEN);
-
-
-                    let user = allUsers[receiverId];
+                        return emitToSocket(errEmitName, Response.HTTP_FORBIDDEN);
 
                     delete data?.receiverId;
                     data['senderId'] = socketUserId;
 
-                    io.to(user).emit('emitNotificationForVoiceCall', data);
+                    emitToSpecificSocket(receiverSocketId, emitName, data);
 
                 });
 
             });
 
-        });
-
-
-    });
-
-    socket.on('onVoiceCall', data => {
-
-        let receiverId = data?.receiverId;
-        let senderId = data?.senderId;
-        if ((receiverId === undefined || null) || (senderId === undefined || null))
-            return socket.emit('emitVoiceCallError', Response.HTTP_BAD_REQUEST);
-
-        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
-
-            if (receiverId === IN_VALID_USER_ID)
-                return socket.emit('emitVoiceCallError', Response.HTTP_NOT_FOUND);
-
-
-            FindInUser.isExistChatRoom({
-                toUser: `${receiverId}`,
-                fromUser: `${socketUserId}`
-            }, result => {
-
-                if (!result)
-                    return socket.emit('emitVoiceCallError', Response.HTTP_NOT_FOUND);
-
-                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
-                    if (!result)
-                        return socket.emit('emitVoiceCallError', Response.HTTP_FORBIDDEN);
-
-                    let user = allUsers[receiverId];
-
-                    delete data?.receiverId;
-                    data['senderId'] = socketUserId;
-
-                    io.to(user).emit('emitVoiceCall', data);
-
-                });
-
-            });
 
         });
 
+    }
 
-    });
+    socketOnForE2e('onNotificationForVoiceCall',
+        'emitNotificationForVoiceCall', 'emitNotificationForVoiceCallError');
 
+    socketOnForE2e('onVoiceCall',
+        'emitVoiceCall', 'emitVoiceCallError');
 
     socket.on('onUserActivities', (data) => {
         let type = data?.type;
@@ -222,20 +199,20 @@ io.use((socket, next) => {
         if (type === 'e2e')
             return CommonFind.getListOfUserE2esActivity(socketUserId, type, result => {
 
-                socket.emit('emitUserActivities', result);
+                emitToSocket('emitUserActivities', result);
 
             });
 
         if (type === 'group' || 'channel')
             return CommonFind.getListOfUserGroupsOrChannelsActivity(socketUserId, type, result => {
 
-                socket.emit('emitUserActivities', result);
+                emitToSocket('emitUserActivities', result);
 
             });
 
         CommonFind.getListOfUsersActivity(socketUserId, result => {
 
-            socket.emit('emitUserActivities', result);
+            emitToSocket('emitUserActivities', result);
 
         });
 
@@ -246,13 +223,13 @@ io.use((socket, next) => {
 
         let listOfUsersArray = arrayOfUser?.data;
 
-        if (listOfUsersArray === undefined || null)
-            return socket.emit('emitListOfUserChatError', Response.HTTP_BAD_REQUEST);
+        if (isUndefined(listOfUsersArray))
+            return emitToSocket('emitListOfUserChatError', Response.HTTP_BAD_REQUEST);
 
         IoUtil.searchAndReplaceInArrayOfUserIdToSocketId(listOfUsersArray, allUsers, result => {
 
             if (result === IN_VALID_USER_ID)
-                return socket.emit('emitListOfUserChatError', Response.HTTP_NOT_FOUND);
+                return emitToSocket('emitListOfUserChatError', Response.HTTP_NOT_FOUND);
 
             allUsers[socketId] = {
                 listOfSocketIdForPvChat: result
@@ -265,155 +242,63 @@ io.use((socket, next) => {
     });
 
 
-    socket.on('onPvTyping', data => {
-        let receiverId = data?.receiverId;
-        let senderId = data?.senderId;
-        if ((receiverId === undefined || null) || (senderId === undefined || null))
-            return socket.emit('emitPvTypingError', Response.HTTP_BAD_REQUEST);
+    socketOnForE2e('onPvTyping',
+        'emitPvTyping', 'emitPvTypingError');
 
-        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+    let socketOnForE2eWithOutCheckUserInBlockList = (endPointName, emitName, errEmitName) => {
 
-            if (receiverId === IN_VALID_USER_ID)
-                return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
+        socket.on(endPointName, data => {
+            let receiverId = data?.receiverId;
 
 
-            FindInUser.isExistChatRoom({
-                toUser: `${receiverId}`,
-                fromUser: `${socketUserId}`
-            }, result => {
+            if (isUndefined(receiverId))
+                return emitToSocket(errEmitName, Response.HTTP_BAD_REQUEST);
 
-                if (!result)
-                    return socket.emit('emitPvTypingError', Response.HTTP_NOT_FOUND);
-
-                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
-                    if (!result)
-                        return socket.emit('emitPvTypingError', Response.HTTP_FORBIDDEN);
-
-
-                    let user = allUsers[receiverId];
-
-                    delete data?.receiverId;
-                    data['senderId'] = socketUserId;
-
-                    io.to(user).emit('emitPvTyping', data);
-
-                });
-
-            });
-
-        });
-
-    });
-
-
-    socket.on('onPvOnlineUser', data => {
-        let receiverId = data?.receiverId;
-
-
-        if (receiverId === undefined || null)
-            return socket.emit('emitPvOnlineUserError', Response.HTTP_BAD_REQUEST);
-
-        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
-
-            if (receiverId === IN_VALID_USER_ID)
-                return socket.emit('emitPvOnlineUserError', Response.HTTP_NOT_FOUND);
-
-
-            FindInUser.isExistChatRoom({
-                toUser: `${receiverId}`,
-                fromUser: `${socketUserId}`
-            }, result => {
-
-                if (!result)
-                    return socket.emit('emitPvOnlineUserError', Response.HTTP_NOT_FOUND);
-
-                let user = allUsers[receiverId];
+            socketOnForE2eFullAuth(receiverId, errEmitName, receiverSocketId => {
 
                 delete data?.receiverId;
                 data['senderId'] = socketUserId;
 
-                io.to(user).emit('emitPvOnlineUser', data);
+                emitToSpecificSocket(receiverSocketId, emitName, data);
 
             });
 
         });
 
-    });
+    }
 
+    socketOnForE2eWithOutCheckUserInBlockList('onPvOnlineUser',
+        'emitPvOnlineUser', 'emitPvOnlineUserError');
 
-    socket.on('onPvMessageSeen', data => {
-        let receiverId = data?.receiverId;
-
-        if (receiverId === undefined || null)
-            return socket.emit('emitPvMessageSeenError', Response.HTTP_BAD_REQUEST);
-
-        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
-
-            if (receiverId === IN_VALID_USER_ID)
-                return socket.emit('emitPvMessageSeenError', Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistChatRoom({
-                toUser: `${receiverId}`,
-                fromUser: `${socketUserId}`
-            }, result => {
-
-                if (!result)
-                    return socket.emit('emitPvMessageSeenError', Response.HTTP_NOT_FOUND);
-
-                let user = allUsers[receiverId];
-
-                delete data?.receiverId;
-                data['senderId'] = socketUserId;
-
-                io.to(user).emit('emitPvMessageSeen', data);
-
-            });
-
-        });
-
-    });
+    socketOnForE2eWithOutCheckUserInBlockList('onPvMessageSeen',
+        'emitPvMessageSeen', 'emitPvMessageSeenError');
 
 
     socket.on('onPvUploadedFile', data => {
-        let receiverId = data?.receiverId;
-        let senderId = data?.senderId;
-        let id = data?.id;
+        let receiverId = data?.receiverId,
+            senderId = data?.senderId,
+            id = data?.id;
 
-        if ((receiverId === undefined || null) || (senderId === undefined || null) || (id === undefined || null))
-            return socket.emit('emitPvUploadedFileError', Response.HTTP_BAD_REQUEST);
+        if (isUndefined(receiverId) || isUndefined(senderId) || isUndefined(id))
+            return emitToSocket('emitPvUploadedFileError', Response.HTTP_BAD_REQUEST);
 
-        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverId => {
+        socketOnForE2eFullAuth(receiverId, 'emitPvUploadedFileError', receiverSocketId => {
 
-            if (receiverId === IN_VALID_USER_ID)
-                return socket.emit('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
+            FindInUser.getTableNameForListOfE2EMessage(senderId, receiverId, dbData => {
 
-            FindInUser.isExistChatRoom({
-                toUser: `${receiverId}`,
-                fromUser: `${socketUserId}`
-            }, result => {
+                if (!dbData)
+                    return emitToSocket('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
 
-                if (!result)
-                    return socket.emit('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
-
-                FindInUser.getTableNameForListOfE2EMessage(senderId, receiverId, dbData => {
-
-                    if (!dbData)
-                        return socket.emit('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
-
-                    FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
-                        if (!result)
-                            return socket.emit('emitPvUploadedFileError', Response.HTTP_FORBIDDEN);
+                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
+                    if (!result)
+                        return emitToSocket('emitPvUploadedFileError', Response.HTTP_FORBIDDEN);
 
 
-                        let user = allUsers[receiverId];
+                    delete data?.receiverId;
+                    dbData['senderId'] = socketUserId;
 
-                        delete data?.receiverId;
-                        dbData['senderId'] = socketUserId;
-
-                        FindInUser.getDataForE2EContentWithId(dbData, id, result => {
-                            io.to(user).emit('emitPvUploadedFile', Object.assign({}, result, data));
-                        });
-
+                    FindInUser.getDataForE2EContentWithId(dbData, id, result => {
+                        emitToSpecificSocket(receiverSocketId, 'emitPvUploadedFile', Object.assign({}, result, data));
                     });
 
                 });
@@ -425,47 +310,34 @@ io.use((socket, next) => {
     });
 
     socket.on('onPvMessage', data => {
-        let receiverId = data?.receiverId;
-        let senderId = data?.senderId;
+        let receiverId = data?.receiverId,
+            senderId = data?.senderId;
 
-        if ((receiverId === undefined || null) || (senderId === undefined || null))
-            return socket.emit('emitPvMessageError', Response.HTTP_BAD_REQUEST);
+        if (isUndefined(receiverId) || isUndefined(senderId))
+            return emitToSocket('emitPvMessageError', Response.HTTP_BAD_REQUEST);
 
-        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
 
-            if (receiverSocketId === IN_VALID_USER_ID)
-                return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
+        socketOnForE2eFullAuth(receiverId, 'emitPvMessageError', receiverSocketId => {
 
-            FindInUser.isExistChatRoom({
-                toUser: `${receiverId}`,
-                fromUser: `${socketUserId}`
-            }, result => {
-
+            FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
                 if (!result)
-                    return socket.emit('emitPvMessageError', Response.HTTP_NOT_FOUND);
-
-                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
-                    if (!result)
-                        return socket.emit('emitPvMessageError', Response.HTTP_FORBIDDEN);
+                    return emitToSocket('emitPvMessageError', Response.HTTP_FORBIDDEN);
 
 
-                    let user = allUsers[receiverSocketId];
-                    delete data?.receiverId;
+                delete data?.receiverId;
 
-                    RestFulUtil.validateMessage(data, result => {
+                RestFulUtil.validateMessage(data, result => {
 
-                        if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                            return socket.emit('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+                    if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                        return emitToSocket('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                        result['senderId'] = socketUserId;
+                    result['senderId'] = socketUserId;
 
-                        io.to(user).emit('emitPvMessage', result);
+                    emitToSpecificSocket(receiverSocketId, 'emitPvMessage', result);
 
-                        Insert.message(socketUserId + 'And' + receiverId + 'E2EContents', result, {
-                            conversationType: 'E2E'
-                        });
-
+                    Insert.message(socketUserId + 'And' + receiverId + 'E2EContents', result, {
+                        conversationType: 'E2E'
                     });
 
                 });
@@ -478,62 +350,46 @@ io.use((socket, next) => {
     });
 
     socket.on('onPvEditMessage', data => {
-        let receiverId = data?.receiverId;
-        let messageId = data?.messageId;
-        let senderId = data?.senderId;
+        let receiverId = data?.receiverId,
+            messageId = data?.messageId,
+            senderId = data?.senderId;
 
-        if ((receiverId === undefined || null) || (messageId === undefined || null) || (senderId === undefined || null))
-            return socket.emit('emitPvEditMessageError', Response.HTTP_BAD_REQUEST);
+        if (isUndefined(receiverId) || isUndefined(messageId) || isUndefined(senderId))
+            return emitToSocket('emitPvEditMessageError', Response.HTTP_BAD_REQUEST);
 
-        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
+        socketOnForE2eFullAuth(receiverId, 'emitPvEditMessageError', receiverSocketId => {
 
-            if (receiverSocketId === IN_VALID_USER_ID)
-                return socket.emit('emitPvEditMessageError', Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistChatRoom({
-                toUser: `${receiverId}`,
-                fromUser: `${socketUserId}`
-            }, result => {
-
+            FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
                 if (!result)
-                    return socket.emit('emitPvEditMessageError', Response.HTTP_NOT_FOUND);
+                    return emitToSocket('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
-                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
-                    if (!result)
-                        return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
-
-                    let user = allUsers[receiverSocketId];
-
-                    FindInUser.isMessageBelongForThisUserInE2E(messageId, socketUserId,
-                        socketUserId + 'And' + receiverId + 'E2EContents', result => {
-                            if (!result)
-                                return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
+                FindInUser.isMessageBelongForThisUserInE2E(messageId, socketUserId,
+                    socketUserId + 'And' + receiverId + 'E2EContents', result => {
+                        if (!result)
+                            return emitToSocket('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
 
-                            delete data?.receiverId;
-                            delete data?.messageId;
+                        delete data?.receiverId;
+                        delete data?.messageId;
 
-                            RestFulUtil.validateMessage(data, result => {
+                        RestFulUtil.validateMessage(data, result => {
 
-                                if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                                    return socket.emit('emitPvEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-
-                                result['senderId'] = socketUserId;
-
-                                io.to(user).emit('emitPvEditMessage', result);
-
-                                UpdateInCommon.message(socketUserId + 'And' + receiverId + 'E2EContents', result, {
-                                    messageId: messageId
-                                });
+                            if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                                return emitToSocket('emitPvEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
+                            result['senderId'] = socketUserId;
+
+                            emitToSpecificSocket(receiverSocketId, 'emitPvEditMessage', result);
+
+                            UpdateInCommon.message(socketUserId + 'And' + receiverId + 'E2EContents', result, {
+                                messageId: messageId
                             });
 
 
                         });
 
-                });
+                    });
 
             });
 
@@ -544,44 +400,29 @@ io.use((socket, next) => {
 
 
     socket.on('onPvDeleteMessage', data => {
-        let receiverId = data?.receiverId;
-        let listOfId = data?.listOfId;
+        let receiverId = data?.receiverId,
+            listOfId = data?.listOfId;
 
-        if ((receiverId === undefined || null) || (listOfId === undefined || null))
-            return socket.emit('emitPvDeleteMessageError', Response.HTTP_BAD_REQUEST);
-
-
-        IoUtil.searchAndReplaceUserIdToSocketId(receiverId, allUsers, receiverSocketId => {
-
-            if (receiverSocketId === IN_VALID_USER_ID)
-                return socket.emit('emitPvDeleteMessageError', Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistChatRoom({
-                toUser: `${receiverId}`,
-                fromUser: `${socketUserId}`
-            }, result => {
-
-                if (!result)
-                    return socket.emit('emitPvDeleteMessageError', Response.HTTP_NOT_FOUND);
-
-                FindInUser.isMessageBelongForThisUserInE2E(listOfId, socketUserId,
-                    socketUserId + 'And' + receiverId + 'E2EContents', result => {
-                        if (!result)
-                            return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
+        if (isUndefined(receiverId) || isUndefined(listOfId))
+            return emitToSocket('emitPvDeleteMessageError', Response.HTTP_BAD_REQUEST);
 
 
-                        let user = allUsers[receiverSocketId];
+        socketOnForE2eFullAuth(receiverId, 'emitPvEditMessageError', receiverSocketId => {
 
-                        delete data['receiverId'];
-                        data['senderId'] = socketUserId;
+            FindInUser.isMessageBelongForThisUserInE2E(listOfId, socketUserId,
+                socketUserId + 'And' + receiverId + 'E2EContents', result => {
+                    if (!result)
+                        return emitToSocket('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
-                        io.to(user).emit('emitPvDeleteMessage', result);
+                    delete data['receiverId'];
+                    data['senderId'] = socketUserId;
 
-                        DeleteInCommon.message(socketUserId + 'And' + receiverId + 'E2EContents', data['listOfId']);
+                    emitToSpecificSocket(receiverSocketId, 'emitPvDeleteMessage', result);
 
-                    });
+                    DeleteInCommon.message(socketUserId + 'And' + receiverId + 'E2EContents', data['listOfId']);
 
-            });
+
+                });
 
 
         });
@@ -592,19 +433,41 @@ io.use((socket, next) => {
 
     // groups
 
+    let validationGroupChatRoom = (groupId, errEmitName, cb) => {
+
+            FindInGroup.groupId(groupId, result => {
+
+                if (!result)
+                    return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
+
+                cb();
+            });
+
+        },
+        fullGroupValidation = (groupId, errEmitName, socketId, cb) => {
+            validationGroupChatRoom(groupId, errEmitName, () => {
+
+                FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
+
+                    if (!result)
+                        return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
+
+                    cb();
+                });
+
+            });
+        };
 
     socket.on('onLeaveGroup', data => {
         let groupId = data?.groupId;
 
-        if (groupId === undefined || null)
-            return socket.emit('emitLeaveGroupError', Response.HTTP_BAD_REQUEST);
+        if (isUndefined(groupId))
+            return emitToSocket('emitLeaveGroupError', Response.HTTP_BAD_REQUEST);
 
-        FindInGroup.groupId(groupId, result => {
-
-            if (!result)
-                return socket.emit('emitLeaveGroupError', Response.HTTP_NOT_FOUND);
+        validationGroupChatRoom(groupId, 'emitLeaveGroupError', () => {
 
             leaveUserInRoom(groupId, 'group');
+
         });
 
     });
@@ -613,43 +476,32 @@ io.use((socket, next) => {
 
         let groupId = data?.groupId;
 
-        if (groupId === undefined || null)
-            return socket.emit('emitGroupMessageError', Response.HTTP_BAD_REQUEST);
+        if (isUndefined(groupId))
+            return emitToSocket('emitGroupMessageError', Response.HTTP_BAD_REQUEST);
 
-        FindInGroup.groupId(groupId, result => {
+        fullGroupValidation(groupId, 'emitGroupMessageError', socketUserId, () => {
 
-            if (!result)
-                return socket.emit('emitGroupMessageError', Response.HTTP_NOT_FOUND);
-
-
-            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
-
-                if (!result)
-                    return socket.emit('emitGroupMessageError', Response.HTTP_NOT_FOUND);
-
-                joinUserInRoom(groupId, 'group');
-                addRoomIntoListOfUserRooms(groupId, 'group');
+            joinUserInRoom(groupId, 'group');
+            addRoomIntoListOfUserRooms(groupId, 'group');
 
 
-                delete data?.groupId;
+            delete data?.groupId;
 
-                RestFulUtil.validateMessage(data, result => {
+            RestFulUtil.validateMessage(data, result => {
 
-                    if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                        return socket.emit('emitGroupMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-
-                    result['senderId'] = socketUserId;
+                if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                    return emitToSocket('emitGroupMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                    Insert.message('`' + groupId + 'GroupContents`', result, {
-                        conversationType: 'Group'
-                    });
+                result['senderId'] = socketUserId;
 
 
-                    io.to(groupId).emit('emitGroupMessage', result);
+                Insert.message('`' + groupId + 'GroupContents`', result, {
+                    conversationType: 'Group'
                 });
 
+
+                emitToSpecificSocket(groupId, 'emitGroupMessage', result);
 
             });
 
@@ -660,35 +512,25 @@ io.use((socket, next) => {
 
     socket.on('onGroupUploadedFile', data => {
 
-        let groupId = data?.groupId;
-        let id = data?.id;
-        if ((id === undefined || null) || (groupId === undefined || null))
-            return socket.emit('emitGroupUploadedFileError', Response.HTTP_BAD_REQUEST);
+        let groupId = data?.groupId,
+            id = data?.id;
 
-        FindInGroup.groupId(groupId, result => {
+        if (isUndefined(groupId) || isUndefined(id))
+            return emitToSocket('emitGroupUploadedFileError', Response.HTTP_BAD_REQUEST);
 
-            if (!result)
-                return socket.emit('emitGroupUploadedFileError', Response.HTTP_NOT_FOUND);
+        fullGroupValidation(groupId, 'emitGroupUploadedFileError', socketUserId, () => {
 
 
-            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
+            joinUserInRoom(groupId, 'group');
+            addRoomIntoListOfUserRooms(groupId, 'group');
 
-                if (!result)
-                    return socket.emit('emitGroupUploadedFileError', Response.HTTP_NOT_FOUND);
+            data['senderId'] = socketUserId;
+            delete data?.groupId;
 
-
-                joinUserInRoom(groupId, 'group');
-                addRoomIntoListOfUserRooms(groupId, 'group');
-
-                data['senderId'] = socketUserId;
-                delete data?.groupId;
-
-                FindInGroup.getDataForGroupContentWithId(groupId, id, result => {
-                    io.to(groupId).emit('emitGroupUploadedFile', Object.assign({}, result, data));
-                });
-
-
+            FindInGroup.getDataForGroupContentWithId(groupId, id, result => {
+                emitToSpecificSocket(groupId, 'emitGroupUploadedFile', Object.assign({}, result, data));
             });
+
 
         });
 
@@ -698,50 +540,39 @@ io.use((socket, next) => {
 
     socket.on('onGroupEditMessage', data => {
 
-        let groupId = data?.groupId;
-        let messageId = data?.messageId;
+        let groupId = data?.groupId,
+            messageId = data?.messageId;
 
-        if ((messageId === undefined || null) || (groupId === undefined || null))
-            return socket.emit('emitGroupEditMessageError', Response.HTTP_BAD_REQUEST);
+        if (isUndefined(groupId) || isUndefined(messageId))
+            return emitToSocket('emitGroupEditMessageError', Response.HTTP_BAD_REQUEST);
 
-        FindInGroup.groupId(groupId, result => {
+        fullGroupValidation(groupId, 'emitGroupEditMessageError', socketUserId, () => {
 
-            if (!result)
-                return socket.emit('emitGroupEditMessageError', Response.HTTP_NOT_FOUND);
-
-
-            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
-
+            CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, '`' + groupId + 'GroupContents`', result => {
                 if (!result)
-                    return socket.emit('emitGroupEditMessageError', Response.HTTP_NOT_FOUND);
+                    return emitToSocket('emitGroupEditMessageError', Response.HTTP_FORBIDDEN);
 
-                CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, '`' + groupId + 'GroupContents`', result => {
-                    if (!result)
-                        return socket.emit('emitGroupEditMessageError', Response.HTTP_FORBIDDEN);
-
-                    joinUserInRoom(groupId, 'group');
-                    addRoomIntoListOfUserRooms(groupId, 'group');
+                joinUserInRoom(groupId, 'group');
+                addRoomIntoListOfUserRooms(groupId, 'group');
 
 
-                    delete data?.groupId;
-                    delete data?.messageId;
+                delete data?.groupId;
+                delete data?.messageId;
 
-                    RestFulUtil.validateMessage(data, result => {
+                RestFulUtil.validateMessage(data, result => {
 
-                        if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                            return socket.emit('emitGroupEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+                    if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                        return emitToSocket('emitGroupEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                        result['senderId'] = socketUserId;
+                    result['senderId'] = socketUserId;
 
-                        UpdateInCommon.message('`' + groupId + 'GroupContents`', result, groupId);
+                    UpdateInCommon.message('`' + groupId + 'GroupContents`', result, groupId);
 
-                        io.to(groupId).emit('emitGroupEditMessage', result);
-
-                    });
-
+                    emitToSpecificSocket(groupId, 'emitGroupEditMessage', result);
 
                 });
+
 
             });
 
@@ -751,39 +582,29 @@ io.use((socket, next) => {
 
     socket.on('onGroupDeleteMessage', data => {
 
-        let groupId = data?.groupId;
-        let lisOfId = data?.listOfId;
-        let messageId = data?.messageId;
+        let groupId = data?.groupId,
+            lisOfId = data?.listOfId,
+            messageId = data?.messageId;
 
-        if ((lisOfId === undefined || null) || (messageId === undefined || null) || (groupId === undefined || null))
-            return socket.emit('emitGroupDeleteMessageError', Response.HTTP_BAD_REQUEST);
+        if (isUndefined(groupId) || isUndefined(messageId) || isUndefined(lisOfId))
+            return emitToSocket('emitGroupDeleteMessageError', Response.HTTP_BAD_REQUEST);
 
-        FindInGroup.groupId(groupId, result => {
+        fullGroupValidation(groupId, 'emitGroupDeleteMessageError', socketUserId, () => {
 
-            if (!result)
-                return socket.emit('emitGroupDeleteMessageError', Response.HTTP_NOT_FOUND);
-
-
-            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
-
+            CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, '`' + groupId + 'GroupContents`', result => {
                 if (!result)
-                    return socket.emit('emitGroupDeleteMessageError', Response.HTTP_NOT_FOUND);
+                    return emitToSocket('emitGroupDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-                CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, '`' + groupId + 'GroupContents`', result => {
-                    if (!result)
-                        return socket.emit('emitGroupDeleteMessageError', Response.HTTP_FORBIDDEN);
-
-                    joinUserInRoom(groupId, 'group');
-                    addRoomIntoListOfUserRooms(groupId, 'group');
+                joinUserInRoom(groupId, 'group');
+                addRoomIntoListOfUserRooms(groupId, 'group');
 
 
-                    DeleteInCommon.message('`' + groupId + 'GroupContents`', lisOfId);
+                DeleteInCommon.message('`' + groupId + 'GroupContents`', lisOfId);
 
-                    io.to(groupId).emit('emitGroupDeleteMessage', data);
-
-                });
+                emitToSpecificSocket(groupId, 'emitGroupDeleteMessage', data);
 
             });
+
 
         });
 
@@ -793,28 +614,18 @@ io.use((socket, next) => {
     socket.on('onTypingGroupMessage', data => {
 
         let groupId = data?.groupId;
-        if (groupId === undefined || null)
-            return socket.emit('emitGroupTypingMessageError', Response.HTTP_BAD_REQUEST);
 
-        FindInGroup.groupId(groupId, result => {
-
-            if (!result)
-                return socket.emit('emitGroupTypingMessageError', Response.HTTP_NOT_FOUND);
+        if (isUndefined(groupId))
+            return emitToSocket('emitGroupTypingMessageError', Response.HTTP_BAD_REQUEST);
 
 
-            FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
+        fullGroupValidation(groupId, 'emitGroupTypingMessageError', socketUserId, () => {
 
-                if (!result)
-                    return socket.emit('emitGroupTypingMessageError', Response.HTTP_NOT_FOUND);
-
-
-                joinUserInRoom(groupId, 'group');
-                addRoomIntoListOfUserRooms(groupId, 'group');
+            joinUserInRoom(groupId, 'group');
+            addRoomIntoListOfUserRooms(groupId, 'group');
 
 
-                io.to(groupId).emit('emitTypingGroupMessage', data);
-
-            });
+            emitToSpecificSocket(groupId, 'emitTypingGroupMessage', data);
 
         });
 
@@ -823,19 +634,41 @@ io.use((socket, next) => {
 
     // channel
 
+    let validationChannelChatRoom = (channelId, errEmitName, cb) => {
+
+            FindInChannel.channelId(channelId, result => {
+
+                if (!result)
+                    return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
+
+                cb();
+            });
+
+        },
+        fullChannelValidation = (channelId, errEmitName, socketId, cb) => {
+            validationChannelChatRoom(channelId, errEmitName, () => {
+
+                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
+
+                    if (!result)
+                        return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
+
+                    cb();
+                });
+
+            });
+        };
 
     socket.on('onLeaveChannel', data => {
         let channelId = data?.channelId;
 
-        if (channelId === undefined || null)
+        if (isUndefined(channelId))
             return socket.emit('emitLeaveChannelError', Response.HTTP_BAD_REQUEST);
 
-        FindInChannel.channelId(channelId, result => {
-
-            if (!result)
-                return socket.emit('emitLeaveChannelError', Response.HTTP_NOT_FOUND);
+        validationChannelChatRoom(channelId, 'emitLeaveChannelError', () => {
 
             leaveUserInRoom(channelId, 'channel');
+
         });
 
     });
@@ -845,7 +678,7 @@ io.use((socket, next) => {
         let channelId = data?.channelId;
 
 
-        if (channelId === undefined || null)
+        if (isUndefined(channelId))
             return socket.emit('emitChannelMessageError', Response.HTTP_BAD_REQUEST);
 
         FindInChannel.channelId(channelId, result => {
@@ -898,7 +731,7 @@ io.use((socket, next) => {
 
         let channelId = data?.channelId;
 
-        if (channelId === undefined || null)
+        if (isUndefined(channelId))
             return socket.emit('emitChannelUploadedFileError', Response.HTTP_BAD_REQUEST);
 
         FindInChannel.channelId(channelId, result => {
@@ -940,7 +773,7 @@ io.use((socket, next) => {
         let channelId = data?.channelId;
         let messageId = data?.messageId;
 
-        if ((messageId === undefined || null) || (channelId === undefined || null))
+        if (isUndefined(messageId) || isUndefined(channelId))
             return socket.emit('emitChannelEditMessageError', Response.HTTP_BAD_REQUEST);
 
         FindInChannel.channelId(channelId, result => {
@@ -993,7 +826,8 @@ io.use((socket, next) => {
 
         let channelId = data?.channelId;
         let listOfId = data?.listOfId;
-        if ((channelId === undefined || null) || (listOfId === undefined || null))
+
+        if (isUndefined(listOfId) || isUndefined(channelId))
             return socket.emit('emitChannelDeleteMessageError', Response.HTTP_BAD_REQUEST);
 
         FindInChannel.channelId(channelId, result => {
@@ -1028,4 +862,5 @@ io.use((socket, next) => {
     });
 
 
-});
+})
+;
