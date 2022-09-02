@@ -7,7 +7,7 @@ let Json = require('app/util/ReturnJson'),
     Insert = require('app/model/add/insert/user/users'),
     Delete = require('app/model/remove/users/user'),
     CommonInsert = require('app/model/add/insert/common/index'),
-    Util = require('app/util/Util'),
+    Util, {isUndefined} = require('app/util/Util'),
     File = require('app/util/File'),
     multerFile = multer().single('file'),
     RestFulUtil = require('app/util/Util'),
@@ -18,8 +18,8 @@ let Json = require('app/util/ReturnJson'),
 
 exports.createE2EChat = (req) => {
 
-    let userId = Number(req.body?.userId);
-    let isNumber = Number.isInteger(userId);
+    let userId = Number(req.body?.userId),
+        isNumber = Number.isInteger(userId);
 
 
     if (!isNumber)
@@ -81,7 +81,7 @@ exports.uploadFile = (req, res) => {
                 let data = JSON.parse(JSON.stringify(req.body));
                 let receiverId = data?.receiverId;
 
-                if (receiverId === undefined)
+                if (isUndefined(receiverId))
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 delete data?.receiverId;
@@ -107,37 +107,32 @@ exports.uploadFile = (req, res) => {
                             let toUser = receiverId;
                             let fromUser = data?.senderId;
 
-                            if (toUser && fromUser !== undefined) {
-
-                                let file = req.file;
-
-                                if (file !== undefined) {
-
-                                    let {
-                                        fileUrl,
-                                        fileSize
-                                    } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
-
-                                    data['fileUrl'] = fileUrl;
-                                    data['fileSize'] = fileSize;
-                                    data['fileName'] = file.originalname;
-
-
-                                    CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, {
-                                        conversationType: 'E2E'
-                                    }, result => {
-                                        return Json.builder(Response.HTTP_CREATED, {
-                                            insertId: result
-                                        });
-                                    });
-
-                                }
-
+                            if (isUndefined(toUser) || isUndefined(fromUser))
                                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                            }
+                            let file = req.file;
 
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
+                            if (isUndefined(file))
+                                return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                            let {
+                                fileUrl,
+                                fileSize
+                            } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+
+                            data['fileUrl'] = fileUrl;
+                            data['fileSize'] = fileSize;
+                            data['fileName'] = file.originalname;
+
+
+                            CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, {
+                                conversationType: 'E2E'
+                            }, result => {
+                                Json.builder(Response.HTTP_CREATED, {
+                                    insertId: result
+                                });
+                            });
+
                         });
 
                     });
@@ -155,16 +150,19 @@ exports.uploadFile = (req, res) => {
 
 
 exports.listOfMessage = (req) => {
-
-
-    let {to, limit, page, order, sort, type, search} = req.query;
-
-    let getLimit = (limit !== undefined) ? limit : 15;
-    let getSort = (sort !== undefined) ? sort : 'DESC';
-    let getOrder = (order !== undefined) ? order : 'id';
-    let getPage = (page !== undefined) ? page : 1;
-
-    let startFrom = (getPage - 1) * limit;
+    let queryObject = req.query,
+        limit = queryObject?.limit,
+        page = queryObject?.page,
+        order = queryObject?.order,
+        to = queryObject?.to,
+        sort = queryObject?.sort,
+        type = queryObject?.type,
+        search = queryObject?.search,
+        getLimit = !isUndefined(limit) ? limit : 1,
+        getSort = !isUndefined(sort) ? sort : 'DESC',
+        getOrder = !isUndefined(order) ? order : 'id',
+        getPage = !isUndefined(page) ? page : 1,
+        startFrom = (getPage - 1) * limit;
 
     getTokenPayLoad(data => {
 
@@ -182,7 +180,7 @@ exports.listOfMessage = (req) => {
 
                 Find.getListOfMessage(data, startFrom, getLimit, getOrder, getSort, type, search, result => {
 
-                    return Json.builder(
+                    Json.builder(
                         Response.HTTP_OK,
                         result, {
                             totalPages: totalPages
@@ -206,12 +204,16 @@ exports.user = (req) => {
 
     let id = req.query?.id;
 
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
+
     Find.isExistUser(id, isUserInDb => {
         if (!isUserInDb)
             return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
         Find.getUserPvDetails(id, result => {
-            return Json.builder(Response.HTTP_OK, result);
+            Json.builder(Response.HTTP_OK, result);
         });
     });
 
@@ -221,6 +223,9 @@ exports.user = (req) => {
 exports.deleteForMe = (req) => {
 
     let id = req.params?.id;
+
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(() => {
 
@@ -237,7 +242,7 @@ exports.deleteForMe = (req) => {
 
                 Delete.chatInListOfChatsForUser(from, id, from);
 
-                return Json.builder(Response.HTTP_OK);
+                Json.builder(Response.HTTP_OK);
 
             });
 
@@ -252,6 +257,10 @@ exports.deleteForUs = (req) => {
 
 
     let id = req.params?.id;
+
+
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
     getTokenPayLoad(() => {
@@ -273,7 +282,7 @@ exports.deleteForUs = (req) => {
 
                     Delete.chatInListOfChatsForUser(from, id, id);
 
-                    return Json.builder(Response.HTTP_OK);
+                    Json.builder(Response.HTTP_OK);
 
                 });
 
@@ -293,6 +302,10 @@ exports.blockUser = (req) => {
     let id = req.body?.id;
 
 
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
+
     getTokenPayLoad(() => {
 
         let from = data.id;
@@ -308,7 +321,7 @@ exports.blockUser = (req) => {
                 }
 
                 Delete.removeUserInUsersBlockList(from, id);
-                return Json.builder(Response.HTTP_OK);
+                Json.builder(Response.HTTP_OK);
             });
 
         });

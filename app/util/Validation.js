@@ -1,16 +1,18 @@
 let Json = require('./ReturnJson'),
     Response = require('./Response'),
     Util = require('./Util'),
-    jwt = require('jsonwebtoken'),
+    jwt,
+    {
+        TokenExpiredError,
+        JsonWebTokenError
+    } = require('jsonwebtoken'),
     {
         JWK,
         parse
     } = require('node-jose'),
     {
         ValidationException
-    } = require('app/exception/ValidationException'), {
-        TokenExpiredError, JsonWebTokenError
-    } = require('jsonwebtoken');
+    } = require('app/exception/ValidationException');
 
 
 module.exports = {

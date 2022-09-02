@@ -18,7 +18,7 @@ let Json = require('app/util/ReturnJson'),
         getHashData
     } = require('app/util/Generate'),
     File = require('app/util/File'),
-    Util = require('app/util/Util'),
+    Util, {isUndefined} = require('app/util/Util'),
     CommonInsert = require('app/model/add/insert/common/index'),
     Create = require('app/model/create/users'),
     Insert = require('app/model/add/insert/user/users'),
@@ -35,7 +35,8 @@ exports.user = () => {
 
         Find.getPersonalUserDetails(userId, result => {
 
-            return Json.builder(Response.HTTP_OK, result);
+            Json.builder(Response.HTTP_OK, result);
+
         });
 
 
@@ -49,7 +50,7 @@ exports.editUsername = (req) => {
 
     let username = req.params?.id;
 
-    if (username < 1 || username === undefined)
+    if (isUndefined(username))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
@@ -58,16 +59,15 @@ exports.editUsername = (req) => {
 
         Find.isUsernameUsed(username.toString().trim(), result => {
 
-            if (result) {
-                Update.username(phone, username.toString().trim(), result => {
-                    if (!result)
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
+            if (!result)
+                return Json.builder(Response.HTTP_CONFLICT);
 
-                    return Json.builder(Response.HTTP_OK);
-                });
-            }
+            Update.username(phone, username.toString().trim(), result => {
+                if (!result)
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            return Json.builder(Response.HTTP_CONFLICT);
+                Json.builder(Response.HTTP_OK);
+            });
 
         });
 
@@ -81,6 +81,9 @@ exports.editBio = (req) => {
 
     let bio = req.params?.bio;
 
+    if (isUndefined(bio))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
     getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
@@ -90,7 +93,7 @@ exports.editBio = (req) => {
             if (!result)
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            return Json.builder(Response.HTTP_OK);
+            Json.builder(Response.HTTP_OK);
         });
 
 
@@ -104,7 +107,7 @@ exports.editName = (req) => {
 
     let {lastName, firstName} = req.body;
 
-    if (firstName < 1 || firstName === undefined)
+    if (isUndefined(firstName))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
@@ -115,7 +118,7 @@ exports.editName = (req) => {
             if (!result)
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            return Json.builder(Response.HTTP_OK);
+            Json.builder(Response.HTTP_OK);
         });
 
 
@@ -129,7 +132,7 @@ exports.twoAuth = (req) => {
 
     let {password, email} = req.body;
 
-    if (email === undefined && (password === undefined || password < 6))
+    if (isUndefined(email) || isUndefined(password) || password?.length < 6)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
@@ -141,7 +144,7 @@ exports.twoAuth = (req) => {
             if (!result)
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            return Json.builder(Response.HTTP_OK);
+            Json.builder(Response.HTTP_OK);
         });
 
     });
@@ -160,7 +163,7 @@ exports.disableTwoAuth = () => {
             if (!result)
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            return Json.builder(Response.HTTP_OK);
+            Json.builder(Response.HTTP_OK);
         });
 
     });
@@ -169,13 +172,11 @@ exports.disableTwoAuth = () => {
 
 
 exports.restPassword = (req) => {
+    let oldPassword = req.body?.old,
+        newPassword = req.body?.new;
 
 
-    let oldPassword = req.body?.old;
-    let newPassword = req.body?.new;
-
-
-    if (oldPassword === undefined && newPassword === undefined)
+    if (isUndefined(oldPassword) || isUndefined(newPassword))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
@@ -192,7 +193,7 @@ exports.restPassword = (req) => {
                 if (!result)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                return Json.builder(Response.HTTP_OK);
+                Json.builder(Response.HTTP_OK);
             });
 
         });
@@ -215,7 +216,7 @@ exports.uploadAvatar = (req, res) => {
 
             let file = req.file;
 
-            if (file === undefined)
+            if (isUndefined(file))
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
             let {
@@ -226,7 +227,7 @@ exports.uploadAvatar = (req, res) => {
                 if (!result)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                return Json.builder(Response.HTTP_OK);
+                Json.builder(Response.HTTP_OK);
             });
 
         });
@@ -243,12 +244,12 @@ exports.listOfBlockUsers = () => {
         let id = data.id;
 
         Find.getListOfBlockUsers(id, data => {
-            if (data === null)
+            if (isUndefined(data))
                 return Json.builder(Response.HTTP_NOT_FOUND);
 
             Find.getUserDetailsInUsersTable(data, result => {
 
-                return Json.builder(Response.HTTP_OK, result);
+                Json.builder(Response.HTTP_OK, result);
 
             });
 
@@ -266,7 +267,7 @@ exports.listOfDevices = () => {
         let id = data.id;
 
         Find.getListOfDevices(id, result => {
-            return Json.builder(Response.HTTP_OK, result);
+            Json.builder(Response.HTTP_OK, result);
         });
 
     });
@@ -275,20 +276,21 @@ exports.listOfDevices = () => {
 
 
 exports.listOfMessage = (req) => {
-
-
-    let {limit, page, order, sort, type, search} = req.query;
-
-    let getLimit = (limit !== undefined) ? limit : 15;
-    let getSort = (sort !== undefined) ? sort : 'DESC';
-    let getOrder = (order !== undefined) ? order : 'id';
-    let getPage = (page !== undefined) ? page : 1;
-
-    let startFrom = (getPage - 1) * limit;
+    let queryObject = req.query,
+        limit = queryObject?.limit,
+        page = queryObject?.page,
+        order = queryObject?.order,
+        sort = queryObject?.sort,
+        type = queryObject?.type,
+        search = queryObject?.search,
+        getLimit = !isUndefined(limit) ? limit : 1,
+        getSort = !isUndefined(sort) ? sort : 'DESC',
+        getOrder = !isUndefined(order) ? order : 'id',
+        getPage = !isUndefined(page) ? page : 1,
+        startFrom = (getPage - 1) * limit;
 
 
     getTokenPayLoad(data => {
-
 
         let phone = data.phoneNumber;
 
@@ -304,7 +306,7 @@ exports.listOfMessage = (req) => {
 
                 FindInUser.getListOfMessage(phone + 'SavedMessages', startFrom, getLimit, getOrder, getSort, type, search, result => {
 
-                    return Json.builder(
+                    Json.builder(
                         Response.HTTP_OK,
                         result, {
                             totalPages: totalPages
@@ -338,7 +340,7 @@ exports.deleteSavedMessage = () => {
 
             Delete.savedMessage(phone);
 
-            return Json.builder(Response.HTTP_OK);
+            Json.builder(Response.HTTP_OK);
 
         });
 
@@ -363,7 +365,7 @@ exports.createSavedMessage = () => {
             Create.savedMessages(phone);
             AddUserForeignKey.savedMessages(phone);
 
-            return Json.builder(Response.HTTP_CREATED);
+            Json.builder(Response.HTTP_CREATED);
 
         });
 
@@ -378,8 +380,8 @@ exports.account = () => {
     getTokenPayLoad(data => {
 
 
-        let phone = data.phoneNumber;
-        let userId = data.id;
+        let phone = data.phoneNumber,
+            userId = data.id;
 
         Json.builder(Response.HTTP_OK);
 
@@ -424,7 +426,7 @@ exports.addMessage = (req) => {
 
                 Insert.messageIntoUserSavedMessage(phone, data);
 
-                return Json.builder(Response.HTTP_CREATED);
+                Json.builder(Response.HTTP_CREATED);
             });
 
         });
@@ -440,8 +442,8 @@ exports.uploadFile = (req, res) => {
 
     getTokenPayLoad(data => {
 
-        let userId = data.id;
-        let phone = data.phoneNumber;
+        let userId = data.id,
+            phone = data.phoneNumber;
 
         Find.isExistUser(userId, isInDb => {
 
@@ -466,29 +468,26 @@ exports.uploadFile = (req, res) => {
 
                         let file = req.file;
 
-                        if (file !== undefined) {
+                        if (isUndefined(file))
+                            return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                            let {
-                                fileUrl,
-                                fileSize
-                            } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+                        let {
+                            fileUrl,
+                            fileSize
+                        } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
 
-                            data['fileUrl'] = fileUrl;
-                            data['fileSize'] = fileSize;
-                            data['fileName'] = file.originalname;
+                        data['fileUrl'] = fileUrl;
+                        data['fileSize'] = fileSize;
+                        data['fileName'] = file.originalname;
 
 
-                            CommonInsert.message('`' + phone + 'SavedMessages`', data, {
-                                conversationType: 'Personal'
-                            }, result => {
-                                return Json.builder(Response.HTTP_OK, {
-                                    insertId: result
-                                });
+                        CommonInsert.message('`' + phone + 'SavedMessages`', data, {
+                            conversationType: 'Personal'
+                        }, result => {
+                            Json.builder(Response.HTTP_OK, {
+                                insertId: result
                             });
-
-                        }
-
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
+                        });
 
                     });
 
@@ -514,14 +513,12 @@ exports.deleteMessage = (req) => {
         InputException(e);
     }
 
+    if (isUndefined(listOfId))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
     getTokenPayLoad(data => {
 
         let phone = data.phoneNumber;
-
-        if (listOfId === undefined)
-            return Json.builder(Response.HTTP_BAD_REQUEST);
-
 
         FindInUser.isSavedMessageCreated(phone, result => {
 
@@ -530,7 +527,7 @@ exports.deleteMessage = (req) => {
 
             Delete.itemInSavedMessage(phone, listOfId);
 
-            return Json.builder(Response.HTTP_OK);
+            Json.builder(Response.HTTP_OK);
 
         });
 
@@ -545,10 +542,11 @@ exports.editMessage = (req) => {
         id = reqData?.id,
         dataWithOutIdObject;
 
-    if (id !== undefined) {
-        delete reqData?.id;
-        dataWithOutIdObject = reqData;
-    }
+    if (isUndefined(id))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
+    delete reqData?.id;
+    dataWithOutIdObject = reqData;
 
 
     getTokenPayLoad(data => {
@@ -566,7 +564,7 @@ exports.editMessage = (req) => {
                     return Json.builder(Response.HTTP_NOT_FOUND);
                 Update.itemInSavedMessage(phone, id);
 
-                return Json.builder(Response.HTTP_OK);
+                Json.builder(Response.HTTP_OK);
 
             });
 
