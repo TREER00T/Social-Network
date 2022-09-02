@@ -645,15 +645,22 @@ io.use((socket, next) => {
             });
 
         },
-        fullChannelValidation = (channelId, errEmitName, socketId, cb) => {
+        fullChannelValidation = (channelId, errEmitName, cb) => {
             validationChannelChatRoom(channelId, errEmitName, () => {
 
-                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
+                FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
 
                     if (!result)
-                        return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
+                        return emitToSocket(errEmitName, Response.HTTP_FORBIDDEN);
 
-                    cb();
+                    FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
+
+                        if (!result)
+                            return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
+
+                        cb();
+                    });
+
                 });
 
             });
@@ -679,47 +686,30 @@ io.use((socket, next) => {
 
 
         if (isUndefined(channelId))
-            return socket.emit('emitChannelMessageError', Response.HTTP_BAD_REQUEST);
+            return emitToSocket('emitChannelMessageError', Response.HTTP_BAD_REQUEST);
 
-        FindInChannel.channelId(channelId, result => {
+        fullChannelValidation(channelId, 'emitChannelMessageError', () => {
 
-            if (!result)
-                return socket.emit('emitChannelMessageError', Response.HTTP_NOT_FOUND);
+            joinUserInRoom(channelId, 'channel');
+            addRoomIntoListOfUserRooms(channelId, 'channel');
 
-            FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
-
-                if (!result)
-                    return socket.emit('emitChannelMessageError', Response.HTTP_FORBIDDEN);
-
-                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
-
-                    if (!result)
-                        return socket.emit('emitChannelMessageError', Response.HTTP_NOT_FOUND);
+            delete data?.channelId;
 
 
-                    joinUserInRoom(channelId, 'channel');
-                    addRoomIntoListOfUserRooms(channelId, 'channel');
+            RestFulUtil.validateMessage(data, result => {
 
-                    delete data?.channelId;
-
-
-                    RestFulUtil.validateMessage(data, result => {
-
-                        if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                            return socket.emit('emitChannelMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+                if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                    return emitToSocket('emitChannelMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                        result['senderId'] = socketUserId;
+                result['senderId'] = socketUserId;
 
-                        Insert.message('`' + channelId + 'ChannelContents`', result, {
-                            conversationType: 'Channel'
-                        });
-
-                        io.to(channelId).emit('emitChannelMessage', result);
-                    });
-
-
+                Insert.message('`' + channelId + 'ChannelContents`', result, {
+                    conversationType: 'Channel'
                 });
+
+                emitToSpecificSocket(channelId, 'emitChannelMessage', result);
+
 
             });
 
@@ -732,36 +722,18 @@ io.use((socket, next) => {
         let channelId = data?.channelId;
 
         if (isUndefined(channelId))
-            return socket.emit('emitChannelUploadedFileError', Response.HTTP_BAD_REQUEST);
-
-        FindInChannel.channelId(channelId, result => {
-
-            if (!result)
-                return socket.emit('emitChannelUploadedFileError', Response.HTTP_NOT_FOUND);
+            return emitToSocket('emitChannelUploadedFileError', Response.HTTP_BAD_REQUEST);
 
 
-            FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
+        fullChannelValidation(channelId, 'emitChannelUploadedFileError', () => {
 
-                if (!result)
-                    return socket.emit('emitChannelUploadedFileError', Response.HTTP_FORBIDDEN);
+            joinUserInRoom(channelId, 'channel');
+            addRoomIntoListOfUserRooms(channelId, 'channel');
 
-                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
+            delete data?.channelId;
 
-                    if (!result)
-                        return socket.emit('emitChannelUploadedFileError', Response.HTTP_NOT_FOUND);
-
-                    joinUserInRoom(channelId, 'channel');
-                    addRoomIntoListOfUserRooms(channelId, 'channel');
-
-                    delete data?.channelId;
-
-                    FindInChannel.getDataForChannelContentWithId(channelId, result => {
-                        io.to(channelId).emit('emitChannelUploadedFile', Object.assign({}, result, data));
-                    });
-
-
-                });
-
+            FindInChannel.getDataForChannelContentWithId(channelId, result => {
+                emitToSpecificSocket(channelId, 'emitChannelUploadedFile', Object.assign({}, result, data));
             });
 
         });
@@ -770,51 +742,35 @@ io.use((socket, next) => {
 
     socket.on('onChanelEditMessage', data => {
 
-        let channelId = data?.channelId;
-        let messageId = data?.messageId;
+        let channelId = data?.channelId,
+            messageId = data?.messageId;
 
         if (isUndefined(messageId) || isUndefined(channelId))
-            return socket.emit('emitChannelEditMessageError', Response.HTTP_BAD_REQUEST);
-
-        FindInChannel.channelId(channelId, result => {
-
-            if (!result)
-                return socket.emit('emitChannelEditMessageError', Response.HTTP_NOT_FOUND);
+            return emitToSocket('emitChannelEditMessageError', Response.HTTP_BAD_REQUEST);
 
 
-            FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
+        fullChannelValidation(channelId, 'emitChannelEditMessageError', () => {
 
-                if (!result)
-                    return socket.emit('emitChannelEditMessageError', Response.HTTP_FORBIDDEN);
+            joinUserInRoom(channelId, 'channel');
+            addRoomIntoListOfUserRooms(channelId, 'channel');
 
-                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
+            if (messageId === undefined)
+                return emitToSocket('emitChannelEditMessageError', Response.HTTP_BAD_REQUEST);
 
-                    if (!result)
-                        return socket.emit('emitChannelEditMessageError', Response.HTTP_NOT_FOUND);
-
-                    joinUserInRoom(channelId, 'channel');
-                    addRoomIntoListOfUserRooms(channelId, 'channel');
-                    if (messageId === undefined)
-                        return socket.emit('emitChannelEditMessageError', Response.HTTP_BAD_REQUEST);
-
-                    delete data?.channelId;
-                    delete data?.messageId;
+            delete data?.channelId;
+            delete data?.messageId;
 
 
-                    RestFulUtil.validateMessage(data, result => {
+            RestFulUtil.validateMessage(data, result => {
 
-                        if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
-                            return socket.emit('emitChannelEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
+                if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                    return emitToSocket('emitChannelEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                        result['senderId'] = socketUserId;
+                result['senderId'] = socketUserId;
 
-                        UpdateInCommon.message('`' + channelId + 'ChannelContents`', result, messageId);
-                        io.to(channelId).emit('emitChannelEditMessage', result);
-
-                    });
-
-                });
+                UpdateInCommon.message('`' + channelId + 'ChannelContents`', result, messageId);
+                emitToSpecificSocket(channelId, 'emitChannelEditMessage', result);
 
             });
 
@@ -824,43 +780,25 @@ io.use((socket, next) => {
 
     socket.on('onChanelDeleteMessage', data => {
 
-        let channelId = data?.channelId;
-        let listOfId = data?.listOfId;
+        let channelId = data?.channelId,
+            listOfId = data?.listOfId;
 
         if (isUndefined(listOfId) || isUndefined(channelId))
-            return socket.emit('emitChannelDeleteMessageError', Response.HTTP_BAD_REQUEST);
+            return emitToSocket('emitChannelDeleteMessageError', Response.HTTP_BAD_REQUEST);
 
-        FindInChannel.channelId(channelId, result => {
+        fullChannelValidation(channelId, 'emitChannelDeleteMessageError', () => {
 
-            if (!result)
-                return socket.emit('emitChannelDeleteMessageError', Response.HTTP_NOT_FOUND);
+            joinUserInRoom(channelId, 'channel');
+            addRoomIntoListOfUserRooms(channelId, 'channel');
 
+            DeleteInCommon.message('`' + channelId + 'ChannelContents`', listOfId);
+            emitToSpecificSocket(channelId, 'emitChannelDeleteMessage', data);
 
-            FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
-
-                if (!result)
-                    return socket.emit('emitChannelDeleteMessageError', Response.HTTP_FORBIDDEN);
-
-                FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
-
-                    if (!result)
-                        return socket.emit('emitChannelDeleteMessageError', Response.HTTP_NOT_FOUND);
-
-                    joinUserInRoom(channelId, 'channel');
-                    addRoomIntoListOfUserRooms(channelId, 'channel');
-
-                    DeleteInCommon.message('`' + channelId + 'ChannelContents`', listOfId);
-                    io.to(channelId).emit('emitChannelDeleteMessage', data);
-
-
-                });
-
-            });
 
         });
+
 
     });
 
 
-})
-;
+});
