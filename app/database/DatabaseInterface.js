@@ -8,15 +8,15 @@ dotenv.config();
 
 module.exports = {
 
-    initialization() {
-        Database.connect();
+    initialization(cb) {
+        Database.connect(cb);
         openSql.createDatabase(process.env.DATABASE);
     },
 
-    create() {
+    create(cb) {
         create.tables();
         add.foreignKeys();
-        return true;
+        cb();
     }
 
 }

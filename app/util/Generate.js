@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken'),
+let jwt = require('jsonwebtoken'),
     {
         JWK,
         JWE
@@ -19,19 +19,21 @@ module.exports = {
 
     // Signs jwt
     getJwtSign(payload, subject) {
-        const signOptions = {
+        const SIGN_OPTIONS = {
             subject: `${subject}`,
             expiresIn: '12h',
             algorithm: 'RS256'
         };
-        return jwt.sign(payload, process.env.PRAIVATE_KEY, signOptions);
+
+        return jwt.sign(payload, process.env.PRAIVATE_KEY, SIGN_OPTIONS);
     },
 
 
     // The jwt encrypt with JWK library
     async getJwtEncrypt(raw, format = 'compact', contentAlg = 'A256GCM', alg = 'RSA-OAEP') {
         let publicKey = await JWK.asKey(process.env.JWT_PUBLIC_KEY, 'pem');
-        const buffer = Buffer.from(JSON.stringify(raw))
+        const buffer = Buffer.from(JSON.stringify(raw));
+
         return await JWE.createEncrypt(
             {format: format, contentAlg: contentAlg, fields: {alg: alg}}, publicKey)
             .update(buffer).final();
@@ -40,26 +42,25 @@ module.exports = {
 
     // Generates refresh jwt
     getJwtRefresh(payload, subject) {
-        const signOptions = {
+        const SIGN_OPTIONS = {
             subject: `${subject}`,
             expiresIn: '1d',
             algorithm: 'RS256'
         };
-        return jwt.sign(payload, process.env.PRAIVATE_KEY, signOptions);
+
+        return jwt.sign(payload, process.env.PRAIVATE_KEY, SIGN_OPTIONS);
     },
 
 
     getApiKey() {
-        const rand = crypto.randomBytes(50);
+        const ARRAY_OF_RANDOM_NUMBER = crypto.randomBytes(50);
 
-        let formatValidString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        let formatValidString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+            chars = formatValidString.repeat(5),
+            str = '';
 
-        let chars = formatValidString.repeat(5);
-
-        let str = '';
-
-        for (let i = 0; i < rand.length; i++) {
-            let decimal = rand[i];
+        for (let i = 0; i < ARRAY_OF_RANDOM_NUMBER.length; i++) {
+            let decimal = ARRAY_OF_RANDOM_NUMBER[i];
             str += chars[decimal];
         }
 
@@ -68,7 +69,6 @@ module.exports = {
 
 
     getHashData(data, salt) {
-
         let hash = crypto.pbkdf2Sync(data, salt,
             1000, 64, `sha512`).toString(`hex`);
 
@@ -77,16 +77,14 @@ module.exports = {
 
 
     getFileHashName() {
-        const rand = crypto.randomBytes(30);
+        const ARRAY_OF_RANDOM_NUMBER = crypto.randomBytes(30);
 
-        let formatValidString = '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
+        let formatValidString = '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
+            chars = formatValidString.repeat(5),
+            str = '';
 
-        let chars = formatValidString.repeat(5);
-
-        let str = '';
-
-        for (let i = 0; i < rand.length; i++) {
-            let decimal = rand[i];
+        for (let i = 0; i < ARRAY_OF_RANDOM_NUMBER.length; i++) {
+            let decimal = ARRAY_OF_RANDOM_NUMBER[i];
             str += chars[decimal];
         }
 
@@ -94,13 +92,15 @@ module.exports = {
     },
 
     makeIdForInviteLink() {
-        let result = '';
-        let characters = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
-        let charactersLength = characters.length;
+        let result = '',
+            characters = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
+            charactersLength = characters.length;
+
         for (let i = 0; i < 20; i++) {
             result += characters.charAt(Math.floor(Math.random() *
                 charactersLength));
         }
+
         return `+` + result;
     },
 

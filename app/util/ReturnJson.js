@@ -4,13 +4,8 @@ let res;
 module.exports = {
 
     builder(obj, data = null, option) {
-        if (typeof res !== 'undefined') {
-            let jsonContent = JSON.stringify(module.exports.jsonObject(obj, data, option));
-            res.status(obj.code);
-            res.end(jsonContent);
-            return true;
-        }
-        return module.exports.jsonObject(obj, data, option);
+        let jsonContent = JSON.stringify(module.exports.jsonObject(obj, data, option));
+        res.status(obj.code).json(jsonContent);
     },
 
     initializationRes(response) {

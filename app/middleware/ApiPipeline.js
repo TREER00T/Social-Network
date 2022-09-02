@@ -12,13 +12,7 @@ let tokenPayload;
 module.exports = {
 
     isSetUserApiKey(key) {
-
-        if (key === undefined)
-            return false;
-
-        module.exports.apiKey = key;
-
-        return true;
+        return key !== undefined;
     },
 
 
@@ -26,11 +20,8 @@ module.exports = {
 
         getApiKey(phone, result => {
 
-            if (result !== key) {
-                return cb(false);
-            }
+            cb(result === key);
 
-            cb(true);
         });
 
     },
@@ -40,30 +31,28 @@ module.exports = {
 
         let isSetUserToken = getSplitBearerJwt(bearerHeader);
 
-        if (typeof isSetUserToken === 'string') {
+        if (typeof isSetUserToken !== 'string')
+            return false;
 
-            (async () => {
+        (async () => {
 
-                let token = await getJwtDecrypt(isSetUserToken);
+            let token = await getJwtDecrypt(isSetUserToken);
 
-                getJwtVerify(token, decode => {
+            getJwtVerify(token, decode => {
 
-                    if (decode.type === 'rt' || 'at') {
+                if (decode.type === 'rt' || 'at') {
 
-                        (function (cb) {
-                            if (typeof cb === 'function')
-                                cb(decode)
-                        })(tokenPayload);
-                    }
+                    (function (cb) {
+                        if (typeof cb === 'function')
+                            cb(decode)
+                    })(tokenPayload);
+                }
 
-                });
+            });
 
-            })();
+        })();
 
-            return true;
-        }
-
-        return false;
+        return true;
     },
 
 

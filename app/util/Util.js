@@ -6,7 +6,7 @@ let {
     } = require('opensql').fieldHelper;
 
 
-const IN_VALID_MESSAGE_TYPE = 'IN_VALID_MESSAGE_TYPE',
+let IN_VALID_MESSAGE_TYPE = 'IN_VALID_MESSAGE_TYPE',
     IN_VALID_OBJECT_KEY = 'IN_VALID_OBJECT_KEY';
 
 
@@ -17,15 +17,16 @@ module.exports = {
 
     formatBytes(realSize) {
 
-        const decimalLength = 2,
-            packetSize = 1024;
+        const DECIMAL_LENGTH = 2,
+            PACKET_SIZE = 1024;
 
-        let d = Math.floor(Math.log(realSize) / Math.log(packetSize));
+        let formatTypeOfFileSize = Math.floor(Math.log(realSize) / Math.log(PACKET_SIZE));
 
-        return 0 === realSize ? '0 Bytes' :
-            parseFloat((realSize / Math.pow(packetSize, d)).toFixed(Math.max(0, decimalLength))) +
-            ' ' + ['Bytes', 'KB', 'MB', 'GB'][d];
-
+        return 0 === realSize ?
+            '0 Byte' :
+            parseFloat((realSize / Math.pow(PACKET_SIZE, formatTypeOfFileSize))
+                .toFixed(Math.max(0, DECIMAL_LENGTH))) + ' ' +
+            ['Bytes', 'KB', 'MB', 'GB'][formatTypeOfFileSize];
     },
 
 
@@ -50,16 +51,17 @@ module.exports = {
     validateMessage(jsonObject, cb) {
 
         let arrayOfValidJsonObjectKey = [
-            'text', 'type', 'isReply', 'isForward',
-            'targetReplyId', 'forwardDataId', 'locationLat', 'locationLon', 'senderId'
-        ];
-
-        let arrayOfMessageType = [
-            'None', 'Image', 'Location', 'Document', 'Video', 'Voice'
-        ];
-
-
-        let isTypeInMessageType = arrayOfMessageType.includes(jsonObject.type);
+                'text', 'type',
+                'isReply', 'isForward',
+                'targetReplyId', 'forwardDataId',
+                'locationLat', 'locationLon', 'senderId'
+            ],
+            arrayOfMessageType = [
+                'None', 'Image',
+                'Video', 'Voice',
+                'Location', 'Document'
+            ],
+            isTypeInMessageType = arrayOfMessageType.includes(jsonObject.type);
 
 
         if (!isTypeInMessageType) {
@@ -79,17 +81,22 @@ module.exports = {
         }
 
 
-        const MESSAGE_WITHOUT_FILE = 'None';
-        const MESSAGE_TYPE_LOCATION = 'Location';
-        let isReplyInJsonObject = jsonObject?.isReply !== false && undefined && null;
-        let isForwardInJsonObject = jsonObject?.isForward !== false && undefined && null;
-        let isNoneMessageType = jsonObject?.type === MESSAGE_WITHOUT_FILE;
-        let isMessageTypeLocation = jsonObject?.type === MESSAGE_TYPE_LOCATION;
-        let isMessageTypeNull = jsonObject?.type?.length === 0 || undefined || null;
-        let isTextNull = jsonObject?.text?.length === 0 || null || undefined;
-        let isSenderIdNull = jsonObject?.senderId?.length === 0 || null || undefined;
-        let isLocationLatNull = jsonObject?.locationLat?.length === 0 || null || undefined;
-        let isLocationLonNull = jsonObject?.locationLon?.length === 0 || null || undefined;
+        const MESSAGE_WITHOUT_FILE = 'None',
+            MESSAGE_TYPE_LOCATION = 'Location';
+
+        let isUndefined = (data) => {
+                return data === false || data === undefined ||
+                    typeof data === 'undefined' || data === null || data?.length === 0;
+            },
+            isReplyInJsonObject = !isUndefined(jsonObject?.isReply),
+            isForwardInJsonObject = !isUndefined(jsonObject?.isForward),
+            isNoneMessageType = jsonObject?.type === MESSAGE_WITHOUT_FILE,
+            isMessageTypeLocation = jsonObject?.type === MESSAGE_TYPE_LOCATION,
+            isMessageTypeNull = isUndefined(jsonObject?.type),
+            isTextNull = isUndefined(jsonObject?.text),
+            isSenderIdNull = isUndefined(jsonObject?.senderId),
+            isLocationLatNull = isUndefined(jsonObject?.locationLat),
+            isLocationLonNull = isUndefined(jsonObject?.locationLon);
 
 
         if (isMessageTypeLocation && (isLocationLonNull || isLocationLatNull)) {
@@ -161,7 +168,7 @@ module.exports = {
 
     splitRoute(str) {
         if (typeof str === 'string')
-            return str.split('/')
+            return str.split('/');
 
         if (str.fast_slash)
             return '';
