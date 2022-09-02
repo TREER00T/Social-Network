@@ -14,7 +14,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: 'channelsAdmins',
             foreignKey: 'channelId',
@@ -22,7 +22,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
 
     },
 

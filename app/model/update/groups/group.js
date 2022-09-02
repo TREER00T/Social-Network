@@ -3,6 +3,9 @@ let openSql = require('opensql'),
         DataBaseException
     } = require('app/exception/DataBaseException'),
     {
+        isBiggerThanZero
+    } = require('app/util/Util'),
+    {
         NULL
     } = openSql.queryHelper;
 
@@ -20,7 +23,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].changedRows > 0);
+                cb(isBiggerThanZero(result[1]?.changedRows));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -38,7 +41,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].changedRows > 0);
+                cb(isBiggerThanZero(result[1]?.changedRows));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -56,7 +59,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].changedRows > 0);
+                cb(isBiggerThanZero(result[1]?.changedRows));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -75,7 +78,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].changedRows > 0);
+                cb(isBiggerThanZero(result[1]?.changedRows));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -94,7 +97,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].changedRows > 0);
+                cb(isBiggerThanZero(result[1]?.changedRows));
             } catch (e) {
                 DataBaseException(e);
             }

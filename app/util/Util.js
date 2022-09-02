@@ -182,7 +182,19 @@ module.exports = {
     },
 
     isUndefined(data) {
+        if (typeof data === 'number' || typeof data === 'boolean' || typeof data === 'bigint')
+            return true;
         return data === undefined || data === null || typeof data === 'undefined' || data?.length < 1;
+    },
+
+    isNotEmptyArr(data) {
+        return data?.length > 0;
+    },
+
+    isBiggerThanZero(data) {
+        if (typeof data === 'bigint' || typeof data === 'number')
+            return data > 0;
+        return false;
     }
 
 }

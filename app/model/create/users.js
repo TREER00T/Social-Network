@@ -8,17 +8,18 @@ let openSql = require('opensql'),
         DATETIME
     } = openSql.dataType,
     {
+        isUndefined
+    } = require('app/util/Util'),
+    {
         AUTO_INCREMENT
     } = openSql.keywordHelper,
     {
+        NULL,
         NOT_NULL
     } = openSql.queryHelper,
     {
         DataBaseException
-    } = require('app/exception/DataBaseException'),
-    {
-        NULL
-    } = require('opensql/src/util/QueryHelper');
+    } = require('app/exception/DataBaseException');
 
 
 module.exports = {
@@ -177,7 +178,7 @@ module.exports = {
             primaryKey: 'id'
         }).result(result => {
             try {
-                (result[1].warningCount > 0 && result[1].warningCount !== undefined) ? cb(false) : cb(true);
+                cb(isUndefined(result[1]?.warningCount));
             } catch (e) {
                 DataBaseException(e);
             }

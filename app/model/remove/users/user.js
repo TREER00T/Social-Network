@@ -5,6 +5,10 @@ let openSql = require('opensql'),
     {
         DataBaseException
     } = require('app/exception/DataBaseException'),
+    {
+        isUndefined,
+        isBiggerThanZero
+    } = require('app/util/Util'),
     FindInCommon = require('app/model/find/common/common'),
     DeleteInCommon = require('app/model/remove/common/common');
 
@@ -14,7 +18,7 @@ module.exports = {
         openSql.dropTable(tableName)
             .result(result => {
                 try {
-                    cb(result[1].affectedRows !== 0)
+                    cb(isBiggerThanZero(result[1]?.affectedRows))
                 } catch (e) {
                     DataBaseException(e);
                 }
@@ -168,7 +172,7 @@ module.exports = {
     itemInSavedMessage(phone, listOfId) {
         listOfId.forEach(item => {
             FindInCommon.isForwardData(phone + 'SavedMessages', item, id => {
-                if (id !== null)
+                if (!isUndefined(id))
                     DeleteInCommon.forwardMessage(id);
             });
         });

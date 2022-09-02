@@ -16,7 +16,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: fromUser + 'And' + toUser + 'E2EContents',
             foreignKey: 'senderId',
@@ -24,7 +24,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     },
 
 
@@ -36,7 +36,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: 'userBlockList',
             foreignKey: 'userTargetId',
@@ -44,7 +44,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     },
 
     devices() {
@@ -55,7 +55,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     },
 
     savedMessages(phone) {
@@ -66,7 +66,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: phone + 'SavedMessages',
             foreignKey: 'senderId',
@@ -74,7 +74,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     },
 
 
@@ -86,7 +86,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: 'listOfUserGroups',
             foreignKey: 'userId',
@@ -94,7 +94,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     },
 
 
@@ -106,7 +106,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: 'listOfUserChannels',
             foreignKey: 'userId',
@@ -114,7 +114,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     },
 
 
@@ -126,7 +126,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: 'listOfUserE2Es',
             foreignKey: 'fromUser',
@@ -134,7 +134,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: 'listOfUserE2Es',
             foreignKey: 'userId',
@@ -142,7 +142,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     }
 
 }

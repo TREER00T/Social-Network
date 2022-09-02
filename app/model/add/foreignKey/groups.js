@@ -15,7 +15,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: groupId + 'GroupContents',
             foreignKey: 'senderId',
@@ -23,7 +23,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     },
 
     groupsAdmins() {
@@ -34,7 +34,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: 'groupsAdmins',
             foreignKey: 'groupId',
@@ -42,7 +42,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     },
 
 
@@ -54,7 +54,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
         openSql.addForeignKey({
             table: 'groupsUsers',
             foreignKey: 'groupId',
@@ -62,7 +62,7 @@ module.exports = {
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     }
 
 

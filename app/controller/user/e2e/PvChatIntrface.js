@@ -164,6 +164,9 @@ exports.listOfMessage = (req) => {
         getPage = !isUndefined(page) ? page : 1,
         startFrom = (getPage - 1) * limit;
 
+    if (isUndefined(to))
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
     getTokenPayLoad(data => {
 
         let from = data.id;

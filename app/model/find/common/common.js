@@ -1,6 +1,10 @@
 let openSql = require('opensql'),
     Generate = require('app/util/Generate'),
     {
+        isUndefined,
+        isNotEmptyArr
+    } = require('app/util/Util'),
+    {
         IN,
         LIKE,
         SOURCE,
@@ -30,7 +34,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                cb(result[1].length !== 0);
+                cb(isNotEmptyArr(result[1]));
             } catch (e) {
                 DataBaseException(e);
             }
@@ -77,7 +81,7 @@ module.exports = {
             ]
         }).result(result => {
             try {
-                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+                isUndefined(result[1][0]) ? cb(null) : cb(result[1]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -95,7 +99,7 @@ module.exports = {
             where: Generate.objectListOfUserActivityForWhereCondition(type, userId)
         }).result(result => {
             try {
-                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+                isUndefined(result[1][0]) ? cb(null) : cb(result[1]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -112,7 +116,7 @@ module.exports = {
             where: Generate.objectListOfUserActivityForWhereCondition(type, userId)
         }).result(result => {
             try {
-                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+                isUndefined(result[1][0]) ? cb(null) : cb(result[1]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -156,7 +160,7 @@ module.exports = {
             ]
         }).result(result => {
             try {
-                (result[1][0] === undefined) ? cb(null) : cb(result[1]);
+                isUndefined(result[1][0]) ? cb(null) : cb(result[1]);
             } catch (e) {
                 DataBaseException(e);
             }
@@ -172,7 +176,7 @@ module.exports = {
             }
         }).result(result => {
             try {
-                (result[1][0] === undefined) ? cb(null) : cb(result[1].forwardDataId);
+                isUndefined(result[1][0]) ? cb(null) : cb(result[1].forwardDataId);
             } catch (e) {
                 DataBaseException(e);
             }
