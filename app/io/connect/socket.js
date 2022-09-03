@@ -679,7 +679,7 @@ io.use((socket, next) => {
 
     });
 
-    socket.on('onChanelMessage', data => {
+    socket.on('onChannelMessage', data => {
 
         let channelId = data?.channelId;
 
@@ -716,7 +716,7 @@ io.use((socket, next) => {
 
     });
 
-    socket.on('onChanelUploadedFile', data => {
+    socket.on('onChannelUploadedFile', data => {
 
         let channelId = data?.channelId;
 
@@ -739,7 +739,7 @@ io.use((socket, next) => {
 
     });
 
-    socket.on('onChanelEditMessage', data => {
+    socket.on('onChannelEditMessage', data => {
 
         let channelId = data?.channelId,
             messageId = data?.messageId;
@@ -777,7 +777,7 @@ io.use((socket, next) => {
 
     });
 
-    socket.on('onChanelDeleteMessage', data => {
+    socket.on('onChannelDeleteMessage', data => {
 
         let channelId = data?.channelId,
             listOfId = data?.listOfId;

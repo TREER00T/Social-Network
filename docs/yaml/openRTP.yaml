@@ -260,19 +260,19 @@ paths:
       - $ref:
           - components/emitLeaveChannelError
 
-  - on: onChanelMessage
-      tags:
-        - Channel
-      parameters:
-        - $ref:
-            - components/ChannelId
-            - components/DataMessage
-      events:
-        - $ref:
-            - components/emitChannelMessageError
-            - components/emitChannelMessage
+  - on: onChannelMessage
+    tags:
+      - Channel
+    parameters:
+      - $ref:
+          - components/ChannelId
+          - components/DataMessage
+    events:
+      - $ref:
+          - components/emitChannelMessageError
+          - components/emitChannelMessage
 
-  - on: onChanelUploadedFile
+  - on: onChannelUploadedFile
     tags:
       - Channel
     parameters:
@@ -284,7 +284,7 @@ paths:
           - components/emitChannelUploadedFileError
           - components/emitChannelUploadedFile
 
-  - on: onChanelEditMessage
+  - on: onChannelEditMessage
     tags:
       - Channel
     parameters:
@@ -297,7 +297,7 @@ paths:
           - components/emitChannelEditMessageError
           - components/emitChannelEditMessage
 
-  - on: onGroupDeleteMessage
+  - on: onChannelDeleteMessage
     tags:
       - Channel
     parameters:
