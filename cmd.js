@@ -10,8 +10,9 @@ program
     .command('db')
     .description('Create database and tables')
     .action(() => {
-        Database.initialization(isConnect => {
-            if (!isConnect)
+        Database.initialization(isErr => {
+
+            if (isErr)
                 return console.log('Database connect failed');
 
             Database.create(() => {
