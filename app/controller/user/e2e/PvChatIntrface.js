@@ -7,10 +7,14 @@ let Json = require('app/util/ReturnJson'),
     Insert = require('app/model/add/insert/user/users'),
     Delete = require('app/model/remove/users/user'),
     CommonInsert = require('app/model/add/insert/common/index'),
-    Util, {isUndefined} = require('app/util/Util'),
+    Util, {
+        isUndefined,
+        getFileFormat,
+        IN_VALID_MESSAGE_TYPE,
+        IN_VALID_OBJECT_KEY
+    } = require('app/util/Util'),
     File = require('app/util/File'),
     multerFile = multer().single('file'),
-    RestFulUtil = require('app/util/Util'),
     {
         getTokenPayLoad
     } = require('app/middleware/ApiPipeline');
@@ -99,9 +103,9 @@ exports.uploadFile = (req, res) => {
                         if (!result)
                             return Json.builder(Response.HTTP_NOT_FOUND);
 
-                        RestFulUtil.validateMessage(data, result => {
+                        Util.validateMessage(data, result => {
 
-                            if (result === (RestFulUtil.IN_VALID_OBJECT_KEY || RestFulUtil.IN_VALID_MESSAGE_TYPE))
+                            if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
                                 return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
                             let toUser = receiverId;
@@ -118,7 +122,7 @@ exports.uploadFile = (req, res) => {
                             let {
                                 fileUrl,
                                 fileSize
-                            } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+                            } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
 
                             data['fileUrl'] = fileUrl;
                             data['fileSize'] = fileSize;

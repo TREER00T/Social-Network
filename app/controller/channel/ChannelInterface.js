@@ -17,7 +17,13 @@ let Json = require('app/util/ReturnJson'),
         getTokenPayLoad
     } = require('app/middleware/ApiPipeline'),
     File = require('app/util/File'),
-    Util, {isUndefined} = require('app/util/Util'),
+    Util, {
+        isUndefined,
+        getFileFormat,
+        getRandomHexColor,
+        IN_VALID_MESSAGE_TYPE,
+        IN_VALID_OBJECT_KEY
+    } = require('app/util/Util'),
     Generate = require('app/util/Generate');
 
 
@@ -39,10 +45,10 @@ exports.create = (req, res) => {
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
             if (!isUndefined(file))
-                fileUrl = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname)).fileUrl;
+                fileUrl = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname)).fileUrl;
 
 
-            Insert.channel(name.toString().trim(), Generate.makeIdForInviteLink(), Util.getRandomHexColor(), fileUrl, id => {
+            Insert.channel(name.toString().trim(), Generate.makeIdForInviteLink(), getRandomHexColor(), fileUrl, id => {
 
                 if (isUndefined(id))
                     return Json.builder(Response.HTTP_BAD_REQUEST);
@@ -151,7 +157,7 @@ exports.uploadFile = (req, res) => {
 
                             Util.validateMessage(data, result => {
 
-                                if (result === (Util.IN_VALID_OBJECT_KEY || Util.IN_VALID_MESSAGE_TYPE))
+                                if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
                                     return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
@@ -164,7 +170,7 @@ exports.uploadFile = (req, res) => {
                                 let {
                                     fileUrl,
                                     fileSize
-                                } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+                                } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
 
                                 data['fileUrl'] = fileUrl;
                                 data['fileSize'] = fileSize;
@@ -327,7 +333,7 @@ exports.uploadAvatar = (req, res) => {
 
                         let {
                             fileUrl
-                        } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+                        } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
 
                         Update.img(id, fileUrl, result => {
                             if (!result)

@@ -18,7 +18,12 @@ let Json = require('app/util/ReturnJson'),
         getHashData
     } = require('app/util/Generate'),
     File = require('app/util/File'),
-    Util, {isUndefined} = require('app/util/Util'),
+    Util, {
+        isUndefined,
+        getFileFormat,
+        IN_VALID_MESSAGE_TYPE,
+        IN_VALID_OBJECT_KEY
+    } = require('app/util/Util'),
     CommonInsert = require('app/model/add/insert/common/index'),
     Create = require('app/model/create/users'),
     Insert = require('app/model/add/insert/user/users'),
@@ -221,7 +226,7 @@ exports.uploadAvatar = (req, res) => {
 
             let {
                 fileUrl
-            } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+            } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
 
             Update.img(phone, fileUrl, result => {
                 if (!result)
@@ -416,7 +421,7 @@ exports.addMessage = (req) => {
 
         Util.validateMessage(req.body, data => {
 
-            if (data === Util.IN_VALID_MESSAGE_TYPE || Util.IN_VALID_OBJECT_KEY)
+            if (data === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
                 return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
             FindInUser.isSavedMessageCreated(phone, result => {
@@ -462,7 +467,7 @@ exports.uploadFile = (req, res) => {
 
                     Util.validateMessage(data, result => {
 
-                        if (result === (Util.IN_VALID_OBJECT_KEY || Util.IN_VALID_MESSAGE_TYPE))
+                        if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
                             return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
@@ -474,7 +479,7 @@ exports.uploadFile = (req, res) => {
                         let {
                             fileUrl,
                             fileSize
-                        } = File.validationAndWriteFile(file.buffer, Util.getFileFormat(file.originalname));
+                        } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
 
                         data['fileUrl'] = fileUrl;
                         data['fileSize'] = fileSize;
@@ -555,7 +560,7 @@ exports.editMessage = (req) => {
 
         Util.validateMessage(dataWithOutIdObject, result => {
 
-            if (result === Util.IN_VALID_MESSAGE_TYPE || Util.IN_VALID_OBJECT_KEY)
+            if (result === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
                 return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
             FindInUser.isSavedMessageCreated(phone, result => {
