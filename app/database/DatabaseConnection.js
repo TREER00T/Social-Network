@@ -14,7 +14,7 @@ module.exports = {
             multipleStatements: true
         }).result((s) => {
             if (cb !== undefined)
-                cb(!s instanceof Error);
+                cb(s instanceof Error);
         });
     }
 
