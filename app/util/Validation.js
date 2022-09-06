@@ -37,18 +37,18 @@ module.exports = {
     },
 
 
-    requestEndpointHandler(url, app) {
+    requestEndpointHandler(url, method, app) {
 
         let arrayOfRouteWithOutAuth = [
-                '/apiDocs/',
-                '/apiDocs/swagger-ui.css',
-                '/apiDocs/swagger-ui-bundle.js',
-                '/apiDocs/swagger-ui-standalone-preset.js',
-                '/apiDocs/swagger-ui-init.js',
-                '/apiDocs/favicon-32x32.png',
-                '/apiDocs/favicon-16x16.png',
-                '/api/auth/generate/user',
-                '/api/auth/verify/authCode'
+                'get /apiDocs/',
+                'get /apiDocs/swagger-ui.css',
+                'get /apiDocs/swagger-ui-bundle.js',
+                'get /apiDocs/swagger-ui-standalone-preset.js',
+                'get /apiDocs/swagger-ui-init.js',
+                'get /apiDocs/favicon-32x32.png',
+                'get /apiDocs/favicon-16x16.png',
+                'post /api/auth/generate/user',
+                'post /api/auth/verify/authCode'
             ],
             arrayOfRoute = [];
 
@@ -63,20 +63,21 @@ module.exports = {
 
 
             if (layer.method)
-                arrayOfRoute.push('/' + path.concat(Util.splitRoute(layer.regexp)).filter(Boolean).join('/'));
+                arrayOfRoute.push(layer.method + ' /' + path.concat(Util.splitRoute(layer.regexp)).filter(Boolean).join('/'));
         }
+
 
         app._router.stack.forEach(print.bind(null, []));
 
-        arrayOfRoute = arrayOfRoute.filter((el) => !arrayOfRouteWithOutAuth.includes(el));
+        arrayOfRoute = arrayOfRoute.filter((i) => !arrayOfRouteWithOutAuth.includes(i));
 
 
-        let isRouteWithoutAuth = arrayOfRouteWithOutAuth.includes(url);
+        let isRouteWithoutAuth = arrayOfRouteWithOutAuth.includes(method + ' ' + url);
 
         if (isRouteWithoutAuth)
             return '';
 
-        let isRouteInArr = arrayOfRoute.includes(url);
+        let isRouteInArr = arrayOfRoute.includes(method + ' ' + url);
 
         if (isRouteInArr)
             return 'AuthRoute';
@@ -106,7 +107,7 @@ module.exports = {
             push(item);
         });
 
-        let isRouteInAuthArr = arrayOfRoute.includes('/' + newUrl.join('/'));
+        let isRouteInAuthArr = arrayOfRoute.includes(method + ' /' + newUrl.join('/'));
 
         if (isRouteInAuthArr)
             return 'AuthRoute';
