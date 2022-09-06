@@ -60,18 +60,17 @@ module.exports = {
                         if (!result)
                             return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
 
-                        app.use(router);
                         next();
                     });
                 });
             }
 
 
-            app.use(router);
             next();
         });
 
 
+        app.use(router);
         app.use('/api/auth', authRouter);
         app.use('/api/e2e', e2eRouter);
         app.use('/api/personal', personalRouter);

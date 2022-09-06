@@ -3,7 +3,10 @@ let app = require('express')(),
     io = require('socket.io')(http),
     Update = require('app/model/update/user/users'),
     IoUtil = require('app/io/util/util'),
-    RestFulUtil = require('app/util/Util'),
+    RestFulUtil, {
+        IN_VALID_MESSAGE_TYPE,
+        IN_VALID_OBJECT_KEY
+    } = require('app/util/Util'),
     Insert = require('app/model/add/insert/common/index'),
     UpdateInCommon = require('app/model/update/common/common'),
     DeleteInCommon = require('app/model/remove/common/common'),
@@ -327,7 +330,7 @@ io.use((socket, next) => {
 
                 RestFulUtil.validateMessage(data, result => {
 
-                    if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                    if (result === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
                         return emitToSocket('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
@@ -373,7 +376,7 @@ io.use((socket, next) => {
 
                         RestFulUtil.validateMessage(data, result => {
 
-                            if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                            if (result === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
                                 return emitToSocket('emitPvEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
@@ -488,7 +491,7 @@ io.use((socket, next) => {
 
             RestFulUtil.validateMessage(data, result => {
 
-                if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                if (result === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
                     return emitToSocket('emitGroupMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
@@ -560,7 +563,7 @@ io.use((socket, next) => {
 
                 RestFulUtil.validateMessage(data, result => {
 
-                    if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                    if (result === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
                         return emitToSocket('emitGroupEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
@@ -697,7 +700,7 @@ io.use((socket, next) => {
 
             RestFulUtil.validateMessage(data, result => {
 
-                if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                if (result === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
                     return emitToSocket('emitChannelMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
@@ -762,7 +765,7 @@ io.use((socket, next) => {
 
             RestFulUtil.validateMessage(data, result => {
 
-                if (result === RestFulUtil.IN_VALID_MESSAGE_TYPE || RestFulUtil.IN_VALID_OBJECT_KEY)
+                if (result === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
                     return emitToSocket('emitChannelEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 

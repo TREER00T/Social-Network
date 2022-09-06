@@ -5,7 +5,8 @@ module.exports = {
 
     builder(obj, data = null, option) {
         let jsonContent = JSON.parse(JSON.stringify(module.exports.jsonObject(obj, data, option)));
-        res.status(obj.code).json(jsonContent);
+        res.status(obj.code);
+        res.send(jsonContent);
     },
 
     initializationRes(response) {
