@@ -33,7 +33,7 @@ module.exports = {
                 return Json.builder(Response.HTTP_METHOD_NOT_ALLOWED);
 
 
-            let routeMsg = Validation.requestEndpointHandler(req.url, app);
+            let routeMsg = Validation.requestEndpointHandler(req.url, req.method.toLowerCase(), app);
 
             if (routeMsg === 'NotFound')
                 return Json.builder(Response.HTTP_NOT_FOUND);
