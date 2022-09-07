@@ -114,7 +114,7 @@ io.use((socket, next) => {
                     socket.leave(item + typeRoom);
                 });
             });
-        }
+        };
 
     Update.userOnline(phone, isActive);
 
