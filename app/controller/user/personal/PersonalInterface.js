@@ -110,7 +110,9 @@ exports.editBio = (req) => {
 
 exports.editName = (req) => {
 
-    let {lastName, firstName} = req.body;
+    let bodyObject = req.body,
+        lastName = bodyObject?.lastName,
+        firstName = bodyObject?.firstName;
 
     if (isUndefined(firstName))
         return Json.builder(Response.HTTP_BAD_REQUEST);
@@ -135,7 +137,9 @@ exports.editName = (req) => {
 
 exports.twoAuth = (req) => {
 
-    let {password, email} = req.body;
+    let bodyObject = req.body,
+        email = bodyObject?.email,
+        password = bodyObject?.password;
 
     if (isUndefined(email) || isUndefined(password) || password?.length < 6)
         return Json.builder(Response.HTTP_BAD_REQUEST);
@@ -177,8 +181,9 @@ exports.disableTwoAuth = () => {
 
 
 exports.restPassword = (req) => {
-    let oldPassword = req.body?.old,
-        newPassword = req.body?.new;
+    let bodyObject = req.body,
+        oldPassword = bodyObject?.old,
+        newPassword = bodyObject?.new;
 
 
     if (isUndefined(oldPassword) || isUndefined(newPassword))

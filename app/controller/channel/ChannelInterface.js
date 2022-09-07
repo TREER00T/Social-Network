@@ -27,6 +27,90 @@ let Json = require('app/util/ReturnJson'),
     Generate = require('app/util/Generate');
 
 
+let validationChannelAndUser = (roomId, userId, cb) => {
+
+        Find.channelId(roomId, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+                cb();
+            });
+
+        });
+
+    },
+    validationChannelAndUserAndOwnerUser = (roomId, userId, cb) => {
+
+        validationChannelAndUser(roomId, userId, () => {
+
+            Find.isOwnerOfChannel(userId, roomId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_FORBIDDEN);
+
+                cb();
+            });
+
+        });
+
+    },
+    validationChannelAndUserAndOwnerOrAdmin = (roomId, userId, cb) => {
+
+        validationChannelAndUser(roomId, userId, () => {
+
+            Find.isOwnerOrAdminOfChannel(userId, roomId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_FORBIDDEN);
+
+                cb();
+            });
+
+        });
+
+    },
+    validationChannelAndUserAndJoinedInChannel = (roomId, userId, cb) => {
+
+        validationChannelAndUser(roomId, userId, () => {
+
+            Find.isJoinedInChannel(roomId, userId, result => {
+
+                if (result)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
+
+                cb();
+            });
+
+        });
+
+    },
+    isExistUserAndIsOwner = (userIdForAdmin, userId, channelId, cb) => {
+
+        FindInUser.isExistUser(userIdForAdmin, result => {
+
+            if (!result)
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+
+            Find.isOwnerOfChannel(userId, channelId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_FORBIDDEN);
+
+                cb();
+            });
+
+        });
+
+    };
+
+
 exports.create = (req, res) => {
 
 
@@ -83,29 +167,11 @@ exports.deleteChannel = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
-
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistUser(userId, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                Find.isOwnerOfChannel(userId, id, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
-
-                    Delete.channel(id);
-                    Delete.channelAdmins(id);
-                    Delete.channelUsers(id);
-                    DeleteInUser.channelInListOfUserChannels(id);
-                });
-
-            });
-
+        validationChannelAndUserAndOwnerUser(id, userId, () => {
+            Delete.channel(id);
+            Delete.channelAdmins(id);
+            Delete.channelUsers(id);
+            DeleteInUser.channelInListOfUserChannels(id);
         });
 
     });
@@ -134,59 +200,42 @@ exports.uploadFile = (req, res) => {
 
             delete data?.channelId;
 
-            Find.channelId(channelId, isDefined => {
+            validationChannelAndUserAndOwnerOrAdmin(channelId, userId, () => {
 
-                if (!isDefined)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
-
-                FindInUser.isExistUser(userId, result => {
+                Find.isJoinedInChannel(channelId, userId, result => {
 
                     if (!result)
-                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                    Find.isOwnerOrAdminOfChannel(userId, channelId, result => {
-
-                        if (!result)
-                            return Json.builder(Response.HTTP_FORBIDDEN);
-
-                        Find.isJoinedInChannel(channelId, userId, result => {
-
-                            if (!result)
-                                return Json.builder(Response.HTTP_NOT_FOUND);
+                        return Json.builder(Response.HTTP_NOT_FOUND);
 
 
-                            Util.validateMessage(data, result => {
+                    Util.validateMessage(data, result => {
 
-                                if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
-                                    return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-
-                                data['senderId'] = userId;
-                                let file = req.file;
-
-                                if (!isUndefined(file))
-                                    return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                                let {
-                                    fileUrl,
-                                    fileSize
-                                } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
-
-                                data['fileUrl'] = fileUrl;
-                                data['fileSize'] = fileSize;
-                                data['fileName'] = file.originalname;
+                        if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
+                            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                                CommonInsert.message('`' + channelId + 'ChannelContents`', data, {
-                                    conversationType: 'Channel'
-                                }, result => {
-                                    Json.builder(Response.HTTP_CREATED, {
-                                        insertId: result
-                                    });
-                                });
+                        data['senderId'] = userId;
+                        let file = req.file;
 
+                        if (!isUndefined(file))
+                            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                        let {
+                            fileUrl,
+                            fileSize
+                        } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+
+                        data['fileUrl'] = fileUrl;
+                        data['fileSize'] = fileSize;
+                        data['fileName'] = file.originalname;
+
+
+                        CommonInsert.message('`' + channelId + 'ChannelContents`', data, {
+                            conversationType: 'Channel'
+                        }, result => {
+                            Json.builder(Response.HTTP_CREATED, {
+                                insertId: result
                             });
-
                         });
 
                     });
@@ -216,30 +265,13 @@ exports.changeName = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
+        validationChannelAndUserAndOwnerUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistUser(userId, result => {
-
+            Update.name(id, name.toString().trim(), result => {
                 if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Find.isOwnerOfChannel(userId, id, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
-
-                    Update.name(id, name.toString().trim(), result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        Json.builder(Response.HTTP_OK);
-                    });
-
-                });
-
+                Json.builder(Response.HTTP_OK);
             });
 
         });
@@ -264,31 +296,15 @@ exports.changeDescription = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
+        validationChannelAndUserAndOwnerUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistUser(userId, result => {
-
+            Update.description(id, description, result => {
                 if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Find.isOwnerOfChannel(userId, id, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
-
-                    Update.description(id, description, result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        Json.builder(Response.HTTP_OK);
-                    });
-
-                });
-
+                Json.builder(Response.HTTP_OK);
             });
+
 
         });
 
@@ -311,39 +327,22 @@ exports.uploadAvatar = (req, res) => {
             if (isUndefined(id))
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            Find.channelId(id, isDefined => {
+            validationChannelAndUserAndOwnerUser(id, userId, () => {
 
-                if (!isDefined)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
+                let file = req.file;
 
-                FindInUser.isExistUser(userId, result => {
+                if (file === undefined)
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
 
+                let {
+                    fileUrl
+                } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+
+                Update.img(id, fileUrl, result => {
                     if (!result)
-                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                    Find.isOwnerOfChannel(userId, id, result => {
-
-                        if (!result)
-                            return Json.builder(Response.HTTP_FORBIDDEN);
-
-                        let file = req.file;
-
-                        if (file === undefined)
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        let {
-                            fileUrl
-                        } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
-
-                        Update.img(id, fileUrl, result => {
-                            if (!result)
-                                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                            Json.builder(Response.HTTP_CREATED);
-                        });
-
-                    });
-
+                    Json.builder(Response.HTTP_CREATED);
                 });
 
             });
@@ -368,32 +367,15 @@ exports.changeToInviteLink = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
+        validationChannelAndUserAndOwnerUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistUser(userId, result => {
-
+            let link = Generate.makeIdForInviteLink();
+            Update.inviteLink(id, link, result => {
                 if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Find.isOwnerOfChannel(userId, id, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
-
-                    let link = Generate.makeIdForInviteLink();
-                    Update.inviteLink(id, link, result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        Json.builder(Response.HTTP_OK, {
-                            inviteLink: link
-                        });
-
-                    });
-
+                Json.builder(Response.HTTP_OK, {
+                    inviteLink: link
                 });
 
             });
@@ -418,36 +400,20 @@ exports.changeToPublicLink = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+        validationChannelAndUserAndOwnerUser(id, userId, () => {
 
-            FindInUser.isExistUser(userId, result => {
+            let publicLink = Generate.makeIdForPublicLink(publicLink);
 
+            Find.isPublicKeyUsed(publicLink, result => {
                 if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                    return Json.builder(Response.HTTP_CONFLICT);
 
-                Find.isOwnerOfChannel(userId, id, result => {
-
+                Update.publicLink(id, publicLink, result => {
                     if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
+                        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                    let publicLink = Generate.makeIdForPublicLink(publicLink);
-
-                    Find.isPublicKeyUsed(publicLink, result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_CONFLICT);
-
-                        Update.publicLink(id, publicLink, result => {
-                            if (!result)
-                                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                            Json.builder(Response.HTTP_OK);
-                        });
-
-                    });
-
+                    Json.builder(Response.HTTP_OK);
                 });
 
             });
@@ -475,35 +441,19 @@ exports.joinUser = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
+        validationChannelAndUserAndJoinedInChannel(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+            let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
 
-            FindInUser.isExistUser(userId, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                Find.isJoinedInChannel(id, userId, result => {
-
-                    if (result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
-
-                    let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
-
-                    Insert.userIntoChannel(id, getUserId);
-                    InsertInUser.channelIntoListOfUserChannels(id, getUserId);
+            Insert.userIntoChannel(id, getUserId);
+            InsertInUser.channelIntoListOfUserChannels(id, getUserId);
 
 
-                    Json.builder(Response.HTTP_CREATED);
-                });
-
-            });
-
+            Json.builder(Response.HTTP_CREATED);
         });
 
     });
+
 
 }
 
@@ -523,49 +473,29 @@ exports.addAdmin = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
+        validationChannelAndUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+            isExistUserAndIsOwner(userIdForNewAdmin, userId, id, () => {
 
-            FindInUser.isExistUser(userId, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                FindInUser.isExistUser(userIdForNewAdmin, result => {
+                Find.isJoinedInChannel(id, userIdForNewAdmin, result => {
 
                     if (!result)
-                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                        return Json.builder(Response.HTTP_NOT_FOUND);
+
+                    Find.isUserAdminOfChannel(id, userIdForNewAdmin, result => {
+
+                        if (result)
+                            return Json.builder(Response.HTTP_CONFLICT);
+
+                        let isNotOwner = 0;
+                        Insert.userIntoChannelsAdmins(userIdForNewAdmin, id, isNotOwner);
 
 
-                    Find.isOwnerOfChannel(userId, id, result => {
-
-                        if (!result)
-                            return Json.builder(Response.HTTP_FORBIDDEN);
-
-                        Find.isJoinedInChannel(id, userIdForNewAdmin, result => {
-
-                            if (!result)
-                                return Json.builder(Response.HTTP_NOT_FOUND);
-
-                            Find.isUserAdminOfChannel(id, userIdForNewAdmin, result => {
-
-                                if (result)
-                                    return Json.builder(Response.HTTP_CONFLICT);
-
-                                let isNotOwner = 0;
-                                Insert.userIntoChannelsAdmins(userIdForNewAdmin, id, isNotOwner);
-
-
-                                Json.builder(Response.HTTP_CREATED);
-                            });
-
-                        });
-
+                        Json.builder(Response.HTTP_CREATED);
                     });
 
                 });
+
             });
 
         });
@@ -589,42 +519,21 @@ exports.deleteAdmin = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
+        validationChannelAndUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+            isExistUserAndIsOwner(userIdForDeleteAdmin, userId, id, () => {
 
-            FindInUser.isExistUser(userId, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                FindInUser.isExistUser(userIdForDeleteAdmin, result => {
+                Find.isUserAdminOfChannel(id, userIdForDeleteAdmin, result => {
 
                     if (!result)
-                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                        return Json.builder(Response.HTTP_NOT_FOUND);
+
+                    Delete.userIntoChannelAdmins(id, userIdForDeleteAdmin);
 
 
-                    Find.isOwnerOfChannel(userId, id, result => {
-
-                        if (!result)
-                            return Json.builder(Response.HTTP_FORBIDDEN);
-
-
-                        Find.isUserAdminOfChannel(id, userIdForDeleteAdmin, result => {
-
-                            if (!result)
-                                return Json.builder(Response.HTTP_NOT_FOUND);
-
-                            Delete.userIntoChannelAdmins(id, userIdForDeleteAdmin);
-
-
-                            Json.builder(Response.HTTP_OK);
-                        });
-
-                    });
-
+                    Json.builder(Response.HTTP_OK);
                 });
+
             });
 
         });
@@ -649,31 +558,14 @@ exports.leaveUser = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
+        validationChannelAndUserAndJoinedInChannel(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+            Delete.userIntoChannel(id, userId);
+            DeleteInUser.channelIntoListOfUserChannels(id, userId);
 
-            FindInUser.isExistUser(userId, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                Find.isJoinedInChannel(id, userId, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
-
-                    Delete.userIntoChannel(id, userId);
-                    DeleteInUser.channelIntoListOfUserChannels(id, userId);
-
-
-                    Json.builder(Response.HTTP_OK);
-                });
-
-            });
-
+            Json.builder(Response.HTTP_OK);
         });
+
 
     });
 
@@ -788,35 +680,16 @@ exports.allUsers = (req) => {
 
         let userId = data.id;
 
-        Find.channelId(id, isDefined => {
+        validationChannelAndUserAndOwnerOrAdmin(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+            Find.getAllUsersForChannel(id, data => {
 
+                if (isUndefined(data))
+                    return Json.builder(Response.HTTP_NOT_FOUND);
 
-            FindInUser.isExistUser(userId, result => {
+                FindInUser.getUserDetailsInUsersTableForMember(data, result => {
 
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-
-                Find.isOwnerOrAdminOfChannel(userId, id, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
-
-                    Find.getAllUsersForChannel(id, data => {
-
-                        if (isUndefined(data))
-                            return Json.builder(Response.HTTP_NOT_FOUND);
-
-                        FindInUser.getUserDetailsInUsersTableForMember(data, result => {
-
-                            Json.builder(Response.HTTP_OK, result);
-
-                        });
-
-                    });
+                    Json.builder(Response.HTTP_OK, result);
 
                 });
 

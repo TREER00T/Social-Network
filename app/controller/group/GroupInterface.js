@@ -27,6 +27,75 @@ let Json = require('app/util/ReturnJson'),
     Generate = require('app/util/Generate');
 
 
+
+let validationGroupAndUser = (roomId, userId, cb) => {
+
+        Find.groupId(roomId, isDefined => {
+
+            if (!isDefined)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            FindInUser.isExistUser(userId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+                cb();
+            });
+
+        });
+
+    },
+    validationGroupAndUserAndOwnerUser = (roomId, userId, cb) => {
+
+        validationGroupAndUser(roomId, userId, () => {
+
+            Find.isOwnerOfGroup(userId, roomId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_FORBIDDEN);
+
+                cb();
+            });
+
+        });
+
+    },
+    validationGroupAndUserAndJoinedInGroup = (roomId, userId, cb) => {
+
+        validationGroupAndUser(roomId, userId, () => {
+
+            Find.isJoinedInGroup(roomId, userId, result => {
+
+                if (result)
+                    return Json.builder(Response.HTTP_NOT_FOUND);
+
+                cb();
+            });
+
+        });
+
+    },
+    isExistAndIsOwnerOfGroup = (userIdForAdmin, userId, groupId, cb) => {
+
+        FindInUser.isExistUser(userIdForAdmin, result => {
+
+            if (!result)
+                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+
+            Find.isOwnerOfGroup(userId, groupId, result => {
+
+                if (!result)
+                    return Json.builder(Response.HTTP_FORBIDDEN);
+
+                cb();
+            });
+
+        });
+    };
+
+
 exports.create = (req, res) => {
 
     getTokenPayLoad(data => {
@@ -91,55 +160,36 @@ exports.uploadFile = (req, res) => {
 
             delete data?.groupId;
 
-            Find.groupId(groupId, isDefined => {
+            validationGroupAndUserAndJoinedInGroup(groupId, userId, () => {
 
-                if (!isDefined)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
+                Util.validateMessage(data, result => {
 
-                FindInUser.isExistUser(userId, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                    if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
+                        return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-                    Find.isJoinedInGroup(groupId, userId, result => {
+                    let file = req.file;
 
-                        if (!result)
-                            return Json.builder(Response.HTTP_NOT_FOUND);
+                    data['senderId'] = userId;
+                    if (isUndefined(file))
+                        return Json.builder(Response.HTTP_BAD_REQUEST);
 
+                    let {
+                        fileUrl,
+                        fileSize
+                    } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
 
-                        Util.validateMessage(data, result => {
-
-                            if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
-                                return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-
-                            let file = req.file;
-
-                            data['senderId'] = userId;
-                            if (isUndefined(file))
-                                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                            let {
-                                fileUrl,
-                                fileSize
-                            } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
-
-                            data['fileUrl'] = fileUrl;
-                            data['fileSize'] = fileSize;
-                            data['fileName'] = file.originalname;
+                    data['fileUrl'] = fileUrl;
+                    data['fileSize'] = fileSize;
+                    data['fileName'] = file.originalname;
 
 
-                            CommonInsert.message('`' + groupId + 'GroupContents`', data, {
-                                conversationType: 'Group'
-                            }, result => {
-                                Json.builder(Response.HTTP_CREATED, {
-                                    insertId: result
-                                });
-                            });
-
+                    CommonInsert.message('`' + groupId + 'GroupContents`', data, {
+                        conversationType: 'Group'
+                    }, result => {
+                        Json.builder(Response.HTTP_CREATED, {
+                            insertId: result
                         });
-
                     });
 
                 });
@@ -166,28 +216,12 @@ exports.deleteGroup = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistUser(userId, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                Find.isOwnerOfGroup(userId, id, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
-
-                    Delete.group(id);
-                    Delete.groupAdmins(id);
-                    Delete.groupUsers(id);
-                    DeleteInUser.groupInListOfUserGroups(id);
-                });
-
-            });
+            Delete.group(id);
+            Delete.groupAdmins(id);
+            Delete.groupUsers(id);
+            DeleteInUser.groupInListOfUserGroups(id);
 
         });
 
@@ -209,30 +243,13 @@ exports.changeName = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistUser(userId, result => {
-
+            Update.name(id, name.toString().trim(), result => {
                 if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Find.isOwnerOfGroup(userId, id, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
-
-                    Update.name(id, name.toString().trim(), result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        Json.builder(Response.HTTP_OK);
-                    });
-
-                });
-
+                Json.builder(Response.HTTP_OK);
             });
 
         });
@@ -255,31 +272,15 @@ exports.changeDescription = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            FindInUser.isExistUser(userId, result => {
-
+            Update.description(id, description, result => {
                 if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Find.isOwnerOfGroup(userId, id, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
-
-                    Update.description(id, description, result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        Json.builder(Response.HTTP_OK);
-                    });
-
-                });
-
+                Json.builder(Response.HTTP_OK);
             });
+
 
         });
 
@@ -301,39 +302,23 @@ exports.uploadAvatar = (req, res) => {
             if (isUndefined(id))
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            Find.groupId(id, isDefined => {
 
-                if (!isDefined)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
+            validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-                FindInUser.isExistUser(userId, result => {
+                let file = req.file;
 
+                if (isUndefined(file))
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
+
+                let {
+                    fileUrl
+                } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+
+                Update.img(id, fileUrl, result => {
                     if (!result)
-                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                    Find.isOwnerOfGroup(userId, id, result => {
-
-                        if (!result)
-                            return Json.builder(Response.HTTP_FORBIDDEN);
-
-                        let file = req.file;
-
-                        if (isUndefined(file))
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        let {
-                            fileUrl
-                        } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
-
-                        Update.img(id, fileUrl, result => {
-                            if (!result)
-                                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                            Json.builder(Response.HTTP_CREATED);
-                        });
-
-                    });
-
+                    Json.builder(Response.HTTP_CREATED);
                 });
 
             });
@@ -358,32 +343,16 @@ exports.changeToInviteLink = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+        validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-            FindInUser.isExistUser(userId, result => {
-
+            let link = Generate.makeIdForInviteLink();
+            Update.inviteLink(id, link, result => {
                 if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                    return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Find.isOwnerOfGroup(userId, id, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
-
-                    let link = Generate.makeIdForInviteLink();
-                    Update.inviteLink(id, link, result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        Json.builder(Response.HTTP_OK, {
-                            inviteLink: link
-                        });
-
-                    });
-
+                Json.builder(Response.HTTP_OK, {
+                    inviteLink: link
                 });
 
             });
@@ -409,36 +378,20 @@ exports.changeToPublicLink = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+        validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-            FindInUser.isExistUser(userId, result => {
+            let publicLink = Generate.makeIdForPublicLink(publicLink);
 
+            Find.isPublicKeyUsed(publicLink, result => {
                 if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                    return Json.builder(Response.HTTP_CONFLICT);
 
-                Find.isOwnerOfGroup(userId, id, result => {
-
+                Update.publicLink(id, publicLink, result => {
                     if (!result)
-                        return Json.builder(Response.HTTP_FORBIDDEN);
+                        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                    let publicLink = Generate.makeIdForPublicLink(publicLink);
-
-                    Find.isPublicKeyUsed(publicLink, result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_CONFLICT);
-
-                        Update.publicLink(id, publicLink, result => {
-                            if (!result)
-                                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                            Json.builder(Response.HTTP_OK);
-                        });
-
-                    });
-
+                    Json.builder(Response.HTTP_OK);
                 });
 
             });
@@ -467,32 +420,15 @@ exports.joinUser = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+        validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-            FindInUser.isExistUser(userId, result => {
+            let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
 
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+            Insert.userIntoGroup(id, getUserId);
+            InsertInUser.groupIntoListOfUserGroups(id, getUserId);
 
-                Find.isJoinedInGroup(id, userId, result => {
-
-                    if (result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
-
-                    let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
-
-                    Insert.userIntoGroup(id, getUserId);
-                    InsertInUser.groupIntoListOfUserGroups(id, getUserId);
-
-
-                    Json.builder(Response.HTTP_CREATED);
-                });
-
-            });
-
+            Json.builder(Response.HTTP_CREATED);
         });
 
     });
@@ -514,49 +450,29 @@ exports.addAdmin = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        validationGroupAndUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+            isExistAndIsOwnerOfGroup(userIdForNewAdmin, userId, id, () => {
 
-            FindInUser.isExistUser(userId, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                FindInUser.isExistUser(userIdForNewAdmin, result => {
+                Find.isJoinedInGroup(id, userIdForNewAdmin, result => {
 
                     if (!result)
-                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                        return Json.builder(Response.HTTP_NOT_FOUND);
+
+                    Find.isUserAdminOfGroup(id, userIdForNewAdmin, result => {
+
+                        if (result)
+                            return Json.builder(Response.HTTP_CONFLICT);
+
+                        let isNotOwner = 0;
+                        Insert.userIntoGroupAdmins(userIdForNewAdmin, id, isNotOwner);
 
 
-                    Find.isOwnerOfGroup(userId, id, result => {
-
-                        if (!result)
-                            return Json.builder(Response.HTTP_FORBIDDEN);
-
-                        Find.isJoinedInGroup(id, userIdForNewAdmin, result => {
-
-                            if (!result)
-                                return Json.builder(Response.HTTP_NOT_FOUND);
-
-                            Find.isUserAdminOfGroup(id, userIdForNewAdmin, result => {
-
-                                if (result)
-                                    return Json.builder(Response.HTTP_CONFLICT);
-
-                                let isNotOwner = 0;
-                                Insert.userIntoGroupAdmins(userIdForNewAdmin, id, isNotOwner);
-
-
-                                Json.builder(Response.HTTP_CREATED);
-                            });
-
-                        });
-
+                        Json.builder(Response.HTTP_CREATED);
                     });
 
                 });
+
             });
 
         });
@@ -580,42 +496,21 @@ exports.deleteAdmin = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
+        validationGroupAndUser(id, userId, () => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+            isExistAndIsOwnerOfGroup(userIdForDeleteAdmin, userId, id, () => {
 
-            FindInUser.isExistUser(userId, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                FindInUser.isExistUser(userIdForDeleteAdmin, result => {
+                Find.isUserAdminOfGroup(id, userIdForDeleteAdmin, result => {
 
                     if (!result)
-                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+                        return Json.builder(Response.HTTP_NOT_FOUND);
+
+                    Delete.userIntoGroupAdmins(id, userIdForDeleteAdmin);
 
 
-                    Find.isOwnerOfGroup(userId, id, result => {
-
-                        if (!result)
-                            return Json.builder(Response.HTTP_FORBIDDEN);
-
-
-                        Find.isUserAdminOfGroup(id, userIdForDeleteAdmin, result => {
-
-                            if (!result)
-                                return Json.builder(Response.HTTP_NOT_FOUND);
-
-                            Delete.userIntoGroupAdmins(id, userIdForDeleteAdmin);
-
-
-                            Json.builder(Response.HTTP_OK);
-                        });
-
-                    });
-
+                    Json.builder(Response.HTTP_OK);
                 });
+
             });
 
         });
@@ -638,30 +533,14 @@ exports.leaveUser = (req) => {
 
         let userId = data.id;
 
-        Find.groupId(id, isDefined => {
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+        validationGroupAndUserAndJoinedInGroup(id, userId, () => {
 
-            FindInUser.isExistUser(userId, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                Find.isJoinedInGroup(id, userId, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
-
-                    Delete.userIntoGroup(id, userId);
-                    DeleteInUser.groupIntoListOfUserGroups(id, userId);
+            Delete.userIntoGroup(id, userId);
+            DeleteInUser.groupIntoListOfUserGroups(id, userId);
 
 
-                    Json.builder(Response.HTTP_OK);
-                });
-
-            });
-
+            Json.builder(Response.HTTP_OK);
         });
 
     });

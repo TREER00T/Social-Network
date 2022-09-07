@@ -20,6 +20,24 @@ let Json = require('app/util/ReturnJson'),
     } = require('app/middleware/ApiPipeline');
 
 
+let validationE2E = (id, from, cb) => {
+
+    Find.isExistUser(id, isUserInDb => {
+        if (!isUserInDb)
+            return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+        Find.getTableNameForListOfE2EMessage(from, id, data => {
+            if (!data)
+                return Json.builder(Response.HTTP_NOT_FOUND);
+
+            cb(data);
+        });
+
+    });
+
+}
+
+
 exports.createE2EChat = (req) => {
 
     let userId = Number(req.body?.userId),
@@ -222,6 +240,7 @@ exports.user = (req) => {
         Find.getUserPvDetails(id, result => {
             Json.builder(Response.HTTP_OK, result);
         });
+
     });
 
 
@@ -234,29 +253,18 @@ exports.deleteForMe = (req) => {
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(() => {
+    getTokenPayLoad(data => {
 
         let from = data.id;
 
-        Find.isExistUser(id, isUserInDb => {
-            if (!isUserInDb)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+        validationE2E(id, from, () => {
 
-            Find.getTableNameForListOfE2EMessage(from, id, data => {
-                if (!data)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
+            Delete.chatInListOfChatsForUser(from, id, from);
 
-
-                Delete.chatInListOfChatsForUser(from, id, from);
-
-                Json.builder(Response.HTTP_OK);
-
-            });
-
+            Json.builder(Response.HTTP_OK);
         });
 
     });
-
 
 }
 
@@ -270,28 +278,17 @@ exports.deleteForUs = (req) => {
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
-    getTokenPayLoad(() => {
+    getTokenPayLoad(data => {
 
         let from = data.id;
 
-        Find.isExistUser(id, isUserInDb => {
-            if (!isUserInDb)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+        validationE2E(id, from, data => {
 
-            Find.getTableNameForListOfE2EMessage(from, id, data => {
-                if (!data)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
+            Delete.chat(data, () => {
 
-
-                Delete.chat(data, () => {
-
-                    Delete.chatInListOfChatsForUser(from, id, from);
-
-                    Delete.chatInListOfChatsForUser(from, id, id);
-
-                    Json.builder(Response.HTTP_OK);
-
-                });
+                Delete.chatInListOfChatsForUser(from, id, from);
+                Delete.chatInListOfChatsForUser(from, id, id);
+                Json.builder(Response.HTTP_OK);
 
             });
 
@@ -313,7 +310,7 @@ exports.blockUser = (req) => {
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
-    getTokenPayLoad(() => {
+    getTokenPayLoad(data => {
 
         let from = data.id;
 
