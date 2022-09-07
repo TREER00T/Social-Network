@@ -21,7 +21,7 @@ module.exports = {
     getJwtSign(payload, subject) {
         const SIGN_OPTIONS = {
             subject: `${subject}`,
-            expiresIn: '12h',
+            expiresIn: payload.expiresIn,
             algorithm: 'RS256'
         };
 
@@ -37,18 +37,6 @@ module.exports = {
         return await JWE.createEncrypt(
             {format: format, contentAlg: contentAlg, fields: {alg: alg}}, publicKey)
             .update(buffer).final();
-    },
-
-
-    // Generates refresh jwt
-    getJwtRefresh(payload, subject) {
-        const SIGN_OPTIONS = {
-            subject: `${subject}`,
-            expiresIn: '1d',
-            algorithm: 'RS256'
-        };
-
-        return jwt.sign(payload, process.env.PRAIVATE_KEY, SIGN_OPTIONS);
     },
 
 

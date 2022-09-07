@@ -13,7 +13,6 @@ let Json = require('app/util/ReturnJson'),
         getApiKey,
         getJwtSign,
         getHashData,
-        getJwtRefresh,
         getJwtEncrypt,
         getVerificationCode
     } = require('app/util/Generate'),
@@ -103,11 +102,13 @@ exports.isValidAuthCode = (req) => {
                                 accessToken: await getJwtEncrypt(getJwtSign({
                                     phoneNumber: `${phone}`,
                                     id: `${result.id}`,
+                                    expiresIn: '12h',
                                     type: 'at'
                                 }, phone)),
-                                refreshToken: await getJwtEncrypt(getJwtRefresh({
+                                refreshToken: await getJwtEncrypt(getJwtSign({
                                     phoneNumber: `${phone}`,
                                     id: `${result.id}`,
+                                    expiresIn: '1d',
                                     type: 'rt'
                                 }, phone)),
                                 apiKey: result.apiKey
@@ -216,11 +217,13 @@ exports.refreshToken = () => {
                         accessToken: await getJwtEncrypt(getJwtSign({
                             phoneNumber: `${phone}`,
                             id: `${id}`,
+                            expiresIn: '12h',
                             type: 'at'
                         }, phone)),
-                        refreshToken: await getJwtEncrypt(getJwtRefresh({
+                        refreshToken: await getJwtEncrypt(getJwtSign({
                             phoneNumber: `${phone}`,
                             id: `${id}`,
+                            expiresIn: '1d',
                             type: 'rt'
                         }, phone))
                     }
