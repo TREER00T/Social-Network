@@ -317,7 +317,7 @@ definitions:
     - name: isOnline
       type: boolean
   Status Code & Message:
-    - name: status
+    - name: code
       type: integer
       description: Http status code
     - name: message
