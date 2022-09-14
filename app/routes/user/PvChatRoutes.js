@@ -1,5 +1,5 @@
 let router = require('express').Router(),
-    PvChat = require('app/controller/user/e2e/PvChatIntrface');
+    PvChat = require('app/controller/user/e2e/PvChatController');
 
 
 router.post('/room/create', PvChat.createE2EChat);
