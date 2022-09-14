@@ -1,5 +1,5 @@
 let router = require('express').Router(),
-    User = require('app/controller/user/auth/AuthInterface');
+    User = require('app/controller/user/auth/AuthController');
 
 
 router.post('/generate/user', User.gvc);

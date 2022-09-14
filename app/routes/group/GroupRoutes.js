@@ -1,5 +1,5 @@
 let router = require('express').Router(),
-    Group = require('app/controller/group/GroupInterface');
+    Group = require('app/controller/group/GroupController');
 
 
 router.post('/create', Group.create);
