@@ -17,12 +17,12 @@ let Json = require('app/util/ReturnJson'),
     multerFile = multer().single('file'),
     {
         getTokenPayLoad
-    } = require('app/middleware/ApiPipeline');
+    } = require('app/middleware/RouterUtil');
 
 
 let validationE2E = (id, from, cb) => {
 
-    Find.isExistUser(id, isUserInDb => {
+    Find.isExist(id, isUserInDb => {
         if (!isUserInDb)
             return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
@@ -48,7 +48,7 @@ exports.createE2EChat = (req) => {
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
-    Find.isExistUser(userId, isInDb => {
+    Find.isExist(userId, isInDb => {
 
         if (!isInDb)
             return Json.builder(Response.HTTP_USER_NOT_FOUND);
@@ -92,7 +92,7 @@ exports.uploadFile = (req, res) => {
 
         let userId = data.id;
 
-        Find.isExistUser(userId, isInDb => {
+        Find.isExist(userId, isInDb => {
 
             if (!isInDb)
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
@@ -108,7 +108,7 @@ exports.uploadFile = (req, res) => {
 
                 delete data?.receiverId;
 
-                Find.isExistUser(receiverId, isInDb => {
+                Find.isExist(receiverId, isInDb => {
 
                     if (!isInDb)
                         return Json.builder(Response.HTTP_USER_NOT_FOUND);
@@ -233,7 +233,7 @@ exports.user = (req) => {
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
 
-    Find.isExistUser(id, isUserInDb => {
+    Find.isExist(id, isUserInDb => {
         if (!isUserInDb)
             return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
@@ -314,7 +314,7 @@ exports.blockUser = (req) => {
 
         let from = data.id;
 
-        Find.isExistUser(id, isUserInDb => {
+        Find.isExist(id, isUserInDb => {
             if (!isUserInDb)
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
 

@@ -6,7 +6,7 @@ let express = require('express'),
     cors = require('cors'),
     Swagger = require('../../docs/swagger'),
     Validation = require('app/util/Validation'),
-    Pipeline = require('app/middleware/ApiPipeline'),
+    RouterUtil = require('app/middleware/RouterUtil'),
     Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
     authRouter = require('app/routes/user/AuthRoutes'),
@@ -33,30 +33,30 @@ module.exports = {
                 return Json.builder(Response.HTTP_METHOD_NOT_ALLOWED);
 
 
-            let routeMsg = Validation.requestEndpointHandler(req.url, req.method.toLowerCase(), app);
+            let requestMessage = Validation.requestEndpointHandler(req.url, req.method.toLowerCase(), app);
 
-            if (routeMsg === 'NotFound')
+            if (requestMessage === 'NotFound')
                 return Json.builder(Response.HTTP_NOT_FOUND);
 
-            if (routeMsg === 'AuthRoute') {
+            if (requestMessage === 'AuthRoute') {
                 let token,
                     apiKey;
                 try {
                     token = req?.headers?.authorization;
-                    apiKey = (req?.headers?.apiKey !== undefined) ? req?.headers?.apiKey : req?.query?.apiKey;
+                    apiKey = req?.headers?.apiKey !== undefined ? req?.headers?.apiKey : req?.query?.apiKey;
                 } catch (e) {
                 }
-                let isAccessTokenVerify = Pipeline.tokenVerify(token);
+                let isAccessTokenVerify = RouterUtil.tokenVerify(token);
 
 
-                let isSetUserToken = (!isAccessTokenVerify) ? isAccessTokenVerify : Pipeline.tokenVerify(token);
-                let isSetUserApiKey = Pipeline.isSetUserApiKey(apiKey);
+                let isSetUserToken = (!isAccessTokenVerify) ? isAccessTokenVerify : RouterUtil.tokenVerify(token);
+                let isSetUserApiKey = RouterUtil.isSetUserApiKey(apiKey);
 
                 if (!isSetUserApiKey || !isSetUserToken)
                     return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
 
-                Pipeline.getTokenPayLoad(data => {
-                    Pipeline.isValidApiKey(apiKey, data.phoneNumber, result => {
+                RouterUtil.getTokenPayLoad(data => {
+                    RouterUtil.isValidApiKey(apiKey, data.phoneNumber, result => {
                         if (!result)
                             return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
 

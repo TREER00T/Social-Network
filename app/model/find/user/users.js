@@ -169,7 +169,7 @@ module.exports = {
         });
     },
 
-    isExistUser(userId, cb) {
+    isExist(userId, cb) {
         openSql.find({
             get: 'id',
             from: 'users',

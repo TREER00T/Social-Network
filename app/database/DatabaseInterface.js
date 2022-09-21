@@ -1,5 +1,5 @@
-let create = require('app/model/create/CreateTableInterface'),
-    add = require('app/model/add/foreignKey/AddForiegnKeyInterface'),
+let Create = require('app/model/create/CreateTableInterface'),
+    Add = require('app/model/add/foreignKey/AddForiegnKeyInterface'),
     Database = require('app/database/DatabaseConnection'),
     openSql = require('opensql'),
     dotenv = require('dotenv');
@@ -14,8 +14,8 @@ module.exports = {
     },
 
     create(cb) {
-        create.tables();
-        add.foreignKeys();
+        Create.tables();
+        Add.foreignKeys();
         cb();
     }
 

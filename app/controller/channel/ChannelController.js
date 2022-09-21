@@ -15,7 +15,7 @@ let Json = require('app/util/ReturnJson'),
     multerFile = multer().single('file'),
     {
         getTokenPayLoad
-    } = require('app/middleware/ApiPipeline'),
+    } = require('app/middleware/RouterUtil'),
     File = require('app/util/File'),
     Util, {
         isUndefined,
@@ -34,7 +34,7 @@ let validationChannelAndUser = (roomId, userId, cb) => {
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
 
-            FindInUser.isExistUser(userId, result => {
+            FindInUser.isExist(userId, result => {
 
                 if (!result)
                     return Json.builder(Response.HTTP_USER_NOT_FOUND);
@@ -92,7 +92,7 @@ let validationChannelAndUser = (roomId, userId, cb) => {
     },
     isExistUserAndIsOwner = (userIdForAdmin, userId, channelId, cb) => {
 
-        FindInUser.isExistUser(userIdForAdmin, result => {
+        FindInUser.isExist(userIdForAdmin, result => {
 
             if (!result)
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
