@@ -18,7 +18,7 @@ let Json = require('app/util/ReturnJson'),
     } = require('app/util/Generate'),
     {
         getTokenPayLoad
-    } = require('app/middleware/ApiPipeline'),
+    } = require('app/middleware/RouterUtil'),
     AddUserForeignKey = require('app/model/add/foreignKey/users');
 
 

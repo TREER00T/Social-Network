@@ -1,7 +1,7 @@
 let Json = require('app/util/ReturnJson'),
     {
         getTokenPayLoad
-    } = require('app/middleware/ApiPipeline'),
+    } = require('app/middleware/RouterUtil'),
     Response = require('app/util/Response'),
     {
         InputException
@@ -455,7 +455,7 @@ exports.uploadFile = (req, res) => {
         let userId = data.id,
             phone = data.phoneNumber;
 
-        Find.isExistUser(userId, isInDb => {
+        Find.isExist(userId, isInDb => {
 
             if (!isInDb)
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
