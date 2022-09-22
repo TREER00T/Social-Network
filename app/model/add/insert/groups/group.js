@@ -36,7 +36,7 @@ module.exports = {
 
     },
 
-    userIntoGroupAdmins(userId, groupId, isOwner) {
+    admin(userId, groupId, isOwner) {
         openSql.addOne({
             table: 'groupsAdmins',
             data: {
@@ -47,7 +47,7 @@ module.exports = {
         });
     },
 
-    userIntoGroup(userId, groupId) {
+    user(userId, groupId) {
         openSql.addOne({
             table: 'groupsUsers',
             data: {

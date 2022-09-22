@@ -14,7 +14,7 @@ let openSql = require('opensql'),
 
 module.exports = {
 
-    channelId(id, cb) {
+    id(id, cb) {
         openSql.find({
             get: 'id',
             from: 'channels',
@@ -46,7 +46,7 @@ module.exports = {
         });
     },
 
-    isOwnerOfChannel(adminId, channelId, cb) {
+    isOwner(adminId, channelId, cb) {
         let isOwner = 1;
         openSql.find({
             get: 'id',
@@ -65,7 +65,7 @@ module.exports = {
         });
     },
 
-    isOwnerOrAdminOfChannel(adminId, channelId, cb) {
+    isOwnerOrAdmin(adminId, channelId, cb) {
         openSql.find({
             get: 'id',
             from: 'channelsAdmins',
@@ -82,7 +82,7 @@ module.exports = {
         });
     },
 
-    isJoinedInChannel(channelId, userId, cb) {
+    isJoined(channelId, userId, cb) {
         openSql.find({
             get: 'id',
             from: 'channelsUsers',
@@ -99,7 +99,7 @@ module.exports = {
         });
     },
 
-    isUserAdminOfChannel(channelId, userId, cb) {
+    isAdmin(channelId, userId, cb) {
         openSql.find({
             get: 'id',
             from: 'channelsAdmins',
@@ -130,7 +130,7 @@ module.exports = {
     },
 
 
-    getChannelInfo(channelId, cb) {
+    getInfo(channelId, cb) {
         openSql.find({
             get: STAR,
             from: 'channels',
@@ -147,7 +147,7 @@ module.exports = {
     },
 
 
-    getCountOfUserInChannel(channelId, cb) {
+    getCountOfUsers(channelId, cb) {
         openSql.find({
             get: COUNT,
             from: 'channels',
@@ -163,7 +163,7 @@ module.exports = {
         });
     },
 
-    getAllUsersForChannel(channelId, cb) {
+    getAllUsers(channelId, cb) {
         openSql.find({
             get: 'userId',
             from: 'channelsUsers',
@@ -179,7 +179,7 @@ module.exports = {
         });
     },
 
-    getDataForChannelContentWithId(id, cb) {
+    getDataWithId(id, cb) {
         openSql.find({
             get: STAR,
             from: '`' + id + 'ChannelContents`',

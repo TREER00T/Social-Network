@@ -25,7 +25,7 @@ module.exports = {
         });
     },
 
-    userIntoGroup(groupId, userId) {
+    user(groupId, userId) {
         openSql.remove({
             table: 'groupsUsers',
             where: {
@@ -35,7 +35,7 @@ module.exports = {
         });
     },
 
-    userIntoGroupAdmins(groupId, userId) {
+    admin(groupId, userId) {
         openSql.remove({
             table: 'groupsAdmins',
             where: {

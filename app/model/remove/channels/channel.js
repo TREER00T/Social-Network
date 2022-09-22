@@ -7,7 +7,7 @@ module.exports = {
         openSql.dropTable('`' + channelId + 'GroupContents`');
     },
 
-    channelAdmins(channelId) {
+    admins(channelId) {
         openSql.remove({
             table: 'channelsAdmins',
             where: {
@@ -16,7 +16,7 @@ module.exports = {
         });
     },
 
-    channelUsers(channelId) {
+    users(channelId) {
         openSql.remove({
             table: 'channelsUsers',
             where: {
@@ -25,7 +25,7 @@ module.exports = {
         });
     },
 
-    userIntoChannel(channelId, userId) {
+    userInChannel(channelId, userId) {
         openSql.remove({
             table: 'channelsUsers',
             where: {
@@ -35,7 +35,7 @@ module.exports = {
         });
     },
 
-    userIntoChannelAdmins(channelId, userId) {
+    admin(channelId, userId) {
         openSql.remove({
             table: 'channelsAdmins',
             where: {
