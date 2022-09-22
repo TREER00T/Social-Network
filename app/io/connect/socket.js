@@ -437,7 +437,7 @@ io.use((socket, next) => {
 
     let validationGroupChatRoom = (groupId, errEmitName, cb) => {
 
-            FindInGroup.groupId(groupId, result => {
+            FindInGroup.id(groupId, result => {
 
                 if (!result)
                     return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
@@ -449,7 +449,7 @@ io.use((socket, next) => {
         fullGroupValidation = (groupId, errEmitName, socketId, cb) => {
             validationGroupChatRoom(groupId, errEmitName, () => {
 
-                FindInGroup.isJoinedInGroup(groupId, socketUserId, result => {
+                FindInGroup.isJoined(groupId, socketUserId, result => {
 
                     if (!result)
                         return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
@@ -529,7 +529,7 @@ io.use((socket, next) => {
             data['senderId'] = socketUserId;
             delete data?.groupId;
 
-            FindInGroup.getDataForGroupContentWithId(groupId, id, result => {
+            FindInGroup.getDataWithId(groupId, id, result => {
                 emitToSpecificSocket(groupId, 'emitGroupUploadedFile', Object.assign({}, result, data));
             });
 
@@ -638,7 +638,7 @@ io.use((socket, next) => {
 
     let validationChannelChatRoom = (channelId, errEmitName, cb) => {
 
-            FindInChannel.channelId(channelId, result => {
+            FindInChannel.id(channelId, result => {
 
                 if (!result)
                     return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
@@ -650,12 +650,12 @@ io.use((socket, next) => {
         fullChannelValidation = (channelId, errEmitName, cb) => {
             validationChannelChatRoom(channelId, errEmitName, () => {
 
-                FindInChannel.isOwnerOrAdminOfChannel(socketUserId, channelId, result => {
+                FindInChannel.isOwnerOrAdmin(socketUserId, channelId, result => {
 
                     if (!result)
                         return emitToSocket(errEmitName, Response.HTTP_FORBIDDEN);
 
-                    FindInChannel.isJoinedInChannel(channelId, socketUserId, result => {
+                    FindInChannel.isJoined(channelId, socketUserId, result => {
 
                         if (!result)
                             return emitToSocket(errEmitName, Response.HTTP_NOT_FOUND);
@@ -734,7 +734,7 @@ io.use((socket, next) => {
 
             delete data?.channelId;
 
-            FindInChannel.getDataForChannelContentWithId(channelId, result => {
+            FindInChannel.getDataWithId(channelId, result => {
                 emitToSpecificSocket(channelId, 'emitChannelUploadedFile', Object.assign({}, result, data));
             });
 

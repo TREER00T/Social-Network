@@ -1,14 +1,14 @@
 let Json = require('app/util/ReturnJson'),
     Response = require('app/util/Response'),
     multer = require('multer'),
-    Insert = require('app/model/add/insert/groups/group'),
+    InsertInGroup = require('app/model/add/insert/groups/group'),
     InsertInUser = require('app/model/add/insert/user/users'),
     Create = require('app/model/create/groups'),
-    Find = require('app/model/find/groups/group'),
+    FindInGroup = require('app/model/find/groups/group'),
     FindInUser = require('app/model/find/user/users'),
-    Delete = require('app/model/remove/groups/group'),
+    DeleteInGroup = require('app/model/remove/groups/group'),
     CommonInsert = require('app/model/add/insert/common/index'),
-    Update = require('app/model/update/groups/group'),
+    UpdateInGroup = require('app/model/update/groups/group'),
     AddGroupForeignKey = require('app/model/add/foreignKey/groups'),
     DeleteInUser = require('app/model/remove/users/user'),
     multerImage = multer().single('image'),
@@ -30,7 +30,7 @@ let Json = require('app/util/ReturnJson'),
 
 let validationGroupAndUser = (roomId, userId, cb) => {
 
-        Find.groupId(roomId, isDefined => {
+        FindInGroup.id(roomId, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -50,7 +50,7 @@ let validationGroupAndUser = (roomId, userId, cb) => {
 
         validationGroupAndUser(roomId, userId, () => {
 
-            Find.isOwnerOfGroup(userId, roomId, result => {
+            FindInGroup.isOwner(userId, roomId, result => {
 
                 if (!result)
                     return Json.builder(Response.HTTP_FORBIDDEN);
@@ -65,7 +65,7 @@ let validationGroupAndUser = (roomId, userId, cb) => {
 
         validationGroupAndUser(roomId, userId, () => {
 
-            Find.isJoinedInGroup(roomId, userId, result => {
+            FindInGroup.isJoined(roomId, userId, result => {
 
                 if (result)
                     return Json.builder(Response.HTTP_NOT_FOUND);
@@ -84,7 +84,7 @@ let validationGroupAndUser = (roomId, userId, cb) => {
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
-            Find.isOwnerOfGroup(userId, groupId, result => {
+            FindInGroup.isOwner(userId, groupId, result => {
 
                 if (!result)
                     return Json.builder(Response.HTTP_FORBIDDEN);
@@ -118,15 +118,15 @@ exports.create = (req, res) => {
                 fileUrl = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname)).fileUrl;
 
 
-            Insert.group(name.toString().trim(), Generate.makeIdForInviteLink(), getRandomHexColor(), fileUrl, id => {
+            InsertInGroup.group(name.toString().trim(), Generate.makeIdForInviteLink(), getRandomHexColor(), fileUrl, id => {
 
                 if (isUndefined(id))
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 Create.groupContents(id);
                 AddGroupForeignKey.groupContents(id);
-                Insert.userIntoGroupAdmins(userId, id, isOwner);
-                Insert.userIntoGroup(userId, id);
+                InsertInGroup.admin(userId, id, isOwner);
+                InsertInGroup.user(userId, id);
 
                 Json.builder(Response.HTTP_CREATED);
             });
@@ -218,9 +218,9 @@ exports.deleteGroup = (req) => {
 
         validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-            Delete.group(id);
-            Delete.groupAdmins(id);
-            Delete.groupUsers(id);
+            DeleteInGroup.group(id);
+            DeleteInGroup.groupAdmins(id);
+            DeleteInGroup.groupUsers(id);
             DeleteInUser.groupInListOfUserGroups(id);
 
         });
@@ -245,7 +245,7 @@ exports.changeName = (req) => {
 
         validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-            Update.name(id, name.toString().trim(), result => {
+            UpdateInGroup.name(id, name.toString().trim(), result => {
                 if (!result)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -274,7 +274,7 @@ exports.changeDescription = (req) => {
 
         validationGroupAndUserAndOwnerUser(id, userId, () => {
 
-            Update.description(id, description, result => {
+            UpdateInGroup.description(id, description, result => {
                 if (!result)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -314,7 +314,7 @@ exports.uploadAvatar = (req, res) => {
                     fileUrl
                 } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
 
-                Update.img(id, fileUrl, result => {
+                UpdateInGroup.img(id, fileUrl, result => {
                     if (!result)
                         return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -347,7 +347,7 @@ exports.changeToInviteLink = (req) => {
         validationGroupAndUserAndOwnerUser(id, userId, () => {
 
             let link = Generate.makeIdForInviteLink();
-            Update.inviteLink(id, link, result => {
+            UpdateInGroup.inviteLink(id, link, result => {
                 if (!result)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -383,11 +383,11 @@ exports.changeToPublicLink = (req) => {
 
             let publicLink = Generate.makeIdForPublicLink(publicLink);
 
-            Find.isPublicKeyUsed(publicLink, result => {
+            FindInGroup.isPublicKeyUsed(publicLink, result => {
                 if (!result)
                     return Json.builder(Response.HTTP_CONFLICT);
 
-                Update.publicLink(id, publicLink, result => {
+                UpdateInGroup.publicLink(id, publicLink, result => {
                     if (!result)
                         return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -425,7 +425,7 @@ exports.joinUser = (req) => {
 
             let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
 
-            Insert.userIntoGroup(id, getUserId);
+            InsertInGroup.user(id, getUserId);
             InsertInUser.groupIntoListOfUserGroups(id, getUserId);
 
             Json.builder(Response.HTTP_CREATED);
@@ -454,18 +454,18 @@ exports.addAdmin = (req) => {
 
             isExistAndIsOwnerOfGroup(userIdForNewAdmin, userId, id, () => {
 
-                Find.isJoinedInGroup(id, userIdForNewAdmin, result => {
+                FindInGroup.isJoined(id, userIdForNewAdmin, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    Find.isUserAdminOfGroup(id, userIdForNewAdmin, result => {
+                    FindInGroup.isAdmin(id, userIdForNewAdmin, result => {
 
                         if (result)
                             return Json.builder(Response.HTTP_CONFLICT);
 
                         let isNotOwner = 0;
-                        Insert.userIntoGroupAdmins(userIdForNewAdmin, id, isNotOwner);
+                        InsertInGroup.admin(userIdForNewAdmin, id, isNotOwner);
 
 
                         Json.builder(Response.HTTP_CREATED);
@@ -500,12 +500,12 @@ exports.deleteAdmin = (req) => {
 
             isExistAndIsOwnerOfGroup(userIdForDeleteAdmin, userId, id, () => {
 
-                Find.isUserAdminOfGroup(id, userIdForDeleteAdmin, result => {
+                FindInGroup.isAdmin(id, userIdForDeleteAdmin, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    Delete.userIntoGroupAdmins(id, userIdForDeleteAdmin);
+                    DeleteInGroup.admin(id, userIdForDeleteAdmin);
 
 
                     Json.builder(Response.HTTP_OK);
@@ -536,7 +536,7 @@ exports.leaveUser = (req) => {
 
         validationGroupAndUserAndJoinedInGroup(id, userId, () => {
 
-            Delete.userIntoGroup(id, userId);
+            DeleteInGroup.user(id, userId);
             DeleteInUser.groupIntoListOfUserGroups(id, userId);
 
 
@@ -578,7 +578,7 @@ exports.listOfMessage = (req) => {
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
-            Find.getCountOfListMessage(id, count => {
+            FindInGroup.getCountOfListMessage(id, count => {
 
                 let totalPages = Math.ceil(count / getLimit);
 
@@ -613,15 +613,15 @@ exports.info = (req) => {
     getTokenPayLoad(() => {
 
 
-        Find.groupId(id, isDefined => {
+        FindInGroup.id(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
 
 
-            Find.getGroupInfo(id, result => {
+            FindInGroup.getInfo(id, result => {
 
-                Find.getCountOfUserInGroup(id, count => {
+                FindInGroup.getCountOfUsers(id, count => {
 
                     Json.builder(Response.HTTP_OK, result, {
                         memberSize: count
@@ -649,13 +649,13 @@ exports.allUsers = (req) => {
     getTokenPayLoad(() => {
 
 
-        Find.groupId(id, isDefined => {
+        FindInGroup.id(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
 
 
-            Find.getAllUsersForGroup(id, data => {
+            FindInGroup.getAllUsers(id, data => {
 
                 if (isUndefined(data))
                     return Json.builder(Response.HTTP_NOT_FOUND);

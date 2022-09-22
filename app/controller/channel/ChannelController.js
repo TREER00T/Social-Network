@@ -4,11 +4,11 @@ let Json = require('app/util/ReturnJson'),
     Insert = require('app/model/add/insert/channels/channel'),
     InsertInUser = require('app/model/add/insert/user/users'),
     Create = require('app/model/create/channels'),
-    Find = require('app/model/find/channels/channel'),
+    FindInChannel = require('app/model/find/channels/channel'),
     FindInUser = require('app/model/find/user/users'),
     CommonInsert = require('app/model/add/insert/common/index'),
-    Delete = require('app/model/remove/channels/channel'),
-    Update = require('app/model/update/channels/channel'),
+    DeleteInChannel = require('app/model/remove/channels/channel'),
+    UpdateInChannel = require('app/model/update/channels/channel'),
     AddChannelForeignKey = require('app/model/add/foreignKey/channels'),
     DeleteInUser = require('app/model/remove/users/user'),
     multerImage = multer().single('image'),
@@ -29,7 +29,7 @@ let Json = require('app/util/ReturnJson'),
 
 let validationChannelAndUser = (roomId, userId, cb) => {
 
-        Find.channelId(roomId, isDefined => {
+        FindInChannel.id(roomId, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
@@ -49,7 +49,7 @@ let validationChannelAndUser = (roomId, userId, cb) => {
 
         validationChannelAndUser(roomId, userId, () => {
 
-            Find.isOwnerOfChannel(userId, roomId, result => {
+            FindInChannel.isOwner(userId, roomId, result => {
 
                 if (!result)
                     return Json.builder(Response.HTTP_FORBIDDEN);
@@ -64,7 +64,7 @@ let validationChannelAndUser = (roomId, userId, cb) => {
 
         validationChannelAndUser(roomId, userId, () => {
 
-            Find.isOwnerOrAdminOfChannel(userId, roomId, result => {
+            FindInChannel.isOwnerOrAdmin(userId, roomId, result => {
 
                 if (!result)
                     return Json.builder(Response.HTTP_FORBIDDEN);
@@ -79,7 +79,7 @@ let validationChannelAndUser = (roomId, userId, cb) => {
 
         validationChannelAndUser(roomId, userId, () => {
 
-            Find.isJoinedInChannel(roomId, userId, result => {
+            FindInChannel.isJoined(roomId, userId, result => {
 
                 if (result)
                     return Json.builder(Response.HTTP_NOT_FOUND);
@@ -98,7 +98,7 @@ let validationChannelAndUser = (roomId, userId, cb) => {
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
-            Find.isOwnerOfChannel(userId, channelId, result => {
+            FindInChannel.isOwner(userId, channelId, result => {
 
                 if (!result)
                     return Json.builder(Response.HTTP_FORBIDDEN);
@@ -168,9 +168,9 @@ exports.deleteChannel = (req) => {
         let userId = data.id;
 
         validationChannelAndUserAndOwnerUser(id, userId, () => {
-            Delete.channel(id);
-            Delete.channelAdmins(id);
-            Delete.channelUsers(id);
+            DeleteInChannel.channel(id);
+            DeleteInChannel.admins(id);
+            DeleteInChannel.users(id);
             DeleteInUser.channelInListOfUserChannels(id);
         });
 
@@ -202,7 +202,7 @@ exports.uploadFile = (req, res) => {
 
             validationChannelAndUserAndOwnerOrAdmin(channelId, userId, () => {
 
-                Find.isJoinedInChannel(channelId, userId, result => {
+                FindInChannel.isJoined(channelId, userId, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_NOT_FOUND);
@@ -267,7 +267,7 @@ exports.changeName = (req) => {
 
         validationChannelAndUserAndOwnerUser(id, userId, () => {
 
-            Update.name(id, name.toString().trim(), result => {
+            UpdateInChannel.name(id, name.toString().trim(), result => {
                 if (!result)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -298,7 +298,7 @@ exports.changeDescription = (req) => {
 
         validationChannelAndUserAndOwnerUser(id, userId, () => {
 
-            Update.description(id, description, result => {
+            UpdateInChannel.description(id, description, result => {
                 if (!result)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -338,7 +338,7 @@ exports.uploadAvatar = (req, res) => {
                     fileUrl
                 } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
 
-                Update.img(id, fileUrl, result => {
+                UpdateInChannel.img(id, fileUrl, result => {
                     if (!result)
                         return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -370,7 +370,7 @@ exports.changeToInviteLink = (req) => {
         validationChannelAndUserAndOwnerUser(id, userId, () => {
 
             let link = Generate.makeIdForInviteLink();
-            Update.inviteLink(id, link, result => {
+            UpdateInChannel.inviteLink(id, link, result => {
                 if (!result)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -405,11 +405,11 @@ exports.changeToPublicLink = (req) => {
 
             let publicLink = Generate.makeIdForPublicLink(publicLink);
 
-            Find.isPublicKeyUsed(publicLink, result => {
+            FindInChannel.isPublicKeyUsed(publicLink, result => {
                 if (!result)
                     return Json.builder(Response.HTTP_CONFLICT);
 
-                Update.publicLink(id, publicLink, result => {
+                UpdateInChannel.publicLink(id, publicLink, result => {
                     if (!result)
                         return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -477,12 +477,12 @@ exports.addAdmin = (req) => {
 
             isExistUserAndIsOwner(userIdForNewAdmin, userId, id, () => {
 
-                Find.isJoinedInChannel(id, userIdForNewAdmin, result => {
+                FindInChannel.isJoined(id, userIdForNewAdmin, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    Find.isUserAdminOfChannel(id, userIdForNewAdmin, result => {
+                    FindInChannel.isAdmin(id, userIdForNewAdmin, result => {
 
                         if (result)
                             return Json.builder(Response.HTTP_CONFLICT);
@@ -523,12 +523,12 @@ exports.deleteAdmin = (req) => {
 
             isExistUserAndIsOwner(userIdForDeleteAdmin, userId, id, () => {
 
-                Find.isUserAdminOfChannel(id, userIdForDeleteAdmin, result => {
+                FindInChannel.isAdmin(id, userIdForDeleteAdmin, result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    Delete.userIntoChannelAdmins(id, userIdForDeleteAdmin);
+                    DeleteInChannel.admin(id, userIdForDeleteAdmin);
 
 
                     Json.builder(Response.HTTP_OK);
@@ -560,7 +560,7 @@ exports.leaveUser = (req) => {
 
         validationChannelAndUserAndJoinedInChannel(id, userId, () => {
 
-            Delete.userIntoChannel(id, userId);
+            DeleteInChannel.userInChannel(id, userId);
             DeleteInUser.channelIntoListOfUserChannels(id, userId);
 
             Json.builder(Response.HTTP_OK);
@@ -604,7 +604,7 @@ exports.listOfMessage = (req) => {
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
-            Find.getCountOfListMessage(id, count => {
+            FindInChannel.getCountOfListMessage(id, count => {
 
                 let totalPages = Math.ceil(count / getLimit);
 
@@ -641,15 +641,15 @@ exports.info = (req) => {
     getTokenPayLoad(() => {
 
 
-        Find.channelId(id, isDefined => {
+        FindInChannel.id(id, isDefined => {
 
             if (!isDefined)
                 return Json.builder(Response.HTTP_NOT_FOUND);
 
 
-            Find.getChannelInfo(id, result => {
+            FindInChannel.getInfo(id, result => {
 
-                Find.getCountOfUserInChannel(id, count => {
+                FindInChannel.getCountOfUsers(id, count => {
 
                     Json.builder(Response.HTTP_OK, result, {
                         memberSize: count
@@ -682,7 +682,7 @@ exports.allUsers = (req) => {
 
         validationChannelAndUserAndOwnerOrAdmin(id, userId, () => {
 
-            Find.getAllUsersForChannel(id, data => {
+            FindInChannel.getAllUsers(id, data => {
 
                 if (isUndefined(data))
                     return Json.builder(Response.HTTP_NOT_FOUND);

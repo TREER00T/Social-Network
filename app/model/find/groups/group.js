@@ -14,7 +14,7 @@ let openSql = require('opensql'),
 
 module.exports = {
 
-    groupId(id, cb) {
+    id(id, cb) {
         openSql.find({
             get: 'id',
             from: 'groups',
@@ -46,7 +46,7 @@ module.exports = {
         });
     },
 
-    isOwnerOfGroup(adminId, groupId, cb) {
+    isOwner(adminId, groupId, cb) {
         let isOwner = 1;
         openSql.find({
             get: 'id',
@@ -65,7 +65,7 @@ module.exports = {
         });
     },
 
-    isJoinedInGroup(groupId, userId, cb) {
+    isJoined(groupId, userId, cb) {
         openSql.find({
             get: 'id',
             from: 'groupsUsers',
@@ -82,7 +82,7 @@ module.exports = {
         });
     },
 
-    isUserAdminOfGroup(groupId, userId, cb) {
+    isAdmin(groupId, userId, cb) {
         openSql.find({
             get: 'id',
             from: 'groupsAdmins',
@@ -113,7 +113,7 @@ module.exports = {
     },
 
 
-    getGroupInfo(groupId, cb) {
+    getInfo(groupId, cb) {
         openSql.find({
             get: STAR,
             from: 'groups',
@@ -130,7 +130,7 @@ module.exports = {
     },
 
 
-    getCountOfUserInGroup(groupId, cb) {
+    getCountOfUsers(groupId, cb) {
         openSql.find({
             get: COUNT,
             from: 'groups',
@@ -146,7 +146,7 @@ module.exports = {
         });
     },
 
-    getAllUsersForGroup(groupId, cb) {
+    getAllUsers(groupId, cb) {
         openSql.find({
             get: 'userId',
             from: 'groupsUsers',
@@ -163,7 +163,7 @@ module.exports = {
     },
 
 
-    getDataForGroupContentWithId(id, cb) {
+    getDataWithId(id, cb) {
         openSql.find({
             get: STAR,
             from: '`' + id + 'GroupContents`',
