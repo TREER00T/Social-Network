@@ -62,7 +62,7 @@ exports.editUsername = (req) => {
 
         let phone = data.phoneNumber;
 
-        Find.isUsernameUsed(username.toString().trim(), result => {
+        Find.isExistUsername(username.toString().trim(), result => {
 
             if (!result)
                 return Json.builder(Response.HTTP_CONFLICT);

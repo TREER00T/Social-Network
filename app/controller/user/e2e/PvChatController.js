@@ -318,7 +318,7 @@ exports.blockUser = (req) => {
             if (!isUserInDb)
                 return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-            Find.isUserInListOfBlockUser(from, id, result => {
+            Find.isBlock(from, id, result => {
                 if (!result) {
                     Insert.addUserToUsersBlockList(from, id);
                     return Json.builder(Response.HTTP_OK);
