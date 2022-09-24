@@ -171,7 +171,7 @@ io.use((socket, next) => {
 
             socketOnForE2eFullAuth(receiverId, errEmitName, receiverSocketId => {
 
-                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
+                FindInUser.isBlock(senderId, receiverId, result => {
                     if (!result)
                         return emitToSocket(errEmitName, Response.HTTP_FORBIDDEN);
 
@@ -291,7 +291,7 @@ io.use((socket, next) => {
                 if (!dbData)
                     return emitToSocket('emitPvUploadedFileError', Response.HTTP_NOT_FOUND);
 
-                FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
+                FindInUser.isBlock(senderId, receiverId, result => {
                     if (!result)
                         return emitToSocket('emitPvUploadedFileError', Response.HTTP_FORBIDDEN);
 
@@ -299,7 +299,7 @@ io.use((socket, next) => {
                     delete data?.receiverId;
                     dbData['senderId'] = socketUserId;
 
-                    FindInUser.getDataForE2EContentWithId(dbData, id, result => {
+                    FindInUser.getDataWithId(dbData, id, result => {
                         emitToSpecificSocket(receiverSocketId, 'emitPvUploadedFile', Object.assign({}, result, data));
                     });
 
@@ -321,7 +321,7 @@ io.use((socket, next) => {
 
         socketOnForE2eFullAuth(receiverId, 'emitPvMessageError', receiverSocketId => {
 
-            FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
+            FindInUser.isBlock(senderId, receiverId, result => {
                 if (!result)
                     return emitToSocket('emitPvMessageError', Response.HTTP_FORBIDDEN);
 
@@ -361,7 +361,7 @@ io.use((socket, next) => {
 
         socketOnForE2eFullAuth(receiverId, 'emitPvEditMessageError', receiverSocketId => {
 
-            FindInUser.isUserInListOfBlockUser(senderId, receiverId, result => {
+            FindInUser.isBlock(senderId, receiverId, result => {
                 if (!result)
                     return emitToSocket('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 

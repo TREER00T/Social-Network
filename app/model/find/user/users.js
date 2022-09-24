@@ -326,7 +326,7 @@ module.exports = {
     },
 
 
-    isUserInListOfBlockUser(from, targetId, cb) {
+    isBlock(from, targetId, cb) {
         openSql.find({
             get: STAR,
             from: 'userBlockList',
@@ -350,7 +350,7 @@ module.exports = {
     },
 
 
-    isUsernameUsed(id, cb) {
+    isExistUsername(id, cb) {
         openSql.find({
             get: 'username',
             from: 'users',
@@ -554,7 +554,7 @@ module.exports = {
     },
 
 
-    getDataForE2EContentWithId(tableName, id, cb) {
+    getDataWithId(tableName, id, cb) {
         openSql.find({
             get: STAR,
             from: `${tableName}`,
