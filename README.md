@@ -32,24 +32,11 @@ For more information about the database structure, refer to [this](https://githu
 
 ## Configuration
 
-You need to make small changes to the program to run the program. A list of all the files that need to be changed.
-
-|File                                |Line               | 
-|:---------------------------------- |-------------------|
-|app/database/DatabaseInterface.js   | 13                |
-|app/middleware/RouterInterface.js   | 73                |
-|app/middleware/DatabaseConnection.js| 10, 11, 12, 13    |
-|app/io/connect/socket.js            | 28                |
-| app/util/File.js                   | 42                | 
-| app/util/Generate.js               | 27, 33, 48        |
-| app/util/Validation.js             | 58, 83            |
-
-
-After making the changes, open cmd and run the following commands.
+Open cmd and run the following commands.
 
 
 ```shell
-node .\cmd.js db
+node cmd.js db
 ```
 
 TIP : Before running this command, make sure that your database and server are on.
