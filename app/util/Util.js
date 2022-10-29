@@ -35,9 +35,9 @@ module.exports = {
         let letters = '0123456789ABCDEF'.split(''),
             color = '#';
 
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 6; i++)
             color += letters[Math.round(Math.random() * 15)];
-        }
+
 
         return color;
     },
@@ -85,8 +85,7 @@ module.exports = {
             MESSAGE_TYPE_LOCATION = 'Location';
 
         let isUndefined = (data) => {
-                return data === false || data === undefined ||
-                    typeof data === 'undefined' || data === null || data?.length === 0;
+                return !data || data?.length === 0;
             },
             isReplyInJsonObject = !isUndefined(jsonObject?.isReply),
             isForwardInJsonObject = !isUndefined(jsonObject?.isForward),
@@ -184,7 +183,7 @@ module.exports = {
     isUndefined(data) {
         if (typeof data === 'number' || typeof data === 'boolean' || typeof data === 'bigint')
             return true;
-        return data === undefined || data === null || typeof data === 'undefined' || data?.length < 1;
+        return !data || data?.length < 1;
     },
 
     isNotEmptyArr(data) {

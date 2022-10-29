@@ -1,5 +1,5 @@
 let fs = require('fs'),
-    {getFileHashName} = require('app/util/Generate'),
+    {getRandomHash} = require('app/util/Generate'),
     Util = require('app/util/Util'),
     dotenv = require('dotenv'),
     {
@@ -35,7 +35,7 @@ module.exports = {
 
         let url = `http://${process.env.IP}`,
             fileFormat = fileType.toLowerCase(),
-            randomFileName = getFileHashName(),
+            randomFileName = getRandomHash(30),
             getFileData = (pathDir) => {
                 try {
                     pathDir = 'cache/' + pathDir + randomFileName + fileFormat;

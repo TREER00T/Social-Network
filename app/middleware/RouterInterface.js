@@ -42,8 +42,8 @@ module.exports = {
                 let token,
                     apiKey;
                 try {
-                    token = req?.headers?.authorization;
-                    apiKey = req?.headers?.apiKey !== undefined ? req?.headers?.apiKey : req?.query?.apiKey;
+                    token = req.headers?.authorization;
+                    apiKey = req.headers?.apiKey ? req.headers?.apiKey : req.query?.apiKey;
                 } catch (e) {
                 }
                 let isAccessTokenVerify = RouterUtil.tokenVerify(token);

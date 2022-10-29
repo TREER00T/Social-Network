@@ -13,7 +13,7 @@ module.exports = {
 
     // Generates verification code E.g : 335496
     getVerificationCode() {
-        return Math.floor(100000 + Math.random() * 999999)
+        return Math.floor(100000 + Math.random() * 999999);
     },
 
 
@@ -34,27 +34,14 @@ module.exports = {
         let publicKey = await JWK.asKey(process.env.JWT_PUBLIC_KEY, 'pem');
         const buffer = Buffer.from(JSON.stringify(raw));
 
-        return await JWE.createEncrypt(
-            {format: format, contentAlg: contentAlg, fields: {alg: alg}}, publicKey)
-            .update(buffer).final();
+        return await JWE.createEncrypt({
+            format: format,
+            contentAlg: contentAlg,
+            fields: {
+                alg: alg
+            }
+        }, publicKey).update(buffer).final();
     },
-
-
-    getApiKey() {
-        const ARRAY_OF_RANDOM_NUMBER = crypto.randomBytes(50);
-
-        let formatValidString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-            chars = formatValidString.repeat(5),
-            str = '';
-
-        for (let i = 0; i < ARRAY_OF_RANDOM_NUMBER.length; i++) {
-            let decimal = ARRAY_OF_RANDOM_NUMBER[i];
-            str += chars[decimal];
-        }
-
-        return str.trim();
-    },
-
 
     getHashData(data, salt) {
         let hash = crypto.pbkdf2Sync(data, salt,
@@ -64,8 +51,8 @@ module.exports = {
     },
 
 
-    getFileHashName() {
-        const ARRAY_OF_RANDOM_NUMBER = crypto.randomBytes(30);
+    getRandomHash(randomHashSize) {
+        const ARRAY_OF_RANDOM_NUMBER = crypto.randomBytes(randomHashSize);
 
         let formatValidString = '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
             chars = formatValidString.repeat(5),
@@ -84,10 +71,9 @@ module.exports = {
             characters = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz',
             charactersLength = characters.length;
 
-        for (let i = 0; i < 20; i++) {
-            result += characters.charAt(Math.floor(Math.random() *
-                charactersLength));
-        }
+        for (let i = 0; i < 20; i++)
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+
 
         return `+` + result;
     },
