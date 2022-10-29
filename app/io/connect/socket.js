@@ -43,12 +43,12 @@ io.use((socket, next) => {
 
     Pipeline.accessTokenVerify(accessToken, result => {
 
-        if (result !== 'TOKEN_EXP' || 'IN_VALID_TOKEN' && result) {
+        if ((result !== 'TOKEN_EXP' || 'IN_VALID_TOKEN') && result) {
 
             Pipeline.getAccessTokenPayLoad(data => {
 
-                let phone = data.phoneNumber;
-                let userId = data.id;
+                let phone = data.phoneNumber,
+                    userId = data.id;
 
                 Pipeline.userApiKey(phone, apiKey, result => {
 
@@ -81,13 +81,13 @@ io.use((socket, next) => {
         listOfUser = allUsers[socketId]?.listOfSocketIdForPvChat,
         emitToSocket = (emitName, data) => socket.emit(emitName, data),
         emitToSpecificSocket = (where, emitName, data) => io.to(where).emit(emitName, data),
-        isUndefined = (data) => data === undefined || typeof data === 'undefined' || data === null,
+        isUndefined = (data) => !data,
         joinUserInRoom = (roomId, type) => {
             if (socket.adapter.rooms.has(roomId + type) === false)
                 socket.join(roomId + type);
         },
         addRoomIntoListOfUserRooms = (roomId, type) => {
-            if (allUsers[socketId][type + 'Rooms'] === undefined)
+            if (!allUsers[socketId][type + 'Rooms'])
                 allUsers[socketId][type + 'Rooms'] = [];
 
             let isRoomAddedInList = allUsers[socketId][type + 'Rooms']?.includes(roomId + type);
@@ -196,28 +196,37 @@ io.use((socket, next) => {
         'emitVoiceCall', 'emitVoiceCallError');
 
     socket.on('onUserActivities', (data) => {
-        let type = data?.type;
 
-        if (type === 'e2e')
-            return CommonFind.getListOfUserE2esActivity(socketUserId, type, result => {
+        let type = data?.type,
+            result = {
+                e2e: () => {
+                    CommonFind.getListOfUserE2esActivity(socketUserId, type, result => {
+
+                        emitToSocket('emitUserActivities', result);
+
+                    });
+                },
+                group: () => {
+                    CommonFind.getListOfUserGroupsOrChannelsActivity(socketUserId, type, result => {
+
+                        emitToSocket('emitUserActivities', result);
+
+                    });
+                },
+                channel: () => {
+                    result.group();
+                }
+            };
+
+        if (!typeof result[type] === 'function')
+            return CommonFind.getListOfUsersActivity(socketUserId, result => {
 
                 emitToSocket('emitUserActivities', result);
 
             });
 
-        if (type === 'group' || 'channel')
-            return CommonFind.getListOfUserGroupsOrChannelsActivity(socketUserId, type, result => {
 
-                emitToSocket('emitUserActivities', result);
-
-            });
-
-        CommonFind.getListOfUsersActivity(socketUserId, result => {
-
-            emitToSocket('emitUserActivities', result);
-
-        });
-
+        result[type]();
     });
 
 

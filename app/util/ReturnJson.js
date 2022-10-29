@@ -14,19 +14,19 @@ module.exports = {
     },
 
     jsonObject(obj, data, option) {
-        if (option !== undefined)
-            return (data != null) ? {
-                code: `${obj.code}`,
-                message: `${obj.message}`,
-                data: data,
-                option: option
-            } : obj;
 
-        return (data != null) ? {
-            code: `${obj.code}`,
-            message: `${obj.message}`,
+        let objectBuilder = {
+            code: obj.code,
+            message: obj.message,
             data: data
-        } : obj;
+        };
+
+        if (option)
+            return (data) ? Object.assign(objectBuilder, {
+                option: option
+            }) : obj;
+
+        return (data) ? objectBuilder : obj;
     }
 
 }

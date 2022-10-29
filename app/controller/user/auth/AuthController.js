@@ -10,7 +10,7 @@ let Json = require('app/util/ReturnJson'),
         isVerificationCode
     } = require('app/util/Validation'),
     {
-        getApiKey,
+        getRandomHash,
         getJwtSign,
         getHashData,
         getJwtEncrypt,
@@ -127,7 +127,7 @@ exports.isValidAuthCode = (req) => {
                     return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
 
 
-                Update.apikey(phone, getApiKey(), result => {
+                Update.apikey(phone, getRandomHash(50), result => {
 
                     if (!result)
                         return Json.builder(Response.HTTP_BAD_REQUEST);

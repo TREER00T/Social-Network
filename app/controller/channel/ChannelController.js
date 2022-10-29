@@ -331,7 +331,7 @@ exports.uploadAvatar = (req, res) => {
 
                 let file = req.file;
 
-                if (file === undefined)
+                if (!isUndefined(file))
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 let {

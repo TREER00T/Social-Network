@@ -13,7 +13,7 @@ module.exports = {
 
     userApiKey(phone, key, cb) {
 
-        if (key === undefined || key === null)
+        if (!key)
             return cb(false);
 
         getApiKey(phone, result => {

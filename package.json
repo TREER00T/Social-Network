@@ -1,6 +1,6 @@
 {
   "name": "social-network-server",
-  "version": "1.0.14",
+  "version": "1.0.17",
   "description": "Social Network Application",
   "main": "init.js",
   "scripts": {

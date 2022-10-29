@@ -13,7 +13,7 @@ module.exports = {
             charset: process.env.CHARSET,
             multipleStatements: true
         }).result((s) => {
-            if (cb !== undefined)
+            if (cb)
                 cb(s instanceof Error);
         });
     }
