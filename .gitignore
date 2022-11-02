@@ -83,3 +83,4 @@ typings/
 
 # phpStorm settings
 .idea
+/Logger/

@@ -1,3 +1,5 @@
-exports.ValidationException = (error) => {
+let WFL = require('wfl');
 
+exports.ValidationException = (error) => {
+    WFL.info(error);
 }
