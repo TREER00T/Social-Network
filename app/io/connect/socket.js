@@ -101,7 +101,7 @@ io.use((socket, next) => {
             if (isRoomAddedInList) {
                 socket.leave(roomId + type);
 
-                let index = allUsers[socketId][type + 'Rooms']?.indexOf(5);
+                let index = allUsers[socketId][type + 'Rooms']?.indexOf(roomId);
 
                 if (index > -1)
                     allUsers[socketId][type + 'Rooms']?.splice(index, 1);
@@ -309,7 +309,7 @@ io.use((socket, next) => {
                     dbData['senderId'] = socketUserId;
 
                     FindInUser.getDataWithId(dbData, id, result => {
-                        emitToSpecificSocket(receiverSocketId, 'emitPvUploadedFile', Object.assign({}, result, data));
+                        emitToSpecificSocket(receiverSocketId, 'emitPvUploadedFile', {...result, ...data});
                     });
 
                 });
@@ -539,7 +539,7 @@ io.use((socket, next) => {
             delete data?.groupId;
 
             FindInGroup.getDataWithId(groupId, id, result => {
-                emitToSpecificSocket(groupId, 'emitGroupUploadedFile', Object.assign({}, result, data));
+                emitToSpecificSocket(groupId, 'emitGroupUploadedFile', {...result, ...data});
             });
 
 
@@ -744,7 +744,7 @@ io.use((socket, next) => {
             delete data?.channelId;
 
             FindInChannel.getDataWithId(channelId, result => {
-                emitToSpecificSocket(channelId, 'emitChannelUploadedFile', Object.assign({}, result, data));
+                emitToSpecificSocket(channelId, 'emitChannelUploadedFile', {...result, ...data});
             });
 
         });
