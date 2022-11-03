@@ -22,11 +22,12 @@ module.exports = {
         };
 
         if (option)
-            return (data) ? Object.assign(objectBuilder, {
+            return data ? {
+                ...objectBuilder,
                 option: option
-            }) : obj;
+            } : obj;
 
-        return (data) ? objectBuilder : obj;
+        return data ? objectBuilder : obj;
     }
 
 }
