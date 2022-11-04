@@ -4,6 +4,7 @@
 
 - [Install](#install)
 - [Introduction](#introduction)
+- [Api Schema](#api-schema)
 - [Database Schema](#database-schema)
 - [Configuration](#configuration)
 - [License](#license)
@@ -25,6 +26,10 @@ Now download and extract project
 
 A simple social network with socket.io and rest api
 
+## Api Schema
+
+In this project, two libraries are used for documentation and display and display with api.
+For Restful Api ([swagger](https://github.com/scottie1984/swagger-ui-express)) and For Socket.io ([OpenRTP](https://github.com/treegex/openrtp))
 
 ## Database Schema
 
