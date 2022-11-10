@@ -1,31 +1,30 @@
-let Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
+let Json = require('../../util/ReturnJson'),
+    Response = require('../../util/Response'),
     multer = require('multer'),
-    InsertInGroup = require('app/model/add/insert/groups/group'),
-    InsertInUser = require('app/model/add/insert/user/users'),
-    Create = require('app/model/create/groups'),
-    FindInGroup = require('app/model/find/groups/group'),
-    FindInUser = require('app/model/find/user/users'),
-    DeleteInGroup = require('app/model/remove/groups/group'),
-    CommonInsert = require('app/model/add/insert/common/index'),
-    UpdateInGroup = require('app/model/update/groups/group'),
-    AddGroupForeignKey = require('app/model/add/foreignKey/groups'),
-    DeleteInUser = require('app/model/remove/users/user'),
+    InsertInGroup = require('../../model/add/insert/groups/group'),
+    InsertInUser = require('../../model/add/insert/user/users'),
+    Create = require('../../model/create/groups'),
+    FindInGroup = require('../../model/find/groups/group'),
+    FindInUser = require('../../model/find/user/users'),
+    DeleteInGroup = require('../../model/remove/groups/group'),
+    CommonInsert = require('../../model/add/insert/common/index'),
+    UpdateInGroup = require('../../model/update/groups/group'),
+    AddGroupForeignKey = require('../../model/add/foreignKey/groups'),
+    DeleteInUser = require('../../model/remove/users/user'),
     multerImage = multer().single('image'),
     multerFile = multer().single('file'),
     {
         getTokenPayLoad
-    } = require('app/middleware/RouterUtil'),
-    File = require('app/util/File'),
+    } = require('../../middleware/RouterUtil'),
+    File = require('../../util/File'),
     Util, {
         isUndefined,
         getFileFormat,
         getRandomHexColor,
         IN_VALID_MESSAGE_TYPE,
         IN_VALID_OBJECT_KEY
-    } = require('app/util/Util'),
-    Generate = require('app/util/Generate');
-
+    } = require('../../util/Util'),
+    Generate = require('../../util/Generate');
 
 
 let validationGroupAndUser = (roomId, userId, cb) => {
@@ -115,7 +114,11 @@ exports.create = (req, res) => {
 
 
             if (!isUndefined(file))
-                fileUrl = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname)).fileUrl;
+                fileUrl = File.validationAndWriteFile({
+                    size: file.size,
+                    dataBinary: file.buffer,
+                    format: getFileFormat(file.originalname)
+                }).url;
 
 
             InsertInGroup.group(name.toString().trim(), Generate.makeIdForInviteLink(), getRandomHexColor(), fileUrl, id => {
@@ -175,12 +178,16 @@ exports.uploadFile = (req, res) => {
                         return Json.builder(Response.HTTP_BAD_REQUEST);
 
                     let {
-                        fileUrl,
-                        fileSize
-                    } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+                        url,
+                        size
+                    } = File.validationAndWriteFile({
+                        size: file.size,
+                        dataBinary: file.buffer,
+                        format: getFileFormat(file.originalname)
+                    });
 
-                    data['fileUrl'] = fileUrl;
-                    data['fileSize'] = fileSize;
+                    data['fileUrl'] = url;
+                    data['fileSize'] = size;
                     data['fileName'] = file.originalname;
 
 
@@ -311,10 +318,14 @@ exports.uploadAvatar = (req, res) => {
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 let {
-                    fileUrl
-                } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+                    url
+                } = File.validationAndWriteFile({
+                    size: file.size,
+                    dataBinary: file.buffer,
+                    format: getFileFormat(file.originalname)
+                });
 
-                UpdateInGroup.img(id, fileUrl, result => {
+                UpdateInGroup.img(id, url, result => {
                     if (!result)
                         return Json.builder(Response.HTTP_BAD_REQUEST);
 

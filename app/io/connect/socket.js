@@ -1,21 +1,21 @@
 let app = require('express')(),
     http = require('http').Server(app),
     io = require('socket.io')(http),
-    Update = require('app/model/update/user/users'),
-    IoUtil = require('app/io/util/util'),
+    Update = require('../../model/update/user/users'),
+    IoUtil = require('../../io/util/util'),
     RestFulUtil, {
         IN_VALID_MESSAGE_TYPE,
         IN_VALID_OBJECT_KEY
-    } = require('app/util/Util'),
-    Insert = require('app/model/add/insert/common/index'),
-    UpdateInCommon = require('app/model/update/common/common'),
-    DeleteInCommon = require('app/model/remove/common/common'),
-    CommonFind = require('app/model/find/common/common'),
-    Response = require('app/util/Response'),
-    Pipeline = require('app/io/middleware/SocketIoPipeline'),
-    FindInGroup = require('app/model/find/groups/group'),
-    FindInChannel = require('app/model/find/channels/channel'),
-    FindInUser = require('app/model/find/user/users');
+    } = require('../../util/Util'),
+    Insert = require('../../model/add/insert/common/index'),
+    UpdateInCommon = require('../../model/update/common/common'),
+    DeleteInCommon = require('../../model/remove/common/common'),
+    CommonFind = require('../../model/find/common/common'),
+    Response = require('../../util/Response'),
+    Pipeline = require('../../io/middleware/SocketIoPipeline'),
+    FindInGroup = require('../../model/find/groups/group'),
+    FindInChannel = require('../../model/find/channels/channel'),
+    FindInUser = require('../../model/find/user/users');
 require('dotenv').config();
 
 

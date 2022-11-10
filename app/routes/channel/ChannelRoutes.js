@@ -1,5 +1,5 @@
 let router = require('express').Router(),
-    Channel = require('app/controller/channel/ChannelController');
+    Channel = require('../../controller/channel/ChannelController');
 
 
 router.post('/create', Channel.create);

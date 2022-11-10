@@ -1,4 +1,4 @@
-let Server = require('app/io/connect/socket');
+let Server = require('../../io/connect/socket');
 
 
 

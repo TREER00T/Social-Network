@@ -31,7 +31,6 @@ module.exports = {
 
 
     getRandomHexColor() {
-
         let letters = '0123456789ABCDEF'.split(''),
             color = '#';
 
@@ -48,7 +47,7 @@ module.exports = {
     },
 
 
-    validateMessage(jsonObject, cb) {
+    validateMessage(jsonObject) {
 
         let arrayOfValidJsonObjectKey = [
                 'text', 'type',
@@ -64,20 +63,15 @@ module.exports = {
             isTypeInMessageType = arrayOfMessageType.includes(jsonObject.type);
 
 
-        if (!isTypeInMessageType) {
-            cb(IN_VALID_MESSAGE_TYPE);
-            return;
-        }
+        if (!isTypeInMessageType)
+            return IN_VALID_MESSAGE_TYPE;
 
 
         for (let key in jsonObject) {
             let isValidObjectKey = arrayOfValidJsonObjectKey.includes(key);
 
-            if (!isValidObjectKey) {
-                cb(IN_VALID_OBJECT_KEY);
-                return;
-            }
-
+            if (!isValidObjectKey)
+                return IN_VALID_OBJECT_KEY;
         }
 
 
@@ -98,35 +92,9 @@ module.exports = {
             isLocationLonNull = isUndefined(jsonObject?.locationLon);
 
 
-        if (isMessageTypeLocation && (isLocationLonNull || isLocationLatNull)) {
-            cb(IN_VALID_OBJECT_KEY);
-            return;
-        }
-
-
-        if (isMessageTypeNull) {
-            cb(IN_VALID_OBJECT_KEY);
-            return;
-        }
-
-
-        if (isMessageTypeNull && !isNoneMessageType && !isMessageTypeLocation) {
-            cb(IN_VALID_OBJECT_KEY);
-            return;
-        }
-
-
-        if (isTextNull && isNoneMessageType) {
-            cb(IN_VALID_OBJECT_KEY);
-            return;
-        }
-
-
-        if (isSenderIdNull) {
-            cb(IN_VALID_OBJECT_KEY);
-            return;
-        }
-
+        if ((isMessageTypeLocation && (isLocationLonNull || isLocationLatNull)) || isMessageTypeNull || isSenderIdNull ||
+            (isMessageTypeNull && !isNoneMessageType && !isMessageTypeLocation) || (isTextNull && isNoneMessageType))
+            return IN_VALID_OBJECT_KEY;
 
         if (isMessageTypeLocation && !isLocationLonNull && !isLocationLatNull) {
             jsonObject.location = POINT(jsonObject.locationLat, jsonObject.locationLon);
@@ -134,25 +102,20 @@ module.exports = {
             delete jsonObject.locationLon;
         }
 
-
         if (isTextNull && !isNoneMessageType)
             jsonObject.text = NULL;
-
 
         if (isTextNull && isMessageTypeNull)
             jsonObject.type = 'Image';
 
-
         if (isMessageTypeNull && !isTextNull)
             jsonObject.type = MESSAGE_WITHOUT_FILE;
-
 
         if (isReplyInJsonObject)
             jsonObject.isReply = 1;
 
         if (!isReplyInJsonObject)
             jsonObject.isReply = 0;
-
 
         if (isForwardInJsonObject)
             jsonObject.isForward = 1;
@@ -161,7 +124,7 @@ module.exports = {
             jsonObject.isForward = 0;
 
 
-        cb(jsonObject);
+        return jsonObject;
     },
 
 

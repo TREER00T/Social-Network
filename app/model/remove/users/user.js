@@ -4,13 +4,13 @@ let openSql = require('opensql'),
     } = openSql.queryHelper,
     {
         DataBaseException
-    } = require('app/exception/DataBaseException'),
+    } = require('../../../exception/DataBaseException'),
     {
         isUndefined,
         isBiggerThanZero
-    } = require('app/util/Util'),
-    FindInCommon = require('app/model/find/common/common'),
-    DeleteInCommon = require('app/model/remove/common/common');
+    } = require('../../../util/Util'),
+    FindInCommon = require('../../../model/find/common/common'),
+    DeleteInCommon = require('../../../model/remove/common/common');
 
 module.exports = {
 

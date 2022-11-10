@@ -1,11 +1,11 @@
 let openSql = require('opensql'),
     {
         isUndefined
-    } = require('app/util/Util'),
+    } = require('../../../util/Util'),
     {
         IN
     } = openSql.queryHelper,
-    FindInCommon = require('app/model/find/common/common');
+    FindInCommon = require('../../../model/find/common/common');
 
 
 module.exports = {

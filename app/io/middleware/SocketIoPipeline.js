@@ -2,10 +2,10 @@ let {
         getJwtVerify,
         getJwtDecrypt,
         getSplitBearerJwt
-    } = require('app/util/Validation'),
+    } = require('../../util/Validation'),
     {
         getApiKey
-    } = require('app/model/find/user/users');
+    } = require('../../model/find/user/users');
 
 let accessTokenPayload, apiKey;
 

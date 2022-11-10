@@ -1,7 +1,7 @@
 let openSql = require('opensql'),
     {
         isUndefined
-    } = require('app/util/Util');
+    } = require('../../../../util/Util');
 
 
 module.exports = {

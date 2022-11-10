@@ -1,9 +1,9 @@
-let Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
+let Json = require('../../util/ReturnJson'),
+    Response = require('../../util/Response'),
     {
         isUndefined
-    } = require('app/util/Util'),
-    Find = require('app/model/find/common/common');
+    } = require('../../util/Util'),
+    Find = require('../../model/find/common/common');
 
 
 exports.search = (req) => {

@@ -6,7 +6,7 @@ let openSql = require('opensql'),
     {
         isUndefined,
         isNotEmptyArr
-    } = require('app/util/Util'),
+    } = require('../../../util/Util'),
     {
         IN,
         ATTACH,
@@ -16,7 +16,7 @@ let openSql = require('opensql'),
     } = openSql.queryHelper,
     {
         DataBaseException
-    } = require('app/exception/DataBaseException'),
+    } = require('../../../exception/DataBaseException'),
     keyHelper = openSql.keywordHelper;
 
 

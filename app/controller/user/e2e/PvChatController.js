@@ -1,23 +1,23 @@
-let Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
-    Create = require('app/model/create/users'),
-    AddUserForeignKey = require('app/model/add/foreignKey/users'),
-    Find = require('app/model/find/user/users'),
+let Json = require('../../../util/ReturnJson'),
+    Response = require('../../../util/Response'),
+    Create = require('../../../model/create/users'),
+    AddUserForeignKey = require('../../../model/add/foreignKey/users'),
+    Find = require('../../../model/find/user/users'),
     multer = require('multer'),
-    Insert = require('app/model/add/insert/user/users'),
-    Delete = require('app/model/remove/users/user'),
-    CommonInsert = require('app/model/add/insert/common/index'),
+    Insert = require('../../../model/add/insert/user/users'),
+    Delete = require('../../../model/remove/users/user'),
+    CommonInsert = require('../../../model/add/insert/common/index'),
     Util, {
         isUndefined,
         getFileFormat,
         IN_VALID_MESSAGE_TYPE,
         IN_VALID_OBJECT_KEY
-    } = require('app/util/Util'),
-    File = require('app/util/File'),
+    } = require('../../../util/Util'),
+    File = require('../../../util/File'),
     multerFile = multer().single('file'),
     {
         getTokenPayLoad
-    } = require('app/middleware/RouterUtil');
+    } = require('../../../middleware/RouterUtil');
 
 
 let validationE2E = (id, from, cb) => {
@@ -138,12 +138,16 @@ exports.uploadFile = (req, res) => {
                                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
                             let {
-                                fileUrl,
-                                fileSize
-                            } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+                                url,
+                                size
+                            } = File.validationAndWriteFile({
+                                size: file.size,
+                                dataBinary: file.buffer,
+                                format: getFileFormat(file.originalname)
+                            });
 
-                            data['fileUrl'] = fileUrl;
-                            data['fileSize'] = fileSize;
+                            data['fileUrl'] = url;
+                            data['fileSize'] = size;
                             data['fileName'] = file.originalname;
 
 

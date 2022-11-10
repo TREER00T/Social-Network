@@ -12,7 +12,7 @@ let Json = require('./ReturnJson'),
     } = require('node-jose'),
     {
         ValidationException
-    } = require('app/exception/ValidationException');
+    } = require('../exception/ValidationException');
 
 
 module.exports = {

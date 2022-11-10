@@ -1,5 +1,5 @@
 let router = require('express').Router(),
-    Personal = require('app/controller/user/personal/PersonalController');
+    Personal = require('../../controller/user/personal/PersonalController');
 
 
 router.get('/user', Personal.user);

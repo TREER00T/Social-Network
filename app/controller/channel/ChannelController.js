@@ -1,30 +1,30 @@
-let Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
+let Json = require('../../util/ReturnJson'),
+    Response = require('../../util/Response'),
     multer = require('multer'),
-    Insert = require('app/model/add/insert/channels/channel'),
-    InsertInUser = require('app/model/add/insert/user/users'),
-    Create = require('app/model/create/channels'),
-    FindInChannel = require('app/model/find/channels/channel'),
-    FindInUser = require('app/model/find/user/users'),
-    CommonInsert = require('app/model/add/insert/common/index'),
-    DeleteInChannel = require('app/model/remove/channels/channel'),
-    UpdateInChannel = require('app/model/update/channels/channel'),
-    AddChannelForeignKey = require('app/model/add/foreignKey/channels'),
-    DeleteInUser = require('app/model/remove/users/user'),
+    Insert = require('../../model/add/insert/channels/channel'),
+    InsertInUser = require('../../model/add/insert/user/users'),
+    Create = require('../../model/create/channels'),
+    FindInChannel = require('../../model/find/channels/channel'),
+    FindInUser = require('../../model/find/user/users'),
+    CommonInsert = require('../../model/add/insert/common/index'),
+    DeleteInChannel = require('../../model/remove/channels/channel'),
+    UpdateInChannel = require('../../model/update/channels/channel'),
+    AddChannelForeignKey = require('../../model/add/foreignKey/channels'),
+    DeleteInUser = require('../../model/remove/users/user'),
     multerImage = multer().single('image'),
     multerFile = multer().single('file'),
     {
         getTokenPayLoad
-    } = require('app/middleware/RouterUtil'),
-    File = require('app/util/File'),
+    } = require('../../middleware/RouterUtil'),
+    File = require('../../util/File'),
     Util, {
         isUndefined,
         getFileFormat,
         getRandomHexColor,
         IN_VALID_MESSAGE_TYPE,
         IN_VALID_OBJECT_KEY
-    } = require('app/util/Util'),
-    Generate = require('app/util/Generate');
+    } = require('../../util/Util'),
+    Generate = require('../../util/Generate');
 
 
 let validationChannelAndUser = (roomId, userId, cb) => {
@@ -129,7 +129,11 @@ exports.create = (req, res) => {
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
             if (!isUndefined(file))
-                fileUrl = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname)).fileUrl;
+                fileUrl = File.validationAndWriteFile({
+                    size: file.size,
+                    dataBinary: file.buffer,
+                    format: getFileFormat(file.originalname)
+                }).url;
 
 
             Insert.channel(name.toString().trim(), Generate.makeIdForInviteLink(), getRandomHexColor(), fileUrl, id => {
@@ -221,12 +225,16 @@ exports.uploadFile = (req, res) => {
                             return Json.builder(Response.HTTP_BAD_REQUEST);
 
                         let {
-                            fileUrl,
-                            fileSize
-                        } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+                            url,
+                            size
+                        } = File.validationAndWriteFile({
+                            size: file.size,
+                            dataBinary: file.buffer,
+                            format: getFileFormat(file.originalname)
+                        });
 
-                        data['fileUrl'] = fileUrl;
-                        data['fileSize'] = fileSize;
+                        data['fileUrl'] = url;
+                        data['fileSize'] = size;
                         data['fileName'] = file.originalname;
 
 
@@ -335,10 +343,14 @@ exports.uploadAvatar = (req, res) => {
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
                 let {
-                    fileUrl
-                } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+                    url
+                } = File.validationAndWriteFile({
+                    size: file.size,
+                    dataBinary: file.buffer,
+                    format: getFileFormat(file.originalname)
+                });
 
-                UpdateInChannel.img(id, fileUrl, result => {
+                UpdateInChannel.img(id, url, result => {
                     if (!result)
                         return Json.builder(Response.HTTP_BAD_REQUEST);
 

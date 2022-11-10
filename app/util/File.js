@@ -1,17 +1,21 @@
 let fs = require('fs'),
-    {getRandomHash} = require('app/util/Generate'),
-    Util = require('app/util/Util'),
+    {getRandomHash} = require('../util/Generate'),
+    Util = require('../util/Util'),
     dotenv = require('dotenv'),
     {
         FileException
-    } = require('app/exception/FileException');
+    } = require('../exception/FileException');
 
 dotenv.config();
 
+let cacheFolder = 'cache/',
+    ROOT_PROJECT_FOLDER = '../',
+    url = `${process.env.HTTP_TYPE}://${process.env.IP}`,
+    cacheFolderPath = ROOT_PROJECT_FOLDER + cacheFolder;
+
 module.exports = {
 
-
-    validationAndWriteFile(dataBinary, fileType) {
+    async validationAndWriteFile(obj) {
 
         const IMAGE_VALIDA_TYPE = [
                 '.png',
@@ -29,47 +33,82 @@ module.exports = {
                 '.mp3',
                 '.m4a',
                 '.ogg'
-            ],
-            ROOT_PROJECT_FOLDER = '../';
+            ];
 
 
-        let url = `http://${process.env.IP}`,
-            fileFormat = fileType.toLowerCase(),
-            randomFileName = getRandomHash(30),
-            getFileData = (pathDir) => {
-                try {
-                    pathDir = 'cache/' + pathDir + randomFileName + fileFormat;
-                    fs.writeFileSync(ROOT_PROJECT_FOLDER + pathDir, dataBinary);
-
-                    const BYTE_SIZE_FOR_FILE = fs.statSync(ROOT_PROJECT_FOLDER + pathDir).size,
-                        FILE_SIZE = Util.formatBytes(BYTE_SIZE_FOR_FILE);
-
-                    return {
-                        fileUrl: url + '/' + pathDir,
-                        fileSize: FILE_SIZE
-                    };
-                } catch (e) {
-                    FileException(e);
-                }
-            },
+        let fileFormat = obj.format.toLowerCase(),
             isAudio = AUDIO_VALIDA_TYPE.includes(fileFormat),
             isVideo = VIDEO_VALIDA_TYPE.includes(fileFormat),
             isImage = IMAGE_VALIDA_TYPE.includes(fileFormat);
 
 
-        if (isImage)
-            return getFileData(`img/`);
+        let fileConfig = {
+            size: obj.size,
+            format: obj.format,
+            dataBinary: obj.dataBinary
+        }
 
+        if (isImage)
+            return await this.getFileData({
+                pathDir: `img/`,
+                ...fileConfig
+            });
 
         if (isVideo)
-            return getFileData(`video/`);
-
+            return await this.getFileData({
+                pathDir: `video/`,
+                ...fileConfig
+            });
 
         if (isAudio)
-            return getFileData(`voice/`);
+            return await this.getFileData({
+                pathDir: `voice/`,
+                ...fileConfig
+            });
 
-        return getFileData(`docs/`);
+        return await this.getFileData({
+            pathDir: `docs/`,
+            ...fileConfig
+        });
+    },
+
+    async isExistFolder() {
+        return await fs.promises.readdir(cacheFolderPath);
+    },
+
+
+    async getFileData(obj) {
+        try {
+
+            let randomFileName = getRandomHash(30),
+                FILE_SIZE = Util.formatBytes(obj.size),
+                pathDir = cacheFolder + obj.pathDir + randomFileName + obj.format;
+
+            await fs.promises.writeFile(ROOT_PROJECT_FOLDER + obj.pathDir, obj.dataBinary);
+
+            return {
+                url: url + '/' + pathDir,
+                size: FILE_SIZE
+            };
+        } catch (e) {
+            FileException(e);
+        }
+    },
+
+    async mkdirForUploadFile() {
+        let isExistFolder = await this.isExistFolder();
+
+        if (!isExistFolder) {
+            await fs.promises.mkdir(cacheFolderPath, {recursive: true});
+
+            for (const item of ['video', 'voice', 'img', 'docs'])
+                await fs.promises.mkdir(cacheFolderPath + item);
+
+
+            await fs.promises.copyFile('../../config/.htaccess', cacheFolderPath + '.htaccess');
+        }
+
+        return isExistFolder;
     }
-
 
 }

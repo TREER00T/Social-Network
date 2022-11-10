@@ -1,11 +1,11 @@
 let openSql = require('opensql'),
     {
         DataBaseException
-    } = require('app/exception/DataBaseException'),
+    } = require('../../../../exception/DataBaseException'),
     {
         isUndefined
-    } = require('app/util/Util'),
-    UpdateInCommon = require('app/model/update/common/common');
+    } = require('../../../../util/Util'),
+    UpdateInCommon = require('../../../../model/update/common/common');
 
 
 module.exports = {

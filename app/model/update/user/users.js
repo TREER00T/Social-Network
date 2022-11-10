@@ -1,10 +1,10 @@
 let openSql = require('opensql'),
     {
         DataBaseException
-    } = require('app/exception/DataBaseException'),
+    } = require('../../../exception/DataBaseException'),
     {
         isBiggerThanZero
-    } = require('app/util/Util'),
+    } = require('../../../util/Util'),
     {
         NULL
     } = openSql.queryHelper;

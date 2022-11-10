@@ -58,10 +58,10 @@ module.exports = {
             chars = formatValidString.repeat(5),
             str = '';
 
-        for (let i = 0; i < ARRAY_OF_RANDOM_NUMBER.length; i++) {
-            let decimal = ARRAY_OF_RANDOM_NUMBER[i];
-            str += chars[decimal];
-        }
+        ARRAY_OF_RANDOM_NUMBER.forEach((item, index) => {
+            str += chars[ARRAY_OF_RANDOM_NUMBER[index]];
+        });
+
 
         return str.trim();
     },

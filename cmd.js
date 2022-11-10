@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-require('app-module-path').addPath(__dirname);
 let {
         program
     } = require('commander'),
-    Database = require('app/database/DatabaseInterface');
+    Database = require('./app/database/DatabaseInterface'),
+    File = require('./app/util/File');
 
 
 program
-    .command('db')
-    .description('Create database and tables')
+    .command('serve')
+    .description('Initialization server')
     .action(() => {
         Database.initialization(isErr => {
 
@@ -20,5 +20,8 @@ program
             });
 
         });
+
+        File.mkdirForUploadFile();
+
     })
     .parse();

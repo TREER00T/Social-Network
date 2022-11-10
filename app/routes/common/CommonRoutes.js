@@ -1,5 +1,5 @@
 let router = require('express').Router(),
-    Common = require('app/controller/common/CommonController');
+    Common = require('../../controller/common/CommonController');
 
 
 

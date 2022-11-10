@@ -6,10 +6,10 @@ let openSql = require('opensql'),
     {
         isUndefined,
         isNotEmptyArr
-    } = require('app/util/Util'),
+    } = require('../../../util/Util'),
     {
         DataBaseException
-    } = require('app/exception/DataBaseException');
+    } = require('../../../exception/DataBaseException');
 
 
 module.exports = {

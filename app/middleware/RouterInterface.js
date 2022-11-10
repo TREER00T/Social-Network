@@ -5,21 +5,21 @@ let express = require('express'),
     dotenv = require('dotenv'),
     cors = require('cors'),
     Swagger = require('../../docs/swagger'),
-    Validation = require('app/util/Validation'),
-    RouterUtil = require('app/middleware/RouterUtil'),
-    Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
-    authRouter = require('app/routes/user/AuthRoutes'),
-    personalRouter = require('app/routes/user/PersonalRoutes'),
-    groupRouter = require('app/routes/group/GroupRoutes'),
-    channelRouter = require('app/routes/channel/ChannelRoutes'),
-    commonRouter = require('app/routes/common/CommonRoutes'),
-    e2eRouter = require('app/routes/user/PvChatRoutes');
+    Validation = require('../util/Validation'),
+    RouterUtil = require('../middleware/RouterUtil'),
+    Json = require('../util/ReturnJson'),
+    Response = require('../util/Response'),
+    authRouter = require('../routes/user/AuthRoutes'),
+    personalRouter = require('../routes/user/PersonalRoutes'),
+    groupRouter = require('../routes/group/GroupRoutes'),
+    channelRouter = require('../routes/channel/ChannelRoutes'),
+    commonRouter = require('../routes/common/CommonRoutes'),
+    e2eRouter = require('../routes/user/PvChatRoutes');
 
 
 module.exports = {
 
-    initialization() {
+    async initialization() {
 
         dotenv.config();
 

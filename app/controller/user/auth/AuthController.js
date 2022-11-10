@@ -1,25 +1,25 @@
-let Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
-    {isUndefined, getRandomHexColor} = require('app/util/Util'),
-    Update = require('app/model/update/user/users'),
-    Insert = require('app/model/add/insert/user/users'),
-    Find = require('app/model/find/user/users'),
-    CreateUser = require('app/model/create/users'),
+let Json = require('../../../util/ReturnJson'),
+    Response = require('../../../util/Response'),
+    {isUndefined, getRandomHexColor} = require('../../../util/Util'),
+    Update = require('../../../model/update/user/users'),
+    Insert = require('../../../model/add/insert/user/users'),
+    Find = require('../../../model/find/user/users'),
+    CreateUser = require('../../../model/create/users'),
     {
         isPhoneNumber,
         isVerificationCode
-    } = require('app/util/Validation'),
+    } = require('../../../util/Validation'),
     {
         getRandomHash,
         getJwtSign,
         getHashData,
         getJwtEncrypt,
         getVerificationCode
-    } = require('app/util/Generate'),
+    } = require('../../../util/Generate'),
     {
         getTokenPayLoad
-    } = require('app/middleware/RouterUtil'),
-    AddUserForeignKey = require('app/model/add/foreignKey/users');
+    } = require('../../../middleware/RouterUtil'),
+    AddUserForeignKey = require('../../../model/add/foreignKey/users');
 
 
 exports.gvc = (req) => {

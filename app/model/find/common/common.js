@@ -1,9 +1,9 @@
 let openSql = require('opensql'),
-    Generate = require('app/util/Generate'),
+    Generate = require('../../../util/Generate'),
     {
         isUndefined,
         isNotEmptyArr
-    } = require('app/util/Util'),
+    } = require('../../../util/Util'),
     {
         IN,
         LIKE,
@@ -15,7 +15,7 @@ let openSql = require('opensql'),
     } = openSql.queryHelper,
     {
         DataBaseException
-    } = require('app/exception/DataBaseException'),
+    } = require('../../../exception/DataBaseException'),
     {
         EQUAL_TO
     } = openSql.keywordHelper,

@@ -1,6 +1,6 @@
-let Create = require('app/model/create/CreateTableInterface'),
-    Add = require('app/model/add/foreignKey/AddForiegnKeyInterface'),
-    Database = require('app/database/DatabaseConnection'),
+let Create = require('../model/create/CreateTableInterface'),
+    Add = require('../model/add/foreignKey/AddForiegnKeyInterface'),
+    Database = require('../database/DatabaseConnection'),
     openSql = require('opensql'),
     dotenv = require('dotenv');
 
