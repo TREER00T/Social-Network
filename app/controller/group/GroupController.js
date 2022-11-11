@@ -27,6 +27,10 @@ let Json = require('../../util/ReturnJson'),
     Generate = require('../../util/Generate');
 
 
+let tokenPayload = await getTokenPayLoad();
+let userId = tokenPayload.id;
+
+
 let validationGroupAndUser = async (roomId, userId) => {
 
         let isDefined = await FindInGroup.id(roomId);
@@ -99,9 +103,6 @@ let validationGroupAndUser = async (roomId, userId) => {
 
 exports.create = async (req, res) => {
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     multerImage(req, res, async () => {
 
         let name = req.body?.name;
@@ -141,9 +142,6 @@ exports.create = async (req, res) => {
 
 
 exports.uploadFile = async (req, res) => {
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     multerFile(req, res, async () => {
 
@@ -208,9 +206,6 @@ exports.deleteGroup = async req => {
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
     if (!isErr)
@@ -232,9 +227,6 @@ exports.changeName = async req => {
 
     if (isUndefined(name) || isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
@@ -260,9 +252,6 @@ exports.changeDescription = async req => {
     if (isUndefined(id) || isUndefined(description))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
     if (!isErr)
@@ -278,9 +267,6 @@ exports.changeDescription = async req => {
 }
 
 exports.uploadAvatar = async (req, res) => {
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     multerImage(req, res, async () => {
 
@@ -326,9 +312,6 @@ exports.changeToInviteLink = async req => {
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
     if (!isErr)
@@ -355,9 +338,6 @@ exports.changeToPublicLink = async req => {
 
     if (isUndefined(id) || isUndefined(publicLink))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
@@ -390,9 +370,6 @@ exports.joinUser = async req => {
     if (isUndefined(id) || isUndefined(targetUserId))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
     if (!isErr)
@@ -416,9 +393,6 @@ exports.addAdmin = async req => {
 
     if (isUndefined(userIdForNewAdmin) || isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let isErr = await validationGroupAndUser(id, userId);
 
@@ -456,9 +430,6 @@ exports.deleteAdmin = async req => {
     if (isUndefined(id) || isUndefined(userIdForDeleteAdmin))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationGroupAndUser(id, userId);
 
     if (!isErr)
@@ -487,9 +458,6 @@ exports.leaveUser = async req => {
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let isErr = await validationGroupAndUserAndJoinedInGroup(id, userId);
 
@@ -522,9 +490,6 @@ exports.listOfMessage = async req => {
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let result = await FindInUser.getTableNameForListOfUserGroups(id, userId);
 

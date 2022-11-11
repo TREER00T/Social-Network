@@ -31,84 +31,59 @@ let Json = require('../../../util/ReturnJson'),
     AddUserForeignKey = require('../../../model/add/foreignKey/users'),
     Delete = require('../../../model/remove/users/user');
 
+let tokenPayload = await getTokenPayLoad();
+let phone = tokenPayload.phoneNumber;
+let userId = tokenPayload.id;
 
-exports.user = () => {
+exports.user = async () => {
 
-    getTokenPayLoad(data => {
+    let personalUserDetails = await Find.getPersonalUserDetails(userId);
 
-        let userId = data.id;
-
-        Find.getPersonalUserDetails(userId, result => {
-
-            Json.builder(Response.HTTP_OK, result);
-
-        });
-
-
-    });
-
+    Json.builder(Response.HTTP_OK, personalUserDetails);
 
 }
 
 
-exports.editUsername = (req) => {
+exports.editUsername = async req => {
 
     let username = req.params?.id;
 
     if (isUndefined(username))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let isExistUsername = await Find.isExistUsername(username.toString().trim());
 
-        let phone = data.phoneNumber;
+    if (!isExistUsername)
+        return Json.builder(Response.HTTP_CONFLICT);
 
-        Find.isExistUsername(username.toString().trim(), result => {
+    let result = await Update.username(phone, username.toString().trim());
 
-            if (!result)
-                return Json.builder(Response.HTTP_CONFLICT);
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            Update.username(phone, username.toString().trim(), result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                Json.builder(Response.HTTP_OK);
-            });
-
-        });
-
-    });
-
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.editBio = (req) => {
+exports.editBio = async req => {
 
     let bio = req.params?.bio;
 
     if (isUndefined(bio))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let result = await Update.bio(phone, bio);
 
-        let phone = data.phoneNumber;
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-
-        Update.bio(phone, bio, result => {
-            if (!result)
-                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-            Json.builder(Response.HTTP_OK);
-        });
-
-
-    });
-
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.editName = (req) => {
+exports.editName = async req => {
 
     let bodyObject = req.body,
         lastName = bodyObject?.lastName,
@@ -117,25 +92,17 @@ exports.editName = (req) => {
     if (isUndefined(firstName))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let result = await Update.name(phone, firstName.toString().trim(), lastName);
 
-        let phone = data.phoneNumber;
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-        Update.name(phone, firstName.toString().trim(), lastName, result => {
-            if (!result)
-                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-            Json.builder(Response.HTTP_OK);
-        });
-
-
-    });
-
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.twoAuth = (req) => {
+exports.twoAuth = async req => {
 
     let bodyObject = req.body,
         email = bodyObject?.email,
@@ -144,153 +111,105 @@ exports.twoAuth = (req) => {
     if (isUndefined(email) || isUndefined(password) || password?.length < 6)
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let result = await Update.passwordAndEmail(phone, getHashData(password, phone), email);
 
-        let phone = data.phoneNumber;
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-
-        Update.passwordAndEmail(phone, getHashData(password, phone), email, result => {
-            if (!result)
-                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-            Json.builder(Response.HTTP_OK);
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.disableTwoAuth = () => {
+exports.disableTwoAuth = async () => {
 
+    let result = await Update.passwordAndEmail(phone, NULL, NULL);
 
-    getTokenPayLoad(data => {
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-        let phone = data.phoneNumber;
-
-        Update.passwordAndEmail(phone, NULL, NULL, result => {
-            if (!result)
-                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-            Json.builder(Response.HTTP_OK);
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.restPassword = (req) => {
+exports.restPassword = async req => {
+
     let bodyObject = req.body,
         oldPassword = bodyObject?.old,
         newPassword = bodyObject?.new;
 
-
     if (isUndefined(oldPassword) || isUndefined(newPassword))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let isValidPassword = await Find.isValidPassword(phone, getHashData(oldPassword, phone));
 
-    getTokenPayLoad(data => {
+    if (!isValidPassword)
+        return Json.builder(Response.HTTP_FORBIDDEN);
 
-        let phone = data.phoneNumber;
+    let result = await Update.password(phone, getHashData(newPassword, phone));
 
-        Find.isValidPassword(phone, getHashData(oldPassword, phone), result => {
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            if (!result)
-                return Json.builder(Response.HTTP_FORBIDDEN);
+    Json.builder(Response.HTTP_OK);
 
-            Update.password(phone, getHashData(newPassword, phone), result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+}
 
-                Json.builder(Response.HTTP_OK);
-            });
 
+exports.uploadAvatar = async (req, res) => {
+
+    multerImage(req, res, async () => {
+
+        let file = req.file;
+
+        if (isUndefined(file))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let {
+            url
+        } = File.validationAndWriteFile({
+            size: file.size,
+            dataBinary: file.buffer,
+            format: getFileFormat(file.originalname)
         });
+
+        let result = await Update.img(phone, url);
+
+        if (!result)
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        Json.builder(Response.HTTP_OK);
 
     });
 
 }
 
 
-exports.uploadAvatar = (req, res) => {
+exports.listOfBlockUsers = async () => {
 
+    let listOfBlockUser = await Find.getListOfBlockUsers(userId);
 
-    getTokenPayLoad(data => {
+    if (isUndefined(listOfBlockUser))
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-        let phone = data.phoneNumber;
+    let result = await Find.getUserDetailsInUsersTable(listOfBlockUser);
 
-
-        multerImage(req, res, () => {
-
-
-            let file = req.file;
-
-            if (isUndefined(file))
-                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-            let {
-                url
-            } = File.validationAndWriteFile({
-                size: file.size,
-                dataBinary: file.buffer,
-                format: getFileFormat(file.originalname)
-            });
-
-
-            Update.img(phone, url, result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                Json.builder(Response.HTTP_OK);
-            });
-
-        });
-
-    });
+    Json.builder(Response.HTTP_OK, result);
 
 }
 
 
-exports.listOfBlockUsers = () => {
+exports.listOfDevices = async () => {
 
-    getTokenPayLoad(data => {
-
-        let id = data.id;
-
-        Find.getListOfBlockUsers(id, data => {
-            if (isUndefined(data))
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            Find.getUserDetailsInUsersTable(data, result => {
-
-                Json.builder(Response.HTTP_OK, result);
-
-            });
-
-        });
-
-    });
+    let devices = await Find.getListOfDevices(userId);
+    Json.builder(Response.HTTP_OK, devices);
 
 }
 
 
-exports.listOfDevices = () => {
+exports.listOfMessage = async req => {
 
-    getTokenPayLoad(data => {
-
-        let id = data.id;
-
-        Find.getListOfDevices(id, result => {
-            Json.builder(Response.HTTP_OK, result);
-        });
-
-    });
-
-}
-
-
-exports.listOfMessage = (req) => {
     let queryObject = req.query,
         limit = queryObject?.limit,
         page = queryObject?.page,
@@ -304,59 +223,151 @@ exports.listOfMessage = (req) => {
         getPage = !isUndefined(page) ? page : 1,
         startFrom = (getPage - 1) * limit;
 
+    let isSavedMessageCreated = await FindInUser.isSavedMessageCreated(phone);
 
-    getTokenPayLoad(data => {
+    if (!isSavedMessageCreated)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-        let phone = data.phoneNumber;
+    let count = await Find.getCountOfListMessage(phone + 'SavedMessages');
 
-        FindInUser.isSavedMessageCreated(phone, result => {
+    let totalPages = Math.ceil(count / getLimit);
 
-            if (!result)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+    let listOfMessage = await FindInUser.getListOfMessage({
+        type: type,
+        sort: getSort,
+        search: search,
+        limit: getLimit,
+        order: getOrder,
+        startFrom: startFrom,
+        tableName: phone + 'SavedMessages'
+    });
+
+    Json.builder(
+        Response.HTTP_OK,
+        listOfMessage, {
+            totalPages: totalPages
+        }
+    );
+
+}
 
 
-            Find.getCountOfListMessage(phone + 'SavedMessages', count => {
+exports.deleteSavedMessage = async () => {
 
-                let totalPages = Math.ceil(count / getLimit);
+    let isSavedMessageCreated = await FindInUser.isSavedMessageCreated(phone);
 
-                FindInUser.getListOfMessage(phone + 'SavedMessages', startFrom, getLimit, getOrder, getSort, type, search, result => {
+    if (!isSavedMessageCreated)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    Json.builder(
-                        Response.HTTP_OK,
-                        result, {
-                            totalPages: totalPages
-                        }
-                    );
+    await Delete.savedMessage(phone);
 
-                });
+    Json.builder(Response.HTTP_OK);
 
+}
+
+
+exports.createSavedMessage = async () => {
+
+    let isSavedMessageCreated = await FindInUser.isSavedMessageCreated(phone);
+
+    if (isSavedMessageCreated)
+        return Json.builder(Response.HTTP_CONFLICT);
+
+    await Create.savedMessages(phone).then(() => AddUserForeignKey.savedMessages(phone));
+
+    Json.builder(Response.HTTP_CREATED);
+
+}
+
+
+exports.account = async () => {
+
+    Json.builder(Response.HTTP_OK);
+
+    await Delete.savedMessage(phone);
+    await Delete.userInAllUsersBlockList(userId);
+    await Delete.userInUsersTable(userId);
+    await Delete.userInDevices(userId);
+    await FindInUser.getListOfUserE2Es(userId).then(async result => {
+        if (result !== null)
+            await Delete.userInAllUsersE2E(result, userId);
+    });
+    await FindInUser.getListOfUserGroup(userId).then(async result => {
+        if (result !== null)
+            await Delete.userInAllUsersGroup(result, userId);
+    });
+    await FindInUser.getListOfUserChannel(userId).then(async result => {
+        if (result !== null)
+            await Delete.userInAllUsersChannel(result, userId);
+    });
+
+}
+
+
+exports.addMessage = async req => {
+
+    let message = Util.validateMessage(req.body);
+
+    if (message === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
+        return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+    let isSavedMessageCreated = await FindInUser.isSavedMessageCreated(phone);
+
+    if (!isSavedMessageCreated)
+        return Json.builder(Response.HTTP_NOT_FOUND);
+
+    await Insert.messageIntoUserSavedMessage(phone, message);
+
+    Json.builder(Response.HTTP_CREATED);
+
+}
+
+
+exports.uploadFile = async (req, res) => {
+
+    let isInDb = await Find.isExist(userId);
+
+    if (!isInDb)
+        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+    multerFile(req, res, async () => {
+
+        let data = JSON.parse(JSON.stringify(req.body));
+
+        let isSavedMessageCreated = await Find.isSavedMessageCreated(phone);
+
+        if (!isSavedMessageCreated)
+            return Json.builder(Response.HTTP_NOT_FOUND);
+
+        let message = Util.validateMessage(data);
+
+        if (message === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
+            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+        let file = req.file;
+
+        if (isUndefined(file))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let {
+            url,
+            size
+        } = File.validationAndWriteFile({
+            size: file.size,
+            dataBinary: file.buffer,
+            format: getFileFormat(file.originalname)
+        });
+
+        message['fileUrl'] = url;
+        message['fileSize'] = size;
+        message['fileName'] = file.originalname;
+
+        await CommonInsert.message('`' + phone + 'SavedMessages`', message, {
+            conversationType: 'Personal'
+        }).then(result => {
+            Json.builder(Response.HTTP_OK, {
+                insertId: result
             });
-
-        });
-
-    });
-
-
-}
-
-
-exports.deleteSavedMessage = () => {
-
-
-    getTokenPayLoad(data => {
-
-
-        let phone = data.phoneNumber;
-
-        FindInUser.isSavedMessageCreated(phone, result => {
-
-            if (!result)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            Delete.savedMessage(phone);
-
-            Json.builder(Response.HTTP_OK);
-
         });
 
     });
@@ -364,165 +375,7 @@ exports.deleteSavedMessage = () => {
 }
 
 
-exports.createSavedMessage = () => {
-
-
-    getTokenPayLoad(data => {
-
-
-        let phone = data.phoneNumber;
-
-        FindInUser.isSavedMessageCreated(phone, result => {
-
-            if (result)
-                return Json.builder(Response.HTTP_CONFLICT);
-
-            Create.savedMessages(phone);
-            AddUserForeignKey.savedMessages(phone);
-
-            Json.builder(Response.HTTP_CREATED);
-
-        });
-
-    });
-
-}
-
-
-exports.account = () => {
-
-
-    getTokenPayLoad(data => {
-
-
-        let phone = data.phoneNumber,
-            userId = data.id;
-
-        Json.builder(Response.HTTP_OK);
-
-        Delete.savedMessage(phone);
-        Delete.userInAllUsersBlockList(userId);
-        Delete.userInUsersTable(userId);
-        Delete.userInDevices(userId);
-        FindInUser.getListOfUserE2Es(userId, result => {
-            if (result !== null)
-                Delete.userInAllUsersE2E(result, userId);
-        });
-        FindInUser.getListOfUserGroup(userId, result => {
-            if (result !== null)
-                Delete.userInAllUsersGroup(result, userId);
-        });
-        FindInUser.getListOfUserChannel(userId, result => {
-            if (result !== null)
-                Delete.userInAllUsersChannel(result, userId);
-        });
-
-    });
-
-}
-
-
-exports.addMessage = (req) => {
-
-
-    getTokenPayLoad(data => {
-
-        let phone = data.phoneNumber;
-
-        Util.validateMessage(req.body, data => {
-
-            if (data === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
-                return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-            FindInUser.isSavedMessageCreated(phone, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
-
-                Insert.messageIntoUserSavedMessage(phone, data);
-
-                Json.builder(Response.HTTP_CREATED);
-            });
-
-        });
-
-
-    });
-
-}
-
-
-exports.uploadFile = (req, res) => {
-
-
-    getTokenPayLoad(data => {
-
-        let userId = data.id,
-            phone = data.phoneNumber;
-
-        Find.isExist(userId, isInDb => {
-
-            if (!isInDb)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-
-            multerFile(req, res, () => {
-
-                let data = JSON.parse(JSON.stringify(req.body));
-
-                Find.isSavedMessageCreated(phone, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
-
-                    Util.validateMessage(data, result => {
-
-                        if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
-                            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-
-                        let file = req.file;
-
-                        if (isUndefined(file))
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        let {
-                            url,
-                            size
-                        } = File.validationAndWriteFile({
-                            size: file.size,
-                            dataBinary: file.buffer,
-                            format: getFileFormat(file.originalname)
-                        });
-
-                        data['fileUrl'] = url;
-                        data['fileSize'] = size;
-                        data['fileName'] = file.originalname;
-
-
-                        CommonInsert.message('`' + phone + 'SavedMessages`', data, {
-                            conversationType: 'Personal'
-                        }, result => {
-                            Json.builder(Response.HTTP_OK, {
-                                insertId: result
-                            });
-                        });
-
-                    });
-
-                });
-
-            });
-
-        });
-
-    });
-
-
-};
-
-
-exports.deleteMessage = (req) => {
+exports.deleteMessage = async req => {
 
     let listOfId;
 
@@ -535,27 +388,19 @@ exports.deleteMessage = (req) => {
     if (isUndefined(listOfId))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let isSavedMessageCreated = await FindInUser.isSavedMessageCreated(phone);
 
-        let phone = data.phoneNumber;
+    if (!isSavedMessageCreated)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-        FindInUser.isSavedMessageCreated(phone, result => {
+    await Delete.itemInSavedMessage(phone, listOfId);
 
-            if (!result)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-            Delete.itemInSavedMessage(phone, listOfId);
-
-            Json.builder(Response.HTTP_OK);
-
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.editMessage = (req) => {
+exports.editMessage = async req => {
 
     let reqData = req.body,
         id = reqData?.id,
@@ -567,28 +412,18 @@ exports.editMessage = (req) => {
     delete reqData?.id;
     dataWithOutIdObject = reqData;
 
+    let message = Util.validateMessage(dataWithOutIdObject);
 
-    getTokenPayLoad(data => {
+    if (message === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
+        return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-        let phone = data.phoneNumber;
+    let isSavedMessageCreated = await FindInUser.isSavedMessageCreated(phone);
 
-        Util.validateMessage(dataWithOutIdObject, result => {
+    if (!isSavedMessageCreated)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-            if (result === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
-                return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+    await Update.itemInSavedMessage(phone, id, message);
 
-            FindInUser.isSavedMessageCreated(phone, result => {
-
-                if (!result)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
-                Update.itemInSavedMessage(phone, id);
-
-                Json.builder(Response.HTTP_OK);
-
-            });
-
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }

@@ -26,6 +26,8 @@ let Json = require('../../util/ReturnJson'),
     } = require('../../util/Util'),
     Generate = require('../../util/Generate');
 
+let tokenPayload = await getTokenPayLoad();
+let userId = tokenPayload.id;
 
 let validationChannelAndUser = async (roomId, userId) => {
 
@@ -115,9 +117,6 @@ let validationChannelAndUser = async (roomId, userId) => {
 
 exports.create = async (req, res) => {
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     multerImage(req, res, async () => {
 
         let file = req.file,
@@ -162,9 +161,6 @@ exports.deleteChannel = async req => {
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
     if (!isErr)
@@ -179,9 +175,6 @@ exports.deleteChannel = async req => {
 
 
 exports.uploadFile = async (req, res) => {
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     multerFile(req, res, async () => {
 
@@ -256,9 +249,6 @@ exports.changeName = async req => {
     if (isUndefined(name) || isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
     if (!isErr)
@@ -284,9 +274,6 @@ exports.changeDescription = async req => {
     if (isUndefined(id) || isUndefined(description))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
     if (!isErr)
@@ -302,9 +289,6 @@ exports.changeDescription = async req => {
 }
 
 exports.uploadAvatar = async (req, res) => {
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     multerImage(req, res, async () => {
 
@@ -350,9 +334,6 @@ exports.changeToInviteLink = async req => {
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
     if (!isErr)
@@ -379,9 +360,6 @@ exports.changeToPublicLink = async req => {
 
     if (isUndefined(id) || isUndefined(publicLink))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
@@ -414,9 +392,6 @@ exports.joinUser = async req => {
     if (isUndefined(id) || isUndefined(targetUserId))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationChannelAndUserAndJoinedInChannel(id, userId);
 
     if (!isErr)
@@ -440,9 +415,6 @@ exports.addAdmin = async req => {
 
     if (isUndefined(id) || isUndefined(userIdForNewAdmin))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let isErr = await validationChannelAndUser(id, userId);
 
@@ -482,9 +454,6 @@ exports.deleteAdmin = async req => {
     if (isUndefined(id) || isUndefined(userIdForDeleteAdmin))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
-
     let isErr = await validationChannelAndUser(id, userId);
 
     if (!isErr)
@@ -513,9 +482,6 @@ exports.leaveUser = async req => {
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let isErr = await validationChannelAndUserAndJoinedInChannel(id, userId);
 
@@ -548,9 +514,6 @@ exports.listOfMessage = async req => {
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let result = await FindInUser.getTableNameForListOfUserChannels(id, userId);
 
@@ -610,9 +573,6 @@ exports.allUsers = async req => {
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id;
 
     let isErr = await validationChannelAndUserAndOwnerOrAdmin(id, userId);
 

@@ -20,17 +20,129 @@ let Json = require('../../../util/ReturnJson'),
     } = require('../../../middleware/RouterUtil');
 
 
-let validationE2E = (id, from, cb) => {
+let tokenPayload = await getTokenPayLoad();
+let from = tokenPayload.id;
 
-    Find.isExist(id, isUserInDb => {
-        if (!isUserInDb)
+
+let validationE2E = async (id, from) => {
+
+    let isUserInDb = await Find.isExist(id);
+
+    if (!isUserInDb) {
+        Json.builder(Response.HTTP_USER_NOT_FOUND);
+        return false;
+    }
+
+    let result = await Find.getTableNameForListOfE2EMessage(from, id);
+
+    if (!result) {
+        Json.builder(Response.HTTP_NOT_FOUND);
+        return false;
+    }
+
+    return result;
+}
+
+
+exports.createE2EChat = async req => {
+
+    let userId = Number(req.body?.userId),
+        isNumber = Number.isInteger(userId);
+
+    if (!isNumber)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
+    let isInDb = await Find.isExist(userId);
+
+    if (!isInDb)
+        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+    let tokenUserId = userId;
+
+    let result = await Create.e2eContents(tokenUserId, userId);
+
+    if (!result)
+        return Json.builder(Response.HTTP_CONFLICT);
+
+    await AddUserForeignKey.e2eContents(tokenUserId, userId);
+
+    Json.builder(Response.HTTP_CREATED);
+
+    let tableName = tokenUserId + 'And' + userId + 'E2EContents';
+
+    await Insert.chatIdInListOfUserE2Es(tokenUserId, userId, tokenUserId, tableName);
+    await Insert.chatIdInListOfUserE2Es(userId, tokenUserId, userId, tableName);
+
+}
+
+
+exports.uploadFile = async (req, res) => {
+
+    let userId = from;
+
+    let isInDb = await Find.isExist(userId);
+
+    if (!isInDb)
+        return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+    multerFile(req, res, async () => {
+
+        let data = JSON.parse(JSON.stringify(req.body));
+        let receiverId = data?.receiverId;
+
+        if (isUndefined(receiverId))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        delete data?.receiverId;
+
+        let isInDb = await Find.isExist(receiverId);
+
+        if (!isInDb)
             return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-        Find.getTableNameForListOfE2EMessage(from, id, data => {
-            if (!data)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+        let isExistChatRoom = await Find.isExistChatRoom({
+            toUser: `${receiverId}`,
+            fromUser: `${userId}`
+        });
 
-            cb(data);
+        if (!isExistChatRoom)
+            return Json.builder(Response.HTTP_NOT_FOUND);
+
+        let message = Util.validateMessage(data);
+
+        if (message === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
+            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+        let toUser = receiverId;
+        let fromUser = data?.senderId;
+
+        if (isUndefined(toUser) || isUndefined(fromUser))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let file = req.file;
+
+        if (isUndefined(file))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let {
+            url,
+            size
+        } = await File.validationAndWriteFile({
+            size: file.size,
+            dataBinary: file.buffer,
+            format: getFileFormat(file.originalname)
+        });
+
+        message['fileUrl'] = url;
+        message['fileSize'] = size;
+        message['fileName'] = file.originalname;
+
+        await CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', message, {
+            conversationType: 'E2E'
+        }).then(result => {
+            Json.builder(Response.HTTP_CREATED, {
+                insertId: result
+            });
         });
 
     });
@@ -38,144 +150,8 @@ let validationE2E = (id, from, cb) => {
 }
 
 
-exports.createE2EChat = (req) => {
+exports.listOfMessage = async req => {
 
-    let userId = Number(req.body?.userId),
-        isNumber = Number.isInteger(userId);
-
-
-    if (!isNumber)
-        return Json.builder(Response.HTTP_BAD_REQUEST);
-
-
-    Find.isExist(userId, isInDb => {
-
-        if (!isInDb)
-            return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-
-        getTokenPayLoad(data => {
-
-            let tokenUserId = data.id;
-
-            Create.e2eContents(tokenUserId, userId, result => {
-
-
-                if (!result)
-                    return Json.builder(Response.HTTP_CONFLICT);
-
-
-                AddUserForeignKey.e2eContents(tokenUserId, userId);
-
-                Json.builder(Response.HTTP_CREATED);
-
-
-                let tableName = tokenUserId + 'And' + userId + 'E2EContents';
-
-                Insert.chatIdInListOfUserE2Es(tokenUserId, userId, tokenUserId, tableName);
-                Insert.chatIdInListOfUserE2Es(userId, tokenUserId, userId, tableName);
-
-
-            });
-
-        });
-
-    });
-
-};
-
-
-exports.uploadFile = (req, res) => {
-
-
-    getTokenPayLoad(data => {
-
-        let userId = data.id;
-
-        Find.isExist(userId, isInDb => {
-
-            if (!isInDb)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-
-            multerFile(req, res, () => {
-
-                let data = JSON.parse(JSON.stringify(req.body));
-                let receiverId = data?.receiverId;
-
-                if (isUndefined(receiverId))
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                delete data?.receiverId;
-
-                Find.isExist(receiverId, isInDb => {
-
-                    if (!isInDb)
-                        return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-                    Find.isExistChatRoom({
-                        toUser: `${receiverId}`,
-                        fromUser: `${userId}`
-                    }, result => {
-
-                        if (!result)
-                            return Json.builder(Response.HTTP_NOT_FOUND);
-
-                        Util.validateMessage(data, result => {
-
-                            if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
-                                return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-                            let toUser = receiverId;
-                            let fromUser = data?.senderId;
-
-                            if (isUndefined(toUser) || isUndefined(fromUser))
-                                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                            let file = req.file;
-
-                            if (isUndefined(file))
-                                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                            let {
-                                url,
-                                size
-                            } = File.validationAndWriteFile({
-                                size: file.size,
-                                dataBinary: file.buffer,
-                                format: getFileFormat(file.originalname)
-                            });
-
-                            data['fileUrl'] = url;
-                            data['fileSize'] = size;
-                            data['fileName'] = file.originalname;
-
-
-                            CommonInsert.message(fromUser + 'And' + toUser + 'E2EContents', data, {
-                                conversationType: 'E2E'
-                            }, result => {
-                                Json.builder(Response.HTTP_CREATED, {
-                                    insertId: result
-                                });
-                            });
-
-                        });
-
-                    });
-
-                });
-
-            });
-
-        });
-
-    });
-
-
-};
-
-
-exports.listOfMessage = (req) => {
     let queryObject = req.query,
         limit = queryObject?.limit,
         page = queryObject?.page,
@@ -193,147 +169,112 @@ exports.listOfMessage = (req) => {
     if (isUndefined(to))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let result = await Find.getTableNameForListOfE2EMessage(from, to);
 
-        let from = data.id;
+    if (!result)
+        return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-        Find.getTableNameForListOfE2EMessage(from, to, data => {
+    let count = await Find.getCountOfListMessage(result);
 
-            if (!data)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+    let totalPages = Math.ceil(count / getLimit);
 
-
-            Find.getCountOfListMessage(data, count => {
-
-                let totalPages = Math.ceil(count / getLimit);
-
-                Find.getListOfMessage(data, startFrom, getLimit, getOrder, getSort, type, search, result => {
-
-                    Json.builder(
-                        Response.HTTP_OK,
-                        result, {
-                            totalPages: totalPages
-                        }
-                    );
-
-                });
-
-            });
-
-        });
-
-
+    let listOfMessage = await Find.getListOfMessage({
+        type: type,
+        sort: getSort,
+        search: search,
+        limit: getLimit,
+        order: getOrder,
+        startFrom: startFrom,
+        tableName: data
     });
 
+    Json.builder(
+        Response.HTTP_OK,
+        listOfMessage, {
+            totalPages: totalPages
+        }
+    );
 
 }
 
 
-exports.user = (req) => {
+exports.user = async req => {
 
     let id = req.query?.id;
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let isUserInDb = await Find.isExist(id);
 
-    Find.isExist(id, isUserInDb => {
-        if (!isUserInDb)
-            return Json.builder(Response.HTTP_USER_NOT_FOUND);
+    if (!isUserInDb)
+        return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-        Find.getUserPvDetails(id, result => {
-            Json.builder(Response.HTTP_OK, result);
-        });
+    let userPvDetails = await Find.getUserPvDetails(id);
 
-    });
-
+    Json.builder(Response.HTTP_OK, userPvDetails);
 
 }
 
-exports.deleteForMe = (req) => {
+exports.deleteForMe = async req => {
 
     let id = req.params?.id;
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let isErr = await validationE2E(id, from);
 
-        let from = data.id;
+    if (!isErr)
+        return;
 
-        validationE2E(id, from, () => {
+    await Delete.chatInListOfChatsForUser(from, id, from);
 
-            Delete.chatInListOfChatsForUser(from, id, from);
-
-            Json.builder(Response.HTTP_OK);
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
-exports.deleteForUs = (req) => {
-
+exports.deleteForUs = async req => {
 
     let id = req.params?.id;
-
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let nameOfE2ERoom = await validationE2E(id, from);
 
-    getTokenPayLoad(data => {
+    if (nameOfE2ERoom === false)
+        return;
 
-        let from = data.id;
+    await Delete.chat(nameOfE2ERoom);
 
-        validationE2E(id, from, data => {
-
-            Delete.chat(data, () => {
-
-                Delete.chatInListOfChatsForUser(from, id, from);
-                Delete.chatInListOfChatsForUser(from, id, id);
-                Json.builder(Response.HTTP_OK);
-
-            });
-
-        });
-
-    });
-
+    await Delete.chatInListOfChatsForUser(from, id, from);
+    await Delete.chatInListOfChatsForUser(from, id, id);
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.blockUser = (req) => {
-
+exports.blockUser = async req => {
 
     let id = req.body?.id;
 
-
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let isUserInDb = await Find.isExist(id);
 
-    getTokenPayLoad(data => {
+    if (!isUserInDb)
+        return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-        let from = data.id;
+    let isBlock = await Find.isBlock(from, id);
 
-        Find.isExist(id, isUserInDb => {
-            if (!isUserInDb)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+    if (!isBlock) {
+        await Insert.addUserToUsersBlockList(from, id);
+        return Json.builder(Response.HTTP_OK);
+    }
 
-            Find.isBlock(from, id, result => {
-                if (!result) {
-                    Insert.addUserToUsersBlockList(from, id);
-                    return Json.builder(Response.HTTP_OK);
-                }
-
-                Delete.removeUserInUsersBlockList(from, id);
-                Json.builder(Response.HTTP_OK);
-            });
-
-        });
-
-    });
+    await Delete.removeUserInUsersBlockList(from, id);
+    Json.builder(Response.HTTP_OK);
 
 }

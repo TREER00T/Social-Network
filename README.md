@@ -41,7 +41,7 @@ Open cmd and run the following commands.
 
 
 ```shell
-node cmd.js db
+node cmd.js serve
 ```
 
 TIP : Before running this command, make sure that your database and server are on.
