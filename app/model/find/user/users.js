@@ -278,7 +278,7 @@ module.exports = {
                     get: STAR,
                     from: `${data.tableName}`,
                     where: {
-                        type: type
+                        type: data.type
                     },
                     option: {
                         order: [[data.order], data.sort],
