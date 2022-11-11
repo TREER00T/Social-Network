@@ -4,12 +4,12 @@ let Server = require('../../io/connect/socket');
 
 module.exports = {
 
-    searchAndReplaceInArrayOfUserIdToSocketId(arrayOfUsersId, users, cb) {
+    searchAndReplaceInArrayOfUserIdToSocketId(arrayOfUsersId, users) {
         let listOfUsersSocketId = [];
         let isArrayNull = arrayOfUsersId?.length === 0;
 
         if (isArrayNull)
-            return cb(listOfUsersSocketId);
+            return listOfUsersSocketId;
 
         arrayOfUsersId.forEach(item => {
 
@@ -17,25 +17,23 @@ module.exports = {
                 let userId = users[socketId].data.userId;
 
                 if (userId === item)
-                    listOfUsersSocketId.push(
-                        {
+                    listOfUsersSocketId.push({
                             userId: userId,
                             socketId: socketId
-
-                        }
-                    );
+                    });
             }
 
         });
+
         let isNullResponse = listOfUsersSocketId.length === 0;
         if (isNullResponse)
-            return cb('IN_VALID_USER_ID');
+            return 'IN_VALID_USER_ID';
 
-        cb(listOfUsersSocketId);
+        return listOfUsersSocketId;
     },
 
 
-    searchAndReplaceUserIdToSocketId(userIdData, users, cb) {
+    searchAndReplaceUserIdToSocketId(userIdData, users) {
         let realSocketId = '';
 
         for (let socketId in users) {
@@ -43,31 +41,30 @@ module.exports = {
 
             if (userId === userIdData)
                 realSocketId = socketId;
-
         }
 
-        let isNullResponse = realSocketId === '';
-        if (isNullResponse)
-            return cb('IN_VALID_USER_ID');
+        if (!realSocketId)
+            return 'IN_VALID_USER_ID';
 
-        cb(realSocketId);
+        return realSocketId;
     },
 
 
-    sendUserOnlineStatusForSpecificUsers(arr, isOnline) {
+    async sendUserOnlineStatusForSpecificUsers(arr, isOnline) {
 
         let isArrayNull = arr?.length === 0;
 
         if (arr !== undefined && !isArrayNull) {
 
-            arr.forEach((item, index) => {
+            for (const item of arr) {
+                const index = arr.indexOf(item);
 
-                Server.io.to(item[index].socketId).emit('onlineStatus', {
+               await Server.io.to(item[index].socketId).emit('onlineStatus', {
                     userId: item[index].userId,
                     isOnline: isOnline
                 });
 
-            });
+            }
 
         }
 
