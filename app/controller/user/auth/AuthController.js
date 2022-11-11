@@ -22,8 +22,12 @@ let Json = require('../../../util/ReturnJson'),
     AddUserForeignKey = require('../../../model/add/foreignKey/users');
 
 
-exports.gvc = async req => {
+let tokenPayload = await getTokenPayLoad();
+let userId = tokenPayload.id,
+    phone = tokenPayload.phoneNumber;
 
+
+exports.gvc = async req => {
 
     let phone = req.body?.phone;
 
@@ -129,9 +133,6 @@ exports.isValidPassword = async req => {
         isUndefined(deviceIp) || isUndefined(deviceLocation))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    let tokenPayload = await getTokenPayLoad();
-    let phone = tokenPayload.phoneNumber;
-
     let isValidPassword = await Find.isValidPassword(phone, getHashData(password.trim(), phone));
 
     if (!isValidPassword)
@@ -154,10 +155,6 @@ exports.isValidPassword = async req => {
 
 
 exports.refreshToken = async () => {
-
-    let tokenPayload = await getTokenPayLoad();
-    let userId = tokenPayload.id,
-        phone = tokenPayload.phoneNumber;
 
     let isInDb = await Find.userPhone(phone);
 

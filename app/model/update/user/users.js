@@ -229,12 +229,13 @@ module.exports = {
 
     },
 
-    async itemInSavedMessage(phone, id) {
+    async itemInSavedMessage(phone, id, data) {
         await openSql.update({
             table: phone + 'SavedMessages',
             where: {
                 id: id
-            }
+            },
+            data: data
         });
     }
 
