@@ -129,7 +129,7 @@ exports.create = async (req, res) => {
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
         if (!isUndefined(file))
-            fileUrl = File.validationAndWriteFile({
+            fileUrl = await File.validationAndWriteFile({
                 size: file.size,
                 dataBinary: file.buffer,
                 format: getFileFormat(file.originalname)
@@ -223,7 +223,7 @@ exports.uploadFile = async (req, res) => {
         let {
             url,
             size
-        } = File.validationAndWriteFile({
+        } = await File.validationAndWriteFile({
             size: file.size,
             dataBinary: file.buffer,
             format: getFileFormat(file.originalname)
@@ -325,7 +325,7 @@ exports.uploadAvatar = async (req, res) => {
 
         let {
             url
-        } = File.validationAndWriteFile({
+        } = await File.validationAndWriteFile({
             size: file.size,
             dataBinary: file.buffer,
             format: getFileFormat(file.originalname)

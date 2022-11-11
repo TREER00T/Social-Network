@@ -22,7 +22,7 @@ let Json = require('../../../util/ReturnJson'),
     AddUserForeignKey = require('../../../model/add/foreignKey/users');
 
 
-exports.gvc = (req) => {
+exports.gvc = async req => {
 
 
     let phone = req.body?.phone;
@@ -30,39 +30,30 @@ exports.gvc = (req) => {
     if (!isPhoneNumber(phone))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    Find.userPhone(phone, isInDb => {
+    let isInDb = await Find.userPhone(phone);
 
-        if (!isInDb) {
+    if (!isInDb) {
+        await CreateUser.savedMessages(phone).then(() => AddUserForeignKey.savedMessages(phone));
 
-            CreateUser.savedMessages(phone);
-            AddUserForeignKey.savedMessages(phone);
+        let isAdded = await Insert.phoneAndAuthCode(phone, getVerificationCode(), getRandomHexColor());
 
-            Insert.phoneAndAuthCode(phone, getVerificationCode(), getRandomHexColor(), isAdded => {
-                if (!isAdded)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+        if (!isAdded)
+            return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Json.builder(Response.HTTP_CREATED);
-            });
+        return Json.builder(Response.HTTP_CREATED);
+    }
 
-        }
+    let isUpdated = await Update.authCode(phone, getVerificationCode());
 
-        if (isInDb) {
-            Update.authCode(phone, getVerificationCode(), isUpdated => {
-                if (!isUpdated)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+    if (!isUpdated)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Json.builder(Response.HTTP_OK);
-            });
-        }
-
-
-    });
-
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.isValidAuthCode = (req) => {
+exports.isValidAuthCode = async req => {
 
     let bodyObject = req.body,
         phone = bodyObject?.phone,
@@ -75,79 +66,58 @@ exports.isValidAuthCode = (req) => {
         (isUndefined(deviceName) || isUndefined(deviceIp) || isUndefined(deviceLocation)))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    Find.isValidAuthCode(phone, authCode, result => {
+    let isValidAuthCode = await Find.isValidAuthCode(phone, authCode);
 
-        if (!result)
-            return Json.builder(Response.HTTP_UNAUTHORIZED);
+    if (!isValidAuthCode)
+        return Json.builder(Response.HTTP_UNAUTHORIZED);
 
+    let password = await Find.password(phone);
 
-        Find.password(phone, result => {
+    if (password) {
 
-            if (result) {
+        let user = await Find.getApiKeyAndUserId(phone);
 
-                return Find.getApiKeyAndUserId(phone, result => {
-
-                    Insert.userDeviceInformation({
-                        id: result.id,
-                        ip: deviceIp,
-                        name: deviceName,
-                        location: deviceLocation
-                    });
-
-                    (async () => {
-
-                        Json.builder(
-                            Response.HTTP_ACCEPTED,
-                            {
-                                accessToken: await getJwtEncrypt(getJwtSign({
-                                    phoneNumber: `${phone}`,
-                                    id: `${result.id}`,
-                                    expiresIn: '12h',
-                                    type: 'at'
-                                }, phone)),
-                                refreshToken: await getJwtEncrypt(getJwtSign({
-                                    phoneNumber: `${phone}`,
-                                    id: `${result.id}`,
-                                    expiresIn: '1d',
-                                    type: 'rt'
-                                }, phone)),
-                                apiKey: result.apiKey
-                            }
-                        )
-
-                    })();
-
-                });
-
-            }
-
-            Find.getApiKey(phone, result => {
-
-                if (!isUndefined(result))
-                    return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
-
-
-                Update.apikey(phone, getRandomHash(50), result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                    Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
-                });
-
-
-            });
-
-
+        await Insert.userDeviceInformation({
+            id: user.id,
+            ip: deviceIp,
+            name: deviceName,
+            location: deviceLocation
         });
 
-    });
+        return Json.builder(Response.HTTP_ACCEPTED, {
+            accessToken: await getJwtEncrypt(getJwtSign({
+                phoneNumber: `${phone}`,
+                id: `${user.id}`,
+                expiresIn: '12h',
+                type: 'at'
+            }, phone)),
+            refreshToken: await getJwtEncrypt(getJwtSign({
+                phoneNumber: `${phone}`,
+                id: `${user.id}`,
+                expiresIn: '1d',
+                type: 'rt'
+            }, phone)),
+            apiKey: user.apiKey
+        });
 
+    }
+
+    let apiKey = await Find.getApiKey(phone);
+
+    if (!isUndefined(apiKey))
+        return Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
+
+    let newApiKey = await Update.apikey(phone, getRandomHash(50));
+
+    if (!newApiKey)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
+
+    Json.builder(Response.HTTP_OK_BUT_TWO_STEP_VERIFICATION);
 
 }
 
 
-exports.isValidPassword = (req) => {
+exports.isValidPassword = async req => {
 
     let bodyObject = req?.body,
         deviceName = bodyObject?.deviceName,
@@ -159,81 +129,54 @@ exports.isValidPassword = (req) => {
         isUndefined(deviceIp) || isUndefined(deviceLocation))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let phone = tokenPayload.phoneNumber;
 
+    let isValidPassword = await Find.isValidPassword(phone, getHashData(password.trim(), phone));
 
-        let phone = data.phoneNumber;
+    if (!isValidPassword)
+        return Json.builder(Response.HTTP_FORBIDDEN);
 
-        Find.isValidPassword(phone, getHashData(password.trim(), phone), result => {
+    let user = await Find.getApiKeyAndUserId(phone);
 
-
-            if (!result)
-                return Json.builder(Response.HTTP_FORBIDDEN);
-
-
-            Find.getApiKeyAndUserId(phone, result => {
-
-                Insert.userDeviceInformation({
-                    id: result.id,
-                    ip: deviceIp,
-                    name: deviceName,
-                    location: deviceLocation
-                });
-
-                Json.builder(Response.HTTP_ACCEPTED, {
-                    apiKey: result.apiKey
-                });
-
-            });
-
-        });
-
+    await Insert.userDeviceInformation({
+        id: user.id,
+        ip: deviceIp,
+        name: deviceName,
+        location: deviceLocation
     });
 
+    Json.builder(Response.HTTP_ACCEPTED, {
+        apiKey: user.apiKey
+    });
 
 }
 
 
-exports.refreshToken = () => {
+exports.refreshToken = async () => {
 
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id,
+        phone = tokenPayload.phoneNumber;
 
-    getTokenPayLoad(data => {
+    let isInDb = await Find.userPhone(phone);
 
-        let phone = data.phoneNumber,
-            id = data.id;
+    if (!isInDb)
+        return Json.builder(Response.HTTP_FORBIDDEN);
 
-
-        Find.userPhone(phone, isInDb => {
-
-            if (!isInDb)
-                return Json.builder(Response.HTTP_FORBIDDEN);
-
-
-            (async () => {
-
-                Json.builder(
-                    Response.HTTP_ACCEPTED,
-                    {
-                        accessToken: await getJwtEncrypt(getJwtSign({
-                            phoneNumber: `${phone}`,
-                            id: `${id}`,
-                            expiresIn: '12h',
-                            type: 'at'
-                        }, phone)),
-                        refreshToken: await getJwtEncrypt(getJwtSign({
-                            phoneNumber: `${phone}`,
-                            id: `${id}`,
-                            expiresIn: '1d',
-                            type: 'rt'
-                        }, phone))
-                    }
-                )
-
-            })();
-
-        });
-
+    Json.builder(Response.HTTP_ACCEPTED, {
+        accessToken: await getJwtEncrypt(getJwtSign({
+            phoneNumber: `${phone}`,
+            id: `${userId}`,
+            expiresIn: '12h',
+            type: 'at'
+        }, phone)),
+        refreshToken: await getJwtEncrypt(getJwtSign({
+            phoneNumber: `${phone}`,
+            id: `${userId}`,
+            expiresIn: '1d',
+            type: 'rt'
+        }, phone))
     });
-
 
 }

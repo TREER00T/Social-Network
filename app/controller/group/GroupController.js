@@ -27,217 +27,204 @@ let Json = require('../../util/ReturnJson'),
     Generate = require('../../util/Generate');
 
 
-let validationGroupAndUser = (roomId, userId, cb) => {
+let validationGroupAndUser = async (roomId, userId) => {
 
-        FindInGroup.id(roomId, isDefined => {
+        let isDefined = await FindInGroup.id(roomId);
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+        if (!isDefined) {
+            Json.builder(Response.HTTP_NOT_FOUND);
+            return false;
+        }
 
-            FindInUser.isExist(userId, result => {
+        let isExist = await FindInUser.isExist(userId);
 
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+        if (!isExist) {
+            Json.builder(Response.HTTP_USER_NOT_FOUND);
+            return false;
+        }
 
-                cb();
-            });
-
-        });
-
+        return true;
     },
-    validationGroupAndUserAndOwnerUser = (roomId, userId, cb) => {
+    validationGroupAndUserAndOwnerUser = async (roomId, userId) => {
 
-        validationGroupAndUser(roomId, userId, () => {
+        let isErr = await validationGroupAndUser(roomId, userId);
 
-            FindInGroup.isOwner(userId, roomId, result => {
+        if (!isErr)
+            return false;
 
-                if (!result)
-                    return Json.builder(Response.HTTP_FORBIDDEN);
+        let isOwner = await FindInGroup.isOwner(userId, roomId);
 
-                cb();
-            });
+        if (!isOwner) {
+            Json.builder(Response.HTTP_FORBIDDEN);
+            return false;
+        }
 
-        });
-
+        return true;
     },
-    validationGroupAndUserAndJoinedInGroup = (roomId, userId, cb) => {
+    validationGroupAndUserAndJoinedInGroup = async (roomId, userId) => {
 
-        validationGroupAndUser(roomId, userId, () => {
+        let isErr = await validationGroupAndUser(roomId, userId);
 
-            FindInGroup.isJoined(roomId, userId, result => {
+        if (!isErr)
+            return false;
 
-                if (result)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
+        let isJoined = await FindInGroup.isJoined(roomId, userId);
 
-                cb();
-            });
+        if (isJoined) {
+            Json.builder(Response.HTTP_NOT_FOUND);
+            return false;
+        }
 
-        });
-
+        return true;
     },
-    isExistAndIsOwnerOfGroup = (userIdForAdmin, userId, groupId, cb) => {
+    isExistAndIsOwnerOfGroup = async (userIdForAdmin, userId, groupId) => {
 
-        FindInUser.isExist(userIdForAdmin, result => {
+        let isExist = await FindInUser.isExist(userIdForAdmin);
 
-            if (!result)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+        if (!isExist) {
+            Json.builder(Response.HTTP_USER_NOT_FOUND);
+            return false;
+        }
 
+        let isOwner = await FindInGroup.isOwner(userId, groupId);
 
-            FindInGroup.isOwner(userId, groupId, result => {
+        if (!isOwner) {
+            Json.builder(Response.HTTP_FORBIDDEN);
+            return false;
+        }
 
-                if (!result)
-                    return Json.builder(Response.HTTP_FORBIDDEN);
-
-                cb();
-            });
-
-        });
+        return true;
     };
 
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-        let userId = data.id;
+    multerImage(req, res, async () => {
 
-        multerImage(req, res, () => {
+        let name = req.body?.name;
 
-            let name = req.body?.name;
+        if (isUndefined(name))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            if (isUndefined(name))
-                return Json.builder(Response.HTTP_BAD_REQUEST);
+        let file = req.file,
+            fileUrl,
+            isOwner = 1;
 
-            let file = req.file,
-                fileUrl,
-                isOwner = 1;
-
-
-            if (!isUndefined(file))
-                fileUrl = File.validationAndWriteFile({
-                    size: file.size,
-                    dataBinary: file.buffer,
-                    format: getFileFormat(file.originalname)
-                }).url;
+        if (!isUndefined(file))
+            fileUrl = await File.validationAndWriteFile({
+                size: file.size,
+                dataBinary: file.buffer,
+                format: getFileFormat(file.originalname)
+            }).url;
 
 
-            InsertInGroup.group(name.toString().trim(), Generate.makeIdForInviteLink(), getRandomHexColor(), fileUrl, id => {
+        let id = await InsertInGroup.group(name.toString().trim(), Generate.makeIdForInviteLink(), getRandomHexColor(), fileUrl);
 
-                if (isUndefined(id))
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+        if (isUndefined(id))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Create.groupContents(id);
-                AddGroupForeignKey.groupContents(id);
-                InsertInGroup.admin(userId, id, isOwner);
-                InsertInGroup.user(userId, id);
+        await Create.groupContents(id)
+            .then(() => AddGroupForeignKey.groupContents(id)
+                .then(async () => {
+                    await InsertInGroup.admin(userId, id, isOwner);
+                    await InsertInGroup.user(userId, id);
+                }));
 
-                Json.builder(Response.HTTP_CREATED);
-            });
-
-        });
+        Json.builder(Response.HTTP_CREATED);
 
     });
-
 
 }
 
 
-exports.uploadFile = (req, res) => {
+exports.uploadFile = async (req, res) => {
 
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-    getTokenPayLoad(data => {
+    multerFile(req, res, async () => {
 
-        let userId = data.id;
+        let data = JSON.parse(JSON.stringify(req.body)),
+            groupId = data?.groupId,
+            receiverId = data?.receiverId;
 
-        multerFile(req, res, () => {
+        if (isUndefined(groupId))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            let data = JSON.parse(JSON.stringify(req.body)),
-                groupId = data?.groupId,
-                receiverId = data?.receiverId;
+        if (!isUndefined(receiverId))
+            delete data?.receiverId;
 
-            if (isUndefined(groupId))
-                return Json.builder(Response.HTTP_BAD_REQUEST);
+        delete data?.groupId;
 
-            if (!isUndefined(receiverId))
-                delete data?.receiverId;
+        let isErr = await validationGroupAndUserAndJoinedInGroup(groupId, userId);
 
-            delete data?.groupId;
+        if (!isErr)
+            return;
 
-            validationGroupAndUserAndJoinedInGroup(groupId, userId, () => {
+        let message = Util.validateMessage(data);
 
-                Util.validateMessage(data, result => {
+        if (message === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
+            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-                    if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
-                        return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+        let file = req.file;
 
+        message['senderId'] = userId;
+        if (isUndefined(file))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                    let file = req.file;
+        let {
+            url,
+            size
+        } = await File.validationAndWriteFile({
+            size: file.size,
+            dataBinary: file.buffer,
+            format: getFileFormat(file.originalname)
+        });
 
-                    data['senderId'] = userId;
-                    if (isUndefined(file))
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
+        message['fileUrl'] = url;
+        message['fileSize'] = size;
+        message['fileName'] = file.originalname;
 
-                    let {
-                        url,
-                        size
-                    } = File.validationAndWriteFile({
-                        size: file.size,
-                        dataBinary: file.buffer,
-                        format: getFileFormat(file.originalname)
-                    });
-
-                    data['fileUrl'] = url;
-                    data['fileSize'] = size;
-                    data['fileName'] = file.originalname;
-
-
-                    CommonInsert.message('`' + groupId + 'GroupContents`', data, {
-                        conversationType: 'Group'
-                    }, result => {
-                        Json.builder(Response.HTTP_CREATED, {
-                            insertId: result
-                        });
-                    });
-
-                });
-
+        await CommonInsert.message('`' + groupId + 'GroupContents`', message, {
+            conversationType: 'Group'
+        }).then(result => {
+            Json.builder(Response.HTTP_CREATED, {
+                insertId: result
             });
-
         });
 
     });
 
+}
 
-};
 
-
-exports.deleteGroup = (req) => {
-
+exports.deleteGroup = async req => {
 
     let id = req.params?.id;
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-        let userId = data.id;
+    let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
-        validationGroupAndUserAndOwnerUser(id, userId, () => {
+    if (!isErr)
+        return;
 
-            DeleteInGroup.group(id);
-            DeleteInGroup.groupAdmins(id);
-            DeleteInGroup.groupUsers(id);
-            DeleteInUser.groupInListOfUserGroups(id);
-
-        });
-
-    });
+    await DeleteInGroup.group(id);
+    await DeleteInGroup.groupAdmins(id);
+    await DeleteInGroup.groupUsers(id);
+    await DeleteInUser.groupInListOfUserGroups(id);
 
 }
 
 
-exports.changeName = (req) => {
+exports.changeName = async req => {
 
     let bodyObject = req.body,
         name = bodyObject?.name,
@@ -246,27 +233,25 @@ exports.changeName = (req) => {
     if (isUndefined(name) || isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-        let userId = data.id;
+    let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
-        validationGroupAndUserAndOwnerUser(id, userId, () => {
+    if (!isErr)
+        return;
 
-            UpdateInGroup.name(id, name.toString().trim(), result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+    let result = await UpdateInGroup.name(id, name.toString().trim());
 
-                Json.builder(Response.HTTP_OK);
-            });
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.changeDescription = (req) => {
+exports.changeDescription = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
@@ -275,106 +260,94 @@ exports.changeDescription = (req) => {
     if (isUndefined(id) || isUndefined(description))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-        let userId = data.id;
+    let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
-        validationGroupAndUserAndOwnerUser(id, userId, () => {
+    if (!isErr)
+        return;
 
-            UpdateInGroup.description(id, description, result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+    let result = await UpdateInGroup.description(id, description);
 
-                Json.builder(Response.HTTP_OK);
-            });
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    Json.builder(Response.HTTP_OK);
 
+}
+
+exports.uploadAvatar = async (req, res) => {
+
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
+
+    multerImage(req, res, async () => {
+
+        let id = req.body?.id;
+
+        if (isUndefined(id))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
+
+        if (!isErr)
+            return;
+
+        let file = req.file;
+
+        if (isUndefined(file))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let {
+            url
+        } = await File.validationAndWriteFile({
+            size: file.size,
+            dataBinary: file.buffer,
+            format: getFileFormat(file.originalname)
         });
+
+        let result = await UpdateInGroup.img(id, url);
+
+        if (!result)
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        Json.builder(Response.HTTP_CREATED);
 
     });
 
 }
 
-exports.uploadAvatar = (req, res) => {
 
-
-    getTokenPayLoad(data => {
-
-        let userId = data.id;
-
-        multerImage(req, res, () => {
-
-            let id = req.body?.id;
-
-            if (isUndefined(id))
-                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-
-            validationGroupAndUserAndOwnerUser(id, userId, () => {
-
-                let file = req.file;
-
-                if (isUndefined(file))
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                let {
-                    url
-                } = File.validationAndWriteFile({
-                    size: file.size,
-                    dataBinary: file.buffer,
-                    format: getFileFormat(file.originalname)
-                });
-
-                UpdateInGroup.img(id, url, result => {
-                    if (!result)
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                    Json.builder(Response.HTTP_CREATED);
-                });
-
-            });
-
-        });
-
-    });
-
-
-}
-
-
-exports.changeToInviteLink = (req) => {
+exports.changeToInviteLink = async req => {
 
     let id = req.body?.id;
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
+    let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
+    let link = Generate.makeIdForInviteLink();
 
-        validationGroupAndUserAndOwnerUser(id, userId, () => {
+    let result = await UpdateInGroup.inviteLink(id, link);
 
-            let link = Generate.makeIdForInviteLink();
-            UpdateInGroup.inviteLink(id, link, result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Json.builder(Response.HTTP_OK, {
-                    inviteLink: link
-                });
-
-            });
-
-        });
-
+    Json.builder(Response.HTTP_OK, {
+        inviteLink: link
     });
 
 }
 
-exports.changeToPublicLink = (req) => {
+exports.changeToPublicLink = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
@@ -383,71 +356,59 @@ exports.changeToPublicLink = (req) => {
     if (isUndefined(id) || isUndefined(publicLink))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-    getTokenPayLoad(data => {
+    let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
+    if (!isErr)
+        return;
 
-        let userId = data.id;
+    let realPublicLink = Generate.makeIdForPublicLink(publicLink);
 
+    let isPublicKeyUsed = await FindInGroup.isPublicKeyUsed(realPublicLink);
 
-        validationGroupAndUserAndOwnerUser(id, userId, () => {
+    if (!isPublicKeyUsed)
+        return Json.builder(Response.HTTP_CONFLICT);
 
-            let publicLink = Generate.makeIdForPublicLink(publicLink);
+    let result = await UpdateInGroup.publicLink(id, realPublicLink);
 
-            FindInGroup.isPublicKeyUsed(publicLink, result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_CONFLICT);
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                UpdateInGroup.publicLink(id, publicLink, result => {
-                    if (!result)
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                    Json.builder(Response.HTTP_OK);
-                });
-
-            });
-
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.joinUser = (req) => {
-
+exports.joinUser = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
         targetUserId = bodyObject?.userId;
 
-
     if (isUndefined(id) || isUndefined(targetUserId))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-    getTokenPayLoad(data => {
+    let isErr = await validationGroupAndUserAndOwnerUser(id, userId);
 
+    if (!isErr)
+        return;
 
-        let userId = data.id;
+    let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
 
+    await InsertInGroup.user(id, getUserId);
+    await InsertInUser.groupIntoListOfUserGroups(id, getUserId);
 
-        validationGroupAndUserAndOwnerUser(id, userId, () => {
-
-            let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
-
-            InsertInGroup.user(id, getUserId);
-            InsertInUser.groupIntoListOfUserGroups(id, getUserId);
-
-            Json.builder(Response.HTTP_CREATED);
-        });
-
-    });
+    Json.builder(Response.HTTP_CREATED);
 
 }
 
 
-exports.addAdmin = (req) => {
+exports.addAdmin = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
@@ -456,44 +417,37 @@ exports.addAdmin = (req) => {
     if (isUndefined(userIdForNewAdmin) || isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
+    let isErr = await validationGroupAndUser(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
-        validationGroupAndUser(id, userId, () => {
+    let isErrAgain = await isExistAndIsOwnerOfGroup(userIdForNewAdmin, userId, id);
 
-            isExistAndIsOwnerOfGroup(userIdForNewAdmin, userId, id, () => {
+    if (!isErrAgain)
+        return;
 
-                FindInGroup.isJoined(id, userIdForNewAdmin, result => {
+    let isJoined = await FindInGroup.isJoined(id, userIdForNewAdmin);
 
-                    if (!result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
+    if (!isJoined)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    FindInGroup.isAdmin(id, userIdForNewAdmin, result => {
+    let isAdmin = await FindInGroup.isAdmin(id, userIdForNewAdmin);
 
-                        if (result)
-                            return Json.builder(Response.HTTP_CONFLICT);
+    if (isAdmin)
+        return Json.builder(Response.HTTP_CONFLICT);
 
-                        let isNotOwner = 0;
-                        InsertInGroup.admin(userIdForNewAdmin, id, isNotOwner);
+    let isNotOwner = 0;
+    await InsertInGroup.admin(userIdForNewAdmin, id, isNotOwner);
 
-
-                        Json.builder(Response.HTTP_CREATED);
-                    });
-
-                });
-
-            });
-
-        });
-
-    });
+    Json.builder(Response.HTTP_CREATED);
 
 }
 
-exports.deleteAdmin = (req) => {
-
+exports.deleteAdmin = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
@@ -502,64 +456,55 @@ exports.deleteAdmin = (req) => {
     if (isUndefined(id) || isUndefined(userIdForDeleteAdmin))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
+    let isErr = await validationGroupAndUser(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
-        validationGroupAndUser(id, userId, () => {
+    let isErrAgain = await isExistAndIsOwnerOfGroup(userIdForDeleteAdmin, userId, id);
 
-            isExistAndIsOwnerOfGroup(userIdForDeleteAdmin, userId, id, () => {
+    if (!isErrAgain)
+        return;
 
-                FindInGroup.isAdmin(id, userIdForDeleteAdmin, result => {
+    let isAdmin = await FindInGroup.isAdmin(id, userIdForDeleteAdmin);
 
-                    if (!result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
+    if (!isAdmin)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    DeleteInGroup.admin(id, userIdForDeleteAdmin);
+    await DeleteInGroup.admin(id, userIdForDeleteAdmin);
 
-
-                    Json.builder(Response.HTTP_OK);
-                });
-
-            });
-
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.leaveUser = (req) => {
-
+exports.leaveUser = async req => {
 
     let id = req.body?.id;
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
+    let isErr = await validationGroupAndUserAndJoinedInGroup(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
+    await DeleteInGroup.user(id, userId);
+    await DeleteInUser.groupIntoListOfUserGroups(id, userId);
 
-        validationGroupAndUserAndJoinedInGroup(id, userId, () => {
-
-            DeleteInGroup.user(id, userId);
-            DeleteInUser.groupIntoListOfUserGroups(id, userId);
-
-
-            Json.builder(Response.HTTP_OK);
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.listOfMessage = (req) => {
+exports.listOfMessage = async req => {
 
     let queryObject = req.query,
         limit = queryObject?.limit,
@@ -578,110 +523,81 @@ exports.listOfMessage = (req) => {
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
+
+    let result = await FindInUser.getTableNameForListOfUserGroups(id, userId);
+
+    if (!result)
+        return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
 
-        let userId = data.id;
+    let count = await FindInGroup.getCountOfListMessage(id);
 
-        FindInUser.getTableNameForListOfUserGroups(id, userId, result => {
+    let totalPages = Math.ceil(count / getLimit);
 
-            if (!result)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-
-            FindInGroup.getCountOfListMessage(id, count => {
-
-                let totalPages = Math.ceil(count / getLimit);
-
-                FindInUser.getListOfMessage('`' + id + 'GroupContents`', startFrom, getLimit, getOrder, getSort, type, search, result => {
-
-                    Json.builder(
-                        Response.HTTP_OK,
-                        result, {
-                            totalPages: totalPages
-                        }
-                    );
-
-                });
-
-            });
-
-        });
-
+    let listOfMessage = await FindInUser.getListOfMessage({
+        type: type,
+        sort: getSort,
+        search: search,
+        limit: getLimit,
+        order: getOrder,
+        startFrom: startFrom,
+        tableName: '`' + id + 'GroupContents`'
     });
 
+    Json.builder(
+        Response.HTTP_OK,
+        listOfMessage, {
+            totalPages: totalPages
+        }
+    );
 
 }
 
 
-exports.info = (req) => {
+exports.info = async req => {
 
     let id = req.body?.id;
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(() => {
+    let isDefined = await FindInGroup.id(id);
 
+    if (!isDefined)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-        FindInGroup.id(id, isDefined => {
+    let info = await FindInGroup.getInfo(id);
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+    let countOfUser = await FindInGroup.getCountOfUsers(id);
 
-
-            FindInGroup.getInfo(id, result => {
-
-                FindInGroup.getCountOfUsers(id, count => {
-
-                    Json.builder(Response.HTTP_OK, result, {
-                        memberSize: count
-                    });
-
-                })
-
-            });
-
-        });
-
-
+    Json.builder(Response.HTTP_OK, info, {
+        memberSize: countOfUser
     });
 
 }
 
 
-exports.allUsers = (req) => {
+exports.allUsers = async req => {
 
     let id = req.body?.id;
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(() => {
+    let isDefined = await FindInGroup.id(id);
 
+    if (!isDefined)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-        FindInGroup.id(id, isDefined => {
+    let users = await FindInGroup.getAllUsers(id);
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+    if (isUndefined(users))
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
+    let result = await FindInUser.getUserDetailsInUsersTableForMember(users);
 
-            FindInGroup.getAllUsers(id, data => {
-
-                if (isUndefined(data))
-                    return Json.builder(Response.HTTP_NOT_FOUND);
-
-                FindInUser.getUserDetailsInUsersTableForMember(data, result => {
-
-                    Json.builder(Response.HTTP_OK, result);
-
-                });
-
-            });
-
-        });
-
-
-    });
+    Json.builder(Response.HTTP_OK, result);
 
 }
