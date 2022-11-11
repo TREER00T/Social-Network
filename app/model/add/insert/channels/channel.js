@@ -6,38 +6,42 @@ let openSql = require('opensql'),
 
 module.exports = {
 
-    channel(name, inviteLink, defaultColor, img, cb) {
+    async channel(name, inviteLink, defaultColor, img) {
 
-        if (isUndefined(img)) {
+        return new Promise(res => {
+
+            if (isUndefined(img)) {
+                openSql.addOne({
+                    table: 'channels',
+                    data: {
+                        name: name,
+                        inviteLink: inviteLink,
+                        defaultColor: defaultColor
+                    }
+                }).result(result => {
+                    !isUndefined(result[1]?.insertId) ? res(result[1].insertId) : res(null);
+                });
+                return;
+            }
+
             openSql.addOne({
                 table: 'channels',
                 data: {
+                    img: img,
                     name: name,
                     inviteLink: inviteLink,
                     defaultColor: defaultColor
                 }
             }).result(result => {
-                !isUndefined(result[1]?.insertId) ? cb(result[1].insertId) : cb(null);
+                !isUndefined(result[1]?.insertId) ? res(result[1].insertId) : res(null);
             });
-            return;
-        }
 
-        openSql.addOne({
-            table: 'channels',
-            data: {
-                img: img,
-                name: name,
-                inviteLink: inviteLink,
-                defaultColor: defaultColor
-            }
-        }).result(result => {
-            !isUndefined(result[1]?.insertId) ? cb(result[1].insertId) : cb(null);
         });
 
     },
 
-    userIntoChannelsAdmins(userId, channelId, isOwner) {
-        openSql.addOne({
+    async userIntoChannelsAdmins(userId, channelId, isOwner) {
+        await openSql.addOne({
             table: 'channelsAdmins',
             data: {
                 adminId: userId,
@@ -47,8 +51,8 @@ module.exports = {
         });
     },
 
-    userIntoChannel(userId, channelId) {
-        openSql.addOne({
+    async userIntoChannel(userId, channelId) {
+        await openSql.addOne({
             table: 'channelsUsers',
             data: {
                 userId: userId,

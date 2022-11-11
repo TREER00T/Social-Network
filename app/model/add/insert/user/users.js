@@ -10,22 +10,29 @@ let openSql = require('opensql'),
 
 module.exports = {
 
-    phoneAndAuthCode(phone, authCode, defaultColor, cb) {
-        openSql.addOne({
-            table: 'users',
-            data: {
-                phone: `${phone}`,
-                authCode: authCode,
-                defaultColor: defaultColor
-            }
-        }).result(result => {
-            cb(result);
+    async phoneAndAuthCode(phone, authCode, defaultColor) {
+
+        return new Promise(res => {
+
+            openSql.addOne({
+                table: 'users',
+                data: {
+                    phone: `${phone}`,
+                    authCode: authCode,
+                    defaultColor: defaultColor
+                }
+            }).result(result => {
+                res(result);
+            });
+
         });
+
+
     },
 
 
-    chatIdInListOfUserE2Es(fromUser, toUser, userId, tableName) {
-        openSql.addOne({
+    async chatIdInListOfUserE2Es(fromUser, toUser, userId, tableName) {
+        await openSql.addOne({
             table: 'listOfUserE2Es',
             data: {
                 toUser: toUser,
@@ -37,8 +44,8 @@ module.exports = {
     },
 
 
-    addUserToUsersBlockList(userId, userTargetId) {
-        openSql.addOne({
+    async addUserToUsersBlockList(userId, userTargetId) {
+        await openSql.addOne({
             table: 'userBlockList',
             data: {
                 userId: userId,
@@ -48,8 +55,8 @@ module.exports = {
     },
 
 
-    userDeviceInformation(user) {
-        openSql.addOne({
+    async userDeviceInformation(user) {
+        await openSql.addOne({
             table: 'devices',
             data: {
                 userId: user['id'],
@@ -60,8 +67,8 @@ module.exports = {
         });
     },
 
-    groupIntoListOfUserGroups(groupId, userId) {
-        openSql.addOne({
+    async groupIntoListOfUserGroups(groupId, userId) {
+        await openSql.addOne({
             table: 'listOfUserGroups',
             data: {
                 userId: userId,
@@ -70,8 +77,8 @@ module.exports = {
         });
     },
 
-    channelIntoListOfUserChannels(channelId, userId) {
-        openSql.addOne({
+    async channelIntoListOfUserChannels(channelId, userId) {
+        await openSql.addOne({
             table: 'listOfUserChannels',
             data: {
                 userId: userId,
@@ -80,9 +87,10 @@ module.exports = {
         });
     },
 
-    messageIntoUserSavedMessage(phone, message) {
+    async messageIntoUserSavedMessage(phone, message) {
+
         if (!isUndefined(message?.forwardDataId)) {
-            openSql.addOne({
+            await openSql.addOne({
                 table: 'forwardContents',
                 data: {
                     conversationId: phone + 'SavedMessages',
@@ -111,10 +119,11 @@ module.exports = {
             return;
         }
 
-        openSql.addOne({
+        await openSql.addOne({
             table: phone + 'SavedMessages',
             data: message
         });
+
     }
 
 }

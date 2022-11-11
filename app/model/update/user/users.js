@@ -12,46 +12,58 @@ let openSql = require('opensql'),
 
 module.exports = {
 
-    authCode(phone, authCode, cb) {
-        openSql.update({
-            table: 'users',
-            edit: {
-                authCode: authCode
-            },
-            where: {
-                phone: `${phone}`
-            }
-        }).result(result => {
-            try {
-                cb(isBiggerThanZero(result[1]?.changedRows));
-            } catch (e) {
-                DataBaseException(e);
-            }
+    async authCode(phone, authCode) {
+
+        return new Promise(res => {
+
+            openSql.update({
+                table: 'users',
+                edit: {
+                    authCode: authCode
+                },
+                where: {
+                    phone: `${phone}`
+                }
+            }).result(result => {
+                try {
+                    res(isBiggerThanZero(result[1]?.changedRows));
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+
         });
+
     },
 
 
-    apikey(phone, key, cb) {
-        openSql.update({
-            table: 'users',
-            edit: {
-                apiKey: `${key}`
-            },
-            where: {
-                phone: `${phone}`
-            }
-        }).result(result => {
-            try {
-                cb(isBiggerThanZero(result[1]?.changedRows));
-            } catch (e) {
-                DataBaseException(e);
-            }
+    async apikey(phone, key) {
+
+        return new Promise(res => {
+
+            openSql.update({
+                table: 'users',
+                edit: {
+                    apiKey: `${key}`
+                },
+                where: {
+                    phone: `${phone}`
+                }
+            }).result(result => {
+                try {
+                    res(isBiggerThanZero(result[1]?.changedRows));
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+
         });
+
     },
 
 
-    userOnline(phone, status) {
-        openSql.update({
+    async userOnline(phone, status) {
+        await openSql.update({
             table: 'users',
             edit: {
                 isActive: `${status}`
@@ -63,125 +75,162 @@ module.exports = {
     },
 
 
-    username(phone, username, cb) {
-        openSql.update({
-            table: 'users',
-            edit: {
-                username: `${username}`
-            },
-            where: {
-                phone: `${phone}`
-            }
-        }).result(result => {
-            try {
-                cb(isBiggerThanZero(result[1]?.changedRows));
-            } catch (e) {
-                DataBaseException(e);
-            }
+    async username(phone, username) {
+
+        return new Promise(res => {
+
+            openSql.update({
+                table: 'users',
+                edit: {
+                    username: `${username}`
+                },
+                where: {
+                    phone: `${phone}`
+                }
+            }).result(result => {
+                try {
+                    res(isBiggerThanZero(result[1]?.changedRows));
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+
         });
+
     },
 
 
-    bio(phone, bio = NULL, cb) {
-        openSql.update({
-            table: 'users',
-            edit: {
-                bio: `${bio}`
-            },
-            where: {
-                phone: `${phone}`
-            }
-        }).result(result => {
-            try {
-                cb(isBiggerThanZero(result[1]?.changedRows));
-            } catch (e) {
-                DataBaseException(e);
-            }
+    async bio(phone, bio = NULL) {
+
+        return new Promise(res => {
+
+            openSql.update({
+                table: 'users',
+                edit: {
+                    bio: `${bio}`
+                },
+                where: {
+                    phone: `${phone}`
+                }
+            }).result(result => {
+                try {
+                    res(isBiggerThanZero(result[1]?.changedRows));
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+
         });
+
     },
 
 
-    name(phone, firstName, lastName, cb) {
-        try {
-            if (typeof lastName === 'string')
-                lastName = lastName.toString().trim();
-        } catch (e) {
-        }
-        openSql.update({
-            table: 'users',
-            edit: {
-                name: `${firstName}`,
-                lastName: `${lastName}`
-            },
-            where: {
-                phone: `${phone}`
-            }
-        }).result(result => {
+    async name(phone, firstName, lastName) {
+
+        return new Promise(res => {
+
             try {
-                cb(isBiggerThanZero(result[1]?.changedRows));
+                if (typeof lastName === 'string')
+                    lastName = lastName.toString().trim();
             } catch (e) {
-                DataBaseException(e);
             }
+
+            openSql.update({
+                table: 'users',
+                edit: {
+                    name: `${firstName}`,
+                    lastName: `${lastName}`
+                },
+                where: {
+                    phone: `${phone}`
+                }
+            }).result(result => {
+                try {
+                    res(isBiggerThanZero(result[1]?.changedRows));
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+
         });
+
     },
 
-    passwordAndEmail(phone, password, email, cb) {
-        openSql.update({
-            table: 'users',
-            edit: {
-                password: `${password}`,
-                email: `${email}`
-            },
-            where: {
-                phone: `${phone}`
-            }
-        }).result(result => {
-            try {
-                cb(isBiggerThanZero(result[1]?.changedRows));
-            } catch (e) {
-                DataBaseException(e);
-            }
+    async passwordAndEmail(phone, password, email) {
+
+        return new Promise(res => {
+
+            openSql.update({
+                table: 'users',
+                edit: {
+                    password: `${password}`,
+                    email: `${email}`
+                },
+                where: {
+                    phone: `${phone}`
+                }
+            }).result(result => {
+                try {
+                    res(isBiggerThanZero(result[1]?.changedRows));
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+
         });
+
     },
 
-    password(phone, password, cb) {
-        openSql.update({
-            table: 'users',
-            edit: {
-                password: `${password}`
-            },
-            where: {
-                phone: `${phone}`
-            }
-        }).result(result => {
-            try {
-                cb(isBiggerThanZero(result[1]?.changedRows));
-            } catch (e) {
-                DataBaseException(e);
-            }
+    async password(phone, password) {
+
+        return new Promise(res => {
+
+            openSql.update({
+                table: 'users',
+                edit: {
+                    password: `${password}`
+                },
+                where: {
+                    phone: `${phone}`
+                }
+            }).result(result => {
+                try {
+                    res(isBiggerThanZero(result[1]?.changedRows));
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+
         });
+
     },
 
-    img(phone, url, cb) {
-        openSql.update({
-            table: 'users',
-            edit: {
-                img: `${url}`
-            },
-            where: {
-                phone: `${phone}`
-            }
-        }).result(result => {
-            try {
-                cb(isBiggerThanZero(result[1]?.changedRows));
-            } catch (e) {
-                DataBaseException(e);
-            }
+    async img(phone, url) {
+
+        return new Promise(res => {
+
+            openSql.update({
+                table: 'users',
+                edit: {
+                    img: `${url}`
+                },
+                where: {
+                    phone: `${phone}`
+                }
+            }).result(result => {
+                try {
+                    res(isBiggerThanZero(result[1]?.changedRows));
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+
         });
+
     },
 
-    itemInSavedMessage(phone, id) {
-        openSql.update({
+    async itemInSavedMessage(phone, id) {
+        await openSql.update({
             table: phone + 'SavedMessages',
             where: {
                 id: id

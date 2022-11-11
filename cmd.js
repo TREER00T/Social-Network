@@ -9,19 +9,16 @@ let {
 program
     .command('serve')
     .description('Initialization server')
-    .action(() => {
-        Database.initialization(isErr => {
+    .action(async () => {
 
+        await Database.connect().then(async isErr => {
             if (isErr)
                 return console.log('Database connect failed');
 
-            Database.create(() => {
-                console.log('Database Successfully Created.');
-            });
-
+            await Database.createTable().then(() => console.log('Database Successfully Created.'));
         });
 
-        File.mkdirForUploadFile();
+        await File.mkdirForUploadFile();
 
     })
     .parse();

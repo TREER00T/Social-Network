@@ -24,9 +24,9 @@ let openSql = require('opensql'),
 
 module.exports = {
 
-    users() {
+    async users() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'users',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -51,9 +51,9 @@ module.exports = {
     },
 
 
-    listOfUserGroups() {
+    async listOfUserGroups() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'listOfUserGroups',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -66,9 +66,9 @@ module.exports = {
     },
 
 
-    listOfUserE2Es() {
+    async listOfUserE2Es() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'listOfUserE2Es',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -83,9 +83,9 @@ module.exports = {
     },
 
 
-    listOfUserChannels() {
+    async listOfUserChannels() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'listOfUserChannels',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -98,9 +98,9 @@ module.exports = {
     },
 
 
-    savedMessages(phone) {
+    async savedMessages(phone) {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: phone + 'SavedMessages',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -123,9 +123,9 @@ module.exports = {
     },
 
 
-    devices() {
+    async devices() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'devices',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -141,9 +141,9 @@ module.exports = {
     },
 
 
-    userBlockList() {
+    async userBlockList() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'userBlockList',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -156,33 +156,38 @@ module.exports = {
     },
 
 
-    e2eContents(fromUser, toUser, cb) {
+    async e2eContents(fromUser, toUser) {
 
-        openSql.createTable({
-            table: fromUser + 'And' + toUser + 'E2EContents',
-            field: {
-                id: INT([NOT_NULL, AUTO_INCREMENT]),
-                text: VARCHAR(4096),
-                date: DATETIME(),
-                type: ENUM(['None', 'Image', 'Location', 'Document', 'Video', 'Voice']),
-                isReply: BOOLEAN(),
-                fileUrl: VARCHAR(130),
-                senderId: INT(),
-                fileSize: VARCHAR(15),
-                fileName: VARCHAR(15),
-                location: POINT([NULL]),
-                isForward: BOOLEAN(),
-                targetReplyId: INT(),
-                forwardDataId: INT()
-            },
-            primaryKey: 'id'
-        }).result(result => {
-            try {
-                cb(isUndefined(result[1]?.warningCount));
-            } catch (e) {
-                DataBaseException(e);
-            }
+        return new Promise(res => {
+
+            openSql.createTable({
+                table: fromUser + 'And' + toUser + 'E2EContents',
+                field: {
+                    id: INT([NOT_NULL, AUTO_INCREMENT]),
+                    text: VARCHAR(4096),
+                    date: DATETIME(),
+                    type: ENUM(['None', 'Image', 'Location', 'Document', 'Video', 'Voice']),
+                    isReply: BOOLEAN(),
+                    fileUrl: VARCHAR(130),
+                    senderId: INT(),
+                    fileSize: VARCHAR(15),
+                    fileName: VARCHAR(15),
+                    location: POINT([NULL]),
+                    isForward: BOOLEAN(),
+                    targetReplyId: INT(),
+                    forwardDataId: INT()
+                },
+                primaryKey: 'id'
+            }).result(result => {
+                try {
+                    res(isUndefined(result[1]?.warningCount));
+                } catch (e) {
+                    DataBaseException(e);
+                }
+            });
+
         });
+
 
     }
 

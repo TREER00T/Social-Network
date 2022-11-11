@@ -8,15 +8,20 @@ dotenv.config();
 
 module.exports = {
 
-    initialization(cb) {
-        Database.connect(cb);
-        openSql.createDatabase(process.env.DATABASE);
+    async connect() {
+        await Database.connect();
     },
 
-    create(cb) {
-        Create.tables();
-        Add.foreignKeys();
-        cb();
+    async createDatabase() {
+        await openSql.createDatabase(process.env.DATABASE).then(async () => {
+            await this.createTable();
+        });
+    },
+
+    async createTable() {
+        await Create.tables().then(async () => {
+            await Add.foreignKeys();
+        });
     }
 
 }

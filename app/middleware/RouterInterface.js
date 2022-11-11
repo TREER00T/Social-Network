@@ -24,7 +24,7 @@ module.exports = {
         dotenv.config();
 
         app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json(), express.raw(), cors());
-        app.use((req, res, next) => {
+        app.use(async (req, res, next) => {
 
             Json.initializationRes(res);
 
@@ -49,20 +49,19 @@ module.exports = {
                 let isAccessTokenVerify = RouterUtil.tokenVerify(token);
 
 
-                let isSetUserToken = (!isAccessTokenVerify) ? isAccessTokenVerify : RouterUtil.tokenVerify(token);
+                let isSetUserToken = !isAccessTokenVerify ? isAccessTokenVerify : RouterUtil.tokenVerify(token);
                 let isSetUserApiKey = RouterUtil.isSetUserApiKey(apiKey);
 
                 if (!isSetUserApiKey || !isSetUserToken)
                     return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
 
-                RouterUtil.getTokenPayLoad(data => {
-                    RouterUtil.isValidApiKey(apiKey, data.phoneNumber, result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+                let data = await RouterUtil.getTokenPayLoad();
+                let result = await RouterUtil.isValidApiKey(apiKey, data.phoneNumber);
 
-                        next();
-                    });
-                });
+                if (!result)
+                    return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+
+                next();
             }
 
 

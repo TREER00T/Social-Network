@@ -7,7 +7,9 @@ main();
 async function main() {
 
     await Router.initialization();
-    await Database.initialization();
+    await Database.connect().then(async () => {
+        await Database.createDatabase();
+    });
 
 }
 

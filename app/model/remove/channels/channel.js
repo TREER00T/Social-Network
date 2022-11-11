@@ -3,12 +3,12 @@ let openSql = require('opensql');
 
 module.exports = {
 
-    channel(channelId) {
-        openSql.dropTable('`' + channelId + 'GroupContents`');
+    async channel(channelId) {
+        await openSql.dropTable('`' + channelId + 'GroupContents`');
     },
 
-    admins(channelId) {
-        openSql.remove({
+    async admins(channelId) {
+        await openSql.remove({
             table: 'channelsAdmins',
             where: {
                 channelId: channelId
@@ -16,8 +16,8 @@ module.exports = {
         });
     },
 
-    users(channelId) {
-        openSql.remove({
+    async users(channelId) {
+        await openSql.remove({
             table: 'channelsUsers',
             where: {
                 channelId: channelId
@@ -25,8 +25,8 @@ module.exports = {
         });
     },
 
-    userInChannel(channelId, userId) {
-        openSql.remove({
+    async userInChannel(channelId, userId) {
+        await openSql.remove({
             table: 'channelsUsers',
             where: {
                 channelId: channelId,
@@ -35,8 +35,8 @@ module.exports = {
         });
     },
 
-    admin(channelId, userId) {
-        openSql.remove({
+    async admin(channelId, userId) {
+        await openSql.remove({
             table: 'channelsAdmins',
             where: {
                 channelId: channelId,

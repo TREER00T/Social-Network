@@ -16,9 +16,9 @@ let openSql = require('opensql'),
 module.exports = {
 
 
-    forwardContents() {
+    async forwardContents() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: `forwardContents`,
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
