@@ -1,25 +1,24 @@
 let openSql = require('opensql'),
     {
         isUndefined
-    } = require('app/util/Util'),
+    } = require('../../../util/Util'),
     {
         IN
     } = openSql.queryHelper,
-    FindInCommon = require('app/model/find/common/common');
+    FindInCommon = require('../../../model/find/common/common');
 
 
 module.exports = {
 
-    message(tableName, listOfId) {
+    async message(tableName, listOfId) {
 
-        listOfId.forEach(item => {
-            FindInCommon.isForwardData(tableName, item, id => {
-                if (!isUndefined(id))
-                    module.exports.forwardMessage(id);
-            });
-        });
+        for (const item of listOfId) {
+            let id = await FindInCommon.isForwardData(tableName, item);
+            if (!isUndefined(id))
+                await module.exports.forwardMessage(id);
+        }
 
-        openSql.remove({
+        await openSql.remove({
             table: tableName,
             where: {
                 id: IN(listOfId)
@@ -27,8 +26,8 @@ module.exports = {
         });
     },
 
-    forwardMessage(id) {
-        openSql.remove({
+    async forwardMessage(id) {
+        await openSql.remove({
             table: 'forwardContents',
             where: {
                 id: id

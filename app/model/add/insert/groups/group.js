@@ -1,43 +1,48 @@
 let openSql = require('opensql'),
     {
         isUndefined
-    } = require('app/util/Util');
+    } = require('../../../../util/Util');
 
 
 module.exports = {
 
-    group(name, inviteLink, defaultColor, img, cb) {
+    async group(name, inviteLink, defaultColor, img) {
 
-        if (isUndefined(img)) {
+        return new Promise(res => {
+
+            if (isUndefined(img)) {
+                openSql.addOne({
+                    table: 'groups',
+                    data: {
+                        name: name,
+                        inviteLink: inviteLink,
+                        defaultColor: defaultColor
+                    }
+                }).result(result => {
+                    !isUndefined(result[1]?.insertId) ? res(result[1].insertId) : res(null);
+                });
+                return;
+            }
+
             openSql.addOne({
                 table: 'groups',
                 data: {
+                    img: img,
                     name: name,
                     inviteLink: inviteLink,
                     defaultColor: defaultColor
                 }
             }).result(result => {
-                !isUndefined(result[1]?.insertId) ? cb(result[1].insertId) : cb(null);
+                !isUndefined(result[1]?.insertId) ? res(result[1].insertId) : res(null);
             });
-            return;
-        }
 
-        openSql.addOne({
-            table: 'groups',
-            data: {
-                img: img,
-                name: name,
-                inviteLink: inviteLink,
-                defaultColor: defaultColor
-            }
-        }).result(result => {
-            !isUndefined(result[1]?.insertId) ? cb(result[1].insertId) : cb(null);
         });
+
 
     },
 
-    admin(userId, groupId, isOwner) {
-        openSql.addOne({
+    async admin(userId, groupId, isOwner) {
+        await openSql.addOne({
             table: 'groupsAdmins',
             data: {
                 adminId: userId,
@@ -47,8 +52,8 @@ module.exports = {
         });
     },
 
-    user(userId, groupId) {
-        openSql.addOne({
+    async user(userId, groupId) {
+        await openSql.addOne({
             table: 'groupsUsers',
             data: {
                 userId: userId,

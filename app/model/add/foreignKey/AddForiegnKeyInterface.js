@@ -17,16 +17,16 @@ let {
 
 module.exports = {
 
-    foreignKeys() {
-        devices();
-        groupsUsers();
-        groupsAdmins();
-        userBlockList();
-        channelsUsers();
-        channelsAdmins();
-        listOfUserE2Es();
-        listOfUserGroups();
-        listOfUserChannels();
+    async foreignKeys() {
+        await devices();
+        await groupsUsers();
+        await groupsAdmins();
+        await userBlockList();
+        await channelsUsers();
+        await channelsAdmins();
+        await listOfUserE2Es();
+        await listOfUserGroups();
+        await listOfUserChannels();
     }
 
 }

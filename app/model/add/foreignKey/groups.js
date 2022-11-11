@@ -7,8 +7,8 @@ let openSql = require('opensql'),
 module.exports = {
 
 
-    groupContents(groupId) {
-        openSql.addForeignKey({
+    async groupContents(groupId) {
+        await openSql.addForeignKey({
             table: groupId + 'GroupContents',
             foreignKey: 'forwardDataId',
             referenceTable: 'forwardContents',
@@ -16,7 +16,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: groupId + 'GroupContents',
             foreignKey: 'senderId',
             referenceTable: 'users',
@@ -26,8 +27,8 @@ module.exports = {
         });
     },
 
-    groupsAdmins() {
-        openSql.addForeignKey({
+    async groupsAdmins() {
+        await openSql.addForeignKey({
             table: 'groupsAdmins',
             foreignKey: 'adminId',
             referenceTable: 'users',
@@ -35,7 +36,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: 'groupsAdmins',
             foreignKey: 'groupId',
             referenceTable: 'groups',
@@ -46,8 +48,8 @@ module.exports = {
     },
 
 
-    groupsUsers() {
-        openSql.addForeignKey({
+    async groupsUsers() {
+        await openSql.addForeignKey({
             table: 'groupsUsers',
             foreignKey: 'userId',
             referenceTable: 'users',
@@ -55,7 +57,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: 'groupsUsers',
             foreignKey: 'groupId',
             referenceTable: 'groups',

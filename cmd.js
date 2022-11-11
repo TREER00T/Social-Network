@@ -1,24 +1,24 @@
 #!/usr/bin/env node
-require('app-module-path').addPath(__dirname);
 let {
         program
     } = require('commander'),
-    Database = require('app/database/DatabaseInterface');
+    Database = require('./app/database/DatabaseInterface'),
+    File = require('./app/util/File');
 
 
 program
-    .command('db')
-    .description('Create database and tables')
-    .action(() => {
-        Database.initialization(isErr => {
+    .command('serve')
+    .description('Initialization server')
+    .action(async () => {
 
+        await Database.connect().then(async isErr => {
             if (isErr)
                 return console.log('Database connect failed');
 
-            Database.create(() => {
-                console.log('Database Successfully Created.');
-            });
-
+            await Database.createTable().then(() => console.log('Database Successfully Created.'));
         });
+
+        await File.mkdirForUploadFile();
+
     })
     .parse();

@@ -4,29 +4,34 @@ let openSql = require('opensql'),
     } = openSql.queryHelper,
     {
         DataBaseException
-    } = require('app/exception/DataBaseException'),
+    } = require('../../../exception/DataBaseException'),
     {
         isUndefined,
         isBiggerThanZero
-    } = require('app/util/Util'),
-    FindInCommon = require('app/model/find/common/common'),
-    DeleteInCommon = require('app/model/remove/common/common');
+    } = require('../../../util/Util'),
+    FindInCommon = require('../../../model/find/common/common'),
+    DeleteInCommon = require('../../../model/remove/common/common');
 
 module.exports = {
 
-    chat(tableName, cb) {
-        openSql.dropTable(tableName)
-            .result(result => {
+    async chat(tableName) {
+
+        return new Promise(res => {
+
+            openSql.dropTable(tableName).result(result => {
                 try {
-                    cb(isBiggerThanZero(result[1]?.affectedRows))
+                    res(isBiggerThanZero(result[1]?.affectedRows))
                 } catch (e) {
                     DataBaseException(e);
                 }
             });
+
+        });
+
     },
 
-    chatInListOfChatsForUser(fromUser, toUser, userId) {
-        openSql.remove({
+    async chatInListOfChatsForUser(fromUser, toUser, userId) {
+        await openSql.remove({
             table: 'listOfUserE2Es',
             where: {
                 fromUser: fromUser,
@@ -36,8 +41,8 @@ module.exports = {
         });
     },
 
-    removeUserInUsersBlockList(userId, id) {
-        openSql.remove({
+    async removeUserInUsersBlockList(userId, id) {
+        await openSql.remove({
             table: 'userBlockList',
             where: {
                 userTargetId: id,
@@ -46,8 +51,8 @@ module.exports = {
         });
     },
 
-    groupInListOfUserGroups(id) {
-        openSql.remove({
+    async groupInListOfUserGroups(id) {
+        await openSql.remove({
             table: 'listOfUserGroups',
             where: {
                 groupId: id
@@ -55,8 +60,8 @@ module.exports = {
         });
     },
 
-    channelInListOfUserChannels(id) {
-        openSql.remove({
+    async channelInListOfUserChannels(id) {
+        await openSql.remove({
             table: 'listOfUserChannels',
             where: {
                 channelId: id
@@ -64,8 +69,8 @@ module.exports = {
         });
     },
 
-    groupIntoListOfUserGroups(groupId, userId) {
-        openSql.remove({
+    async groupIntoListOfUserGroups(groupId, userId) {
+        await openSql.remove({
             table: 'listOfUserGroups',
             where: {
                 groupId: groupId,
@@ -74,8 +79,8 @@ module.exports = {
         });
     },
 
-    channelIntoListOfUserChannels(channelId, userId) {
-        openSql.remove({
+    async channelIntoListOfUserChannels(channelId, userId) {
+        await openSql.remove({
             table: 'listOfUserChannels',
             where: {
                 channelId: channelId,
@@ -84,12 +89,12 @@ module.exports = {
         });
     },
 
-    savedMessage(phone) {
-        openSql.dropTable(phone + 'SavedMessages');
+    async savedMessage(phone) {
+        await openSql.dropTable(phone + 'SavedMessages');
     },
 
-    userInAllUsersBlockList(id) {
-        openSql.remove({
+    async userInAllUsersBlockList(id) {
+        await openSql.remove({
             table: 'userBlockList',
             where: {
                 userId: id
@@ -97,8 +102,8 @@ module.exports = {
         });
     },
 
-    userInUsersTable(id) {
-        openSql.remove({
+    async userInUsersTable(id) {
+        await openSql.remove({
             table: 'users',
             where: {
                 id: id
@@ -106,7 +111,7 @@ module.exports = {
         });
     },
 
-    userInAllUsersGroup(array, id) {
+    async userInAllUsersGroup(array, id) {
         let arrayOfTable = [];
 
         array.forEach(item => {
@@ -115,8 +120,8 @@ module.exports = {
 
         });
 
-        openSql.dropTable(arrayOfTable);
-        openSql.remove({
+        await openSql.dropTable(arrayOfTable);
+        await openSql.remove({
             table: 'listOfUserGroups',
             where: {
                 userId: id
@@ -124,7 +129,7 @@ module.exports = {
         });
     },
 
-    userInAllUsersChannel(array, id) {
+    async userInAllUsersChannel(array, id) {
         let arrayOfTable = [];
 
         array.forEach(item => {
@@ -133,8 +138,8 @@ module.exports = {
 
         });
 
-        openSql.dropTable(arrayOfTable);
-        openSql.remove({
+        await openSql.dropTable(arrayOfTable);
+        await openSql.remove({
             table: 'listOfUserChannels',
             where: {
                 userId: id
@@ -142,7 +147,7 @@ module.exports = {
         });
     },
 
-    userInAllUsersE2E(array, id) {
+    async userInAllUsersE2E(array, id) {
         let arrayOfTable = [];
 
         array.forEach(item => {
@@ -151,8 +156,8 @@ module.exports = {
 
         });
 
-        openSql.dropTable(arrayOfTable);
-        openSql.remove({
+        await openSql.dropTable(arrayOfTable);
+        await openSql.remove({
             table: 'listOfUserE2Es',
             where: {
                 userId: id
@@ -160,8 +165,8 @@ module.exports = {
         });
     },
 
-    userInDevices(id) {
-        openSql.remove({
+    async userInDevices(id) {
+        await openSql.remove({
             table: 'devices',
             where: {
                 userId: id
@@ -169,19 +174,21 @@ module.exports = {
         });
     },
 
-    itemInSavedMessage(phone, listOfId) {
-        listOfId.forEach(item => {
-            FindInCommon.isForwardData(phone + 'SavedMessages', item, id => {
-                if (!isUndefined(id))
-                    DeleteInCommon.forwardMessage(id);
-            });
-        });
-        openSql.remove({
+    async itemInSavedMessage(phone, listOfId) {
+
+        for (const item of listOfId) {
+            let id = await FindInCommon.isForwardData(phone + 'SavedMessages', item);
+            if (!isUndefined(id))
+                await DeleteInCommon.forwardMessage(id);
+        }
+
+        await openSql.remove({
             table: phone + 'SavedMessages',
             where: {
                 id: IN(listOfId)
             }
         });
+
     }
 
 }

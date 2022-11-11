@@ -12,7 +12,7 @@ let Json = require('./ReturnJson'),
     } = require('node-jose'),
     {
         ValidationException
-    } = require('app/exception/ValidationException');
+    } = require('../exception/ValidationException');
 
 
 module.exports = {
@@ -132,25 +132,31 @@ module.exports = {
 
 
     // The verify jwt and check jwt expired time
-    getJwtVerify(token, cb) {
-        try {
-            jwt.verify(token, process.env.PUBLIC_KEY, {}, (err, decoded) => {
+    async getJwtVerify(token) {
 
-                if (err instanceof TokenExpiredError) {
-                    cb('TOKEN_EXP');
-                    return Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
-                }
+        return new Promise(res => {
 
-                if (err instanceof JsonWebTokenError) {
-                    cb('IN_VALID_TOKEN');
-                    return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
-                }
+            try {
+                jwt.verify(token, process.env.PUBLIC_KEY, {}, (err, decoded) => {
 
-                cb(decoded);
-            });
-        } catch (e) {
-            ValidationException(e);
-        }
+                    if (err instanceof TokenExpiredError) {
+                        res('TOKEN_EXP');
+                        return Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
+                    }
+
+                    if (err instanceof JsonWebTokenError) {
+                        res('IN_VALID_TOKEN');
+                        return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
+                    }
+
+                    cb(decoded);
+                });
+            } catch (e) {
+                ValidationException(e);
+            }
+
+        });
+
     },
 
 

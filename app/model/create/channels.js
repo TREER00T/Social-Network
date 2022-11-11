@@ -19,10 +19,10 @@ let openSql = require('opensql'),
 module.exports = {
 
 
-    channelContents(channelId) {
+    async channelContents(channelId) {
 
-        openSql.createTable({
-            table:  channelId + 'ChannelContents',
+        await openSql.createTable({
+            table: channelId + 'ChannelContents',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
                 text: VARCHAR(4096),
@@ -44,9 +44,9 @@ module.exports = {
     },
 
 
-    channelsUsers() {
+    async channelsUsers() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'channelsUsers',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -59,9 +59,9 @@ module.exports = {
     },
 
 
-    channels() {
+    async channels() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'channels',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -78,9 +78,9 @@ module.exports = {
     },
 
 
-    channelsAdmins() {
+    async channelsAdmins() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'channelsAdmins',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),

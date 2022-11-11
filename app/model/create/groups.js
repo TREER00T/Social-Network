@@ -19,9 +19,9 @@ let openSql = require('opensql'),
 module.exports = {
 
 
-    groups() {
+    async groups() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: `groups`,
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -38,9 +38,9 @@ module.exports = {
     },
 
 
-    groupsUsers() {
+    async groupsUsers() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'groupsUsers',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -53,9 +53,9 @@ module.exports = {
     },
 
 
-    groupsAdmins() {
+    async groupsAdmins() {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: 'groupsAdmins',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),
@@ -69,9 +69,9 @@ module.exports = {
     },
 
 
-    groupContents(groupId) {
+    async groupContents(groupId) {
 
-        openSql.createTable({
+        await openSql.createTable({
             table: '`' + groupId + 'GroupContents`',
             field: {
                 id: INT([NOT_NULL, AUTO_INCREMENT]),

@@ -5,26 +5,26 @@ let express = require('express'),
     dotenv = require('dotenv'),
     cors = require('cors'),
     Swagger = require('../../docs/swagger'),
-    Validation = require('app/util/Validation'),
-    RouterUtil = require('app/middleware/RouterUtil'),
-    Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
-    authRouter = require('app/routes/user/AuthRoutes'),
-    personalRouter = require('app/routes/user/PersonalRoutes'),
-    groupRouter = require('app/routes/group/GroupRoutes'),
-    channelRouter = require('app/routes/channel/ChannelRoutes'),
-    commonRouter = require('app/routes/common/CommonRoutes'),
-    e2eRouter = require('app/routes/user/PvChatRoutes');
+    Validation = require('../util/Validation'),
+    RouterUtil = require('../middleware/RouterUtil'),
+    Json = require('../util/ReturnJson'),
+    Response = require('../util/Response'),
+    authRouter = require('../routes/user/AuthRoutes'),
+    personalRouter = require('../routes/user/PersonalRoutes'),
+    groupRouter = require('../routes/group/GroupRoutes'),
+    channelRouter = require('../routes/channel/ChannelRoutes'),
+    commonRouter = require('../routes/common/CommonRoutes'),
+    e2eRouter = require('../routes/user/PvChatRoutes');
 
 
 module.exports = {
 
-    initialization() {
+    async initialization() {
 
         dotenv.config();
 
         app.use(express.json(), bodyParser.urlencoded({extended: true}), bodyParser.json(), express.raw(), cors());
-        app.use((req, res, next) => {
+        app.use(async (req, res, next) => {
 
             Json.initializationRes(res);
 
@@ -49,20 +49,19 @@ module.exports = {
                 let isAccessTokenVerify = RouterUtil.tokenVerify(token);
 
 
-                let isSetUserToken = (!isAccessTokenVerify) ? isAccessTokenVerify : RouterUtil.tokenVerify(token);
+                let isSetUserToken = !isAccessTokenVerify ? isAccessTokenVerify : RouterUtil.tokenVerify(token);
                 let isSetUserApiKey = RouterUtil.isSetUserApiKey(apiKey);
 
                 if (!isSetUserApiKey || !isSetUserToken)
                     return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
 
-                RouterUtil.getTokenPayLoad(data => {
-                    RouterUtil.isValidApiKey(apiKey, data.phoneNumber, result => {
-                        if (!result)
-                            return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+                let data = await RouterUtil.getTokenPayLoad();
+                let result = await RouterUtil.isValidApiKey(apiKey, data.phoneNumber);
 
-                        next();
-                    });
-                });
+                if (!result)
+                    return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+
+                next();
             }
 
 

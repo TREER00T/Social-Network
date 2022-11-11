@@ -3,12 +3,12 @@ let openSql = require('opensql');
 
 module.exports = {
 
-    group(groupId) {
-        openSql.dropTable('`' + groupId + 'GroupContents`');
+    async group(groupId) {
+        await openSql.dropTable('`' + groupId + 'GroupContents`');
     },
 
-    groupAdmins(groupId) {
-        openSql.remove({
+    async groupAdmins(groupId) {
+        await openSql.remove({
             table: 'groupsAdmins',
             where: {
                 groupId: groupId
@@ -16,8 +16,8 @@ module.exports = {
         });
     },
 
-    groupUsers(groupId) {
-        openSql.remove({
+    async groupUsers(groupId) {
+        await openSql.remove({
             table: 'groupsUsers',
             where: {
                 groupId: groupId
@@ -25,8 +25,8 @@ module.exports = {
         });
     },
 
-    user(groupId, userId) {
-        openSql.remove({
+    async user(groupId, userId) {
+        await openSql.remove({
             table: 'groupsUsers',
             where: {
                 groupId: groupId,
@@ -35,8 +35,8 @@ module.exports = {
         });
     },
 
-    admin(groupId, userId) {
-        openSql.remove({
+    async admin(groupId, userId) {
+        await openSql.remove({
             table: 'groupsAdmins',
             where: {
                 groupId: groupId,

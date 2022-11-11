@@ -18,26 +18,26 @@ let {
     } = require('./channels'),
     {
         forwardContents
-    } = require('app/model/create/common');
+    } = require('../../model/create/common');
 
 
 module.exports = {
 
-    tables() {
+    async tables() {
 
-        users();
-        groups();
-        devices();
-        channels();
-        groupsUsers();
-        groupsAdmins();
-        channelsUsers();
-        userBlockList();
-        listOfUserE2Es();
-        channelsAdmins();
-        forwardContents();
-        listOfUserGroups();
-        listOfUserChannels();
+        await users();
+        await groups();
+        await devices();
+        await channels();
+        await groupsUsers();
+        await groupsAdmins();
+        await channelsUsers();
+        await userBlockList();
+        await listOfUserE2Es();
+        await channelsAdmins();
+        await forwardContents();
+        await listOfUserGroups();
+        await listOfUserChannels();
 
     }
 

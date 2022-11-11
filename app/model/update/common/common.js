@@ -3,8 +3,8 @@ let openSql = require('opensql');
 
 module.exports = {
 
-    message(tableName, data, id) {
-        openSql.update({
+    async message(tableName, data, id) {
+        await openSql.update({
             table: tableName,
             edit: data,
             where: {
@@ -13,8 +13,8 @@ module.exports = {
         });
     },
 
-    messageIdFromTableForwardContents(id, messageId) {
-        openSql.update({
+    async messageIdFromTableForwardContents(id, messageId) {
+        await openSql.update({
             table: 'forwardContents',
             edit: {
                 messageId: messageId

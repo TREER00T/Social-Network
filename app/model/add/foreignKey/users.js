@@ -4,12 +4,11 @@ let openSql = require('opensql'),
     } = openSql.keywordHelper;
 
 
-
 module.exports = {
 
 
-    e2eContents(fromUser, toUser) {
-        openSql.addForeignKey({
+    async e2eContents(fromUser, toUser) {
+        await openSql.addForeignKey({
             table: fromUser + 'And' + toUser + 'E2EContents',
             foreignKey: 'forwardDataId',
             referenceTable: 'forwardContents',
@@ -17,7 +16,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: fromUser + 'And' + toUser + 'E2EContents',
             foreignKey: 'senderId',
             referenceTable: 'users',
@@ -28,8 +28,8 @@ module.exports = {
     },
 
 
-    userBlockList() {
-        openSql.addForeignKey({
+    async userBlockList() {
+        await openSql.addForeignKey({
             table: 'userBlockList',
             foreignKey: 'userId',
             referenceTable: 'users',
@@ -37,7 +37,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: 'userBlockList',
             foreignKey: 'userTargetId',
             referenceTable: 'users',
@@ -47,8 +48,8 @@ module.exports = {
         });
     },
 
-    devices() {
-        openSql.addForeignKey({
+    async devices() {
+        await openSql.addForeignKey({
             table: 'devices',
             foreignKey: 'userId',
             referenceTable: 'users',
@@ -58,8 +59,8 @@ module.exports = {
         });
     },
 
-    savedMessages(phone) {
-        openSql.addForeignKey({
+    async savedMessages(phone) {
+        await openSql.addForeignKey({
             table: phone + 'SavedMessages',
             foreignKey: 'forwardDataId',
             referenceTable: 'forwardContents',
@@ -67,7 +68,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: phone + 'SavedMessages',
             foreignKey: 'senderId',
             referenceTable: 'users',
@@ -78,8 +80,8 @@ module.exports = {
     },
 
 
-    listOfUserGroups() {
-        openSql.addForeignKey({
+    async listOfUserGroups() {
+        await openSql.addForeignKey({
             table: 'listOfUserGroups',
             foreignKey: 'groupId',
             referenceTable: 'groups',
@@ -87,7 +89,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: 'listOfUserGroups',
             foreignKey: 'userId',
             referenceTable: 'users',
@@ -98,8 +101,8 @@ module.exports = {
     },
 
 
-    listOfUserChannels() {
-        openSql.addForeignKey({
+    async listOfUserChannels() {
+        await openSql.addForeignKey({
             table: 'listOfUserChannels',
             foreignKey: 'channelId',
             referenceTable: 'channels',
@@ -107,7 +110,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: 'listOfUserChannels',
             foreignKey: 'userId',
             referenceTable: 'users',
@@ -118,8 +122,8 @@ module.exports = {
     },
 
 
-    listOfUserE2Es() {
-        openSql.addForeignKey({
+    async listOfUserE2Es() {
+        await openSql.addForeignKey({
             table: 'listOfUserE2Es',
             foreignKey: 'toUser',
             referenceTable: 'users',
@@ -127,7 +131,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: 'listOfUserE2Es',
             foreignKey: 'fromUser',
             referenceTable: 'users',
@@ -135,7 +140,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: 'listOfUserE2Es',
             foreignKey: 'userId',
             referenceTable: 'users',

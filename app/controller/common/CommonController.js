@@ -1,24 +1,23 @@
-let Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
+let Json = require('../../util/ReturnJson'),
+    Response = require('../../util/Response'),
     {
         isUndefined
-    } = require('app/util/Util'),
-    Find = require('app/model/find/common/common');
+    } = require('../../util/Util'),
+    Find = require('../../model/find/common/common');
 
 
-exports.search = (req) => {
+exports.search = async (req) => {
 
 
     let value = req.query?.v;
 
 
-    Find.searchWithNameInTableUsersGroupsAndChannels(value, result => {
+    let result = await Find.searchWithNameInTableUsersGroupsAndChannels(value);
 
-        if (isUndefined(result))
-            return Json.builder(Response.HTTP_NOT_FOUND);
+    if (isUndefined(result))
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-        Json.builder(Response.HTTP_OK, result);
+    Json.builder(Response.HTTP_OK, result);
 
-    });
 
 }

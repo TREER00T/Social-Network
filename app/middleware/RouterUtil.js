@@ -2,10 +2,10 @@ let {
         getJwtVerify,
         getJwtDecrypt,
         getSplitBearerJwt
-    } = require('app/util/Validation'),
+    } = require('../util/Validation'),
     {
         getApiKey
-    } = require('app/model/find/user/users');
+    } = require('../model/find/user/users');
 
 let tokenPayload;
 
@@ -16,50 +16,33 @@ module.exports = {
     },
 
 
-    isValidApiKey(key, phone, cb) {
+    async isValidApiKey(key, phone) {
+        let result = await getApiKey(phone);
 
-        getApiKey(phone, result => {
-
-            cb(result === key);
-
-        });
-
+        return result === key;
     },
 
 
-    tokenVerify(bearerHeader) {
+    async tokenVerify(bearerHeader) {
 
         let isSetUserToken = getSplitBearerJwt(bearerHeader);
 
         if (typeof isSetUserToken !== 'string')
             return false;
 
-        (async () => {
+        let token = await getJwtDecrypt(isSetUserToken);
 
-            let token = await getJwtDecrypt(isSetUserToken);
+        let decode = await getJwtVerify(token);
 
-            getJwtVerify(token, decode => {
-
-                if (decode.type === 'rt' || 'at') {
-
-                    (function (cb) {
-                        if (typeof cb === 'function')
-                            cb(decode)
-                    })(tokenPayload);
-                }
-
-            });
-
-        })();
+        if (decode.type === 'rt' || 'at')
+            return tokenPayload = decode;
 
         return true;
     },
 
 
-    getTokenPayLoad(cb) {
-        tokenPayload = (data => {
-            cb(data);
-        });
+    async getTokenPayLoad() {
+        return await tokenPayload;
     }
 
 

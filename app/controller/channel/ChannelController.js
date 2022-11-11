@@ -1,177 +1,245 @@
-let Json = require('app/util/ReturnJson'),
-    Response = require('app/util/Response'),
+let Json = require('../../util/ReturnJson'),
+    Response = require('../../util/Response'),
     multer = require('multer'),
-    Insert = require('app/model/add/insert/channels/channel'),
-    InsertInUser = require('app/model/add/insert/user/users'),
-    Create = require('app/model/create/channels'),
-    FindInChannel = require('app/model/find/channels/channel'),
-    FindInUser = require('app/model/find/user/users'),
-    CommonInsert = require('app/model/add/insert/common/index'),
-    DeleteInChannel = require('app/model/remove/channels/channel'),
-    UpdateInChannel = require('app/model/update/channels/channel'),
-    AddChannelForeignKey = require('app/model/add/foreignKey/channels'),
-    DeleteInUser = require('app/model/remove/users/user'),
+    Insert = require('../../model/add/insert/channels/channel'),
+    InsertInUser = require('../../model/add/insert/user/users'),
+    Create = require('../../model/create/channels'),
+    FindInChannel = require('../../model/find/channels/channel'),
+    FindInUser = require('../../model/find/user/users'),
+    CommonInsert = require('../../model/add/insert/common/index'),
+    DeleteInChannel = require('../../model/remove/channels/channel'),
+    UpdateInChannel = require('../../model/update/channels/channel'),
+    AddChannelForeignKey = require('../../model/add/foreignKey/channels'),
+    DeleteInUser = require('../../model/remove/users/user'),
     multerImage = multer().single('image'),
     multerFile = multer().single('file'),
     {
         getTokenPayLoad
-    } = require('app/middleware/RouterUtil'),
-    File = require('app/util/File'),
+    } = require('../../middleware/RouterUtil'),
+    File = require('../../util/File'),
     Util, {
         isUndefined,
         getFileFormat,
         getRandomHexColor,
         IN_VALID_MESSAGE_TYPE,
         IN_VALID_OBJECT_KEY
-    } = require('app/util/Util'),
-    Generate = require('app/util/Generate');
+    } = require('../../util/Util'),
+    Generate = require('../../util/Generate');
 
 
-let validationChannelAndUser = (roomId, userId, cb) => {
+let validationChannelAndUser = async (roomId, userId) => {
 
-        FindInChannel.id(roomId, isDefined => {
+        let isIdDefined = FindInChannel.id(roomId);
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
+        if (!isIdDefined) {
+            Json.builder(Response.HTTP_NOT_FOUND);
+            return false;
+        }
 
-            FindInUser.isExist(userId, result => {
+        let isExistUser = await FindInUser.isExist(userId);
 
-                if (!result)
-                    return Json.builder(Response.HTTP_USER_NOT_FOUND);
+        if (!isExistUser) {
+            Json.builder(Response.HTTP_USER_NOT_FOUND)
+            return false;
+        }
 
-                cb();
-            });
-
-        });
-
+        return true;
     },
-    validationChannelAndUserAndOwnerUser = (roomId, userId, cb) => {
+    validationChannelAndUserAndOwnerUser = async (roomId, userId) => {
 
-        validationChannelAndUser(roomId, userId, () => {
+        let isErr = await validationChannelAndUser(roomId, userId);
 
-            FindInChannel.isOwner(userId, roomId, result => {
+        if (!isErr)
+            return false;
 
-                if (!result)
-                    return Json.builder(Response.HTTP_FORBIDDEN);
+        let isOwner = await FindInChannel.isOwner(userId, roomId);
 
-                cb();
-            });
+        if (!isOwner) {
+            Json.builder(Response.HTTP_FORBIDDEN);
+            return false;
+        }
 
-        });
-
+        return true;
     },
-    validationChannelAndUserAndOwnerOrAdmin = (roomId, userId, cb) => {
+    validationChannelAndUserAndOwnerOrAdmin = async (roomId, userId) => {
 
-        validationChannelAndUser(roomId, userId, () => {
+        let isErr = await validationChannelAndUser(roomId, userId);
 
-            FindInChannel.isOwnerOrAdmin(userId, roomId, result => {
+        if (!isErr)
+            return false;
 
-                if (!result)
-                    return Json.builder(Response.HTTP_FORBIDDEN);
+        let isOwnerOrAdmin = await FindInChannel.isOwnerOrAdmin(userId, roomId);
 
-                cb();
-            });
+        if (!isOwnerOrAdmin) {
+            Json.builder(Response.HTTP_FORBIDDEN);
+            return false;
+        }
 
-        });
-
+        return true;
     },
-    validationChannelAndUserAndJoinedInChannel = (roomId, userId, cb) => {
+    validationChannelAndUserAndJoinedInChannel = async (roomId, userId) => {
 
-        validationChannelAndUser(roomId, userId, () => {
+        let isErr = await validationChannelAndUser(roomId, userId);
 
-            FindInChannel.isJoined(roomId, userId, result => {
+        if (!isErr)
+            return false;
 
-                if (result)
-                    return Json.builder(Response.HTTP_NOT_FOUND);
+        let isJoined = await FindInChannel.isJoined(roomId, userId);
 
-                cb();
-            });
+        if (isJoined) {
+            Json.builder(Response.HTTP_NOT_FOUND);
+            return false;
+        }
 
-        });
-
+        return true;
     },
-    isExistUserAndIsOwner = (userIdForAdmin, userId, channelId, cb) => {
+    isExistUserAndIsOwner = async (userIdForAdmin, userId, channelId) => {
 
-        FindInUser.isExist(userIdForAdmin, result => {
+        let isExist = await FindInUser.isExist(userIdForAdmin);
 
-            if (!result)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
+        if (!isExist) {
+            Json.builder(Response.HTTP_USER_NOT_FOUND);
+            return false;
+        }
 
+        let isOwner = await FindInChannel.isOwner(userId, channelId);
 
-            FindInChannel.isOwner(userId, channelId, result => {
+        if (!isOwner) {
+            Json.builder(Response.HTTP_FORBIDDEN);
+            return false;
+        }
 
-                if (!result)
-                    return Json.builder(Response.HTTP_FORBIDDEN);
-
-                cb();
-            });
-
-        });
-
+        return true;
     };
 
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
+
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
+
+    multerImage(req, res, async () => {
+
+        let file = req.file,
+            fileUrl,
+            isOwner = 1,
+            name = req.body?.name;
+
+        if (isUndefined(name))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        if (!isUndefined(file))
+            fileUrl = await File.validationAndWriteFile({
+                size: file.size,
+                dataBinary: file.buffer,
+                format: getFileFormat(file.originalname)
+            }).url;
 
 
-    getTokenPayLoad(data => {
+        let id = await Insert.channel(name.toString().trim(), Generate.makeIdForInviteLink(), getRandomHexColor(), fileUrl)
 
-        let userId = data.id;
+        if (isUndefined(id))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
 
-        multerImage(req, res, () => {
+        await Create.channelContents(id)
+            .then(() => AddChannelForeignKey.channelContents(id)
+                .then(async () => {
+                    await Insert.userIntoChannelsAdmins(userId, id, isOwner);
+                    await Insert.userIntoChannel(userId, id);
+                }));
 
-            let file = req.file,
-                fileUrl,
-                isOwner = 1,
-                name = req.body?.name;
-
-            if (isUndefined(name))
-                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-            if (!isUndefined(file))
-                fileUrl = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname)).fileUrl;
-
-
-            Insert.channel(name.toString().trim(), Generate.makeIdForInviteLink(), getRandomHexColor(), fileUrl, id => {
-
-                if (isUndefined(id))
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                Create.channelContents(id);
-                AddChannelForeignKey.channelContents(id);
-                Insert.userIntoChannelsAdmins(userId, id, isOwner);
-                Insert.userIntoChannel(userId, id);
-
-                Json.builder(Response.HTTP_CREATED);
-            });
-
-        });
+        Json.builder(Response.HTTP_CREATED);
 
     });
-
 
 }
 
 
-exports.deleteChannel = (req) => {
-
+exports.deleteChannel = async req => {
 
     let id = req.params?.id;
-
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-    getTokenPayLoad(data => {
+    let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
-        validationChannelAndUserAndOwnerUser(id, userId, () => {
-            DeleteInChannel.channel(id);
-            DeleteInChannel.admins(id);
-            DeleteInChannel.users(id);
-            DeleteInUser.channelInListOfUserChannels(id);
+    await DeleteInChannel.channel(id);
+    await DeleteInChannel.admins(id);
+    await DeleteInChannel.users(id);
+    await DeleteInUser.channelInListOfUserChannels(id);
+
+}
+
+
+exports.uploadFile = async (req, res) => {
+
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
+
+    multerFile(req, res, async () => {
+
+        let data = JSON.parse(JSON.stringify(req.body)),
+            receiverId = data?.receiverId,
+            channelId = data?.channelId;
+
+        if (isUndefined(channelId))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        if (!isUndefined(receiverId))
+            delete data?.receiverId;
+
+        delete data?.channelId;
+
+        let isErr = await validationChannelAndUserAndOwnerOrAdmin(channelId, userId);
+
+        if (!isErr)
+            return;
+
+        let isJoined = await FindInChannel.isJoined(channelId, userId);
+
+        if (!isJoined)
+            return Json.builder(Response.HTTP_NOT_FOUND);
+
+
+        let message = Util.validateMessage(data);
+
+        if (message === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
+            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+
+
+        message['senderId'] = userId;
+        let file = req.file;
+
+        if (!isUndefined(file))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let {
+            url,
+            size
+        } = await File.validationAndWriteFile({
+            size: file.size,
+            dataBinary: file.buffer,
+            format: getFileFormat(file.originalname)
+        });
+
+        message['fileUrl'] = url;
+        message['fileSize'] = size;
+        message['fileName'] = file.originalname;
+
+
+        await CommonInsert.message('`' + channelId + 'ChannelContents`', message, {
+            conversationType: 'Channel'
+        }).then(result => {
+            Json.builder(Response.HTTP_CREATED, {
+                insertId: result
+            });
         });
 
     });
@@ -179,80 +247,7 @@ exports.deleteChannel = (req) => {
 }
 
 
-exports.uploadFile = (req, res) => {
-
-
-    getTokenPayLoad(data => {
-
-        let userId = data.id;
-
-        multerFile(req, res, () => {
-
-            let data = JSON.parse(JSON.stringify(req.body)),
-                receiverId = data?.receiverId,
-                channelId = data?.channelId;
-
-            if (isUndefined(channelId))
-                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-            if (!isUndefined(receiverId))
-                delete data?.receiverId;
-
-            delete data?.channelId;
-
-            validationChannelAndUserAndOwnerOrAdmin(channelId, userId, () => {
-
-                FindInChannel.isJoined(channelId, userId, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
-
-
-                    Util.validateMessage(data, result => {
-
-                        if (result === (IN_VALID_OBJECT_KEY || IN_VALID_MESSAGE_TYPE))
-                            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-
-                        data['senderId'] = userId;
-                        let file = req.file;
-
-                        if (!isUndefined(file))
-                            return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                        let {
-                            fileUrl,
-                            fileSize
-                        } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
-
-                        data['fileUrl'] = fileUrl;
-                        data['fileSize'] = fileSize;
-                        data['fileName'] = file.originalname;
-
-
-                        CommonInsert.message('`' + channelId + 'ChannelContents`', data, {
-                            conversationType: 'Channel'
-                        }, result => {
-                            Json.builder(Response.HTTP_CREATED, {
-                                insertId: result
-                            });
-                        });
-
-                    });
-
-                });
-
-            });
-
-        });
-
-    });
-
-
-};
-
-
-exports.changeName = (req) => {
+exports.changeName = async req => {
 
     let bodyObject = req.body,
         name = bodyObject?.body,
@@ -261,27 +256,25 @@ exports.changeName = (req) => {
     if (isUndefined(name) || isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-        let userId = data.id;
+    let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
-        validationChannelAndUserAndOwnerUser(id, userId, () => {
+    if (!isErr)
+        return;
 
-            UpdateInChannel.name(id, name.toString().trim(), result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+    let result = await UpdateInChannel.name(id, name.toString().trim());
 
-                Json.builder(Response.HTTP_OK);
-            });
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.changeDescription = (req) => {
+exports.changeDescription = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
@@ -291,102 +284,94 @@ exports.changeDescription = (req) => {
     if (isUndefined(id) || isUndefined(description))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-    getTokenPayLoad(data => {
+    let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
-        validationChannelAndUserAndOwnerUser(id, userId, () => {
+    let result = await UpdateInChannel.description(id, description);
 
-            UpdateInChannel.description(id, description, result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                Json.builder(Response.HTTP_OK);
-            });
+    Json.builder(Response.HTTP_OK);
 
+}
 
+exports.uploadAvatar = async (req, res) => {
+
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
+
+    multerImage(req, res, async () => {
+
+        let id = req.body?.id;
+
+        if (isUndefined(id))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
+
+        if (!isErr)
+            return;
+
+        let file = req.file;
+
+        if (!isUndefined(file))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let {
+            url
+        } = await File.validationAndWriteFile({
+            size: file.size,
+            dataBinary: file.buffer,
+            format: getFileFormat(file.originalname)
         });
+
+        let result = await UpdateInChannel.img(id, url);
+
+        if (!result)
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        Json.builder(Response.HTTP_CREATED);
 
     });
 
 }
 
-exports.uploadAvatar = (req, res) => {
 
-
-    getTokenPayLoad(data => {
-
-        let userId = data.id;
-
-
-        multerImage(req, res, () => {
-
-            let id = req.body?.id;
-
-            if (isUndefined(id))
-                return Json.builder(Response.HTTP_BAD_REQUEST);
-
-            validationChannelAndUserAndOwnerUser(id, userId, () => {
-
-                let file = req.file;
-
-                if (!isUndefined(file))
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                let {
-                    fileUrl
-                } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
-
-                UpdateInChannel.img(id, fileUrl, result => {
-                    if (!result)
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
-
-                    Json.builder(Response.HTTP_CREATED);
-                });
-
-            });
-
-        });
-
-    });
-
-
-}
-
-
-exports.changeToInviteLink = (req) => {
+exports.changeToInviteLink = async req => {
 
     let id = req.body?.id;
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
+    let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
-        validationChannelAndUserAndOwnerUser(id, userId, () => {
+    let link = Generate.makeIdForInviteLink();
 
-            let link = Generate.makeIdForInviteLink();
-            UpdateInChannel.inviteLink(id, link, result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_BAD_REQUEST);
+    let result = await UpdateInChannel.inviteLink(id, link);
 
-                Json.builder(Response.HTTP_OK, {
-                    inviteLink: link
-                });
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-            });
-
-        });
-
+    Json.builder(Response.HTTP_OK, {
+        inviteLink: link
     });
 
 }
 
-exports.changeToPublicLink = (req) => {
+exports.changeToPublicLink = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
@@ -395,71 +380,59 @@ exports.changeToPublicLink = (req) => {
     if (isUndefined(id) || isUndefined(publicLink))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
+    let isErr = await validationChannelAndUserAndOwnerUser(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
+    let realPublicLink = Generate.makeIdForPublicLink(publicLink);
 
-        validationChannelAndUserAndOwnerUser(id, userId, () => {
+    let isPublicKeyUsed = await FindInChannel.isPublicKeyUsed(realPublicLink);
 
-            let publicLink = Generate.makeIdForPublicLink(publicLink);
+    if (!isPublicKeyUsed)
+        return Json.builder(Response.HTTP_CONFLICT);
 
-            FindInChannel.isPublicKeyUsed(publicLink, result => {
-                if (!result)
-                    return Json.builder(Response.HTTP_CONFLICT);
+    let result = await UpdateInChannel.publicLink(id, publicLink);
 
-                UpdateInChannel.publicLink(id, publicLink, result => {
-                    if (!result)
-                        return Json.builder(Response.HTTP_BAD_REQUEST);
+    if (!result)
+        return Json.builder(Response.HTTP_BAD_REQUEST);
 
-                    Json.builder(Response.HTTP_OK);
-                });
-
-            });
-
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.joinUser = (req) => {
-
+exports.joinUser = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
         targetUserId = bodyObject?.userId;
 
-
     if (isUndefined(id) || isUndefined(targetUserId))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
+    let isErr = await validationChannelAndUserAndJoinedInChannel(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
-        validationChannelAndUserAndJoinedInChannel(id, userId, () => {
+    let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
 
-            let getUserId = isUndefined(targetUserId) ? userId : targetUserId;
+    await Insert.userIntoChannel(id, getUserId);
+    await InsertInUser.channelIntoListOfUserChannels(id, getUserId);
 
-            Insert.userIntoChannel(id, getUserId);
-            InsertInUser.channelIntoListOfUserChannels(id, getUserId);
-
-
-            Json.builder(Response.HTTP_CREATED);
-        });
-
-    });
-
+    Json.builder(Response.HTTP_CREATED);
 
 }
 
 
-exports.addAdmin = (req) => {
-
+exports.addAdmin = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
@@ -468,44 +441,39 @@ exports.addAdmin = (req) => {
     if (isUndefined(id) || isUndefined(userIdForNewAdmin))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
+
+    let isErr = await validationChannelAndUser(id, userId);
+
+    if (!isErr)
+        return;
+
+    let isErrAgain = await isExistUserAndIsOwner(userIdForNewAdmin, userId, id);
+
+    if (!isErrAgain)
+        return;
+
+    let isJoined = await FindInChannel.isJoined(id, userIdForNewAdmin);
+
+    if (!isJoined)
+        return Json.builder(Response.HTTP_NOT_FOUND);
+
+    let isAdmin = await FindInChannel.isAdmin(id, userIdForNewAdmin);
+
+    if (isAdmin)
+        return Json.builder(Response.HTTP_CONFLICT);
+
+    let isNotOwner = 0;
+    await Insert.userIntoChannelsAdmins(userIdForNewAdmin, id, isNotOwner);
 
 
-        let userId = data.id;
-
-        validationChannelAndUser(id, userId, () => {
-
-            isExistUserAndIsOwner(userIdForNewAdmin, userId, id, () => {
-
-                FindInChannel.isJoined(id, userIdForNewAdmin, result => {
-
-                    if (!result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
-
-                    FindInChannel.isAdmin(id, userIdForNewAdmin, result => {
-
-                        if (result)
-                            return Json.builder(Response.HTTP_CONFLICT);
-
-                        let isNotOwner = 0;
-                        Insert.userIntoChannelsAdmins(userIdForNewAdmin, id, isNotOwner);
-
-
-                        Json.builder(Response.HTTP_CREATED);
-                    });
-
-                });
-
-            });
-
-        });
-
-    });
+    Json.builder(Response.HTTP_CREATED);
 
 }
 
-exports.deleteAdmin = (req) => {
 
+exports.deleteAdmin = async req => {
 
     let bodyObject = req.body,
         id = bodyObject?.id,
@@ -514,65 +482,55 @@ exports.deleteAdmin = (req) => {
     if (isUndefined(id) || isUndefined(userIdForDeleteAdmin))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
-    getTokenPayLoad(data => {
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
+    let isErr = await validationChannelAndUser(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
-        validationChannelAndUser(id, userId, () => {
+    let isErrAgain = await isExistUserAndIsOwner(userIdForDeleteAdmin, userId, id);
 
-            isExistUserAndIsOwner(userIdForDeleteAdmin, userId, id, () => {
+    if (!isErrAgain)
+        return;
 
-                FindInChannel.isAdmin(id, userIdForDeleteAdmin, result => {
+    let isAdmin = await FindInChannel.isAdmin(id, userIdForDeleteAdmin);
 
-                    if (!result)
-                        return Json.builder(Response.HTTP_NOT_FOUND);
+    if (!isAdmin)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-                    DeleteInChannel.admin(id, userIdForDeleteAdmin);
+    await DeleteInChannel.admin(id, userIdForDeleteAdmin);
 
-
-                    Json.builder(Response.HTTP_OK);
-                });
-
-            });
-
-        });
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.leaveUser = (req) => {
-
+exports.leaveUser = async req => {
 
     let id = req.body?.id;
-
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-    getTokenPayLoad(data => {
+    let isErr = await validationChannelAndUserAndJoinedInChannel(id, userId);
 
+    if (!isErr)
+        return;
 
-        let userId = data.id;
+    await DeleteInChannel.userInChannel(id, userId);
+    await DeleteInUser.channelIntoListOfUserChannels(id, userId);
 
-        validationChannelAndUserAndJoinedInChannel(id, userId, () => {
-
-            DeleteInChannel.userInChannel(id, userId);
-            DeleteInUser.channelIntoListOfUserChannels(id, userId);
-
-            Json.builder(Response.HTTP_OK);
-        });
-
-
-    });
+    Json.builder(Response.HTTP_OK);
 
 }
 
 
-exports.listOfMessage = (req) => {
+exports.listOfMessage = async req => {
 
     let queryObject = req.query,
         limit = queryObject?.limit,
@@ -588,116 +546,86 @@ exports.listOfMessage = (req) => {
         getPage = !isUndefined(page) ? page : 1,
         startFrom = (getPage - 1) * limit;
 
-
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-    getTokenPayLoad(data => {
+    let result = await FindInUser.getTableNameForListOfUserChannels(id, userId);
 
+    if (!result)
+        return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
-        let userId = data.id;
+    let count = await FindInChannel.getCountOfListMessage(id);
 
-        FindInUser.getTableNameForListOfUserChannels(id, userId, result => {
+    let totalPages = Math.ceil(count / getLimit);
 
-            if (!result)
-                return Json.builder(Response.HTTP_USER_NOT_FOUND);
-
-
-            FindInChannel.getCountOfListMessage(id, count => {
-
-                let totalPages = Math.ceil(count / getLimit);
-
-                FindInUser.getListOfMessage('`' + id + 'ChannelContents`', startFrom, getLimit, getOrder, getSort, type, search, result => {
-
-                    Json.builder(
-                        Response.HTTP_OK,
-                        result, {
-                            totalPages: totalPages
-                        }
-                    );
-
-                });
-
-            });
-
-        });
-
+    let listOfMessage = await FindInUser.getListOfMessage({
+        type: type,
+        sort: getSort,
+        search: search,
+        limit: getLimit,
+        order: getOrder,
+        startFrom: startFrom,
+        tableName: '`' + id + 'ChannelContents`'
     });
 
+    Json.builder(
+        Response.HTTP_OK,
+        listOfMessage, {
+            totalPages: totalPages
+        }
+    );
 
 }
 
 
-exports.info = (req) => {
+exports.info = async req => {
 
     let id = req.body?.id;
-
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let isDefined = await FindInChannel.id(id);
 
-    getTokenPayLoad(() => {
+    if (!isDefined)
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
+    let info = await FindInChannel.getInfo(id);
 
-        FindInChannel.id(id, isDefined => {
+    let countOfUser = await FindInChannel.getCountOfUsers(id);
 
-            if (!isDefined)
-                return Json.builder(Response.HTTP_NOT_FOUND);
-
-
-            FindInChannel.getInfo(id, result => {
-
-                FindInChannel.getCountOfUsers(id, count => {
-
-                    Json.builder(Response.HTTP_OK, result, {
-                        memberSize: count
-                    });
-
-                })
-
-            });
-
-        });
-
-
+    Json.builder(Response.HTTP_OK, info, {
+        memberSize: countOfUser
     });
 
 }
 
 
-exports.allUsers = (req) => {
+exports.allUsers = async req => {
 
     let id = req.body?.id;
-
 
     if (isUndefined(id))
         return Json.builder(Response.HTTP_BAD_REQUEST);
 
+    let tokenPayload = await getTokenPayLoad();
+    let userId = tokenPayload.id;
 
-    getTokenPayLoad(data => {
+    let isErr = await validationChannelAndUserAndOwnerOrAdmin(id, userId);
 
-        let userId = data.id;
+    if (!isErr)
+        return;
 
-        validationChannelAndUserAndOwnerOrAdmin(id, userId, () => {
+    let users = await FindInChannel.getAllUsers(id);
 
-            FindInChannel.getAllUsers(id, data => {
+    if (isUndefined(users))
+        return Json.builder(Response.HTTP_NOT_FOUND);
 
-                if (isUndefined(data))
-                    return Json.builder(Response.HTTP_NOT_FOUND);
+    let result = await FindInUser.getUserDetailsInUsersTableForMember(users);
 
-                FindInUser.getUserDetailsInUsersTableForMember(data, result => {
-
-                    Json.builder(Response.HTTP_OK, result);
-
-                });
-
-            });
-
-        });
-
-
-    });
+    Json.builder(Response.HTTP_OK, result);
 
 }

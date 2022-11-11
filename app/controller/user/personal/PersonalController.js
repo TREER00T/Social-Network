@@ -1,13 +1,13 @@
-let Json = require('app/util/ReturnJson'),
+let Json = require('../../../util/ReturnJson'),
     {
         getTokenPayLoad
-    } = require('app/middleware/RouterUtil'),
-    Response = require('app/util/Response'),
+    } = require('../../../middleware/RouterUtil'),
+    Response = require('../../../util/Response'),
     {
         InputException
-    } = require('app/exception/InputException'),
-    Update = require('app/model/update/user/users'),
-    Find = require('app/model/find/user/users'),
+    } = require('../../../exception/InputException'),
+    Update = require('../../../model/update/user/users'),
+    Find = require('../../../model/find/user/users'),
     multer = require('multer'),
     {
         NULL
@@ -16,20 +16,20 @@ let Json = require('app/util/ReturnJson'),
     multerFile = multer().single('file'),
     {
         getHashData
-    } = require('app/util/Generate'),
-    File = require('app/util/File'),
+    } = require('../../../util/Generate'),
+    File = require('../../../util/File'),
     Util, {
         isUndefined,
         getFileFormat,
         IN_VALID_MESSAGE_TYPE,
         IN_VALID_OBJECT_KEY
-    } = require('app/util/Util'),
-    CommonInsert = require('app/model/add/insert/common/index'),
-    Create = require('app/model/create/users'),
-    Insert = require('app/model/add/insert/user/users'),
-    FindInUser = require('app/model/find/user/users'),
-    AddUserForeignKey = require('app/model/add/foreignKey/users'),
-    Delete = require('app/model/remove/users/user');
+    } = require('../../../util/Util'),
+    CommonInsert = require('../../../model/add/insert/common/index'),
+    Create = require('../../../model/create/users'),
+    Insert = require('../../../model/add/insert/user/users'),
+    FindInUser = require('../../../model/find/user/users'),
+    AddUserForeignKey = require('../../../model/add/foreignKey/users'),
+    Delete = require('../../../model/remove/users/user');
 
 
 exports.user = () => {
@@ -230,10 +230,15 @@ exports.uploadAvatar = (req, res) => {
                 return Json.builder(Response.HTTP_BAD_REQUEST);
 
             let {
-                fileUrl
-            } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+                url
+            } = File.validationAndWriteFile({
+                size: file.size,
+                dataBinary: file.buffer,
+                format: getFileFormat(file.originalname)
+            });
 
-            Update.img(phone, fileUrl, result => {
+
+            Update.img(phone, url, result => {
                 if (!result)
                     return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -482,12 +487,16 @@ exports.uploadFile = (req, res) => {
                             return Json.builder(Response.HTTP_BAD_REQUEST);
 
                         let {
-                            fileUrl,
-                            fileSize
-                        } = File.validationAndWriteFile(file.buffer, getFileFormat(file.originalname));
+                            url,
+                            size
+                        } = File.validationAndWriteFile({
+                            size: file.size,
+                            dataBinary: file.buffer,
+                            format: getFileFormat(file.originalname)
+                        });
 
-                        data['fileUrl'] = fileUrl;
-                        data['fileSize'] = fileSize;
+                        data['fileUrl'] = url;
+                        data['fileSize'] = size;
                         data['fileName'] = file.originalname;
 
 

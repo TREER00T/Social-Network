@@ -5,9 +5,8 @@ let openSql = require('opensql'),
 
 module.exports = {
 
-    channelsAdmins() {
-
-        openSql.addForeignKey({
+    async channelsAdmins() {
+        await openSql.addForeignKey({
             table: 'channelsAdmins',
             foreignKey: 'adminId',
             referenceTable: 'users',
@@ -15,7 +14,8 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-        openSql.addForeignKey({
+
+        await openSql.addForeignKey({
             table: 'channelsAdmins',
             foreignKey: 'channelId',
             referenceTable: 'channels',
@@ -23,47 +23,48 @@ module.exports = {
             onDelete: CASCADE,
             onUpdate: CASCADE
         });
-
     },
 
 
-    channelsUsers() {
-        openSql.addForeignKey({
+    async channelsUsers() {
+        await openSql.addForeignKey({
             table: 'channelsUsers',
             foreignKey: 'userId',
             referenceTable: 'users',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
-        openSql.addForeignKey({
+        });
+
+        await openSql.addForeignKey({
             table: 'channelsUsers',
             foreignKey: 'channelId',
             referenceTable: 'channels',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     },
 
 
-    channelContents(channelId) {
-        openSql.addForeignKey({
+    async channelContents(channelId) {
+        await openSql.addForeignKey({
             table: channelId + 'ChannelContents',
             foreignKey: 'forwardDataId',
             referenceTable: 'forwardContents',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
-        openSql.addForeignKey({
+        });
+
+        await openSql.addForeignKey({
             table: channelId + 'ChannelContents',
             foreignKey: 'senderId',
             referenceTable: 'channels',
             field: 'id',
             onDelete: CASCADE,
             onUpdate: CASCADE
-        }).result(()=>{});
+        });
     }
 
 

@@ -2,85 +2,57 @@ let {
         getJwtVerify,
         getJwtDecrypt,
         getSplitBearerJwt
-    } = require('app/util/Validation'),
+    } = require('../../util/Validation'),
     {
         getApiKey
-    } = require('app/model/find/user/users');
+    } = require('../../model/find/user/users');
 
 let accessTokenPayload, apiKey;
 
 module.exports = {
 
-    userApiKey(phone, key, cb) {
+    async userApiKey(phone, key) {
 
         if (!key)
-            return cb(false);
+            return false;
 
-        getApiKey(phone, result => {
+        let result = await getApiKey(phone);
 
-            cb(result === key);
+        apiKey = result;
 
-            (function (cb) {
-                if (typeof cb === 'function')
-                    cb(key)
-            })(apiKey);
-
-        });
-
+        return result === key;
     },
 
-    accessTokenVerify(bearerHeader, cb) {
+    async accessTokenVerify(bearerHeader) {
 
         let isSetUserAccessToken = getSplitBearerJwt(bearerHeader);
 
         if (typeof isSetUserAccessToken !== 'string')
-            return cb(false);
+            return false;
 
-        cb(true);
+        let token = await getJwtDecrypt(isSetUserAccessToken);
 
-        (async () => {
+        let decode = await getJwtVerify(token);
 
-            let token = await getJwtDecrypt(isSetUserAccessToken);
+        if (decode === 'TOKEN_EXP')
+            return 'TOKEN_EXP';
 
-            getJwtVerify(token, decode => {
+        if (decode === 'IN_VALID_TOKEN')
+            return 'IN_VALID_TOKEN';
 
+        accessTokenPayload = decode;
 
-                if (decode === 'TOKEN_EXP')
-                    return cb('TOKEN_EXP');
-
-
-                if (decode === 'IN_VALID_TOKEN')
-                    return cb('IN_VALID_TOKEN');
-
-
-
-                if (decode.type === 'at') {
-
-                    (function (cb) {
-                        if (typeof cb === 'function')
-                            cb(decode)
-                    })(accessTokenPayload);
-
-                }
-
-            });
-
-        })();
-
+        return decode.type === 'at';
     },
 
 
-    getAccessTokenPayLoad(cb) {
-        accessTokenPayload = (data => {
-            cb(data);
-        });
+    async getAccessTokenPayLoad() {
+        return await accessTokenPayload;
     },
 
 
-    getApiKey(cb) {
-        apiKey = (data => {
-            cb(data);
-        });
+    async getApiKey() {
+        return await apiKey;
     }
 
 
