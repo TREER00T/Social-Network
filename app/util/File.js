@@ -84,7 +84,7 @@ module.exports = {
                 FILE_SIZE = Util.formatBytes(obj.size),
                 pathDir = cacheFolder + obj.pathDir + randomFileName + obj.format;
 
-            await fs.promises.writeFile(ROOT_PROJECT_FOLDER + obj.pathDir, obj.dataBinary);
+            await fs.promises.writeFile(ROOT_PROJECT_FOLDER + pathDir, obj.dataBinary);
 
             return {
                 url: url + '/' + pathDir,
@@ -108,7 +108,7 @@ module.exports = {
             await fs.promises.copyFile('../../config/.htaccess', cacheFolderPath + '.htaccess');
         }
 
-        return isExistFolder;
+        return !!isExistFolder;
     }
 
 }
