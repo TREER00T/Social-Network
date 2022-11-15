@@ -1,11 +1,11 @@
 let Json = require('./ReturnJson'),
     Response = require('./Response'),
     Util = require('./Util'),
-    jwt,
     {
         TokenExpiredError,
         JsonWebTokenError
     } = require('jsonwebtoken'),
+    jwt = require('jsonwebtoken'),
     {
         JWK,
         parse
@@ -134,7 +134,7 @@ module.exports = {
     // The verify jwt and check jwt expired time
     async getJwtVerify(token) {
 
-        return new Promise(res => {
+        return new Promise(async res => {
 
             try {
                 jwt.verify(token, process.env.PUBLIC_KEY, {}, (err, decoded) => {
@@ -149,7 +149,7 @@ module.exports = {
                         return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
                     }
 
-                    cb(decoded);
+                    res(decoded);
                 });
             } catch (e) {
                 ValidationException(e);

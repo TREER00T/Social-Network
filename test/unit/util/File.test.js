@@ -21,18 +21,22 @@ let simpleImageBase64 =
     'PFjmHyhclXOvdEDiAYwnsRO6rhs6cco1JS+U0TL9mZq7BydO2ODyGKAMvqU6/Hz2mNplrpWV1f+qf0av' +
     'LKCFtScKAAAAAElFTkSuQmCC';
 
-describe('Validation class', () => {
+describe('Validation module', () => {
 
-    it('should be return object with file size and url', () => {
+    it('should be return object with file size and url', async () => {
 
-        expect(File.validationAndWriteFile(Buffer.from(simpleImageBase64, 'base64'), '.png')).toMatchObject({
+        expect(await File.validationAndWriteFile({
+            format: '.png',
+            size: 1095,
+            dataBinary: Buffer.from(simpleImageBase64, 'base64')
+        })).toMatchObject({
             size: "1.07 KB"
         });
 
     });
 
-    it('should be make directory if isn\'t exist', () => {
-        expect(File.mkdirForUploadFile()).toBe(true);
+    it('should be make directory if isn\'t exist', async () => {
+        expect(await File.mkdirForUploadFile()).toBe(true);
     });
 
 });
