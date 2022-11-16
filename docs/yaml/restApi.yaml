@@ -2,7 +2,7 @@ swagger: "2.0"
 info:
   title: Social Network API
   description: Social Network API Documentation
-  version: 1.0.0
+  version: 1.1.2
   contact:
     email: treeroot.ir@gmail.com
   license:
@@ -693,7 +693,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /personal/bio/{bio}:
+  /personal/bio:
     put:
       tags:
         - Personal
@@ -701,7 +701,7 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: path
+        - in: body
           name: bio
           type: string
           required: true

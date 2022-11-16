@@ -1,25 +1,26 @@
 let router = require('express').Router(),
     Personal = require('../../controller/user/personal/PersonalController');
 
+let personal = new Personal();
 
-router.get('/user', Personal.user);
-router.put('/username/:id', Personal.editUsername);
-router.put('/bio/:bio', Personal.editBio);
-router.put('/name', Personal.editName);
-router.put('/twoAuth', Personal.twoAuth);
-router.put('/twoAuth/disable', Personal.disableTwoAuth);
-router.put('/twoAuth/rest/password', Personal.restPassword);
-router.put('/uploadAvatar', Personal.uploadAvatar);
-router.get('/blockUsers', Personal.listOfBlockUsers);
-router.get('/devices', Personal.listOfDevices);
-router.get('/savedMessage', Personal.listOfMessage);
-router.delete('/savedMessage', Personal.deleteSavedMessage);
-router.post('/savedMessage', Personal.createSavedMessage);
-router.delete('/account', Personal.account);
-router.post('/message', Personal.addMessage);
-router.post('/uploadFile', Personal.uploadFile);
-router.delete('/message', Personal.deleteMessage);
-router.put('/message', Personal.editMessage);
+router.get('/user', personal.user);
+router.put('/username/:id', personal.editUsername);
+router.put('/bio', personal.editBio);
+router.put('/name', personal.editName);
+router.put('/twoAuth', personal.twoAuth);
+router.put('/twoAuth/disable', personal.disableTwoAuth);
+router.put('/twoAuth/rest/password', personal.restPassword);
+router.put('/uploadAvatar', personal.uploadAvatar);
+router.get('/blockUsers', personal.listOfBlockUsers);
+router.get('/devices', personal.listOfDevices);
+router.get('/savedMessage', personal.listOfMessage);
+router.delete('/savedMessage', personal.deleteSavedMessage);
+router.post('/savedMessage', personal.createSavedMessage);
+router.delete('/account', personal.account);
+router.post('/message', personal.addMessage);
+router.post('/uploadFile', personal.uploadFile);
+router.delete('/message', personal.deleteMessage);
+router.put('/message', personal.editMessage);
 
 
 module.exports = router;

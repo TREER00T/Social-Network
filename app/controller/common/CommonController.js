@@ -6,18 +6,19 @@ let Json = require('../../util/ReturnJson'),
     Find = require('../../model/find/common/common');
 
 
-exports.search = async (req) => {
+module.exports = class {
 
+    async search(req) {
 
-    let value = req.query?.v;
+        let value = req.query?.v;
 
+        let result = await Find.searchWithNameInTableUsersGroupsAndChannels(value);
 
-    let result = await Find.searchWithNameInTableUsersGroupsAndChannels(value);
+        if (isUndefined(result))
+            return Json.builder(Response.HTTP_NOT_FOUND);
 
-    if (isUndefined(result))
-        return Json.builder(Response.HTTP_NOT_FOUND);
+        Json.builder(Response.HTTP_OK, result);
 
-    Json.builder(Response.HTTP_OK, result);
-
+    }
 
 }

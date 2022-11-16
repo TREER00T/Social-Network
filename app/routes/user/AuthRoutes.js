@@ -1,11 +1,12 @@
 let router = require('express').Router(),
     User = require('../../controller/user/auth/AuthController');
 
+let user = new User();
 
-router.post('/generate/user', User.gvc);
-router.post('/refresh/token', User.refreshToken);
-router.post('/verify/authCode', User.isValidAuthCode);
-router.post('/verify/twoStep', User.isValidPassword);
+router.post('/generate/user', user.gvc);
+router.post('/refresh/token', user.refreshToken);
+router.post('/verify/authCode', user.isValidAuthCode);
+router.post('/verify/twoStep', user.isValidPassword);
 
 
 module.exports = router;
