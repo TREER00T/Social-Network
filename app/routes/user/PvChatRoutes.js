@@ -1,14 +1,15 @@
 let router = require('express').Router(),
     PvChat = require('../../controller/user/e2e/PvChatController');
 
+let pvChat = new PvChat();
 
-router.post('/room/create', PvChat.createE2EChat);
-router.post('/room/uploadFile', PvChat.uploadFile);
-router.post('/room/user/block', PvChat.blockUser);
-router.get('/room/chats', PvChat.listOfMessage);
-router.get('/room/user', PvChat.user);
-router.delete('/room/:id/me', PvChat.deleteForMe);
-router.delete('/room/:id/us', PvChat.deleteForUs);
+router.post('/room/create', pvChat.createE2EChat);
+router.post('/room/uploadFile', pvChat.uploadFile);
+router.post('/room/user/block', pvChat.blockUser);
+router.get('/room/chats', pvChat.listOfMessage);
+router.get('/room/user', pvChat.user);
+router.delete('/room/:id/me', pvChat.deleteForMe);
+router.delete('/room/:id/us', pvChat.deleteForUs);
 
 
 module.exports = router;

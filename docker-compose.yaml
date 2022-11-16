@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: mysql
+    restart: always
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  app:
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: app
+    image: socail-network
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./:/app/
+
+volumes:
+  db:
+    driver: local
+

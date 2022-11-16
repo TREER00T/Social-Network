@@ -1,6 +1,6 @@
 {
   "name": "social-network-server",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Social Network Application",
   "main": "init.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "node-jose": "^2.1.1",
-    "openrtp": "^1.0.5",
+    "openrtp": "^1.0.6",
     "opensql": "^1.2.47",
     "socket.io": "^4.5.3",
     "swagger-ui-express": "^4.5.0",
