@@ -5,6 +5,7 @@
 - [Install](#install)
 - [Introduction](#introduction)
 - [Api Schema](#api-schema)
+    - [URL Schema](#url-Schema)
 - [Database Schema](#database-schema)
 - [Configuration](#configuration)
 - [License](#license)
@@ -28,17 +29,26 @@ A simple social network with socket.io and rest api
 
 ## Api Schema
 
-In this project, two libraries are used for documentation and display and display with api.
-For Restful Api ([swagger](https://github.com/scottie1984/swagger-ui-express)) and For Socket.io ([OpenRTP](https://github.com/treegex/openrtp))
+In this project, two libraries are used for documentation and display and display with api. For Restful
+Api ([swagger](https://github.com/scottie1984/swagger-ui-express)) and For
+Socket.io ([OpenRTP](https://github.com/treegex/openrtp))
+
+### URL Schema
+
+**Rest Api** =>
+`http://localhost:3000/apiDocs`
+
+**Socket.io** =>
+`http://localhost:17892/socket-docs`
 
 ## Database Schema
 
-For more information about the database structure, refer to [this](https://github.com/TREER00T/Social-Network-Database) repository
+For more information about the database structure, refer to [this](https://github.com/TREER00T/Social-Network-Database)
+repository
 
 ## Configuration
 
 Open cmd and run the following commands.
-
 
 ```shell
 node cmd.js serve
@@ -46,12 +56,11 @@ node cmd.js serve
 
 TIP : Before running this command, make sure that your database and server are on.
 
-
 ```shell
 npm start
 ```
 
-
 ## Licensing
 
-The code in this project is licensed under the [Apache License](https://github.com/TREER00T/Social-Network-Server/blob/main/LICENSE)
+The code in this project is licensed under
+the [Apache License](https://github.com/TREER00T/Social-Network-Server/blob/main/LICENSE)

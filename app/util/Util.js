@@ -151,12 +151,6 @@ module.exports = {
 
     isNotEmptyArr(data) {
         return data?.length > 0;
-    },
-
-    isBiggerThanZero(data) {
-        if (typeof data === 'bigint' || typeof data === 'number')
-            return data > 0;
-        return false;
     }
 
 }

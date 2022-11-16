@@ -2,7 +2,7 @@
 let {
         program
     } = require('commander'),
-    Database = require('./app/database/DatabaseInterface'),
+    Database = require('./app/database/config'),
     File = require('./app/util/File');
 
 
@@ -11,12 +11,7 @@ program
     .description('Initialization server')
     .action(async () => {
 
-        await Database.connect().then(async isErr => {
-            if (isErr)
-                return console.log('Database connect failed');
-
-            await Database.createTable().then(() => console.log('Database Successfully Created.'));
-        });
+        await Database.createDatabase();
 
         await File.mkdirForUploadFile();
 

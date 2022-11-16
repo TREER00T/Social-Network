@@ -75,16 +75,11 @@ module.exports = {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
 
 
-        return `+` + result;
+        return `+${result}`;
     },
 
     makeIdForPublicLink(id) {
-        return `+` + id.toString().trim();
-    },
-
-    objectListOfUserActivityForWhereCondition(type, userId) {
-        let objectForWhereCondition = {};
-        return objectForWhereCondition['listOfUser' + type + 's.userId'] = `${userId}`;
+        return `+${id.toString().trim()}`;
     }
 
 
