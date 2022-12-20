@@ -9,12 +9,12 @@ let express = require('express'),
     RouterUtil = require('../middleware/RouterUtil'),
     Json = require('../util/ReturnJson'),
     Response = require('../util/Response'),
-    authRouter = require('../routes/user/AuthRoutes'),
-    personalRouter = require('../routes/user/PersonalRoutes'),
-    groupRouter = require('../routes/group/GroupRoutes'),
-    channelRouter = require('../routes/channel/ChannelRoutes'),
-    commonRouter = require('../routes/common/CommonRoutes'),
-    e2eRouter = require('../routes/user/PvChatRoutes');
+    authRouter = require('../routes/user/auth'),
+    personalRouter = require('../routes/user/personal'),
+    groupRouter = require('../routes/group'),
+    channelRouter = require('../routes/channel'),
+    commonRouter = require('../routes/common'),
+    e2eRouter = require('../routes/user/e2e');
 
 
 module.exports = {
@@ -49,7 +49,7 @@ module.exports = {
                 let isAccessTokenVerify = RouterUtil.tokenVerify(token);
 
 
-                let isSetUserToken = !isAccessTokenVerify ? isAccessTokenVerify : RouterUtil.tokenVerify(token);
+                let isSetUserToken = !isAccessTokenVerify ? isAccessTokenVerify : await RouterUtil.tokenVerify(token);
                 let isSetUserApiKey = RouterUtil.isSetUserApiKey(apiKey);
 
                 if (!isSetUserApiKey || !isSetUserToken)

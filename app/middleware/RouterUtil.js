@@ -5,7 +5,7 @@ let {
     } = require('../util/Validation'),
     {
         getApiKey
-    } = require('../model/find/user/users');
+    } = require('../model/find/user');
 
 let tokenPayload;
 

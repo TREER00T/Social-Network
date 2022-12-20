@@ -1,21 +1,21 @@
 let app = require('express')(),
     http = require('http').Server(app),
     io = require('socket.io')(http),
-    Update = require('../../model/update/user/users'),
+    Update = require('../../model/update/user'),
     IoUtil = require('../../io/util/util'),
     RestFulUtil, {
         IN_VALID_MESSAGE_TYPE,
         IN_VALID_OBJECT_KEY
     } = require('../../util/Util'),
-    Insert = require('../../model/add/insert/common/index'),
-    UpdateInCommon = require('../../model/update/common/common'),
-    DeleteInCommon = require('../../model/remove/common/common'),
-    CommonFind = require('../../model/find/common/common'),
+    Insert = require('../../model/add/common/index'),
+    UpdateInCommon = require('../../model/update/common'),
+    DeleteInCommon = require('../../model/remove/common'),
+    CommonFind = require('../../model/find/common'),
     Response = require('../../util/Response'),
     Pipeline = require('../../io/middleware/SocketIoPipeline'),
-    FindInGroup = require('../../model/find/groups/group'),
-    FindInChannel = require('../../model/find/channels/channel'),
-    FindInUser = require('../../model/find/user/users');
+    FindInGroup = require('../../model/find/group'),
+    FindInChannel = require('../../model/find/channel'),
+    FindInUser = require('../../model/find/user');
 require('dotenv').config();
 
 
@@ -39,24 +39,24 @@ http.listen(port, () => {
 io.use(async (socket, next) => {
 
     let accessToken = socket.handshake.headers?.authorization;
-    let apiKey = socket.handshake.query?.apiKey;
+    let userApiKey = socket.handshake.query?.apiKey;
 
     let result = await Pipeline.accessTokenVerify(accessToken);
 
-    if ((result !== 'TOKEN_EXP' || 'IN_VALID_TOKEN') && result) {
+    if ((result !== 'TOKEN_EXP' || result !== 'IN_VALID_TOKEN') && result) {
 
         let data = await Pipeline.getAccessTokenPayLoad();
 
         let phone = data.phoneNumber,
             userId = data.id;
 
-        let apiKey = await Pipeline.userApiKey(phone, apiKey);
+        let apiKey = await Pipeline.userApiKey(phone, userApiKey);
 
         if (apiKey) {
-            let socketId = `${socket.id}`;
+            let socketId = socket.id;
             allUsers[socketId] = {
                 data: {
-                    phone: `${phone}`,
+                    phone: phone,
                     userId: userId
                 }
             };
@@ -141,8 +141,8 @@ io.use(async (socket, next) => {
         }
 
         let result = await FindInUser.isExistChatRoom({
-            toUser: `${receiverId}`,
-            fromUser: `${socketUserId}`
+            toUser: receiverId,
+            fromUser: socketUserId
         });
 
         if (!result) {
@@ -175,7 +175,7 @@ io.use(async (socket, next) => {
                 return emitToSocket(errEmitName, Response.HTTP_FORBIDDEN);
 
             delete data?.receiverId;
-            data['senderId'] = socketUserId;
+            data.senderId = socketUserId;
 
             emitToSpecificSocket(receiverSocketId, emitName, data);
 
@@ -193,13 +193,11 @@ io.use(async (socket, next) => {
 
         let type = data?.type,
             result = {
-                e2e: async () => await CommonFind.getListOfUserE2esActivity(socketUserId, type).then(result => {
+                e2e: async () => await CommonFind.getListOfUserGroupsChannelsOrE2EsActivity(socketUserId, type).then(result => {
                     emitToSocket('emitUserActivities', result);
                 }),
-                group: async () => await CommonFind.getListOfUserGroupsOrChannelsActivity(socketUserId, type).then(result => {
-                    emitToSocket('emitUserActivities', result);
-                }),
-                channel: async () => await result.group()
+                group: async () => await result.e2e(),
+                channel: async () => await result.e2e()
             };
 
         if (!typeof result[type] === 'function')
@@ -234,8 +232,7 @@ io.use(async (socket, next) => {
     });
 
 
-    socketOnForE2e('onPvTyping',
-        'emitPvTyping', 'emitPvTypingError');
+    socketOnForE2e('onPvTyping', 'emitPvTyping', 'emitPvTypingError');
 
     let socketOnForE2eWithOutCheckUserInBlockList = (endPointName, emitName, errEmitName) => {
 
@@ -252,7 +249,7 @@ io.use(async (socket, next) => {
                 return;
 
             delete data?.receiverId;
-            data['senderId'] = socketUserId;
+            data.senderId = socketUserId;
 
             emitToSpecificSocket(receiverSocketId, emitName, data);
 
@@ -292,11 +289,9 @@ io.use(async (socket, next) => {
             return emitToSocket('emitPvUploadedFileError', Response.HTTP_FORBIDDEN);
 
         delete data?.receiverId;
-        dbData['senderId'] = socketUserId;
+        dbData.senderId = socketUserId;
 
-        let result = await FindInUser.getDataWithId(dbData, id);
-
-        emitToSpecificSocket(receiverSocketId, 'emitPvUploadedFile', {...result, ...data});
+        emitToSpecificSocket(receiverSocketId, 'emitPvUploadedFile', data);
 
     });
 
@@ -328,11 +323,11 @@ io.use(async (socket, next) => {
             return emitToSocket('emitPvMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-        message['senderId'] = socketUserId;
+        message.senderId = socketUserId;
 
         emitToSpecificSocket(receiverSocketId, 'emitPvMessage', message);
 
-        await Insert.message(socketUserId + 'And' + receiverId + 'E2EContents', message, {
+        await Insert.message(`${socketUserId}And${receiverId}E2EContents`, message, {
             conversationType: 'E2E'
         });
 
@@ -359,7 +354,7 @@ io.use(async (socket, next) => {
             return emitToSocket('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
         let result = await FindInUser.isMessageBelongForThisUserInE2E(messageId, socketUserId,
-            socketUserId + 'And' + receiverId + 'E2EContents');
+            `${socketUserId}And${receiverId}E2EContents`);
 
         if (!result)
             return emitToSocket('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
@@ -375,11 +370,11 @@ io.use(async (socket, next) => {
             return emitToSocket('emitPvEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
 
-        message['senderId'] = socketUserId;
+        message.senderId = socketUserId;
 
         emitToSpecificSocket(receiverSocketId, 'emitPvEditMessage', message);
 
-        await UpdateInCommon.message(socketUserId + 'And' + receiverId + 'E2EContents', message, {
+        await UpdateInCommon.message(`${socketUserId}And${receiverId}E2EContents`, message, {
             messageId: messageId
         });
 
@@ -402,17 +397,17 @@ io.use(async (socket, next) => {
             return;
 
         let result = await FindInUser.isMessageBelongForThisUserInE2E(listOfId, socketUserId,
-            socketUserId + 'And' + receiverId + 'E2EContents');
+            `${socketUserId}And${receiverId}E2EContents`);
 
         if (!result)
             return emitToSocket('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
-        delete data['receiverId'];
-        data['senderId'] = socketUserId;
+        delete data.receiverId;
+        data.senderId = socketUserId;
 
         emitToSpecificSocket(receiverSocketId, 'emitPvDeleteMessage', result);
 
-        await DeleteInCommon.message(socketUserId + 'And' + receiverId + 'E2EContents', data['listOfId']);
+        await DeleteInCommon.message(`${socketUserId}And${receiverId}E2EContents`, data.listOfId);
 
     });
 
@@ -483,9 +478,9 @@ io.use(async (socket, next) => {
         if (message === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
             return emitToSocket('emitGroupMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-        message['senderId'] = socketUserId;
+        message.senderId = socketUserId;
 
-        await Insert.message('`' + groupId + 'GroupContents`', message, {
+        await Insert.message(`${groupId}GroupContents`, message, {
             conversationType: 'Group'
         });
 
@@ -511,12 +506,10 @@ io.use(async (socket, next) => {
         joinUserInRoom(groupId, 'group');
         addRoomIntoListOfUserRooms(groupId, 'group');
 
-        data['senderId'] = socketUserId;
+        data.senderId = socketUserId;
         delete data?.groupId;
 
-        let result = await FindInGroup.getDataWithId(groupId, id);
-
-        emitToSpecificSocket(groupId, 'emitGroupUploadedFile', {...result, ...data});
+        emitToSpecificSocket(groupId, 'emitGroupUploadedFile', data);
 
     });
 
@@ -534,7 +527,7 @@ io.use(async (socket, next) => {
         if (!isErr)
             return;
 
-        let result = await CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, '`' + groupId + 'GroupContents`');
+        let result = await CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, `${groupId}GroupContents`);
 
         if (!result)
             return emitToSocket('emitGroupEditMessageError', Response.HTTP_FORBIDDEN);
@@ -550,9 +543,9 @@ io.use(async (socket, next) => {
         if (message === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
             return emitToSocket('emitGroupEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-        message['senderId'] = socketUserId;
+        message.senderId = socketUserId;
 
-        await UpdateInCommon.message('`' + groupId + 'GroupContents`', message, groupId);
+        await UpdateInCommon.message(`${groupId}GroupContents`, message, groupId);
 
         emitToSpecificSocket(groupId, 'emitGroupEditMessage', message);
 
@@ -572,7 +565,7 @@ io.use(async (socket, next) => {
         if (!isErr)
             return;
 
-        let result = await CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, '`' + groupId + 'GroupContents`');
+        let result = await CommonFind.isMessageBelongForThisUserInRoom(messageId, socketUserId, `${groupId}GroupContents`);
 
         if (!result)
             return emitToSocket('emitGroupDeleteMessageError', Response.HTTP_FORBIDDEN);
@@ -580,7 +573,7 @@ io.use(async (socket, next) => {
         joinUserInRoom(groupId, 'group');
         addRoomIntoListOfUserRooms(groupId, 'group');
 
-        await DeleteInCommon.message('`' + groupId + 'GroupContents`', lisOfId);
+        await DeleteInCommon.message(`${groupId}GroupContents`, lisOfId);
 
         emitToSpecificSocket(groupId, 'emitGroupDeleteMessage', data);
 
@@ -680,9 +673,9 @@ io.use(async (socket, next) => {
         if (message === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
             return emitToSocket('emitChannelMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-        message['senderId'] = socketUserId;
+        message.senderId = socketUserId;
 
-        await Insert.message('`' + channelId + 'ChannelContents`', message, {
+        await Insert.message(`${channelId}ChannelContents`, message, {
             conversationType: 'Channel'
         });
 
@@ -707,9 +700,7 @@ io.use(async (socket, next) => {
 
         delete data?.channelId;
 
-        let result = await FindInChannel.getDataWithId(channelId);
-
-        emitToSpecificSocket(channelId, 'emitChannelUploadedFile', {...result, ...data});
+        emitToSpecificSocket(channelId, 'emitChannelUploadedFile', data);
 
     });
 
@@ -730,7 +721,7 @@ io.use(async (socket, next) => {
         joinUserInRoom(channelId, 'channel');
         addRoomIntoListOfUserRooms(channelId, 'channel');
 
-        if (messageId === undefined)
+        if (!messageId)
             return emitToSocket('emitChannelEditMessageError', Response.HTTP_BAD_REQUEST);
 
         delete data?.channelId;
@@ -741,9 +732,9 @@ io.use(async (socket, next) => {
         if (message === IN_VALID_MESSAGE_TYPE || IN_VALID_OBJECT_KEY)
             return emitToSocket('emitChannelEditMessageError', Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-        message['senderId'] = socketUserId;
+        message.senderId = socketUserId;
 
-        await UpdateInCommon.message('`' + channelId + 'ChannelContents`', message, messageId);
+        await UpdateInCommon.message(`${channelId}ChannelContents`, message, messageId);
 
         emitToSpecificSocket(channelId, 'emitChannelEditMessage', message);
 
@@ -765,7 +756,7 @@ io.use(async (socket, next) => {
         joinUserInRoom(channelId, 'channel');
         addRoomIntoListOfUserRooms(channelId, 'channel');
 
-        await DeleteInCommon.message('`' + channelId + 'ChannelContents`', listOfId);
+        await DeleteInCommon.message(`${channelId}ChannelContents`, listOfId);
         emitToSpecificSocket(channelId, 'emitChannelDeleteMessage', data);
 
     });

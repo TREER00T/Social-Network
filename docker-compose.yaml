@@ -3,13 +3,12 @@ version: '3.9'
 services:
 
   db:
-    image: mysql
+    image: mongo
     restart: always
     ports:
-      - '3306:3306'
+      - '27014:27014'
     volumes:
-      - db:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db:/var/lib/mongo
 
   app:
     restart: always
