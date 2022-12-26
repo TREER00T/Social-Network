@@ -1,10 +1,10 @@
-FROM node:16.9.1
+FROM node:18.12.1
 
-WORKDIR /app
+WORKDIR /src
 
 COPY . /app
 
-RUN npm install
+RUN npm i && node cmd.js serve
 
 EXPOSE 3000
-CMD npm start
+CMD npm run start:prod

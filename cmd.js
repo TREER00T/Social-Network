@@ -2,16 +2,13 @@
 let {
         program
     } = require('commander'),
-    Database = require('./app/database/config'),
-    File = require('./app/util/File');
+    File = require('./src/util/File');
 
 
 program
     .command('serve')
     .description('Initialization server')
     .action(async () => {
-
-        await Database.createDatabase();
 
         await File.mkdirForUploadFile();
 

@@ -7,7 +7,10 @@
 - [Api Schema](#api-schema)
     - [URL Schema](#url-Schema)
 - [Database Schema](#database-schema)
-- [Configuration](#configuration)
+- [Installation](#installation)
+    - [Configuration](#configuration)
+    - [Running the app](#running-the-app)
+    - [Test](#test)
 - [License](#license)
 
 ## Install
@@ -46,6 +49,12 @@ Socket.io ([OpenRTP](https://github.com/treegex/openrtp))
 For more information about the database structure, refer to [this](https://github.com/TREER00T/Social-Network-Database)
 repository
 
+## Installation
+
+```bash
+$ npm i
+```
+
 ## Configuration
 
 Open cmd and run the following commands.
@@ -54,13 +63,38 @@ Open cmd and run the following commands.
 node cmd.js serve
 ```
 
-TIP : Before running this command, make sure that your database and server are on.
+* Create new database with this name `social_network`
+* Create new collection with this name `users`
 
-```shell
-npm start
+You can change database and collection name in .env file and create your own database 
+
+## Running the app
+
+```bash
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
+```
+
+## Test
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
 ```
 
 ## Licensing
 
 The code in this project is licensed under
-the [Apache License](https://github.com/TREER00T/Social-Network-Server/blob/main/LICENSE)
+the [MIT](https://github.com/TREER00T/Social-Network-Server/blob/main/LICENSE)
