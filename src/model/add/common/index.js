@@ -30,7 +30,7 @@ module.exports = {
 
         let insertedData = await insertOne(data, tableName);
 
-        return insertedData.insertedId;
+        return insertedData?.insertedId;
 
     }
 

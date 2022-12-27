@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
 import { RouterModule } from "@nestjs/core";
 import { GenerateUserModule } from "./module/user/gen/GenerateUser.module";
-import { RefreshTokenModule } from "./module/user/refresh/RefreshToken.module";
+import { TwoStepModule } from "./module/user/refresh/TwoStep.module";
 import { VerifyAuthCodeModule } from "./module/user/autoCode/VerifyAuthCode.module";
-import { TwoStepModule } from "./module/user/twoStep/TwoStep.module";
+import { TwoStepsModule } from "./module/user/twoStep/TwoSteps.module";
 import { E2ECreateRoomModule } from "./module/e2e/create/E2ECreateRoom.module";
 import { E2EBlockUserModule } from "./module/e2e/upload/E2EBlockUser.module";
 import { E2EUploadFileModule } from "./module/e2e/block/E2EUploadFile.module";
@@ -60,9 +60,9 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
 
     // Auth module
     GenerateUserModule,
-    RefreshTokenModule,
-    VerifyAuthCodeModule,
     TwoStepModule,
+    VerifyAuthCodeModule,
+    TwoStepsModule,
 
     // E2E module
     E2ECreateRoomModule,
@@ -138,7 +138,7 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
               },
               {
                 path: "refresh/token",
-                module: RefreshTokenModule
+                module: TwoStepModule
               },
               {
                 path: "verify",
@@ -149,7 +149,7 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
                   },
                   {
                     path: "twoStep",
-                    module: TwoStepModule
+                    module: TwoStepsModule
                   }
                 ]
               }

@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
+import Find from "../../../model/find/user";
 
 @Injectable()
 export class RefreshTokenService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+    async isExistUser(userPhone: string): Promise<boolean> {
+        return await Find.userPhone(userPhone);
+    }
 }

@@ -48,7 +48,7 @@ module.exports = {
             }
         });
 
-        return !isUndefined(`${data.phone}`);
+        return !isUndefined(`${data?.phone}`);
 
     },
 
@@ -98,7 +98,7 @@ module.exports = {
             }
         });
 
-        return data.password;
+        return data?.password;
 
     },
 
@@ -114,7 +114,7 @@ module.exports = {
             }
         });
 
-        return !isUndefined(data.password);
+        return !isUndefined(data?.password);
 
     },
 
@@ -130,7 +130,7 @@ module.exports = {
             }
         });
 
-        return data.apiKey;
+        return data?.apiKey;
 
     },
 
@@ -151,7 +151,7 @@ module.exports = {
             }
         });
 
-        return !isUndefined(result.tblChatId) ? result.tblChatId : false;
+        return !isUndefined(result?.tblChatId) ? result?.tblChatId : false;
 
     },
 
@@ -188,7 +188,7 @@ module.exports = {
             }
         });
 
-        return !isUndefined(result.tblChatId) ? result.tblChatId : false;
+        return !isUndefined(result?.tblChatId) ? result?.tblChatId : false;
 
     },
 
