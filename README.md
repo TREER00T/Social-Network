@@ -28,7 +28,7 @@ Now download and extract project
 
 ## Introduction
 
-A simple social network with socket.io and rest api
+A simple social network with socket.io and rest api in nest.js
 
 ## Api Schema
 
