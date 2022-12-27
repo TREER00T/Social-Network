@@ -323,7 +323,7 @@ module.exports = {
     },
 
 
-    async getListOfBlockUsers(id) {
+    async getListOfBlockedUsers(id) {
 
         let data = await userBlockList().find({
             userId: id

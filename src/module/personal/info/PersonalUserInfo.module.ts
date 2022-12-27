@@ -3,7 +3,6 @@ import { PersonalUserInfoController } from "./PersonalUserInfo.controller";
 import { PersonalUserInfoService } from "./PersonalUserInfo.service";
 
 @Module({
-  imports: [],
   controllers: [PersonalUserInfoController],
   providers: [PersonalUserInfoService]
 })

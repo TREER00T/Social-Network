@@ -1,12 +1,33 @@
-import { Controller, Get } from '@nestjs/common';
-import { PersonalUsernameService } from './PersonalUsername.service';
+import {Controller, Param, Put} from '@nestjs/common';
+import {PersonalUsernameService} from './PersonalUsername.service';
+import {UserTokenManager} from "../../base/UserTokenManager";
+import Util from "../../../util/Util";
+import Response from "../../../util/Response";
+import Json from "../../../util/ReturnJson";
 
 @Controller()
-export class PersonalUsernameController {
-  constructor(private readonly appService: PersonalUsernameService) {}
+export class PersonalUsernameController extends UserTokenManager {
+    constructor(private readonly appService: PersonalUsernameService) {
+        super();
+    }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+    @Put("/:username")
+    async updateUsername(@Param("username") username: string) {
+        await this.init();
+
+        if (Util.isUndefined(username))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let isExistUsername = await this.appService.isExistUsername(username);
+
+        if (!isExistUsername)
+            return Json.builder(Response.HTTP_CONFLICT);
+
+        let hasUpdate = this.appService.updateUsername(this.phoneNumber,username);
+
+        if (!hasUpdate)
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        return Json.builder(Response.HTTP_OK);
+    }
 }

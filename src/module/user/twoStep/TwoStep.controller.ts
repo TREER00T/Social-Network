@@ -1,9 +1,9 @@
 import {Controller, Post, Body} from '@nestjs/common';
 import {TwoStepService} from './TwoStep.service';
-import {RefreshTokenDto} from "./RefreshToken.dto";
 import {UserTokenManager} from "../../base/UserTokenManager";
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
+import {TwoStepDto} from "./TwoStep.dto";
 
 @Controller()
 export class TwoStepController extends UserTokenManager {
@@ -12,7 +12,7 @@ export class TwoStepController extends UserTokenManager {
     }
 
     @Post()
-    async validationPassword(@Body() dto: RefreshTokenDto) {
+    async validationPassword(@Body() dto: TwoStepDto) {
         await this.init();
 
         let isValidaPassword = await this.appService.isValidPassword(this.phoneNumber, dto.password);

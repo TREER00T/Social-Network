@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import Generate from "../../../util/Generate";
-import {RefreshTokenDto} from "./RefreshToken.dto";
+import {TwoStepDto} from "./TwoStep.dto";
 import Device from "../../base/Device";
 
 let Find = require("../../../model/find/user");
@@ -11,7 +11,7 @@ export class TwoStepService {
         return await Find.isValidPassword(userPhone, Generate.getHashData(password.trim(), userPhone));
     }
 
-    async getUserApiKey(userPhone: string, dto: RefreshTokenDto): Promise<object> {
+    async getUserApiKey(userPhone: string, dto: TwoStepDto): Promise<object> {
 
         let user = await Find.getApiKeyAndUserId(userPhone);
 

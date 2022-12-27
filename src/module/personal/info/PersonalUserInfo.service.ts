@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
+import Find from '../../../model/find/user';
 
 @Injectable()
 export class PersonalUserInfoService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+    async userInfo(userId: string) {
+        return await Find.getPersonalUserDetails(userId);
+    }
 }

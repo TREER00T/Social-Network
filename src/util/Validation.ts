@@ -28,7 +28,7 @@ export default {
 
     //                                                      Searching in string to ensure exactly string
     //                                                      In some case it was break something like this: /api/channel/1452/us
-    return arrayOfHttpMethods.includes(requestMethod) ? "" : requestMethod.match(/\d+/g).length > 0 ? "AuthRoute" : "";
+    return arrayOfHttpMethods.includes(requestMethod) ? "" : requestMethod.match(/\d+/g)?.length > 0 ? "AuthRoute" : "";
   },
 
   // The verify jwt and check jwt expired time

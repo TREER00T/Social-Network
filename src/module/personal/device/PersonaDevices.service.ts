@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
+
+let Find = require("../../../model/find/user");
 
 @Injectable()
 export class PersonaDevicesService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+    async listOfDevices(userId: string) {
+        return await Find.getListOfDevices(userId);
+    }
 }

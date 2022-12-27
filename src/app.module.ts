@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
 import { RouterModule } from "@nestjs/core";
 import { GenerateUserModule } from "./module/user/gen/GenerateUser.module";
-import { TwoStepModule } from "./module/user/refresh/TwoStep.module";
+import { TwoStepModule } from "./module/user/twoStep/TwoStep.module";
 import { VerifyAuthCodeModule } from "./module/user/autoCode/VerifyAuthCode.module";
-import { TwoStepsModule } from "./module/user/twoStep/TwoSteps.module";
+import { RefreshTokenModule } from "./module/user/refresh/RefreshToken.module";
 import { E2ECreateRoomModule } from "./module/e2e/create/E2ECreateRoom.module";
 import { E2EBlockUserModule } from "./module/e2e/upload/E2EBlockUser.module";
 import { E2EUploadFileModule } from "./module/e2e/block/E2EUploadFile.module";
@@ -14,7 +14,7 @@ import { PersonalUserInfoModule } from "./module/personal/info/PersonalUserInfo.
 import { PersonalUsernameModule } from "./module/personal/username/PersonalUsername.module";
 import { PersonalBioModule } from "./module/personal/bio/PersonalBio.module";
 import { PersonalNameModule } from "./module/personal/name/PersonalName.module";
-import { PersonalTwoAuthModule } from "./module/personal/twoAuth/PersonalTwoAuth.module";
+import { PersonalAuthModule } from "./module/personal/auth/PersonalAuth.module";
 import { PersonalUploadAvatarModule } from "./module/personal/upload/avatar/PersonalUploadAvatar.module";
 import { PersonalUserBlocksModule } from "./module/personal/block/PersonalUserBlocks.module";
 import { PersonaDevicesModule } from "./module/personal/device/PersonaDevices.module";
@@ -62,7 +62,7 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
     GenerateUserModule,
     TwoStepModule,
     VerifyAuthCodeModule,
-    TwoStepsModule,
+    RefreshTokenModule,
 
     // E2E module
     E2ECreateRoomModule,
@@ -77,7 +77,7 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
     PersonalUsernameModule,
     PersonalBioModule,
     PersonalNameModule,
-    PersonalTwoAuthModule,
+    PersonalAuthModule,
     PersonalUploadAvatarModule,
     PersonalUserBlocksModule,
     PersonaDevicesModule,
@@ -138,7 +138,7 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
               },
               {
                 path: "refresh/token",
-                module: TwoStepModule
+                module: RefreshTokenModule
               },
               {
                 path: "verify",
@@ -149,7 +149,7 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
                   },
                   {
                     path: "twoStep",
-                    module: TwoStepsModule
+                    module: TwoStepModule
                   }
                 ]
               }
@@ -219,7 +219,7 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
               },
               {
                 path: "twoAuth",
-                module: PersonalTwoAuthModule
+                module: PersonalAuthModule
               },
               {
                 path: "uploadAvatar",
