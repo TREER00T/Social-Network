@@ -3,7 +3,6 @@ import { TwoStepController } from "./TwoStep.controller";
 import { TwoStepService } from "./TwoStep.service";
 
 @Module({
-  imports: [],
   controllers: [TwoStepController],
   providers: [TwoStepService]
 })

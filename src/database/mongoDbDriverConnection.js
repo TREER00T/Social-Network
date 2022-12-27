@@ -3,8 +3,6 @@ let { MongoClient } = require("mongodb"),
   client = new MongoClient(`mongodb://${process.env.HOST}:${process.env.MONGO_PORT}`),
   db = client.db(process.env.DATABASE);
 
-client.connect();
-
 module.exports = {
 
   async insertOne(obj, name) {

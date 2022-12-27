@@ -1,12 +1,27 @@
-import { Controller, Get } from '@nestjs/common';
-import { TwoStepService } from './TwoStep.service';
+import {Controller, Post, Body} from '@nestjs/common';
+import {TwoStepService} from './TwoStep.service';
+import {UserTokenManager} from "../../base/UserTokenManager";
+import Json from "../../../util/ReturnJson";
+import Response from "../../../util/Response";
+import {TwoStepDto} from "./TwoStep.dto";
 
 @Controller()
-export class TwoStepController {
-  constructor(private readonly appService: TwoStepService) {}
+export class TwoStepController extends UserTokenManager {
+    constructor(private readonly appService: TwoStepService) {
+        super();
+    }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+    @Post()
+    async validationPassword(@Body() dto: TwoStepDto) {
+        await this.init();
+
+        let isValidaPassword = await this.appService.isValidPassword(this.phoneNumber, dto.password);
+
+        if (!isValidaPassword)
+            return Json.builder(Response.HTTP_FORBIDDEN);
+
+
+        Json.builder(Response.HTTP_ACCEPTED,
+            await this.appService.getUserApiKey(this.phoneNumber, dto));
+    }
 }

@@ -5,7 +5,7 @@ require('dotenv').config();
 
 mongoose.set('strictQuery', false);
 
-mongoose.connect(`mongodb://${process.env.HOST}:${process.env.MONGO_PORT}/${process.env.DATABASE}`);
+mongoose.connect(`mongodb://${process.env.HOST}/${process.env.DATABASE}`);
 
 module.exports = {
 

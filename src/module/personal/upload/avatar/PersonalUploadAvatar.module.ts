@@ -3,7 +3,6 @@ import { PersonalUploadAvatarController } from "./PersonalUploadAvatar.controlle
 import { PersonalUploadAvatarService } from "./PersonalUploadAvatar.service";
 
 @Module({
-  imports: [],
   controllers: [PersonalUploadAvatarController],
   providers: [PersonalUploadAvatarService]
 })
