@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
+
+let Find = require("../../../model/find/user");
 
 @Injectable()
 export class E2EChatsService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+    async getTableNameFrom2EChat(userIdWhichCreatedChat, targetUserId) {
+        return await Find.getTableNameForListOfE2EMessage(userIdWhichCreatedChat, targetUserId, userIdWhichCreatedChat);
+    }
 }

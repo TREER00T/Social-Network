@@ -6,10 +6,9 @@ let {
         listOfUserGroup,
         listOfUserChannel
     } = require('../../create/user'),
-    {dropCollection} = require('../../../database/mongoDbDriverConnection'),
+    {dropCollection, deleteMany} = require('../../../database/mongoDbDriverConnection'),
     FindInCommon = require('../../find/common'),
     DeleteInCommon = require('../../remove/common'),
-    {deleteMany} = require('../../../database/mongoDbDriverConnection'),
     {isUndefined} = require('../../../Util/Util');
 
 module.exports = {
@@ -23,9 +22,7 @@ module.exports = {
     async chatInListOfE2EChat(fromUser, toUser, userId) {
 
         await listOfUserE2E().deleteOne({
-            fromUser: fromUser,
-            toUser: toUser,
-            userId: userId
+            fromUser: fromUser, toUser: toUser, userId: userId
         });
 
     },
@@ -33,8 +30,7 @@ module.exports = {
     async userInUsersBlockList(userId, id) {
 
         await userBlockList().deleteOne({
-            userTargetId: id,
-            userId: userId
+            userTargetId: id, userId: userId
         });
 
     },
@@ -58,8 +54,7 @@ module.exports = {
     async groupIntoListOfUserGroup(groupId, userId) {
 
         await listOfUserGroup().deleteOne({
-            groupId: groupId,
-            userId: userId
+            groupId: groupId, userId: userId
         });
 
     },
@@ -67,8 +62,7 @@ module.exports = {
     async channelIntoListOfUserChannel(channelId, userId) {
 
         await listOfUserChannel().deleteOne({
-            channelId: channelId,
-            userId: userId
+            channelId: channelId, userId: userId
         });
 
     },
@@ -95,9 +89,8 @@ module.exports = {
 
     async userInAllUsersGroup(array, id) {
 
-        array.map(e => e.groupId);
-
-        await dropCollection(array);
+        // Drop user created group
+        array.map(async e => await dropCollection(e.groupId));
 
         await listOfUserGroup().deleteMany({
             userId: id
@@ -107,9 +100,8 @@ module.exports = {
 
     async userInAllUsersChannel(array, id) {
 
-        array.map(e => e.channelId);
-
-        await dropCollection(array);
+        // Drop user created channel
+        array.map(async e => await dropCollection(e.channelId));
 
         await listOfUserChannel().deleteMany({
             userId: id
@@ -117,11 +109,27 @@ module.exports = {
 
     },
 
+    async userDataInJoinedChannels(arr, userId) {
+        // Delete the list of messages of any channel sent by the user
+        for (const item of arr) {
+            await deleteMany({
+                senderId: userId
+            }, `${item.channelId}ChannelContents`);
+        }
+    },
+
+    async userDataInJoinedGroups(arr, userId) {
+        // Delete the list of messages of any group sent by the user
+        for (const item of arr) {
+            await deleteMany({
+                senderId: userId
+            }, `${item.groupId}GroupContents`);
+        }
+    },
+
     async userInAllUsersE2E(array, id) {
 
-        array.map(e => e.tblChatId);
-
-        await dropCollection(array);
+        array.map(async e => await dropCollection(e.tblChatId));
 
         await listOfUserE2E().deleteMany({
             userId: id
@@ -140,7 +148,7 @@ module.exports = {
     async itemInSavedMessage(phone, listOfId) {
 
         for (const item of listOfId) {
-            let id = await FindInCommon.isForwardData(`${phone}SavedMessages`, item);
+            let id = await FindInCommon.isForwardData(`${phone}SavedMessage`, item);
 
             if (!isUndefined(id))
                 await DeleteInCommon.forwardMessage(id);
