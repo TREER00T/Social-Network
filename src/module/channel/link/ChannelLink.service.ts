@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class GroupRemoveAdminService {
+export class ChannelLinkService {
   getHello(): string {
     return 'Hello World!';
   }

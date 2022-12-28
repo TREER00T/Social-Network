@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { GroupUsersService } from './GroupUsers.service';
 
 @Controller()
-export class GroupUsersController {
+export class GroupUserController {
   constructor(private readonly appService: GroupUsersService) {}
 
   @Get()

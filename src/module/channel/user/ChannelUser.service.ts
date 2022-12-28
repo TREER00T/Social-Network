@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class ChannelUserJoinService {
+export class ChannelUserService {
   getHello(): string {
     return 'Hello World!';
   }

@@ -28,32 +28,24 @@ import { GroupUploadAvatarModule } from "./module/group/upload/avatar/GroupUploa
 import { DeleteGroupModule } from "./module/group/delete/DeleteGroup.module";
 import { GroupNameModule } from "./module/group/name/GroupName.module";
 import { GroupDescriptionModule } from "./module/group/description/GroupDescription.module";
-import { GroupInviteLinkModule } from "./module/group/link/invite/GroupInviteLink.module";
-import { GroupPublicLinkModule } from "./module/group/link/public/GroupPublicLink.module";
-import { GroupUserJoinModule } from "./module/group/user/join/GroupUserJoin.module";
-import { GroupUserLeaveModule } from "./module/group/user/leave/GroupUserLeave.module";
-import { GroupUsersModule } from "./module/group/user/list/GroupUsers.module";
+import { GroupLinkModule } from "./module/group/link/GroupLink.module";
+import { GroupUserModule } from "./module/group/user/GroupUser.module";
 import { GroupInfoModule } from "./module/group/info/GroupInfo.module";
 import { GroupChatsModule } from "./module/group/chats/GroupChats.module";
-import { GroupAddAdminModule } from "./module/group/admin/add/GroupAddAdmin.module";
-import { GroupRemoveAdminModule } from "./module/group/admin/remove/GroupRemoveAdmin.module";
+import { GroupAdminModule } from "./module/group/admin/GroupAdmin.module";
 import { ChannelUploadFileModule } from "./module/channel/upload/file/ChannelUploadFile.module";
 import { CreateChannelModule } from "./module/channel/create/CreateChannel.module";
 import { DeleteChannelModule } from "./module/channel/delete/DeleteChannel.module";
 import { ChannelNameModule } from "./module/channel/name/ChannelName.module";
 import { ChannelDescriptionModule } from "./module/channel/description/ChannelDescription.module";
 import { ChannelUploadAvatarModule } from "./module/channel/upload/avatar/ChannelUploadAvatar.module";
-import { ChannelInviteLinkModule } from "./module/channel/link/invite/ChannelInviteLink.module";
-import { ChannelPublicLinkModule } from "./module/channel/link/public/ChannelPublicLink.module";
-import { ChannelAddAdminModule } from "./module/channel/admin/add/ChannelAddAdmin.module";
-import { ChannelRemoveAdminModule } from "./module/channel/admin/remove/ChannelRemoveAdmin.module";
-import { ChannelUserJoinModule } from "./module/channel/user/join/ChannelUserJoin.module";
-import { ChannelUserLeaveModule } from "./module/channel/user/leave/ChannelUserLeave.module";
+import { ChannelAdminModule } from "./module/channel/admin/ChannelAdmin.module";
 import { ChannelChatsModule } from "./module/channel/chats/ChannelChats.module";
 import { ChannelInfoModule } from "./module/channel/info/ChannelInfo.module";
-import { ChannelUsersModule } from "./module/channel/user/list/ChannelUsers.module";
+import { ChannelUserModule } from "./module/channel/user/ChannelUser.module";
 import { ContentSearchModule } from "./module/common/search/ContentSearch.module";
 import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
+import {ChannelLinkModule} from "./module/channel/link/ChannelLink.module";
 
 @Module({
   imports: [
@@ -93,15 +85,11 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
     GroupNameModule,
     GroupDescriptionModule,
     GroupUploadAvatarModule,
-    GroupInviteLinkModule,
-    GroupPublicLinkModule,
-    GroupAddAdminModule,
-    GroupRemoveAdminModule,
-    GroupUserJoinModule,
-    GroupUserLeaveModule,
+    GroupLinkModule,
+    GroupAdminModule,
     GroupChatsModule,
     GroupInfoModule,
-    GroupUsersModule,
+    GroupUserModule,
 
     // Channel module
     CreateChannelModule,
@@ -110,15 +98,11 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
     ChannelNameModule,
     ChannelDescriptionModule,
     ChannelUploadAvatarModule,
-    ChannelInviteLinkModule,
-    ChannelPublicLinkModule,
-    ChannelAddAdminModule,
-    ChannelRemoveAdminModule,
-    ChannelUserJoinModule,
-    ChannelUserLeaveModule,
+    ChannelLinkModule,
+    ChannelAdminModule,
     ChannelChatsModule,
     ChannelInfoModule,
-    ChannelUsersModule,
+    ChannelUserModule,
 
     // Socket.io
     ChatGatewayModule,
@@ -282,42 +266,15 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
               },
               {
                 path: "link",
-                children: [
-                  {
-                    path: "invite",
-                    module: GroupInviteLinkModule
-                  },
-                  {
-                    path: "public",
-                    module: GroupPublicLinkModule
-                  }
-                ]
+                module: GroupLinkModule
               },
               {
                 path: "user",
-                children: [
-                  {
-                    path: "join",
-                    module: GroupUserJoinModule
-                  },
-                  {
-                    path: "leave",
-                    module: GroupUserLeaveModule
-                  }
-                ]
+                module: GroupUserModule
               },
               {
                 path: "admin",
-                children: [
-                  {
-                    path: "add",
-                    module: GroupAddAdminModule
-                  },
-                  {
-                    path: "remove",
-                    module: GroupRemoveAdminModule
-                  }
-                ]
+                module: GroupAdminModule
               },
               {
                 path: "chats",
@@ -326,10 +283,6 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
               {
                 path: "info",
                 module: GroupInfoModule
-              },
-              {
-                path: "users",
-                module: GroupUsersModule
               }
             ]
           },
@@ -364,42 +317,15 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
               },
               {
                 path: "link",
-                children: [
-                  {
-                    path: "invite",
-                    module: ChannelInviteLinkModule
-                  },
-                  {
-                    path: "public",
-                    module: ChannelPublicLinkModule
-                  }
-                ]
+                module: ChannelLinkModule
               },
               {
                 path: "user",
-                children: [
-                  {
-                    path: "join",
-                    module: ChannelUserJoinModule
-                  },
-                  {
-                    path: "leave",
-                    module: ChannelUserLeaveModule
-                  }
-                ]
+                module: ChannelUserModule
               },
               {
                 path: "admin",
-                children: [
-                  {
-                    path: "add",
-                    module: ChannelAddAdminModule
-                  },
-                  {
-                    path: "remove",
-                    module: ChannelRemoveAdminModule
-                  }
-                ]
+                module: ChannelAdminModule
               },
               {
                 path: "chats",
@@ -408,10 +334,6 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
               {
                 path: "info",
                 module: ChannelInfoModule
-              },
-              {
-                path: "users",
-                module: ChannelUsersModule
               }
             ]
           },
