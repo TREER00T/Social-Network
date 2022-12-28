@@ -1,12 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
-import { ChannelUploadFileService } from './ChannelUploadFile.service';
+import {Controller, Post} from '@nestjs/common';
+import {ChannelUploadFileService} from './ChannelUploadFile.service';
 
 @Controller()
 export class ChannelUploadFileController {
-  constructor(private readonly appService: ChannelUploadFileService) {}
+    constructor(private readonly appService: ChannelUploadFileService) {
+    }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+    @Post()
+    async save() {
+
+    }
 }

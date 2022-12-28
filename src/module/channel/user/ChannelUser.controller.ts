@@ -1,12 +1,23 @@
-import { Controller, Get } from '@nestjs/common';
-import { ChannelUserService } from './ChannelUser.service';
+import {Controller, Delete, Get, Post} from '@nestjs/common';
+import {ChannelUserService} from './ChannelUser.service';
 
 @Controller()
 export class ChannelUserController {
-  constructor(private readonly appService: ChannelUserService) {}
+    constructor(private readonly appService: ChannelUserService) {
+    }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+    @Get("/all")
+    async listOfUsers() {
+
+    }
+
+    @Post("/join")
+    async joinUser() {
+
+    }
+
+    @Delete("/leave")
+    async leaveUser() {
+
+    }
 }
