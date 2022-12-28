@@ -1,18 +1,16 @@
 import {Controller, Post, Body, UploadedFile, UseInterceptors} from '@nestjs/common';
 import {PersonalUploadFileService} from './PersonalUploadFile.service';
-import {UserTokenManager} from "../../../base/UserTokenManager";
 import Json from "../../../../util/ReturnJson";
 import Response from "../../../../util/Response";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {Message} from "../../../base/dto/Message";
-import {SavedMessageService} from "../../savedMessage/SavedMessage.service";
 import Util from "../../../../util/Util";
 import File from "../../../../util/File";
+import {SavedMessage} from "../../../base/SavedMessage";
 
 @Controller()
-export class PersonalUploadFileController extends UserTokenManager {
-    constructor(private readonly appService: PersonalUploadFileService,
-                private readonly savedMessageService: SavedMessageService) {
+export class PersonalUploadFileController extends SavedMessage {
+    constructor(private readonly appService: PersonalUploadFileService) {
         super();
     }
 
@@ -29,31 +27,25 @@ export class PersonalUploadFileController extends UserTokenManager {
         if (message === Util.IN_VALID_MESSAGE_TYPE || message === Util.IN_VALID_OBJECT_KEY)
             return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
 
-        let isUserExist = await this.appService.isUserExist(this.userId);
+        this.verifySavedMessage().then(async () => {
 
-        if (!isUserExist)
-            return Json.builder(Response.HTTP_USER_NOT_FOUND);
+            let FileGenerated = await File.validationAndWriteFile({
+                size: file.size,
+                dataBinary: file.buffer,
+                format: Util.getFileFormat(file.originalname)
+            });
 
-        let isSavedMessageCreated = await this.savedMessageService.isSavedMessageCreated(this.phoneNumber);
+            message.fileUrl = FileGenerated.url;
+            message.fileSize = FileGenerated.size;
+            message.fileName = file.originalname;
 
-        if (!isSavedMessageCreated)
-            return Json.builder(Response.HTTP_NOT_FOUND);
+            let insertedId = await this.appService.uploadFile(
+                `${this.phoneNumber}SavedMessage`, message, 'Personal');
 
-        let FileGenerated = await File.validationAndWriteFile({
-            size: file.size,
-            dataBinary: file.buffer,
-            format: Util.getFileFormat(file.originalname)
-        });
+            Json.builder(Response.HTTP_OK, {
+                insertedId: insertedId
+            });
 
-        message.fileUrl = FileGenerated.url;
-        message.fileSize = FileGenerated.size;
-        message.fileName = file.originalname;
-
-        let insertedId = await this.appService.uploadFile(
-            `${this.phoneNumber}SavedMessage`, message, 'Personal');
-
-        Json.builder(Response.HTTP_OK, {
-            insertedId: insertedId
         });
 
     }

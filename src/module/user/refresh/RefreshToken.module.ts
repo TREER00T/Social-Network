@@ -1,10 +1,8 @@
-import { Module } from "@nestjs/common";
-import { RefreshTokenController } from "./RefreshToken.controller";
-import { RefreshTokenService } from "./RefreshToken.service";
+import {Module} from "@nestjs/common";
+import {RefreshTokenController} from "./RefreshToken.controller";
 
 @Module({
-  controllers: [RefreshTokenController],
-  providers: [RefreshTokenService]
+    controllers: [RefreshTokenController]
 })
 export class RefreshTokenModule {
 }

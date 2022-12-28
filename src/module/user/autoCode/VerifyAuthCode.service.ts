@@ -23,14 +23,14 @@ export class VerifyAuthCodeService {
 
         let user = await Find.getApiKeyAndUserId(userPhone);
 
-        await Device.insert(user.id, {
+        await Device.insert(user._id, {
             ip: dto.deviceIp,
             name: dto.deviceName,
             location: dto.deviceLocation
         });
 
         return {
-            ...await Token.setup(userPhone, user.id),
+            ...await Token.setup(userPhone, user._id),
             apiKey: user.apiKey
         }
 

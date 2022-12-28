@@ -7,7 +7,6 @@ let {
         groupAdmin
     } = require('../../create/group'),
     {
-        findMany,
         countRows
     } = require('../../../database/mongoDbDriverConnection');
 

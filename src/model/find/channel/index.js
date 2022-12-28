@@ -7,7 +7,6 @@ let {
         channelAdmin
     } = require('../../create/channel'),
     {
-        findMany,
         countRows
     } = require('../../../database/mongoDbDriverConnection');
 

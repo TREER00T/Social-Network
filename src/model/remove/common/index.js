@@ -1,7 +1,7 @@
 let {
         isUndefined
     } = require('../../../util/Util'),
-    FindInCommon = require('app/model/find/common'),
+    FindInCommon = require('../../find/common'),
     {
         forwardContent
     } = require('../../create/common'),

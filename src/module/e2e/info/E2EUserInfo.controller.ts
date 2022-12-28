@@ -1,26 +1,25 @@
 import {Controller, Get, Query} from '@nestjs/common';
 import {E2EUserInfoService} from './E2EUserInfo.service';
-import Util from "../../../util/Util";
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
+import {User} from "../../base/User";
 
 @Controller()
-export class E2EUserInfoController {
+export class E2EUserInfoController extends User {
     constructor(private readonly appService: E2EUserInfoService) {
+        super();
     }
 
     @Get()
     async userInfo(@Query() userId: string) {
-        if (Util.isUndefined(userId))
-            return Json.builder(Response.HTTP_BAD_REQUEST);
 
-        let isUserExist = this.appService.isUserExist(userId);
+        this.verifyUser(userId).then(async () => {
 
-        if (!isUserExist)
-            return Json.builder(Response.HTTP_USER_NOT_FOUND);
+            let userPvDetails = await this.appService.userInfo(userId);
 
-        let userPvDetails = await this.appService.userInfo(userId);
+            return Json.builder(Response.HTTP_OK, userPvDetails);
 
-        return Json.builder(Response.HTTP_OK, userPvDetails);
+        });
+
     }
 }

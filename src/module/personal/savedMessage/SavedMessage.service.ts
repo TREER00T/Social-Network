@@ -1,7 +1,6 @@
 import {Injectable} from '@nestjs/common';
 
-let Find = require("../../../model/find/user"),
-    Delete = require("../../../model/remove/user"),
+let Delete = require("../../../model/remove/user"),
     Create = require("../../../model/create/user");
 
 @Injectable()
@@ -14,7 +13,4 @@ export class SavedMessageService {
         await Delete.savedMessage(userPhone);
     }
 
-    async isSavedMessageCreated(userPhone: string) {
-        return await Find.isSavedMessageCreated(userPhone);
-    }
 }

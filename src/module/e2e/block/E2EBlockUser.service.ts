@@ -14,10 +14,6 @@ export class E2EBlockUserService {
         await Delete.userInUsersBlockList(userIdWhichCreatedChat, targetUserId);
     }
 
-    async isExistUser(userId: string) {
-        return await Find.isExist(userId);
-    }
-
     async hasUserBlocked(userIdWhichCreatedChat: string, targetUserId: string) {
         return await Find.isBlock(userIdWhichCreatedChat, targetUserId);
     }

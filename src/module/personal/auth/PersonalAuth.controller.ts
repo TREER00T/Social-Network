@@ -36,12 +36,14 @@ export class PersonalAuthController extends UserTokenManager {
         let oldPassword = dto.old,
             newPassword = dto.new;
 
-        let isValidPassword = await this.appService.isValidPassword(this.phoneNumber, Generate.getHashData(oldPassword, this.phoneNumber));
+        let isValidPassword = await this.appService.isValidPassword(
+            this.phoneNumber, Generate.getHashData(oldPassword, this.phoneNumber));
 
         if (!isValidPassword)
             return Json.builder(Response.HTTP_FORBIDDEN);
 
-        await this.appService.updatePassword(this.phoneNumber, Generate.getHashData(newPassword, this.phoneNumber));
+        await this.appService.updatePassword(
+            this.phoneNumber, Generate.getHashData(newPassword, this.phoneNumber));
 
         return Json.builder(Response.HTTP_OK);
     }

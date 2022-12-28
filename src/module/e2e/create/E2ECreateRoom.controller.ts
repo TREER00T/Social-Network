@@ -1,13 +1,12 @@
 import {Body, Controller, Post} from '@nestjs/common';
 import {E2ECreateRoomService} from './E2ECreateRoom.service';
-import {UserTokenManager} from "../../base/UserTokenManager";
-import Util from "../../../util/Util";
+import {User} from "../../base/User";
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
 
 
 @Controller()
-export class E2ECreateRoomController extends UserTokenManager {
+export class E2ECreateRoomController extends User {
     constructor(private readonly appService: E2ECreateRoomService) {
         super();
     }
@@ -16,16 +15,12 @@ export class E2ECreateRoomController extends UserTokenManager {
     async createRoom(@Body("targetUserId") targetUserId: string) {
         await this.init();
 
-        if (Util.isUndefined(targetUserId))
-            return Json.builder(Response.HTTP_BAD_REQUEST);
+        this.verifyUser(targetUserId).then(async () => {
 
-        let isUserExist = await this.appService.isUserExist(targetUserId);
+            await this.appService.initializationRoom(targetUserId, this.userId);
 
-        if (!isUserExist)
-            return Json.builder(Response.HTTP_USER_NOT_FOUND);
+            return Json.builder(Response.HTTP_CREATED);
 
-        await this.appService.initializationRoom(targetUserId, this.userId);
-
-        return Json.builder(Response.HTTP_CREATED);
+        });
     }
 }

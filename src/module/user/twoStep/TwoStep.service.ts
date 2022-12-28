@@ -15,7 +15,7 @@ export class TwoStepService {
 
         let user = await Find.getApiKeyAndUserId(userPhone);
 
-        await Device.insert(user.id, {
+        await Device.insert(user._id, {
             ip: dto.deviceIp,
             name: dto.deviceName,
             location: dto.deviceLocation

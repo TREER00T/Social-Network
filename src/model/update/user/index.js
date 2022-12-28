@@ -1,5 +1,5 @@
 let {user} = require('../../create/user'),
-    {updateOne} = require('../../../database//mongoDbDriverConnection');
+    {updateOne} = require('../../../database/mongoDbDriverConnection');
 
 
 module.exports = {

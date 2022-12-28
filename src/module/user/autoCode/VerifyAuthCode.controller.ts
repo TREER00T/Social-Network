@@ -17,12 +17,10 @@ export class VerifyAuthCodeController {
         if (!isValidCode)
             return Json.builder(Response.HTTP_UNAUTHORIZED);
 
-
         let havePassword = await this.appService.havePassword(dto.phone);
 
         if (!havePassword)
             return Json.builder(Response.HTTP_ACCEPTED, await this.appService.generateToken(dto));
-
 
         await this.appService.updateApiKey(dto.phone);
 
