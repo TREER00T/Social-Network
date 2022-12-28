@@ -7,6 +7,8 @@ let {
         findMany,
         countRows
     } = require('../../../database/mongoDbDriverConnection'),
+    FindInGroup = require('../group'),
+    FindInChannel = require('../channel'),
     {
         user,
         device,
@@ -442,7 +444,7 @@ module.exports = {
     },
 
 
-    async getListOfUserGroup(userId) {
+    async getListOfUserCreatedGroup(userId) {
 
         let data = await listOfUserGroup().find({
             userId: userId
@@ -457,7 +459,27 @@ module.exports = {
 
     },
 
-    async getListOfUserChannel(userId) {
+    async getListOfUserJoinedGroup(userId) {
+
+        let data = await listOfUserGroup().find({
+            userId: userId
+        }, {
+            projection: {
+                _id: 0,
+                groupId: 1
+            }
+        });
+
+        if (!isNotEmptyArr(data))
+            return false;
+
+        data?.filter(async d => !(await FindInGroup.isOwner(userId, d.groupId)));
+
+        return isNotEmptyArr(data) ? data : false;
+
+    },
+
+    async getListOfUserCreatedChannel(userId) {
 
         let data = await listOfUserChannel().find({
             userId: userId
@@ -467,6 +489,26 @@ module.exports = {
                 channelId: 1
             }
         });
+
+        return isNotEmptyArr(data) ? data : false;
+
+    },
+
+    async getListOfUserJoinedChannel(userId) {
+
+        let data = await listOfUserChannel().find({
+            userId: userId
+        }, {
+            projection: {
+                _id: 0,
+                channelId: 1
+            }
+        });
+
+        if (!isNotEmptyArr(data))
+            return false;
+
+        data?.filter(async d => !(await FindInChannel.isOwner(userId, d.channelId)));
 
         return isNotEmptyArr(data) ? data : false;
 
