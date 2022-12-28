@@ -7,8 +7,4 @@ export class E2EUserInfoService {
     async userInfo(userId: string) {
         return await Find.getUserPvDetails(userId);
     }
-
-    async isUserExist(userId: string) {
-        return await Find.isExist(userId);
-    }
 }

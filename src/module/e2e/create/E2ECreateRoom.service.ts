@@ -1,16 +1,10 @@
 import {Injectable} from '@nestjs/common';
 
-let Find = require("../../../model/find/user"),
-    Insert = require("../../../model/add/user"),
+let Insert = require("../../../model/add/user"),
     Create = require("../../../model/create/user");
 
 @Injectable()
 export class E2ECreateRoomService {
-
-    async isUserExist(userId) {
-        return await Find.isExist(userId);
-    }
-
     async initializationRoom(targetUserId: string, userIdWhichCreatedChat: string) {
         let tableName = `${userIdWhichCreatedChat}And${targetUserId}E2EContents`;
 

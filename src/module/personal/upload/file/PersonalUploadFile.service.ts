@@ -1,8 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {Message} from "../../../base/dto/Message";
 
-let Find = require("../../../../model/find/user"),
-    CommonInsert = require("../../../../model/add/common");
+let CommonInsert = require("../../../../model/add/common");
 
 @Injectable()
 export class PersonalUploadFileService {
@@ -10,9 +9,5 @@ export class PersonalUploadFileService {
         return await CommonInsert.message(tableName, message, {
             conversationType: conversationType
         });
-    }
-
-    async isUserExist(userId) {
-        return await Find.isExist(userId);
     }
 }

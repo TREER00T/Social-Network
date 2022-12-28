@@ -20,7 +20,6 @@ export class PersonalUserBlocksController extends UserTokenManager {
         if (Util.isUndefined(listOfBlockedUsers))
             return Json.builder(Response.HTTP_NOT_FOUND);
 
-
         Json.builder(Response.HTTP_OK,
             await this.appService.userDetails(listOfBlockedUsers));
     }

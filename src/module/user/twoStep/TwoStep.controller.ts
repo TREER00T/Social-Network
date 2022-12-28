@@ -20,8 +20,7 @@ export class TwoStepController extends UserTokenManager {
         if (!isValidaPassword)
             return Json.builder(Response.HTTP_FORBIDDEN);
 
-
-        Json.builder(Response.HTTP_ACCEPTED,
+        return Json.builder(Response.HTTP_ACCEPTED,
             await this.appService.getUserApiKey(this.phoneNumber, dto));
     }
 }
