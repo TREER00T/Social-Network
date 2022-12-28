@@ -30,4 +30,11 @@ export class DataQuery {
     @IsNotEmpty()
     @Length(1)
     search: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @IsOptional()
+    @Length(1)
+    to?: string;
+
 }

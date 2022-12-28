@@ -9,8 +9,6 @@ import {SavedMessageService} from "../../savedMessage/SavedMessage.service";
 import Util from "../../../../util/Util";
 import File from "../../../../util/File";
 
-let CommonInsert = require("../../../../model/add/common");
-
 @Controller()
 export class PersonalUploadFileController extends UserTokenManager {
     constructor(private readonly appService: PersonalUploadFileService,
@@ -51,9 +49,8 @@ export class PersonalUploadFileController extends UserTokenManager {
         message.fileSize = FileGenerated.size;
         message.fileName = file.originalname;
 
-        let insertedId = await CommonInsert.message(`${this.phoneNumber}SavedMessage`, message, {
-            conversationType: 'Personal'
-        });
+        let insertedId = await this.appService.uploadFile(
+            `${this.phoneNumber}SavedMessage`, message, 'Personal');
 
         Json.builder(Response.HTTP_OK, {
             insertedId: insertedId

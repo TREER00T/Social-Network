@@ -15,7 +15,7 @@ export default {
                 "isReply", "isForward",
                 "targetReplyId", "forwardDataId",
                 "locationLat", "locationLon",
-                "senderId" , "id"
+                "senderId", "id", "receiverId"
             ],
             arrayOfMessageType = [
                 "None", "Image",

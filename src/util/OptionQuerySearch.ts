@@ -4,6 +4,9 @@ export default {
 
     build(obj: any) {
 
+        if (obj?.to)
+            delete obj.to;
+
         let limit = obj?.limit,
             page = obj?.page,
             order = obj?.order,

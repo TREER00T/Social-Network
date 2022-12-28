@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
+
+let Find = require("../../../model/find/common");
 
 @Injectable()
 export class ContentSearchService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+    async search(value) {
+        return await Find.searchWithNameInTableUsersGroupsAndChannels(value);
+    }
 }

@@ -46,4 +46,9 @@ export class Message {
     @IsOptional()
     @IsNotEmpty()
     messageId?: string;
+
+    @IsString()
+    @IsOptional()
+    @IsNotEmpty()
+    receiverId?: string;
 }

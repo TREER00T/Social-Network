@@ -5,11 +5,11 @@ import { TwoStepModule } from "./module/user/twoStep/TwoStep.module";
 import { VerifyAuthCodeModule } from "./module/user/autoCode/VerifyAuthCode.module";
 import { RefreshTokenModule } from "./module/user/refresh/RefreshToken.module";
 import { E2ECreateRoomModule } from "./module/e2e/create/E2ECreateRoom.module";
-import { E2EBlockUserModule } from "./module/e2e/upload/E2EBlockUser.module";
-import { E2EUploadFileModule } from "./module/e2e/block/E2EUploadFile.module";
+import { E2EBlockUserModule } from "./module/e2e/block/E2EBlockUser.module";
+import { E2EUploadFileModule } from "./module/e2e/upload/E2EUploadFile.module";
 import { E2EChatsModule } from "./module/e2e/chats/E2EChats.module";
 import { E2EUserInfoModule } from "./module/e2e/info/E2EUserInfo.module";
-import { E2EDeleteChatModule } from "./module/e2e/deleteChat/E2EDeleteChat.module";
+import { E2EDeleteChatModule } from "./module/e2e/delete/E2EDeleteChat.module";
 import { PersonalUserInfoModule } from "./module/personal/info/PersonalUserInfo.module";
 import { PersonalUsernameModule } from "./module/personal/username/PersonalUsername.module";
 import { PersonalBioModule } from "./module/personal/bio/PersonalBio.module";
@@ -183,7 +183,7 @@ import { ChatGatewayModule } from "./io/chat/ChatGateway.module";
                         module: E2EBlockUserModule
                       },
                       {
-                        path: "/",
+                        path: "/info",
                         module: E2EUserInfoModule
                       }
                     ]
