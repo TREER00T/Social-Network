@@ -1,8 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 
 @Injectable()
 export class GroupUsersService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+    async listOfUser() {
+
+    }
+
+    async joinUser() {
+
+    }
+
+    async leaveUser() {
+
+    }
 }

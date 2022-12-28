@@ -1,12 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
-import { DeleteChannelService } from './DeleteChannel.service';
+import {Controller, Delete, Param} from '@nestjs/common';
+import {DeleteChannelService} from './DeleteChannel.service';
 
 @Controller()
 export class DeleteChannelController {
-  constructor(private readonly appService: DeleteChannelService) {}
+    constructor(private readonly appService: DeleteChannelService) {
+    }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+    @Delete()
+    async removeChannel(@Param("channelId") channelId: string) {
+
+    }
 }

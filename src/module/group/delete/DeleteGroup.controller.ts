@@ -1,12 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
-import { DeleteGroupService } from './DeleteGroup.service';
+import {Controller, Delete, Param} from '@nestjs/common';
+import {DeleteGroupService} from './DeleteGroup.service';
 
 @Controller()
 export class DeleteGroupController {
-  constructor(private readonly appService: DeleteGroupService) {}
+    constructor(private readonly appService: DeleteGroupService) {
+    }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+    @Delete()
+    async removeGroup(@Param("groupId") groupId: string) {
+
+    }
 }

@@ -1,8 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 
 @Injectable()
 export class ChannelLinkService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+    async inviteLink() {
+
+    }
+
+    async publicLink() {
+
+    }
 }

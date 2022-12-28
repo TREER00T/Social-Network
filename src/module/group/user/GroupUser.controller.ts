@@ -1,12 +1,23 @@
-import { Controller, Get } from '@nestjs/common';
-import { GroupUsersService } from './GroupUsers.service';
+import {Controller, Delete, Get, Post} from '@nestjs/common';
+import {GroupUsersService} from './GroupUsers.service';
 
 @Controller()
 export class GroupUserController {
-  constructor(private readonly appService: GroupUsersService) {}
+    constructor(private readonly appService: GroupUsersService) {
+    }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+    @Get("/all")
+    async listOfUsers() {
+
+    }
+
+    @Post("/join")
+    async joinUser() {
+
+    }
+
+    @Delete("/leave")
+    async leaveUser() {
+
+    }
 }
