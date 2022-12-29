@@ -31,7 +31,7 @@ export default {
     return arrayOfHttpMethods.includes(requestMethod) ? "" : requestMethod.match(/\d+/g)?.length > 0 ? "AuthRoute" : "";
   },
 
-  // The verify jwt and check jwt expired time
+  // Verify jwt and check jwt expired time
   async getJwtVerify(token): Promise<any> {
 
     return new Promise(async res => {

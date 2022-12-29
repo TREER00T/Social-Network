@@ -2,14 +2,23 @@ let {
         channelUser,
         channelAdmin
     } = require('../../create/channel'),
-    {dropCollection} = require('../../../database/mongoDbDriverConnection');
+    {dropCollection} = require('../../../database/mongoDbDriverConnection'),
+    {channel} = require("../../create/channel");
 
 
 module.exports = {
 
-    async channel(channelId) {
+    async channelContent(channelId) {
 
         await dropCollection(`${channelId}ChannelContents`);
+
+    },
+
+    async channel(channelId) {
+
+        await channel().deleteOne({
+            _id: channelId
+        });
 
     },
 
