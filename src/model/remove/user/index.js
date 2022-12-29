@@ -51,7 +51,7 @@ module.exports = {
 
     },
 
-    async groupIntoListOfUserGroup(groupId, userId) {
+    async userFromGroup(groupId, userId) {
 
         await listOfUserGroup().deleteOne({
             groupId: groupId, userId: userId
@@ -59,7 +59,7 @@ module.exports = {
 
     },
 
-    async channelIntoListOfUserChannel(channelId, userId) {
+    async userFromChannel(channelId, userId) {
 
         await listOfUserChannel().deleteOne({
             channelId: channelId, userId: userId
@@ -100,7 +100,7 @@ module.exports = {
 
     async userInAllUsersChannel(array, id) {
 
-        // Drop user created channel
+        // Drop user created channelContent
         array.map(async e => await dropCollection(e.channelId));
 
         await listOfUserChannel().deleteMany({
@@ -110,7 +110,7 @@ module.exports = {
     },
 
     async userDataInJoinedChannels(arr, userId) {
-        // Delete the list of messages of any channel sent by the user
+        // Delete the list of messages of any channelContent sent by the user
         for (const item of arr) {
             await deleteMany({
                 senderId: userId
