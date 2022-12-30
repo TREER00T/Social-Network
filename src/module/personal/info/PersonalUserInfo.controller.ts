@@ -1,19 +1,18 @@
 import {Controller, Get} from '@nestjs/common';
 import {PersonalUserInfoService} from './PersonalUserInfo.service';
-import {UserTokenManager} from "../../base/UserTokenManager";
+import {User} from "../../base/User";
 import Json from '../../../util/ReturnJson';
 import Response from '../../../util/Response';
 
 @Controller()
-export class PersonalUserInfoController extends UserTokenManager {
+export class PersonalUserInfoController extends User {
     constructor(private readonly appService: PersonalUserInfoService) {
         super();
+        this.init();
     }
 
     @Get()
     async userInfo() {
-        await this.init();
-
         Json.builder(Response.HTTP_OK, await this.appService.userInfo(this.userId));
     }
 }

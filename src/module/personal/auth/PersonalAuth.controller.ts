@@ -1,22 +1,21 @@
 import {Body, Controller, Put} from '@nestjs/common';
 import {PersonalAuthService} from './PersonalAuth.service';
 import {LoginTwoRefactorCode} from "../../base/dto/LoginTwoRefactorCode";
-import {UserTokenManager} from "../../base/UserTokenManager";
+import {User} from "../../base/User";
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
 import {AuthPasswordDto} from "./AuthPassword.dto";
 import Generate from "../../../util/Generate";
 
 @Controller()
-export class PersonalAuthController extends UserTokenManager {
+export class PersonalAuthController extends User {
     constructor(private readonly appService: PersonalAuthService) {
         super();
+        this.init();
     }
 
     @Put("/enable")
     async enableTwoAuth(@Body() dto: LoginTwoRefactorCode) {
-        await this.init();
-
         await this.appService.twoAuth(this.phoneNumber, dto.email, dto.password);
 
         return Json.builder(Response.HTTP_OK);
@@ -31,8 +30,6 @@ export class PersonalAuthController extends UserTokenManager {
 
     @Put("/rest/password")
     async restPassword(@Body() dto: AuthPasswordDto) {
-        await this.init();
-
         let oldPassword = dto.old,
             newPassword = dto.new;
 

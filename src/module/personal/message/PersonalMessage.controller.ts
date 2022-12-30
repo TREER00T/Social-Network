@@ -13,12 +13,11 @@ import {SavedMessage} from "../../base/SavedMessage";
 export class PersonalMessageController extends SavedMessage {
     constructor(private readonly appService: PersonalAccount) {
         super();
+        this.init();
     }
 
     @Get()
     async listOfMessage(@Query() dto: DataQuery) {
-        await this.init();
-
         let query = OptionQuerySearch.build(dto);
 
         this.verifySavedMessage().then(async () => {
@@ -39,8 +38,6 @@ export class PersonalMessageController extends SavedMessage {
 
     @Delete()
     async deleteMessage(@Body() data: string) {
-        await this.init();
-
         let messageIdOrListOfMessageId;
 
         try {
@@ -64,7 +61,7 @@ export class PersonalMessageController extends SavedMessage {
 
     @Post()
     async addMessage(@Body() msg: Message) {
-        let message = await this.handleMessage(msg);
+        let message = await this.handleSavedMessage(msg);
 
         await this.appService.addMessage(this.phoneNumber, message);
 
@@ -73,7 +70,7 @@ export class PersonalMessageController extends SavedMessage {
 
     @Put()
     async updateMessage(@Body() msg: Message) {
-        let message = await this.handleMessage(msg);
+        let message = await this.handleSavedMessage(msg);
 
         delete message?.id;
 
@@ -82,14 +79,4 @@ export class PersonalMessageController extends SavedMessage {
         return Json.builder(Response.HTTP_OK);
     }
 
-    async handleMessage(msg: Message) {
-        await this.init();
-
-        let message = Util.validateMessage(msg);
-
-        if (message === Util.IN_VALID_MESSAGE_TYPE || message === Util.IN_VALID_OBJECT_KEY)
-            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
-
-        return this.verifySavedMessage().then(() => message);
-    }
 }

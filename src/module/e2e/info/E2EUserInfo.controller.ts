@@ -8,6 +8,7 @@ import {User} from "../../base/User";
 export class E2EUserInfoController extends User {
     constructor(private readonly appService: E2EUserInfoService) {
         super();
+        this.init();
     }
 
     @Get()

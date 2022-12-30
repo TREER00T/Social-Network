@@ -1,13 +1,13 @@
-import {HandleMessage} from "./HandleMessage";
 import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
 import {Message} from "./dto/Message";
+import {User} from "./User";
 
 
 let CommonInsert = require("../../model/add/common"),
     Find = require("../../model/find/user");
 
-export abstract class E2EMessage extends HandleMessage {
+export abstract class E2EMessage extends User {
 
     async getNameOfE2EChat(targetUserId) {
         let e2eChatName = await Find.getTableNameForListOfE2EMessage(this.userId, targetUserId, this.userId);

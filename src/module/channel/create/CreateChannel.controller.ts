@@ -11,13 +11,12 @@ import File from "../../../util/File";
 export class CreateChannelController extends User {
     constructor(private readonly appService: CreateChannelService) {
         super();
+        this.init();
     }
 
     @Post()
     @UseInterceptors(FileInterceptor("avatar"))
     async createChannel(@UploadedFile() avatar: Express.Multer.File, @Body("name") name: string) {
-        await this.init();
-
         let avatarUrl;
 
         if (Util.isUndefined(name))

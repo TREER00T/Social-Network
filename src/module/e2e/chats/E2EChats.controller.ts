@@ -10,12 +10,11 @@ import {E2EMessage} from "../../base/E2EMessage";
 export class E2EChatsController extends E2EMessage {
     constructor() {
         super();
+        this.init();
     }
 
     @Get()
     async allChats(@Query() dto: DataQuery) {
-        await this.init();
-
         if (Util.isUndefined(dto?.to))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 

@@ -15,7 +15,9 @@ export default {
                 "isReply", "isForward",
                 "targetReplyId", "forwardDataId",
                 "locationLat", "locationLon",
-                "senderId", "id", "receiverId"
+                "senderId", "id",
+                "receiverId", "channelId",
+                "groupId"
             ],
             arrayOfMessageType = [
                 "None", "Image",
@@ -134,12 +136,11 @@ export default {
         if (typeof isSetUserToken !== "string")
             return false;
 
-        let token = await Validation.getJwtDecrypt(isSetUserToken);
+        let decodeToken = await Validation.getJwtDecrypt(isSetUserToken)
+            .then(async decode => Validation.getJwtVerify(decode));
 
-        let decode = await Validation.getJwtVerify(token);
-
-        if (decode.type === "rt" || "at")
-            return tokenPayload = decode;
+        if (decodeToken.type === "rt" || "at")
+            return tokenPayload = decodeToken;
 
         return true;
     },

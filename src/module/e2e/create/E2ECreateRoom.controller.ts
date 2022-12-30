@@ -9,12 +9,11 @@ import Response from "../../../util/Response";
 export class E2ECreateRoomController extends User {
     constructor(private readonly appService: E2ECreateRoomService) {
         super();
+        this.init();
     }
 
     @Post()
     async createRoom(@Body("targetUserId") targetUserId: string) {
-        await this.init();
-
         this.verifyUser(targetUserId).then(async () => {
 
             await this.appService.initializationRoom(targetUserId, this.userId);

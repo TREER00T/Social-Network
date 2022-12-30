@@ -12,13 +12,12 @@ import {SavedMessage} from "../../../base/SavedMessage";
 export class PersonalUploadFileController extends SavedMessage {
     constructor(private readonly appService: PersonalUploadFileService) {
         super();
+        this.init();
     }
 
     @Post()
     @UseInterceptors(FileInterceptor("file"))
     async save(@UploadedFile() file: Express.Multer.File, @Body() msg: Message) {
-        await this.init();
-
         if (Util.isUndefined(file))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -42,7 +41,7 @@ export class PersonalUploadFileController extends SavedMessage {
             let insertedId = await this.appService.uploadFile(
                 `${this.phoneNumber}SavedMessage`, message, 'Personal');
 
-            Json.builder(Response.HTTP_OK, {
+            Json.builder(Response.HTTP_CREATED, {
                 insertedId: insertedId
             });
 

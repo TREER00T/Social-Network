@@ -11,13 +11,12 @@ import {E2EMessage} from "../../base/E2EMessage";
 export class E2EUploadFileController extends E2EMessage {
     constructor() {
         super();
+        this.init();
     }
 
     @Post()
     @UseInterceptors(FileInterceptor("file"))
     async save(@UploadedFile() file: Express.Multer.File, @Body() msg: Message) {
-        await this.init();
-
         if (Util.isUndefined(file))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -58,7 +57,7 @@ export class E2EUploadFileController extends E2EMessage {
             let insertedId = await this.uploadFile(
                 `${this.userId}And${targetUserId}E2EContents`, message, 'E2E');
 
-            return Json.builder(Response.HTTP_OK, {
+            return Json.builder(Response.HTTP_CREATED, {
                 insertedId: insertedId
             });
 

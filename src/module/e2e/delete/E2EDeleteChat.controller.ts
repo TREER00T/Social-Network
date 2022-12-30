@@ -9,6 +9,7 @@ import {E2EMessage} from "../../base/E2EMessage";
 export class E2EDeleteChatController extends E2EMessage {
     constructor(private readonly appService: E2EDeleteChatService) {
         super();
+        this.init();
     }
 
     @Delete("/:id/us")
@@ -38,8 +39,6 @@ export class E2EDeleteChatController extends E2EMessage {
     }
 
     async validation(targetUserId: string): Promise<any> {
-        await this.init();
-
         let e2eChatName = await this.verifyUser(targetUserId)
             .then(async () => await this.getNameOfE2EChat(targetUserId));
 

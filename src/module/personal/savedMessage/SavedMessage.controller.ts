@@ -8,12 +8,11 @@ import {SavedMessage} from "../../base/SavedMessage";
 export class SavedMessageController extends SavedMessage {
     constructor(private readonly appService: SavedMessageService) {
         super();
+        this.init();
     }
 
     @Post()
     async createSavedMessage() {
-        await this.init();
-
         this.verifySavedMessage().then(async () => {
 
             await this.appService.addSavedMessage(this.phoneNumber);
@@ -25,8 +24,6 @@ export class SavedMessageController extends SavedMessage {
 
     @Delete()
     async deleteSavedMessage() {
-        await this.init();
-
         this.verifySavedMessage().then(async () => {
 
             await this.appService.removeSavedMessage(this.phoneNumber);
