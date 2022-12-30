@@ -1,20 +1,19 @@
 import {Controller, Post, Body} from '@nestjs/common';
 import {TwoStepService} from './TwoStep.service';
-import {UserTokenManager} from "../../base/UserTokenManager";
+import {User} from "../../base/User";
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
 import {TwoStepDto} from "./TwoStep.dto";
 
 @Controller()
-export class TwoStepController extends UserTokenManager {
+export class TwoStepController extends User {
     constructor(private readonly appService: TwoStepService) {
         super();
+        this.init();
     }
 
     @Post()
     async validationPassword(@Body() dto: TwoStepDto) {
-        await this.init();
-
         let isValidaPassword = await this.appService.isValidPassword(this.phoneNumber, dto.password);
 
         if (!isValidaPassword)

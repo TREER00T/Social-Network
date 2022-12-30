@@ -1,20 +1,19 @@
 import {Controller, Param, Put} from '@nestjs/common';
 import {PersonalUsernameService} from './PersonalUsername.service';
-import {UserTokenManager} from "../../base/UserTokenManager";
+import {User} from "../../base/User";
 import Util from "../../../util/Util";
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
 
 @Controller()
-export class PersonalUsernameController extends UserTokenManager {
+export class PersonalUsernameController extends User {
     constructor(private readonly appService: PersonalUsernameService) {
         super();
+        this.init();
     }
 
     @Put("/:username")
     async updateUsername(@Param("username") username: string) {
-        await this.init();
-
         if (Util.isUndefined(username))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 

@@ -1,23 +1,22 @@
 import {Controller, Put, UploadedFile, UseInterceptors} from '@nestjs/common';
 import {PersonalUploadAvatarService} from './PersonalUploadAvatar.service';
 import {FileInterceptor} from "@nestjs/platform-express";
-import {UserTokenManager} from "../../../base/UserTokenManager";
+import {User} from "../../../base/User";
 import Util from "../../../../util/Util";
 import Json from "../../../../util/ReturnJson";
 import Response from "../../../../util/Response";
 import File from "../../../../util/File";
 
 @Controller()
-export class PersonalUploadAvatarController extends UserTokenManager {
+export class PersonalUploadAvatarController extends User {
     constructor(private readonly appService: PersonalUploadAvatarService) {
         super();
+        this.init();
     }
 
     @Put()
     @UseInterceptors(FileInterceptor("avatar"))
     async save(@UploadedFile() avatar: Express.Multer.File) {
-        await this.init();
-
         if (Util.isUndefined(avatar))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -29,6 +28,6 @@ export class PersonalUploadAvatarController extends UserTokenManager {
 
         await this.appService.updateAvatar(this.phoneNumber, FileGenerated.url);
 
-        return Json.builder(Response.HTTP_OK);
+        return Json.builder(Response.HTTP_CREATED);
     }
 }

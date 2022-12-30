@@ -5,10 +5,7 @@ let {
         channel,
         channelUser,
         channelAdmin
-    } = require('../../create/channel'),
-    {
-        countRows
-    } = require('../../../database/mongoDbDriverConnection');
+    } = require('../../create/channel');
 
 
 module.exports = {
@@ -99,13 +96,6 @@ module.exports = {
         return !isUndefined(data?._id);
 
     },
-
-    async getCountOfListMessage(channelId) {
-
-        return await countRows(`${channelId}ChannelContents`);
-
-    },
-
 
     async getInfo(channelId) {
 

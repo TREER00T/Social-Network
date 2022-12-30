@@ -51,4 +51,14 @@ export class Message {
     @IsOptional()
     @IsNotEmpty()
     receiverId?: string;
+
+    @IsString()
+    @IsOptional()
+    @IsNotEmpty()
+    channelId?: string;
+
+    @IsString()
+    @IsOptional()
+    @IsNotEmpty()
+    groupId?: string;
 }

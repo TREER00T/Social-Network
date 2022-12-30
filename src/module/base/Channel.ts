@@ -1,7 +1,6 @@
-import {User} from "./User";
-
 import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
+import {User} from "./User";
 
 let Find = require("../../model/find/channel");
 
@@ -28,6 +27,21 @@ export abstract class Channel extends User {
 
         if (!isExist)
             return Json.builder(Response.HTTP_NOT_FOUND);
+    }
+
+    async isUserJoined(roomId: string, userId: string = this.userId) {
+        let isJoined = await Find.isJoined(roomId, userId);
+
+        if (!isJoined)
+            return Json.builder(Response.HTTP_NOT_FOUND);
+    }
+
+    async isNotJoinedUser(roomId: string, userId: string = this.userId) {
+        return await Find.isJoined(roomId, userId);
+    }
+
+    async isAdmin(chanelId: string, targetUserId: string) {
+        return await Find.isAdmin(chanelId, targetUserId);
     }
 
 }

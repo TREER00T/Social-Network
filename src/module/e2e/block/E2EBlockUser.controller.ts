@@ -9,12 +9,11 @@ import Json from "../../../util/ReturnJson";
 export class E2EBlockUserController extends User {
     constructor(private readonly appService: E2EBlockUserService) {
         super();
+        this.init();
     }
 
     @Put()
     async handleUserBlockState(@Body("targetUserId") targetUserId: string) {
-        await this.init();
-
         this.verifyUser(targetUserId).then(async () => {
 
             let hasUserBlocked = await this.appService.hasUserBlocked(this.userId, targetUserId);
