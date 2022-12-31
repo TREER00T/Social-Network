@@ -1,23 +1,66 @@
-import {Controller, Delete, Get, Post} from '@nestjs/common';
-import {GroupUsersService} from './GroupUsers.service';
+import {Body, Controller, Delete, Get, Post} from '@nestjs/common';
+import {GroupUserService} from './GroupUser.service';
+import Response from "../../../util/Response";
+import Json from "../../../util/ReturnJson";
+import PromiseVerify from "../../base/PromiseVerify";
+import {Group} from "../../base/Group";
 
 @Controller()
-export class GroupUserController {
-    constructor(private readonly appService: GroupUsersService) {
+export class GroupUserController extends Group {
+    constructor(private readonly appService: GroupUserService) {
+        super();
     }
 
     @Get("/all")
-    async listOfUsers() {
+    async listOfUsers(@Body("groupId") groupId: string) {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(groupId)
+        ]);
 
-    }
+        if (haveErr)
+            return haveErr;
 
-    @Post("/join")
-    async joinUser() {
-
+        return Json.builder(Response.HTTP_OK,
+            await this.appService.listOfUserWithDetails(
+                await this.appService.listOfUser(groupId)));
     }
 
     @Delete("/leave")
-    async leaveUser() {
+    async leaveUser(@Body("groupId") groupId: string) {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(groupId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        let isJoinedUser = await this.isNotJoinedUser(groupId);
+
+        if (!isJoinedUser)
+            return Json.builder(Response.HTTP_CONFLICT);
+
+        await this.appService.leaveUser(groupId, this.userId);
+
+        return Json.builder(Response.HTTP_OK);
+    }
+
+    @Post("/join")
+    async joinUser(@Body("groupId") groupId: string) {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(groupId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        let isJoinedUser = await this.isNotJoinedUser(groupId);
+
+        if (isJoinedUser)
+            return Json.builder(Response.HTTP_CONFLICT);
+
+        await this.appService.joinUser(groupId, this.userId);
+
+        return Json.builder(Response.HTTP_CREATED);
 
     }
 }

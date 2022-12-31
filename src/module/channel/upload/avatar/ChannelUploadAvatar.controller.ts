@@ -6,33 +6,35 @@ import Json from "../../../../util/ReturnJson";
 import Response from "../../../../util/Response";
 import File from "../../../../util/File";
 import {Channel} from "../../../base/Channel";
+import PromiseVerify from "../../../base/PromiseVerify";
 
 @Controller()
 export class ChannelUploadAvatarController extends Channel {
     constructor(private readonly appService: ChannelUploadAvatarService) {
         super();
-        this.init();
     }
 
     @Put()
     @UseInterceptors(FileInterceptor("avatar"))
     async save(@UploadedFile() avatar: Express.Multer.File, @Body("channelId") channelId: string) {
+        this.init();
 
-        this.isUndefined(avatar)
-            .then(() => this.isOwner(channelId))
-            .then(() => File.validationAndWriteFile({
-                size: avatar.size,
-                dataBinary: avatar.buffer,
-                format: Util.getFileFormat(avatar.originalname)
-            }))
-            .then(async FileGenerated => {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(avatar),
+            this.isOwner(channelId)
+        ]);
 
-                await this.appService.updateAvatar(channelId, FileGenerated.url);
+        if (haveErr)
+            return haveErr;
 
-                Json.builder(Response.HTTP_CREATED);
+        let FileGenerated = await File.validationAndWriteFile({
+            size: avatar.size,
+            dataBinary: avatar.buffer,
+            format: Util.getFileFormat(avatar.originalname)
+        });
 
-            });
+        await this.appService.updateAvatar(channelId, FileGenerated.url);
 
-
+        return Json.builder(Response.HTTP_CREATED);
     }
 }

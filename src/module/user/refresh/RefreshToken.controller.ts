@@ -7,13 +7,9 @@ import Token from "../../../util/Token";
 @Controller()
 export class RefreshTokenController extends User {
 
-    constructor() {
-        super();
-        this.init();
-    }
-
     @Post()
     async refreshToken() {
+        this.init();
         return Json.builder(Response.HTTP_ACCEPTED, await Token.setup(this.phoneNumber, this.userId));
     }
 

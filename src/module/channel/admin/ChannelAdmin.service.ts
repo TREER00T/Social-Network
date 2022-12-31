@@ -10,6 +10,6 @@ export class ChannelAdminService {
     }
 
     async removeAdmin(channelId: string, targetUserId: string) {
-        await Delete.admin(channelId,targetUserId);
+        await Delete.admin(channelId, targetUserId);
     }
 }

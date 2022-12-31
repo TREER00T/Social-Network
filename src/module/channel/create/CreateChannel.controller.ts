@@ -11,12 +11,13 @@ import File from "../../../util/File";
 export class CreateChannelController extends User {
     constructor(private readonly appService: CreateChannelService) {
         super();
-        this.init();
     }
 
     @Post()
     @UseInterceptors(FileInterceptor("avatar"))
     async createChannel(@UploadedFile() avatar: Express.Multer.File, @Body("name") name: string) {
+        this.init();
+
         let avatarUrl;
 
         if (Util.isUndefined(name))
@@ -29,7 +30,7 @@ export class CreateChannelController extends User {
                 format: Util.getFileFormat(avatar.originalname)
             });
 
-        let channelId = await this.appService.createChannelAndReturnId(name, avatarUrl);
+        let channelId = await this.appService.createChannelAndReturnId(name, avatarUrl.url);
 
         await this.appService.createChannelContent(this.userId, channelId);
 

@@ -9,11 +9,12 @@ import Json from "../../../util/ReturnJson";
 export class PersonalUsernameController extends User {
     constructor(private readonly appService: PersonalUsernameService) {
         super();
-        this.init();
     }
 
     @Put("/:username")
     async updateUsername(@Param("username") username: string) {
+        this.init();
+
         if (Util.isUndefined(username))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
@@ -22,7 +23,7 @@ export class PersonalUsernameController extends User {
         if (!isExistUsername)
             return Json.builder(Response.HTTP_CONFLICT);
 
-        let hasUpdate = this.appService.updateUsername(this.phoneNumber,username);
+        let hasUpdate = this.appService.updateUsername(this.phoneNumber, username);
 
         if (!hasUpdate)
             return Json.builder(Response.HTTP_BAD_REQUEST);

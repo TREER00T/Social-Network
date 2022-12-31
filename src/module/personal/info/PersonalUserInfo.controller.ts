@@ -8,11 +8,12 @@ import Response from '../../../util/Response';
 export class PersonalUserInfoController extends User {
     constructor(private readonly appService: PersonalUserInfoService) {
         super();
-        this.init();
     }
 
     @Get()
     async userInfo() {
-        Json.builder(Response.HTTP_OK, await this.appService.userInfo(this.userId));
+        this.init();
+
+        return Json.builder(Response.HTTP_OK, await this.appService.userInfo(this.userId));
     }
 }

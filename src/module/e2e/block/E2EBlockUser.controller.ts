@@ -1,7 +1,6 @@
 import {Body, Controller, Put} from '@nestjs/common';
 import {E2EBlockUserService} from './E2EBlockUser.service';
 import {User} from "../../base/User";
-import Util from "../../../util/Util";
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
 
@@ -9,22 +8,24 @@ import Json from "../../../util/ReturnJson";
 export class E2EBlockUserController extends User {
     constructor(private readonly appService: E2EBlockUserService) {
         super();
-        this.init();
     }
 
     @Put()
     async handleUserBlockState(@Body("targetUserId") targetUserId: string) {
-        this.verifyUser(targetUserId).then(async () => {
+        this.init();
 
-            let hasUserBlocked = await this.appService.hasUserBlocked(this.userId, targetUserId);
+        let haveErr = await this.verifyUser(targetUserId);
 
-            if (!hasUserBlocked)
-                await this.appService.enableBlockUser(this.userId, targetUserId);
-            else
-                await this.appService.disableBlockUser(this.userId, targetUserId);
+        if (haveErr)
+            return haveErr;
 
-            return Json.builder(Response.HTTP_OK);
+        let hasUserBlocked = await this.appService.hasUserBlocked(this.userId, targetUserId);
 
-        });
+        if (!hasUserBlocked)
+            await this.appService.enableBlockUser(this.userId, targetUserId);
+        else
+            await this.appService.disableBlockUser(this.userId, targetUserId);
+
+        return Json.builder(Response.HTTP_OK);
     }
 }

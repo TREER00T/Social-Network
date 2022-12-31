@@ -1,5 +1,6 @@
 import {Injectable} from '@nestjs/common';
-import Find from "../../../model/find/user";
+
+let Find = require("../../../model/find/user");
 
 @Injectable()
 export class ChannelChatsService {

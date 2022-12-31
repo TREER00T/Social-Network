@@ -6,6 +6,12 @@ let {
 
 module.exports = {
 
+    async groupContent(groupId) {
+
+        await dropCollection(`${groupId}GroupContents`);
+
+    },
+
     async group(groupId) {
 
         await dropCollection(`${groupId}GroupContents`);

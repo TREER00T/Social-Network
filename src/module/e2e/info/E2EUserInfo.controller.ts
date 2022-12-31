@@ -8,19 +8,20 @@ import {User} from "../../base/User";
 export class E2EUserInfoController extends User {
     constructor(private readonly appService: E2EUserInfoService) {
         super();
-        this.init();
     }
 
     @Get()
     async userInfo(@Query() userId: string) {
+        this.init();
 
-        this.verifyUser(userId).then(async () => {
+        let haveErr = await this.verifyUser(userId);
 
-            let userPvDetails = await this.appService.userInfo(userId);
+        if (haveErr)
+            return haveErr;
 
-            return Json.builder(Response.HTTP_OK, userPvDetails);
+        // Like username , img ...
+        let userPvDetails = await this.appService.userInfo(userId);
 
-        });
-
+        return Json.builder(Response.HTTP_OK, userPvDetails);
     }
 }

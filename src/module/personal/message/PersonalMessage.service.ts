@@ -1,8 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {Message} from "../../base/dto/Message";
 
-let Find = require("../../../model/find/user"),
-    Delete = require("../../../model/remove/user"),
+let Delete = require("../../../model/remove/user"),
     Update = require("../../../model/update/user"),
     Insert = require("../../../model/add/user");
 

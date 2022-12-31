@@ -1,59 +1,48 @@
 import {Body, Controller, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
-import {ChannelUploadFileService} from './ChannelUploadFile.service';
 import {Channel} from "../../../base/Channel";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {Message} from "../../../base/dto/Message";
 import Util from "../../../../util/Util";
-import Response from "../../../../util/Response";
-import Json from "../../../../util/ReturnJson";
-import File from "../../../../util/File";
+import PromiseVerify from "../../../base/PromiseVerify";
 
 @Controller()
 export class ChannelUploadFileController extends Channel {
-    constructor(private readonly appService: ChannelUploadFileService) {
-        super();
-        this.init();
-    }
-
     @Post()
     @UseInterceptors(FileInterceptor("file"))
     async save(@UploadedFile() file: Express.Multer.File, @Body() msg: Message) {
+        this.init();
+
         let receiverId = msg?.receiverId,
             channelId = msg?.channelId;
 
         if (!Util.isUndefined(receiverId))
             delete msg?.receiverId;
 
-        this.isUndefined(channelId)
-            .then(() => this.isUndefined(file))
-            .then(() => this.isUserJoined(channelId))
-            .then(() => this.isOwnerOrAdmin(channelId))
-            .then(() => this.handleMessage(msg))
-            .then(async message => {
+        let message = await PromiseVerify.all([
+            this.isUndefined(channelId),
+            this.isUndefined(file),
+            this.isUserJoined(channelId),
+            this.isOwnerOrAdmin(channelId),
+            this.handleMessage(msg)
+        ]);
 
-                delete message?.channelId;
+        // In this case will be error
+        if (message?.code)
+            return message;
 
-                message.senderId = this.userId;
+        delete message?.channelId;
 
-                let FileGenerated = await File.validationAndWriteFile({
-                    size: file.size,
-                    dataBinary: file.buffer,
-                    format: Util.getFileFormat(file.originalname)
-                });
+        message.senderId = this.userId;
 
-                message.fileUrl = FileGenerated.url;
-                message.fileSize = FileGenerated.size;
-                message.fileName = file.originalname;
-
-                return message;
-            })
-            .then(async message =>
-                this.appService.uploadFileWithMessage(
-                    `${channelId}ChannelContents`, await message, "Channel"))
-            .then(async insertedId => {
-                Json.builder(Response.HTTP_CREATED, {
-                    insertId: insertedId
-                });
-            });
+        return await this.saveAndGetId({
+            file: {
+                size: file.size,
+                buffer: file.buffer,
+                name: file.originalname
+            },
+            tableName: `${channelId}ChannelContents`,
+            message: message,
+            conversationType: "Channel"
+        });
     }
 }

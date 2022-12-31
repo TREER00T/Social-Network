@@ -11,12 +11,13 @@ import File from "../../../../util/File";
 export class PersonalUploadAvatarController extends User {
     constructor(private readonly appService: PersonalUploadAvatarService) {
         super();
-        this.init();
     }
 
     @Put()
     @UseInterceptors(FileInterceptor("avatar"))
     async save(@UploadedFile() avatar: Express.Multer.File) {
+        this.init();
+
         if (Util.isUndefined(avatar))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 

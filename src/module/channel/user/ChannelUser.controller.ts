@@ -1,64 +1,67 @@
 import {Body, Controller, Delete, Get, Post} from '@nestjs/common';
 import {ChannelUserService} from './ChannelUser.service';
 import {Channel} from "../../base/Channel";
-import Util from "../../../util/Util";
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
+import PromiseVerify from "../../base/PromiseVerify";
 
 @Controller()
 export class ChannelUserController extends Channel {
     constructor(private readonly appService: ChannelUserService) {
         super();
-        this.init();
     }
 
     @Get("/all")
     async listOfUsers(@Body("channelId") channelId: string) {
-        this.isUndefined(channelId)
-            .then(() => this.isOwnerOrAdmin(channelId))
-            .then(async () => {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(channelId),
+            this.isOwnerOrAdmin(channelId)
+        ]);
 
-                Json.builder(Response.HTTP_OK,
-                    this.appService.listOfUserWithDetails(
-                        await this.appService.listOfUser(channelId)));
+        if (haveErr)
+            return haveErr;
 
-            });
+        return Json.builder(Response.HTTP_OK,
+            await this.appService.listOfUserWithDetails(
+                await this.appService.listOfUser(channelId)));
     }
 
     @Delete("/leave")
     async leaveUser(@Body("channelId") channelId: string) {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(channelId)
+        ]);
 
-        this.isUndefined(channelId)
-            .then(async () => {
+        if (haveErr)
+            return haveErr;
 
-                let isJoinedUser = await this.isNotJoinedUser(channelId);
+        let isJoinedUser = await this.isNotJoinedUser(channelId);
 
-                if (!isJoinedUser)
-                    return Json.builder(Response.HTTP_CONFLICT);
+        if (!isJoinedUser)
+            return Json.builder(Response.HTTP_CONFLICT);
 
-                await this.appService.leaveUser(channelId, this.userId);
+        await this.appService.leaveUser(channelId, this.userId);
 
-                Json.builder(Response.HTTP_OK);
-
-            });
-
+        return Json.builder(Response.HTTP_OK);
     }
 
     @Post("/join")
     async joinUser(@Body("channelId") channelId: string) {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(channelId)
+        ]);
 
-        this.isUndefined(channelId)
-            .then(async () => {
-                let isJoinedUser = await this.isNotJoinedUser(channelId);
+        if (haveErr)
+            return haveErr;
 
-                if (isJoinedUser)
-                    return Json.builder(Response.HTTP_CONFLICT);
+        let isJoinedUser = await this.isNotJoinedUser(channelId);
 
-                await this.appService.joinUser(channelId, this.userId);
+        if (isJoinedUser)
+            return Json.builder(Response.HTTP_CONFLICT);
 
-                return Json.builder(Response.HTTP_CREATED);
+        await this.appService.joinUser(channelId, this.userId);
 
-            });
+        return Json.builder(Response.HTTP_CREATED);
 
     }
 }

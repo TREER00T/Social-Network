@@ -8,12 +8,13 @@ import Response from "../../../util/Response";
 export class PersonaDevicesController extends User {
     constructor(private readonly appService: PersonaDevicesService) {
         super();
-        this.init();
     }
 
     @Get()
     async listOfDevices() {
-        Json.builder(Response.HTTP_OK,
+        this.init();
+
+        return Json.builder(Response.HTTP_OK,
             await this.appService.listOfDevices(this.userId));
     }
 }

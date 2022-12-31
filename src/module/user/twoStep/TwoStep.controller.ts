@@ -9,11 +9,12 @@ import {TwoStepDto} from "./TwoStep.dto";
 export class TwoStepController extends User {
     constructor(private readonly appService: TwoStepService) {
         super();
-        this.init();
     }
 
     @Post()
     async validationPassword(@Body() dto: TwoStepDto) {
+        this.init();
+
         let isValidaPassword = await this.appService.isValidPassword(this.phoneNumber, dto.password);
 
         if (!isValidaPassword)
