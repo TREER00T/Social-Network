@@ -8,11 +8,12 @@ import Response from "../../../util/Response";
 export class PersonalAccountController extends User {
     constructor(private readonly appService: PersonalAccount) {
         super();
-        this.init();
     }
 
     @Delete()
     async deleteAccount() {
+        this.init();
+
         await this.appService.deleteAccount(this.phoneNumber, this.userId);
 
         return Json.builder(Response.HTTP_OK);

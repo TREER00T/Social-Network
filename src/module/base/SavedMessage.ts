@@ -2,6 +2,7 @@ import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
 import {Message} from "./dto/Message";
 import {User} from "./User";
+import PromiseVerify from "./PromiseVerify";
 
 let Find = require("../../model/find/user");
 
@@ -14,7 +15,10 @@ export abstract class SavedMessage extends User {
     }
 
     async handleSavedMessage(msg: Message) {
-        return this.verifySavedMessage().then(() => this.handleMessage(msg))
+        return await PromiseVerify.all([
+            this.verifySavedMessage(),
+            this.handleMessage(msg)
+        ]);
     }
 
 }

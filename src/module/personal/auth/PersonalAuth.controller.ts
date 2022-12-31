@@ -11,11 +11,12 @@ import Generate from "../../../util/Generate";
 export class PersonalAuthController extends User {
     constructor(private readonly appService: PersonalAuthService) {
         super();
-        this.init();
     }
 
     @Put("/enable")
     async enableTwoAuth(@Body() dto: LoginTwoRefactorCode) {
+        this.init();
+
         await this.appService.twoAuth(this.phoneNumber, dto.email, dto.password);
 
         return Json.builder(Response.HTTP_OK);
@@ -23,6 +24,8 @@ export class PersonalAuthController extends User {
 
     @Put("/disable")
     async disableTwoAuth() {
+        this.init();
+
         await this.appService.twoAuth(this.phoneNumber);
 
         return Json.builder(Response.HTTP_OK);
@@ -30,6 +33,8 @@ export class PersonalAuthController extends User {
 
     @Put("/rest/password")
     async restPassword(@Body() dto: AuthPasswordDto) {
+        this.init();
+
         let oldPassword = dto.old,
             newPassword = dto.new;
 

@@ -3,41 +3,36 @@ import {PersonalAccount} from './PersonalMessage.service';
 import {DataQuery} from "../../base/dto/DataQuery";
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
-import OptionQuerySearch from "../../../util/OptionQuerySearch";
 import Util from "../../../util/Util";
 import {Message} from "../../base/dto/Message";
 import {InputException} from "../../../exception/InputException";
 import {SavedMessage} from "../../base/SavedMessage";
+import PromiseVerify from "../../base/PromiseVerify";
 
 @Controller()
 export class PersonalMessageController extends SavedMessage {
     constructor(private readonly appService: PersonalAccount) {
         super();
-        this.init();
     }
 
     @Get()
     async listOfMessage(@Query() dto: DataQuery) {
-        let query = OptionQuerySearch.build(dto);
+        this.init();
 
-        this.verifySavedMessage().then(async () => {
+        let haveErr = await PromiseVerify.all([
+            this.verifySavedMessage()
+        ]);
 
-            let totalPages = await this.getListOfMessageCount(`${this.phoneNumber}SavedMessage`, query.limit);
+        if (haveErr)
+            return haveErr;
 
-            let listOfMessage = await this.getListOfMessage(`${this.phoneNumber}SavedMessage`, query);
-
-            return Json.builder(
-                Response.HTTP_OK,
-                listOfMessage, {
-                    totalPages: totalPages
-                }
-            );
-
-        });
+        return await this.getListOfMessageFromRoom(dto, `${this.phoneNumber}SavedMessage`);
     }
 
     @Delete()
     async deleteMessage(@Body() data: string) {
+        this.init();
+
         let messageIdOrListOfMessageId;
 
         try {
@@ -49,19 +44,26 @@ export class PersonalMessageController extends SavedMessage {
         if (Util.isUndefined(messageIdOrListOfMessageId))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
+        let haveErr = await PromiseVerify.all([
+            this.verifySavedMessage()
+        ]);
 
-        this.verifySavedMessage().then(async () => {
+        if (haveErr)
+            return haveErr;
 
-            await this.appService.removeMessageOrListOfMessage(this.phoneNumber, messageIdOrListOfMessageId);
+        await this.appService.removeMessageOrListOfMessage(this.phoneNumber, messageIdOrListOfMessageId);
 
-            return Json.builder(Response.HTTP_OK);
-
-        });
+        return Json.builder(Response.HTTP_OK);
     }
 
     @Post()
     async addMessage(@Body() msg: Message) {
+        this.init();
+
         let message = await this.handleSavedMessage(msg);
+
+        if (message?.code)
+            return message;
 
         await this.appService.addMessage(this.phoneNumber, message);
 
@@ -70,7 +72,12 @@ export class PersonalMessageController extends SavedMessage {
 
     @Put()
     async updateMessage(@Body() msg: Message) {
+        this.init();
+
         let message = await this.handleSavedMessage(msg);
+
+        if (message?.code)
+            return message;
 
         delete message?.id;
 

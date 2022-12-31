@@ -9,17 +9,18 @@ import Response from "../../../util/Response";
 export class PersonalUserBlocksController extends User {
     constructor(private readonly appService: PersonalUserBlocksService) {
         super();
-        this.init();
     }
 
     @Get()
     async listOfUserBlocks() {
+        this.init();
+
         let listOfBlockedUsers = await this.appService.listOfBlockedUsers(this.userId);
 
         if (Util.isUndefined(listOfBlockedUsers))
             return Json.builder(Response.HTTP_NOT_FOUND);
 
-        Json.builder(Response.HTTP_OK,
+        return Json.builder(Response.HTTP_OK,
             await this.appService.userDetails(listOfBlockedUsers));
     }
 }

@@ -6,7 +6,7 @@ import {UserInput} from "./UserInput";
 
 let Find = require("../../model/find/user");
 
-export abstract class HandleMessage extends UserInput{
+export abstract class HandleMessage extends UserInput {
 
     async getListOfMessageCount(tableName: string, limit: number) {
         return Math.ceil(await Find.getCountOfListMessage(tableName) / limit);

@@ -9,17 +9,19 @@ import Response from "../../../util/Response";
 export class E2ECreateRoomController extends User {
     constructor(private readonly appService: E2ECreateRoomService) {
         super();
-        this.init();
     }
 
     @Post()
     async createRoom(@Body("targetUserId") targetUserId: string) {
-        this.verifyUser(targetUserId).then(async () => {
+        this.init();
 
-            await this.appService.initializationRoom(targetUserId, this.userId);
+        let haveErr = await this.verifyUser(targetUserId);
 
-            return Json.builder(Response.HTTP_CREATED);
+        if (haveErr)
+            return haveErr;
 
-        });
+        await this.appService.initializationRoom(targetUserId, this.userId);
+
+        return Json.builder(Response.HTTP_CREATED);
     }
 }

@@ -9,11 +9,12 @@ import Response from "../../../util/Response";
 export class PersonalNameController extends User {
     constructor(private readonly appService: PersonalNameService) {
         super();
-        this.init();
     }
 
     @Put()
     async updateFirstNameOrLastName(@Body() dto: PersonalNameDto) {
+        this.init();
+
         await this.appService.updateFirstNameOrLastName(this.userId, dto);
 
         return Json.builder(Response.HTTP_OK);

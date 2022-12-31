@@ -1,6 +1,7 @@
 import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
 import {User} from "./User";
+import PromiseVerify from "./PromiseVerify";
 
 let Find = require("../../model/find/channel");
 
@@ -14,9 +15,14 @@ export abstract class Channel extends User {
     }
 
     async isOwner(roomId: string) {
-        let isOwner = await this.isChannelExist(roomId)
-            .then(() => this.verifyUser(this.userId))
-            .then(() => Find.isOwner(this.userId, roomId));
+        let isOwner = await PromiseVerify.all([
+            this.isChannelExist(roomId),
+            this.verifyUser(this.userId),
+            Find.isOwner(this.userId, roomId)
+        ]);
+
+        if (typeof isOwner !== "boolean")
+            return isOwner;
 
         if (!isOwner)
             return Json.builder(Response.HTTP_FORBIDDEN);
