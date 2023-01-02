@@ -1,8 +1,9 @@
 import Generate from "./Generate";
+import {Token} from "./Types";
 
 export default {
 
-    async setup(userPhone: string, userId: string): Promise<{ accessToken: string, refreshToken: string }> {
+    async setup(userPhone: string, userId: string): Promise<Token> {
         return {
             accessToken: await Generate.getJwtEncrypt(Generate.getJwtSign({
                 phoneNumber: userPhone,

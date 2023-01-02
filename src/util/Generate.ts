@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { JWK, JWE } from "node-jose";
 import * as crypto from "crypto";
 import * as dotenv from "dotenv";
+import {JsonObject} from "./Types";
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ export default {
 
 
   // Signs jwt
-  getJwtSign(payload: { [key: string]: any }, subject: number | string): string {
+  getJwtSign(payload: JsonObject, subject: number | string): string {
     const SIGN_OPTIONS = {
       subject: subject,
       expiresIn: payload.expiresIn,

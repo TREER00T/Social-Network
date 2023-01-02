@@ -1,4 +1,5 @@
 import Validation from "../util/Validation";
+import {JsonObject} from "./Types";
 
 let Find = require("../model/find/user");
 
@@ -152,7 +153,7 @@ export default {
         return decodeToken;
     },
 
-    async getTokenPayLoad(): Promise<{ [key: string]: any }> {
+    async getTokenPayLoad(): Promise<JsonObject> {
         return await tokenPayload;
     },
 

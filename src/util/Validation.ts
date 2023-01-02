@@ -15,11 +15,6 @@ export default {
     return /^\d+$/.test(data);
   },
 
-  // Checks the verification code E.g : 335486 return true
-  isVerificationCode(code: string): boolean {
-    return /^[0-9]{6}$/.test(code);
-  },
-
   requestEndpointHandler(requestMethod: string): string {
     const arrayOfHttpMethods = [
       "/api/auth/generate/user",

@@ -3,6 +3,7 @@ import Util from "../../util/Util";
 import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
 import {UserInput} from "./UserInput";
+import {JsonObject} from "../../util/Types";
 
 let Find = require("../../model/find/user");
 
@@ -19,7 +20,7 @@ export abstract class HandleMessage extends UserInput {
         });
     }
 
-    async handleMessage(msg: Message) {
+    async handleMessage(msg: Message | JsonObject) {
         let message = Util.validateMessage(msg);
 
         if (message === Util.IN_VALID_MESSAGE_TYPE || message === Util.IN_VALID_OBJECT_KEY)
