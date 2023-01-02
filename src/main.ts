@@ -5,7 +5,6 @@ import Res from "./util/Response";
 import {NextFunction, Request, Response} from "express";
 import Validation from "./util/Validation";
 import Util from "./util/Util";
-import {SocketIoAdapter} from "./io/adapter";
 import Json from "./util/ReturnJson";
 import Swagger from "../docs/swagger";
 import {ValidationPipe} from "@nestjs/common";
@@ -18,7 +17,6 @@ async function bootstrap() {
     Swagger.restApi(app);
     Swagger.socketIo();
 
-    app.useWebSocketAdapter(new SocketIoAdapter(app));
     app.useGlobalPipes(new ValidationPipe());
 
     app.use(async (req: Request, res: Response, next: NextFunction) => {
@@ -37,12 +35,10 @@ async function bootstrap() {
 
             let tokenPayload = await Util.tokenVerify(token);
 
-            let isSetUserApiKey = Util.isSetUserApiKey(apiKey);
-
-            if (!isSetUserApiKey || !tokenPayload)
+            if (!apiKey || !tokenPayload)
                 return Json.builder(Res.HTTP_UNAUTHORIZED_INVALID_TOKEN);
 
-            let isValidApiKey = await Util.isValidApiKey(apiKey, tokenPayload.phoneNumber);
+            let isValidApiKey = await Util.isValidApiKey(tokenPayload.phoneNumber, apiKey);
 
             if (!isValidApiKey)
                 return Json.builder(Res.HTTP_UNAUTHORIZED_INVALID_API_KEY);

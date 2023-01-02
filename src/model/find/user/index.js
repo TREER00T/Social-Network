@@ -512,7 +512,22 @@ module.exports = {
 
         return isNotEmptyArr(data) ? data : false;
 
-    }
+    },
 
+    async getUsersFromListOfUser(userId) {
+        let data = await listOfUserE2E().find({
+            userId: userId,
+            fromUser: userId
+        }, {
+            projection: {
+                _id: 0,
+                toUser: 1
+            }
+        });
+
+        data?.map(d => d.toUser);
+
+        return data;
+    }
 
 }
