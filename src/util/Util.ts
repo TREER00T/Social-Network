@@ -1,6 +1,9 @@
 import Validation from "../util/Validation";
 
+let Find = require("../model/find/user");
+
 let tokenPayload,
+    apiKey,
     IN_VALID_MESSAGE_TYPE = "IN_VALID_MESSAGE_TYPE",
     IN_VALID_OBJECT_KEY = "IN_VALID_OBJECT_KEY";
 export default {
@@ -76,7 +79,7 @@ export default {
     },
 
 
-    formatBytes(realSize): string {
+    formatBytes(realSize: number): string {
 
         const DECIMAL_LENGTH = 2,
             PACKET_SIZE = 1024;
@@ -103,7 +106,7 @@ export default {
     },
 
 
-    getFileFormat(fileName): string {
+    getFileFormat(fileName: string): string {
         return fileName.match(/\.[0-9a-z]+$/i)[0].toLowerCase();
     },
 
@@ -117,37 +120,51 @@ export default {
         return data?.length > 0;
     },
 
-    isSetUserApiKey(key): boolean {
-        return key !== undefined;
+    async tokenVerify(bearerHeader: string) {
+        let token = await this.handleToken(bearerHeader);
+
+        if (!token)
+            return false;
+
+        return tokenPayload = token;
     },
 
+    async isAccessToken(bearerHeader: string) {
+        let token = await this.handleToken(bearerHeader);
 
-    async isValidApiKey(key, phone): Promise<boolean> {
-        let result = await this.getApiKey(phone);
+        if (!token)
+            return false;
 
-        return result === key;
+        tokenPayload = token;
+
+        return token.type === "at";
     },
 
-
-    async tokenVerify(bearerHeader) {
-
+    async handleToken(bearerHeader: string) {
         let isSetUserToken = Validation.getSplitBearerJwt(bearerHeader);
 
         if (typeof isSetUserToken !== "string")
             return false;
 
         let decodeToken = await Validation.getJwtDecrypt(isSetUserToken)
-            .then(async decode => Validation.getJwtVerify(decode));
+            .then(async decode => Validation.getJwtVerify(await decode));
 
-        if (decodeToken.type === "rt" || "at")
-            return tokenPayload = decodeToken;
-
-        return true;
+        return decodeToken;
     },
-
 
     async getTokenPayLoad(): Promise<{ [key: string]: any }> {
         return await tokenPayload;
+    },
+
+    async isValidApiKey(phone: string, key: string) {
+        if (!key)
+            return false;
+
+        let result = await Find.getApiKey(phone);
+
+        apiKey = result;
+
+        return result === key;
     }
 
 };
