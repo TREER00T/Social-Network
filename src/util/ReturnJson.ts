@@ -1,6 +1,5 @@
 import { Response } from "express";
-
-type IResponse = { code: number, message: string };
+import {IResponse} from "./Types";
 
 // instance of response object express
 let res: Response;

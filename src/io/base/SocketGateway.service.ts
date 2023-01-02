@@ -3,6 +3,7 @@ import {Server} from "socket.io";
 
 let Update = require("../../model/update/user"),
     Find = require("../../model/find/user"),
+    CommonFind = require("../../model/find/common"),
     Redis = require("../../database/redisDbDriver");
 
 
@@ -32,6 +33,13 @@ export class SocketGatewayService {
 
         }
 
+    }
+
+    async isExistChat(receiverId: string, socketUserId: string): Promise<boolean> {
+        return await Find.isExistChatRoom({
+            toUser: receiverId,
+            fromUser: socketUserId
+        });
     }
 
 }

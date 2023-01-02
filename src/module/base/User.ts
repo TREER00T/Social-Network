@@ -3,26 +3,13 @@ import Response from "../../util/Response";
 import Util from "../../util/Util";
 import {HandleMessage} from "./HandleMessage";
 import PromiseVerify from "./PromiseVerify";
-import {Message} from "./dto/Message";
 import File from "../../util/File";
 import OptionQuerySearch from "../../util/OptionQuerySearch";
 import {DataQuery} from "./dto/DataQuery";
+import {MessagePayload} from "../../util/Types";
 
 let CommonInsert = require("../../model/add/common"),
     Find = require("../../model/find/user");
-
-type IFile = {
-    size: number,
-    buffer: ArrayBuffer,
-    name: string
-}
-
-type MessagePayload = {
-    file: IFile,
-    tableName: string,
-    message: Message,
-    conversationType: string
-}
 
 export abstract class User extends HandleMessage {
 

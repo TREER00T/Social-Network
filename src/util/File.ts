@@ -3,6 +3,7 @@ import * as dotenv from "dotenv";
 import Generate from "../util/Generate";
 import Util from "../util/Util";
 import {FileException} from "../exception/FileException";
+import {FileUploaded} from "./Types";
 
 dotenv.config();
 
@@ -10,11 +11,6 @@ let cacheFolder = "cache/",
     ROOT_PROJECT_FOLDER = "../",
     url = `${process.env.HTTP_TYPE}://${process.env.IP}`,
     cacheFolderPath = ROOT_PROJECT_FOLDER + cacheFolder;
-
-type FileUploaded = {
-    url: string
-    size: string
-}
 
 
 export default {
