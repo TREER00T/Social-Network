@@ -1,13 +1,13 @@
 info:
-  title: Social Network Application
-  version: 1.1.2
+  title: Social Network Socket.io API
+  version: 2.0.0
   contact:
     email: treeroot.ir@gmail.com
     phone: '+989030207892'
   license:
-    name: Apache 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0.html
-  description: A simple node.js app using rest api and socket.io
+    name: MIT
+    url: https://github.com/TREER00T/Social-Network-Server/blob/main/LICENSE
+  description: Social Network API Documentation
 
 baseUrl: http://localhost:4000
 
@@ -46,30 +46,6 @@ paths:
       - name: onlineStatus
         description: By notifying all sockets known to the user.
 
-  - on: onNotificationForVoiceCall
-    tags:
-      - E2E
-    parameters:
-      - $ref:
-          - components/ReceiverId
-          - components/SenderId
-    events:
-      - $ref:
-          - components/emitNotificationForVoiceCallError
-          - components/emitNotificationForVoiceCall
-
-  - on: onVoiceCall
-    tags:
-      - E2E
-    parameters:
-      - $ref:
-          - components/ReceiverId
-          - components/SenderId
-    events:
-      - $ref:
-          - components/emitVoiceCallError
-          - components/emitVoiceCall
-
   - on: onUserActivities
     description: Return list of user chats
     tags:
@@ -77,20 +53,11 @@ paths:
     parameters:
       - name: type
         type: string
-        description: The room type and by defualt return all rooms => [ 'e2e' , 'channel', 'group' ]
+        description: The activity type => [ 'e2e' , 'channel', 'group' , 'all' ]
         required: true
     events:
       - name: emitUserActivities
         description: Emitting list of rooms
-
-  - on: setOnListOfUsersChat
-    description: Help to send user online status for specific user
-    tags:
-      - E2E
-    parameters:
-      - name: data
-        type: array
-        description: List of users who chat with this person
 
   - on: onPvTyping
     tags:
@@ -103,43 +70,6 @@ paths:
       - $ref:
           - components/emitPvTypingError
           - components/emitPvTyping
-
-  - on: onPvOnlineUser
-    tags:
-      - E2E
-    parameters:
-      - $ref:
-          - components/ReceiverId
-          - components/SenderId
-    events:
-      - $ref:
-          - components/emitPvOnlineUserError
-          - components/emitPvOnlineUser
-
-  - on: onPvMessageSeen
-    tags:
-      - E2E
-    parameters:
-      - $ref:
-          - components/ReceiverId
-          - components/SenderId
-    events:
-      - $ref:
-          - components/emitPvMessageSeenError
-          - components/emitPvMessageSeen
-
-  - on: onPvUploadedFile
-    tags:
-      - E2E
-    parameters:
-      - $ref:
-          - components/ReceiverId
-          - components/SenderId
-          - components/UploadedId
-    events:
-      - $ref:
-          - components/emitPvUploadedFileError
-          - components/emitPvUploadedFile
 
   - on: onPvMessage
     tags:
@@ -180,7 +110,7 @@ paths:
           - components/emitPvDeleteMessageError
           - components/emitPvDeleteMessage
 
-  - on: onLeaveGroup
+  - on: onLeaveUserFromGroup
     tags:
       - Group
     parameters:
@@ -188,7 +118,8 @@ paths:
           - components/GroupId
     events:
       - $ref:
-          - components/emitLeaveGroupError
+          - components/emitLeaveUserFromGroupError
+          - components/emitLeaveUserFromGroup
 
   - on: onGroupMessage
     tags:
@@ -201,18 +132,6 @@ paths:
       - $ref:
           - components/emitGroupMessageError
           - components/emitGroupMessage
-
-  - on: onGroupUploadedFile
-    tags:
-      - Group
-    parameters:
-      - $ref:
-          - components/GroupId
-          - components/UploadedId
-    events:
-      - $ref:
-          - components/emitGroupUploadedFileError
-          - components/emitGroupUploadedFile
 
   - on: onGroupEditMessage
     tags:
@@ -239,17 +158,6 @@ paths:
           - components/emitGroupDeleteMessageError
           - components/emitGroupDeleteMessage
 
-  - on: onTypingGroupMessage
-    tags:
-      - Group
-    parameters:
-      - $ref:
-          - components/GroupId
-    events:
-      - $ref:
-          - components/emitGroupTypingMessageError
-          - components/emitTypingGroupMessage
-
   - on: onLeaveChannel
     tags:
       - Channel
@@ -258,7 +166,8 @@ paths:
           - components/ChannelId
     events:
       - $ref:
-          - components/emitLeaveChannelError
+          - components/emitLeaveUserFromChannelError
+          - components/emitLeaveUserFromChannel
 
   - on: onChannelMessage
     tags:
@@ -271,18 +180,6 @@ paths:
       - $ref:
           - components/emitChannelMessageError
           - components/emitChannelMessage
-
-  - on: onChannelUploadedFile
-    tags:
-      - Channel
-    parameters:
-      - $ref:
-          - components/ChannelId
-          - components/UploadedId
-    events:
-      - $ref:
-          - components/emitChannelUploadedFileError
-          - components/emitChannelUploadedFile
 
   - on: onChannelEditMessage
     tags:
@@ -328,42 +225,12 @@ definitions:
 
 components:
   events:
-    emitNotificationForVoiceCallError:
-      - name: emitNotificationForVoiceCallError
-        description: Return error status code and message
-    emitNotificationForVoiceCall:
-      - name: emitNotificationForVoiceCall
-        description: Emitting notification voice call for specific user
-    emitVoiceCallError:
-      - name: emitVoiceCallError
-        description: Return error status code and message
-    emitVoiceCall:
-      - name: emitVoiceCall
-        description: Return voice call data
     emitPvTypingError:
       - name: emitPvTypingError
         description: Return error status code and message
     emitPvTyping:
       - name: emitPvTyping
         description: Emitting user pv typing
-    emitPvOnlineUserError:
-      - name: emitPvOnlineUserError
-        description: Return error status code and message
-    emitPvOnlineUser:
-      - name: emitPvOnlineUser
-        description: Emitting user pv online status
-    emitPvMessageSeenError:
-      - name: emitPvMessageSeenError
-        description: Return error status code and message
-    emitPvMessageSeen:
-      - name: emitPvMessageSeen
-        description: Emitting user pv message seen
-    emitPvUploadedFileError:
-      - name: emitPvUploadedFileError
-        description: Return error status code and message
-    emitPvUploadedFile:
-      - name: emitPvUploadedFile
-        description: Emitting uploaded file for specific user into pv chat
     emitPvMessageError:
       - name: emitPvMessageError
         description: Return error status code and message
@@ -382,8 +249,11 @@ components:
     emitPvDeleteMessage:
       - name: emitPvDeleteMessage
         description: Emitting list of message id deleted for specific user into pv chat
-    emitLeaveGroupError:
-      - name: emitLeaveGroupError
+    emitLeaveUserFromGroup:
+      - name: emitLeaveUserFromGroup
+        description: Return status code and message
+    emitLeaveUserFromGroupError:
+      - name: emitLeaveUserFromGroupError
         description: Return error status code and message
     emitGroupMessageError:
       - name: emitGroupMessageError
@@ -391,12 +261,6 @@ components:
     emitGroupMessage:
       - name: emitGroupMessage
         description: Emitting message for specific group
-    emitGroupUploadedFileError:
-      - name: emitGroupUploadedFileError
-        description: Return error status code and message
-    emitGroupUploadedFile:
-      - name: emitGroupUploadedFile
-        description: Emitting file uploaded for specific group
     emitGroupEditMessageError:
       - name: emitGroupEditMessageError
         description: Return error status code and message
@@ -409,14 +273,11 @@ components:
     emitGroupDeleteMessage:
       - name: emitGroupDeleteMessage
         description: Emitting list of message id deleted for specific group
-    emitGroupTypingMessageError:
-      - name: emitGroupTypingMessageError
-        description: Return error status code and message
-    emitTypingGroupMessage:
-      - name: emitTypingGroupMessage
-        description: Emitting message typing for specific group
-    emitLeaveChannelError:
-      - name: emitLeaveChannelError
+    emitLeaveUserFromChannel:
+      - name: emitLeaveUserFromChannel
+        description: Return status code and message
+    emitLeaveUserFromChannelError:
+      - name: emitLeaveUserFromChannelError
         description: Return error status code and message
     emitChannelMessageError:
       - name: emitChannelMessageError
@@ -424,12 +285,6 @@ components:
     emitChannelMessage:
       - name: emitChannelMessage
         description: Emitting message for specific channel
-    emitChannelUploadedFileError:
-      - name: emitChannelUploadedFileError
-        description: Return error status code and message
-    emitChannelUploadedFile:
-      - name: emitChannelUploadedFile
-        description: Emitting file uploaded for specific channel
     emitChannelEditMessageError:
       - name: emitChannelEditMessageError
         description: Return error status code and message

@@ -2,12 +2,12 @@ swagger: "2.0"
 info:
   title: Social Network API
   description: Social Network API Documentation
-  version: 1.1.2
+  version: 2.0.0
   contact:
     email: treeroot.ir@gmail.com
   license:
-    name: Apache 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0.html
+    name: MIT
+    url: https://github.com/TREER00T/Social-Network-Server/blob/main/LICENSE
 host: http://localhost:3000/api
 
 tags:
@@ -38,6 +38,7 @@ securityDefinitions:
 
 schemes:
   - http
+  - https
 
 paths:
 
@@ -343,7 +344,7 @@ paths:
             $ref: '#/definitions/StatusWithDataObject'
 
   /e2e/room/user/block:
-    post:
+    put:
       tags:
         - E2E
       summary: Block OR UnBlock User In end to end message room
@@ -461,7 +462,7 @@ paths:
             $ref: '#/definitions/Status'
 
 
-  /e2e/room/user:
+  /e2e/room/user/info:
     get:
       tags:
         - E2E
@@ -655,7 +656,7 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: id
+          name: username
           type: string
           required: true
       security:
@@ -784,11 +785,11 @@ paths:
 
 
 
-  /personal/twoAuth:
+  /personal/twoAuth/enable:
     put:
       tags:
         - Personal
-      summary: Update two auth
+      summary: Enable two auth
       consumes:
         - application/x-www-form-urlencoded
       parameters:
@@ -829,7 +830,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
 
   /personal/twoAuth/disable:
     put:
@@ -920,7 +920,7 @@ paths:
             $ref: '#/definitions/Status'
 
 
-  /personal/uploadAvatar:
+  /personal/upload/avatar:
     put:
       tags:
         - Personal
@@ -929,7 +929,7 @@ paths:
         - multipart/form-data
       parameters:
         - in: formData
-          name: image
+          name: avatar
           type: file
           required: true
       security:
@@ -1035,71 +1035,6 @@ paths:
 
 
   /personal/savedMessage:
-    get:
-      tags:
-        - Personal
-      summary: Return list of user saved message
-      consumes:
-        - application/json
-      parameters:
-        - in: query
-          name: to
-          type: number
-          required: true
-        - in: query
-          name: search
-          type: number
-          required: true
-        - in: query
-          name: limit
-          type: number
-          required: false
-        - in: query
-          name: page
-          type: number
-          required: false
-        - in: query
-          name: sort
-          type: string
-          required: false
-        - in: query
-          name: order
-          type: string
-          required: false
-        - in: query
-          name: type
-          type: string
-          required: false
-      security:
-        - apiKey: [ ]
-        - token: [ ]
-      responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        404:
-          description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        200:
-          description: OK
-          schema:
-            type: object
-            $ref: '#/definitions/StatusWithDataAndOptionObject'
-
     delete:
       tags:
         - Personal
@@ -1206,6 +1141,71 @@ paths:
             $ref: '#/definitions/Status'
 
   /personal/message:
+    get:
+      tags:
+        - Personal
+      summary: Return list of user saved message
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: to
+          type: number
+          required: true
+        - in: query
+          name: search
+          type: number
+          required: true
+        - in: query
+          name: limit
+          type: number
+          required: false
+        - in: query
+          name: page
+          type: number
+          required: false
+        - in: query
+          name: sort
+          type: string
+          required: false
+        - in: query
+          name: order
+          type: string
+          required: false
+        - in: query
+          name: type
+          type: string
+          required: false
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataAndOptionObject'
+
     post:
       tags:
         - Personal
@@ -1419,7 +1419,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /personal/uploadFile:
+  /personal/upload/file:
     post:
       tags:
         - Personal
@@ -1555,7 +1555,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /group/uploadFile:
+  /group/upload/file:
     post:
       tags:
         - Group
@@ -1817,7 +1817,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /group/uploadAvatar:
+  /group/upload/avatar:
     put:
       tags:
         - Group
@@ -1875,7 +1875,7 @@ paths:
             $ref: '#/definitions/Status'
 
 
-  /group/inviteLink:
+  /group/link/invite:
     put:
       tags:
         - Group
@@ -1932,7 +1932,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /group/publicLink:
+  /group/link/public:
     put:
       tags:
         - Group
@@ -1993,7 +1993,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /group/joinUser:
+  /group/user/join:
     post:
       tags:
         - Group
@@ -2056,7 +2056,7 @@ paths:
 
 
 
-  /group/addAdmin:
+  /group/admin/add:
     post:
       tags:
         - Group
@@ -2119,7 +2119,7 @@ paths:
 
 
 
-  /group/deleteAdmin:
+  /group/admin/remove:
     delete:
       tags:
         - Group
@@ -2183,7 +2183,7 @@ paths:
 
 
 
-  /group/leaveUser:
+  /group/user/leave:
     delete:
       tags:
         - Group
@@ -2359,7 +2359,7 @@ paths:
 
 
 
-  /group/users:
+  /group/user/all:
     get:
       tags:
         - Group
@@ -2458,7 +2458,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /channel/uploadFile:
+  /channel/upload/file:
     post:
       tags:
         - Channel
@@ -2720,7 +2720,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /channel/uploadAvatar:
+  /channel/upload/avatar:
     put:
       tags:
         - Channel
@@ -2778,7 +2778,7 @@ paths:
             $ref: '#/definitions/Status'
 
 
-  /channel/inviteLink:
+  /channel/link/invite:
     put:
       tags:
         - Channel
@@ -2835,7 +2835,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /channel/publicLink:
+  /channel/link/public:
     put:
       tags:
         - Channel
@@ -2896,7 +2896,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /channel/joinUser:
+  /channel/user/join:
     post:
       tags:
         - Channel
@@ -2959,7 +2959,7 @@ paths:
 
 
 
-  /channel/addAdmin:
+  /channel/admin/add:
     post:
       tags:
         - Channel
@@ -3022,7 +3022,7 @@ paths:
 
 
 
-  /channel/deleteAdmin:
+  /channel/admin/remove:
     delete:
       tags:
         - Channel
@@ -3086,7 +3086,7 @@ paths:
 
 
 
-  /channel/leaveUser:
+  /channel/user/leave:
     delete:
       tags:
         - Channel
@@ -3259,7 +3259,7 @@ paths:
 
 
 
-  /channel/users:
+  /channel/user/all:
     get:
       tags:
         - Channel

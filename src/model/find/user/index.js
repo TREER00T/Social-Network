@@ -21,24 +21,6 @@ let {
 
 module.exports = {
 
-
-    async isMessageBelongForThisUserInE2E(messageId, senderId, e2eId) {
-
-        let data = await findMany({
-            id: {$in: messageId},
-            senderId: senderId
-        }, {
-            projection: {
-                _id: 1,
-                senderId: 1
-            }
-        }, e2eId);
-
-        return isNotEmptyArr(data);
-
-    },
-
-
     async userPhone(phone) {
 
         let data = await user().findOne({

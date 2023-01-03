@@ -5,18 +5,18 @@ import {
     SubscribeMessage,
     WebSocketGateway,
 } from "@nestjs/websockets";
-import {SocketGatewayController} from "../base/SocketGateway.controller";
 import {Socket} from "socket.io";
 import PromiseVerify from "../../module/base/PromiseVerify";
 import {E2EService} from "./E2E.service";
 import Response from "../../util/Response";
 import {JsonObject} from "../../util/Types";
+import {AbstractRoom} from "../base/abstract/AbstractRoom";
 
 @WebSocketGateway(Number(process.env.SOCKET_IO_PORT), {
     namespace: '/e2e'
 })
 @Controller()
-export class E2EController extends SocketGatewayController {
+export class E2EController extends AbstractRoom {
 
     private readonly appService: E2EService = new E2EService();
 
@@ -80,7 +80,7 @@ export class E2EController extends SocketGatewayController {
             return;
 
         let receiverId = data.receiverId;
-        let isUserMessage = this.appService.isUserMessage(d.senderId, messageId, `${d.senderId}And${receiverId}E2EContents`);
+        let isUserMessage = this.isUserMessage(d.senderId, messageId, `${d.senderId}And${receiverId}E2EContents`);
 
         if (!isUserMessage)
             return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
@@ -118,7 +118,7 @@ export class E2EController extends SocketGatewayController {
             return;
 
         let receiverId = data.receiverId;
-        let isUserMessage = this.appService.isUserMessage(d.senderId, listOfId, `${d.senderId}And${receiverId}E2EContents`);
+        let isUserMessage = this.isUserMessage(d.senderId, listOfId, `${d.senderId}And${receiverId}E2EContents`);
 
         if (!isUserMessage)
             return socket.emit('emitPvDeleteMessageError', Response.HTTP_FORBIDDEN);

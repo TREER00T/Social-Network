@@ -9,8 +9,4 @@ export class E2EService {
         return await Find.isBlock(senderId, receiverId);
     }
 
-    async isUserMessage(userId: string, messageId: string | string[], tableName: string) {
-        return await Find.isMessageBelongForThisUserInE2E(messageId, userId, tableName);
-    }
-
 }
