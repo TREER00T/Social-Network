@@ -6,7 +6,8 @@
 - [Introduction](#introduction)
 - [Api Schema](#api-schema)
     - [URL Schema](#url-Schema)
-- [Database Schema](#database-schema)
+- [Databases](#databases)
+    - [Schema](#database-schema)
 - [Installation](#installation)
     - [Configuration](#configuration)
     - [Running the app](#running-the-app)
@@ -44,7 +45,11 @@ Socket.io ([OpenRTP](https://github.com/treegex/openrtp))
 **Socket.io** =>
 `http://localhost:17892/socket-docs`
 
-## Database Schema
+## Database
+
+This app has used two databases (mongodb, redis) for development
+
+### Schema
 
 For more information about the database structure, refer to [this](https://github.com/TREER00T/Social-Network-Database)
 repository

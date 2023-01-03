@@ -46,6 +46,9 @@ import {ChannelUserModule} from "./module/channel/user/ChannelUser.module";
 import {ContentSearchModule} from "./module/common/search/ContentSearch.module";
 import {ChannelLinkModule} from "./module/channel/link/ChannelLink.module";
 import {ChannelController} from "./io/channel/Channel.controller";
+import {E2EController} from "./io/e2e/E2E.controller";
+import {GroupController} from "./io/group/Group.controller";
+import {CommonController} from "./io/common/Common.controller";
 
 @Module({
     imports: [
@@ -203,10 +206,6 @@ import {ChannelController} from "./io/channel/Channel.controller";
                                 module: PersonalAuthModule
                             },
                             {
-                                path: "uploadAvatar",
-                                module: PersonalUploadAvatarModule
-                            },
-                            {
                                 path: "blockUsers",
                                 module: PersonalUserBlocksModule
                             },
@@ -227,8 +226,17 @@ import {ChannelController} from "./io/channel/Channel.controller";
                                 module: PersonalMessageModule
                             },
                             {
-                                path: "uploadFile",
-                                module: PersonalUploadFileModule
+                                path: "upload",
+                                children: [
+                                    {
+                                        path: "file",
+                                        module: PersonalUploadFileModule
+                                    },
+                                    {
+                                        path: "avatar",
+                                        module: PersonalUploadAvatarModule
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -240,10 +248,6 @@ import {ChannelController} from "./io/channel/Channel.controller";
                             {
                                 path: "create",
                                 module: CreateGroupModule
-                            },
-                            {
-                                path: "uploadFile",
-                                module: GroupUploadFileModule
                             },
                             {
                                 path: "/",
@@ -258,8 +262,17 @@ import {ChannelController} from "./io/channel/Channel.controller";
                                 module: GroupDescriptionModule
                             },
                             {
-                                path: "uploadAvatar",
-                                module: GroupUploadAvatarModule
+                                path: "upload",
+                                children: [
+                                    {
+                                        path: "avatar",
+                                        module: GroupUploadAvatarModule
+                                    },
+                                    {
+                                        path: "file",
+                                        module: GroupUploadFileModule
+                                    }
+                                ]
                             },
                             {
                                 path: "link",
@@ -293,8 +306,17 @@ import {ChannelController} from "./io/channel/Channel.controller";
                                 module: CreateChannelModule
                             },
                             {
-                                path: "uploadFile",
-                                module: ChannelUploadFileModule
+                                path: "upload",
+                                children: [
+                                    {
+                                        path: "file",
+                                        module: ChannelUploadFileModule
+                                    },
+                                    {
+                                        path: "avatar",
+                                        module: ChannelUploadAvatarModule
+                                    }
+                                ]
                             },
                             {
                                 path: "/",
@@ -307,10 +329,6 @@ import {ChannelController} from "./io/channel/Channel.controller";
                             {
                                 path: "description",
                                 module: ChannelDescriptionModule
-                            },
-                            {
-                                path: "uploadAvatar",
-                                module: ChannelUploadAvatarModule
                             },
                             {
                                 path: "link",
@@ -350,7 +368,8 @@ import {ChannelController} from "./io/channel/Channel.controller";
             }
         ])
     ],
-    providers: [ChannelController]
+    // Socket.io
+    providers: [ChannelController, E2EController, GroupController, CommonController]
 })
 export class AppModule {
 }
