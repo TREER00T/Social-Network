@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
 
-  db:
+  mongo:
     image: mongo
     restart: always
     ports:
@@ -10,23 +10,37 @@ services:
     volumes:
       - db:/var/lib/mongo
 
+  redis:
+    image: 'bitnami/redis:latest'
+    restart: always
+    ports:
+      - '6379:6379'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - db:/var/lib/redis
+
   app:
     restart: always
     build:
       context: ./
       dockerfile: Dockerfile
     container_name: app
-    image: socail-network
+    image: social_network
     depends_on:
-      - db
+      - mongo
+      - redis
     links:
-      - db
+      - redis
+      - mongo
     ports:
       - '3000:3000'
+      - '4000:4000'
     volumes:
       - ./:/app/
 
 volumes:
-  db:
+  mongo:
     driver: local
-
+  redis:
+    driver: local
