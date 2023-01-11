@@ -13,9 +13,7 @@ module.exports = {
     async id(id) {
 
         let data = await channel().findById(id, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -27,9 +25,7 @@ module.exports = {
         let data = await channel().findOne({
             publicLink: publicLink
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -43,9 +39,7 @@ module.exports = {
             channelId: channelId,
             isOwner: 1
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -58,9 +52,7 @@ module.exports = {
             adminId: adminId,
             channelId: channelId
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -73,9 +65,7 @@ module.exports = {
             userId: userId,
             channelId: channelId
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -88,9 +78,7 @@ module.exports = {
             userId: userId,
             channelId: channelId
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -119,10 +107,8 @@ module.exports = {
     async getAllUsers(channelId) {
 
         let data = await channelUser().find({channelId: channelId}, {
-            projection: {
-                _id: 0,
-                userId: 1
-            }
+            _id: 0,
+            userId: 1
         });
 
         return data;

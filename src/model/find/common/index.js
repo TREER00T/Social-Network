@@ -17,10 +17,8 @@ module.exports = {
             _id: {$in: messageId},
             senderId: senderId
         }, {
-            projection: {
-                _id: 1,
-                senderId: 1
-            }
+            _id: 1,
+            senderId: 1
         }, tableName);
 
         return !isUndefined(data?._id);
@@ -34,12 +32,10 @@ module.exports = {
 
         let like = new RegExp(value),
             projection = {
-                projection: {
-                    _id: 1,
-                    img: 1,
-                    name: 1,
-                    defaultColor: 1
-                }
+                _id: 1,
+                img: 1,
+                name: 1,
+                defaultColor: 1
             }, filter = {
                 name: {$regex: like},
                 $or: [{
@@ -72,10 +68,8 @@ module.exports = {
         let listOfId = await findMany({
             userId: userId
         }, {
-            projection: {
-                _id: 0,
-                [objKey]: 1
-            }
+            _id: 0,
+            [objKey]: 1
         }, `listOfUser${type}s`);
 
         listOfId.map(e => `${e[objKey]}`);
@@ -83,12 +77,10 @@ module.exports = {
         return await findMany({
             _id: {$in: listOfId}
         }, {
-            projection: {
-                _id: 1,
-                img: 1,
-                name: 1,
-                defaultColor: 1
-            }
+            _id: 1,
+            img: 1,
+            name: 1,
+            defaultColor: 1
         }, `${type === 'e2e' ? 'user' : type}s`);
 
     },
@@ -116,10 +108,8 @@ module.exports = {
         return await findMany({
             _id: id
         }, {
-            projection: {
-                _id: 0,
-                forwardDataId: 1
-            }
+            _id: 0,
+            forwardDataId: 1
         }, tableName);
 
     }

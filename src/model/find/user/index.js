@@ -26,10 +26,8 @@ module.exports = {
         let data = await user().findOne({
             phone: phone
         }, {
-            projection: {
-                _id: 0,
-                phone: 1
-            }
+            _id: 0,
+            phone: 1
         });
 
         return !isUndefined(`${data?.phone}`);
@@ -42,11 +40,9 @@ module.exports = {
             phone: phone,
             authCode: authCode
         }, {
-            projection: {
-                _id: 0,
-                phone: 1,
-                authCode: 1
-            }
+            _id: 0,
+            phone: 1,
+            authCode: 1
         });
 
         return isNotEmptyArr(data);
@@ -59,10 +55,8 @@ module.exports = {
         let data = await user().findOne({
             phone: phone
         }, {
-            projection: {
-                _id: 1,
-                apiKey: 1
-            }
+            _id: 1,
+            apiKey: 1
         });
 
         return data;
@@ -76,10 +70,8 @@ module.exports = {
             phone: phone,
             password: {$ne: ''}
         }, {
-            projection: {
-                _id: 0,
-                password: 1
-            }
+            _id: 0,
+            password: 1
         });
 
         return data?.password;
@@ -92,10 +84,8 @@ module.exports = {
             phone: phone,
             password: password
         }, {
-            projection: {
-                _id: 0,
-                password: 1
-            }
+            _id: 0,
+            password: 1
         });
 
         return !isUndefined(data?.password);
@@ -108,10 +98,8 @@ module.exports = {
         let data = await user().findOne({
             phone: phone
         }, {
-            projection: {
-                _id: 0,
-                apiKey: 1
-            }
+            _id: 0,
+            apiKey: 1
         });
 
         return data?.apiKey;
@@ -129,10 +117,8 @@ module.exports = {
                 {fromUser: data.toUser}
             ]
         }, {
-            projection: {
-                _id: 0,
-                tblChatId: 1
-            }
+            _id: 0,
+            tblChatId: 1
         });
 
         return !isUndefined(result?.tblChatId) ? result?.tblChatId : false;
@@ -144,9 +130,7 @@ module.exports = {
         let data = await user().findOne({
             _id: userId
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(`${data._id}`);
@@ -166,10 +150,8 @@ module.exports = {
                 {userId: userId}
             ]
         }, {
-            projection: {
-                _id: 0,
-                tblChatId: 1
-            }
+            _id: 0,
+            tblChatId: 1
         });
 
         return !isUndefined(result?.tblChatId) ? result?.tblChatId : false;
@@ -236,16 +218,14 @@ module.exports = {
     async getUserPvDetails(userId) {
 
         let data = await user().findById(userId, {
-            projection: {
-                _id: 0,
-                bio: 1,
-                img: 1,
-                name: 1,
-                isActive: 1,
-                username: 1,
-                lastName: 1,
-                defaultColor: 1
-            }
+            _id: 0,
+            bio: 1,
+            img: 1,
+            name: 1,
+            isActive: 1,
+            username: 1,
+            lastName: 1,
+            defaultColor: 1
         });
 
         return data;
@@ -256,18 +236,16 @@ module.exports = {
     async getPersonalUserDetails(userId) {
 
         let data = await user().findById(userId, {
-            projection: {
-                _id: 0,
-                bio: 1,
-                img: 1,
-                name: 1,
-                email: 1,
-                phone: 1,
-                isActive: 1,
-                username: 1,
-                lastName: 1,
-                defaultColor: 1
-            }
+            _id: 0,
+            bio: 1,
+            img: 1,
+            name: 1,
+            email: 1,
+            phone: 1,
+            isActive: 1,
+            username: 1,
+            lastName: 1,
+            defaultColor: 1
         });
 
         return data;
@@ -296,10 +274,8 @@ module.exports = {
         let data = await user().findOne({
             username: id
         }, {
-            projection: {
-                _id: 0,
-                username: 1
-            }
+            _id: 0,
+            username: 1
         });
 
         return !isUndefined(data?.password);
@@ -312,10 +288,8 @@ module.exports = {
         let data = await userBlockList().find({
             userId: id
         }, {
-            projection: {
-                _id: 0,
-                userTargetId: 1
-            }
+            _id: 0,
+            userTargetId: 1
         });
 
         return !isUndefined(data?.userTargetId) ? data?.userTargetId : false;
@@ -330,12 +304,10 @@ module.exports = {
         let data = await user().find({
             id: {$in: array}
         }, {
-            projection: {
-                _id: 1,
-                img: 1,
-                name: 1,
-                username: 1
-            }
+            _id: 1,
+            img: 1,
+            name: 1,
+            username: 1
         });
 
         return isUndefined(data) ? false : data;
@@ -350,12 +322,10 @@ module.exports = {
         let data = await user().find({
             id: {$in: array}
         }, {
-            projection: {
-                _id: 1,
-                img: 1,
-                name: 1,
-                username: 1
-            }
+            _id: 1,
+            img: 1,
+            name: 1,
+            username: 1
         });
 
         return isUndefined(data) ? false : data;
@@ -379,9 +349,7 @@ module.exports = {
             userId: userId,
             groupId: groupId
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return isNotEmptyArr(data);
@@ -394,9 +362,7 @@ module.exports = {
             userId: userId,
             channelId: channelId
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return isNotEmptyArr(data);
@@ -415,10 +381,8 @@ module.exports = {
         let data = await listOfUserE2E().find({
             userId: userId
         }, {
-            projection: {
-                _id: 0,
-                tblChatId: 1
-            }
+            _id: 0,
+            tblChatId: 1
         });
 
         return isNotEmptyArr(data) ? data : false;
@@ -431,10 +395,8 @@ module.exports = {
         let data = await listOfUserGroup().find({
             userId: userId
         }, {
-            projection: {
-                _id: 0,
-                groupId: 1
-            }
+            _id: 0,
+            groupId: 1
         });
 
         return isNotEmptyArr(data) ? data : false;
@@ -446,10 +408,8 @@ module.exports = {
         let data = await listOfUserGroup().find({
             userId: userId
         }, {
-            projection: {
-                _id: 0,
-                groupId: 1
-            }
+            _id: 0,
+            groupId: 1
         });
 
         if (!isNotEmptyArr(data))
@@ -466,10 +426,8 @@ module.exports = {
         let data = await listOfUserChannel().find({
             userId: userId
         }, {
-            projection: {
-                _id: 0,
-                channelId: 1
-            }
+            _id: 0,
+            channelId: 1
         });
 
         return isNotEmptyArr(data) ? data : false;
@@ -481,10 +439,8 @@ module.exports = {
         let data = await listOfUserChannel().find({
             userId: userId
         }, {
-            projection: {
-                _id: 0,
-                channelId: 1
-            }
+            _id: 0,
+            channelId: 1
         });
 
         if (!isNotEmptyArr(data))
@@ -501,10 +457,8 @@ module.exports = {
             userId: userId,
             fromUser: userId
         }, {
-            projection: {
-                _id: 0,
-                toUser: 1
-            }
+            _id: 0,
+            toUser: 1
         });
 
         data?.map(d => d.toUser);
