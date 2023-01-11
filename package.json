@@ -1,6 +1,6 @@
 {
   "name": "social-network-server",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A simple social network with socket.io and rest api in nest.js",
   "author": "Ali Azmoodeh Valadi",
   "private": true,
