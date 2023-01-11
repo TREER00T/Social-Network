@@ -16,9 +16,7 @@ module.exports = {
     async id(id) {
 
         let data = await group().findById(id, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -30,10 +28,8 @@ module.exports = {
         let data = await group().find({
             publicLink: publicLink
         }, {
-            projection: {
-                _id: 0,
-                publicLink: 1
-            }
+            _id: 0,
+            publicLink: 1
         });
 
         return !isUndefined(data?._id);
@@ -47,9 +43,7 @@ module.exports = {
             groupId: groupId,
             isOwner: 1
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -62,9 +56,7 @@ module.exports = {
             groupId: groupId,
             userId: userId
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -77,9 +69,7 @@ module.exports = {
             userId: userId,
             groupId: groupId
         }, {
-            projection: {
-                _id: 1
-            }
+            _id: 1
         });
 
         return !isUndefined(data?._id);
@@ -115,10 +105,8 @@ module.exports = {
         let data = await groupUser().find({
             groupId: groupId
         }, {
-            projection: {
-                _id: 0,
-                userId: 1
-            }
+            _id: 0,
+            userId: 1
         });
 
         return data;
