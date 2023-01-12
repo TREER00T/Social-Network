@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
+import Find from "../../../model/find/group";
 
-let Update = require("../../../model/update/group"),
-    Find = require("../../../model/find/group");
+let Update = require("../../../model/update/group");
 
 @Injectable()
 export class GroupLinkService {

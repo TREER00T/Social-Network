@@ -1,4 +1,4 @@
-let Insert = require("../../model/add/user");
+import Insert from "../../model/add/user";
 
 export default {
 

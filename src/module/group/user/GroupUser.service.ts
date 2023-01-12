@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common';
 import {UserId} from "../../base/dto/User";
+import Insert from "../../../model/add/group";
+import DeleteInUser from "../../../model/remove/user";
+import FindInUser from "../../../model/find/user";
+import Find from "../../../model/find/group";
+import InsertInUser from "../../../model/add/user";
 
-let Insert = require("../../../model/add/group"),
-    Delete = require("../../../model/remove/group"),
-    DeleteInUser = require("../../../model/remove/user"),
-    FindInUser = require("../../../model/find/user"),
-    Find = require("../../../model/find/group"),
-    InsertInUser = require("../../../model/add/user");
+let Delete = require("../../../model/remove/group");
 
 @Injectable()
 export class GroupUserService {

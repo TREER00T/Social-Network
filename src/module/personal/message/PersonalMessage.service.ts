@@ -1,9 +1,9 @@
 import {Injectable} from '@nestjs/common';
 import {Message} from "../../base/dto/Message";
+import Delete from "../../../model/remove/user";
+import Insert from "../../../model/add/user";
 
-let Delete = require("../../../model/remove/user"),
-    Update = require("../../../model/update/user"),
-    Insert = require("../../../model/add/user");
+let Update = require("../../../model/update/user");
 
 @Injectable()
 export class PersonalAccount {

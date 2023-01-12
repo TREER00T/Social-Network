@@ -3,8 +3,7 @@ import Response from "../../util/Response";
 import {Message} from "./dto/Message";
 import {User} from "./User";
 import PromiseVerify from "./PromiseVerify";
-
-let Find = require("../../model/find/user");
+import Find from "../../model/find/user";
 
 export abstract class SavedMessage extends User {
     async verifySavedMessage() {

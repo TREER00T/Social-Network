@@ -2,8 +2,7 @@ import {User} from "./User";
 import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
 import PromiseVerify from "./PromiseVerify";
-
-let Find = require("../../model/find/group");
+import Find from "../../model/find/group";
 
 export class Group extends User {
 

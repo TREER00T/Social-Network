@@ -1,8 +1,7 @@
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
 import {AbstractRoom} from "./AbstractRoom";
-
-let Find = require("../../../model/find/group");
+import Find from "../../../model/find/group";
 
 export class AbstractGroup extends AbstractRoom {
 

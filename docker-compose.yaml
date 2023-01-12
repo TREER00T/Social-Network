@@ -6,7 +6,7 @@ services:
     image: mongo
     restart: always
     ports:
-      - '27014:27014'
+      - '27017:27017'
     volumes:
       - db:/var/lib/mongo
 

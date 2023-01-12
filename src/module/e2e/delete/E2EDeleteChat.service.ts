@@ -1,6 +1,5 @@
 import {Injectable} from '@nestjs/common';
-
-let Delete = require("../../../model/remove/user");
+import Delete from "../../../model/remove/user";
 
 @Injectable()
 export class E2EDeleteChatService {

@@ -7,9 +7,8 @@ import File from "../../util/File";
 import OptionQuerySearch from "../../util/OptionQuerySearch";
 import {DataQuery} from "./dto/DataQuery";
 import {MessagePayload} from "../../util/Types";
-
-let CommonInsert = require("../../model/add/common"),
-    Find = require("../../model/find/user");
+import CommonInsert from "../../model/add/common";
+import Find from "../../model/find/user";
 
 export abstract class User extends HandleMessage {
 

@@ -1,12 +1,12 @@
 import Validation from "../util/Validation";
 import {JsonObject} from "./Types";
-
-let Find = require("../model/find/user");
+import Find from "../model/find/user";
 
 let tokenPayload,
     apiKey,
     IN_VALID_MESSAGE_TYPE = "IN_VALID_MESSAGE_TYPE",
     IN_VALID_OBJECT_KEY = "IN_VALID_OBJECT_KEY";
+
 export default {
 
     IN_VALID_OBJECT_KEY: IN_VALID_OBJECT_KEY,

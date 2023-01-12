@@ -1,6 +1,5 @@
 import {Injectable} from "@nestjs/common";
-
-let CommonFind = require("../../model/find/common");
+import CommonFind from "../../model/find/common";
 
 @Injectable()
 export class CommonService {

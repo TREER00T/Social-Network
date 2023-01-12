@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
+import DeleteInUser from "../../../model/remove/user";
 
-let Delete = require("../../../model/remove/group"),
-    DeleteInUser = require("../../../model/remove/user");
+let Delete = require("../../../model/remove/group");
 
 @Injectable()
 export class DeleteGroupService {

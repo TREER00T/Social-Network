@@ -1,7 +1,6 @@
 import {Injectable} from '@nestjs/common';
-
-let Delete = require("../../../model/remove/user"),
-    Find = require("../../../model/find/user");
+import Delete from "../../../model/remove/user";
+import Find from "../../../model/find/user";
 
 @Injectable()
 export class PersonalAccount {

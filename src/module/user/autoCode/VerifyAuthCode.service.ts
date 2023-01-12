@@ -3,9 +3,9 @@ import {VerifyAuthCodeDto} from "./VerifyAuthCode.dto";
 import Generate from "../../../util/Generate";
 import Device from "../../base/Device";
 import Token from "../../../util/Token";
+import Find from "../../../model/find/user";
 
-let Find = require("../../../model/find/user"),
-    Update = require("../../../model/update/user");
+let Update = require("../../../model/update/user");
 
 @Injectable()
 export class VerifyAuthCodeService {

@@ -12,11 +12,11 @@ import Util from "../../util/Util";
 import Response from "../../util/Response";
 import {HandleMessage} from "../../module/base/HandleMessage";
 import {TSaveMessage} from "../../util/Types";
+import CommonDelete from "../../model/remove/common";
+import CommonInsert from "../../model/add/common";
 
 let Redis = require("../../database/redisDbDriver"),
-    CommonUpdate = require("../../model/update/common"),
-    CommonDelete = require("../../model/remove/common"),
-    CommonInsert = require("../../model/add/common");
+    CommonUpdate = require("../../model/update/common");
 
 dotenv.config();
 
@@ -52,6 +52,8 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
                 await this.socketGatewayService.sendUserOnlineStatusForSpecificUsers(this.io, false, socket.id);
             })
             .then(async () => await Redis.remove(socketId));
+
+        this.leaveUserInAllRooms(client);
     }
 
     async handleConnection(client: Socket, ...args: any[]) {

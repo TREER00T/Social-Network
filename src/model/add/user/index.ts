@@ -8,17 +8,15 @@ let {
     } = require('../../create/user'),
     UpdateInCommon = require('../../../model/update/common'),
     {
-        isUndefined
-    } = require('../../../util/Util'),
-    {
         forwardContent
     } = require('../../create/common'),
     {
         insertOne
     } = require('../../../database/mongoDbDriverConnection');
+import Util from '../../../util/Util';
 
 
-module.exports = {
+export default {
 
     async phoneAndAuthCode(phone, authCode, defaultColor) {
 
@@ -84,7 +82,7 @@ module.exports = {
 
     async messageIntoUserSavedMessage(phone, message) {
 
-        if (!isUndefined(message?.forwardDataId)) {
+        if (!Util.isUndefined(message?.forwardDataId)) {
             let data = await forwardContent()({
                 conversationId: `${phone}SavedMessages`,
                 conversationType: 'Personal'

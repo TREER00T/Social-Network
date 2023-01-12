@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
+import Find from "../../../model/find/channel";
 
-let Update = require("../../../model/update/channel"),
-    Find = require("../../../model/find/channel");
+let Update = require("../../../model/update/channel");
 
 @Injectable()
 export class ChannelLinkService {

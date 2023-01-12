@@ -1,14 +1,8 @@
 let {
-        isUndefined,
-        isNotEmptyArr
-    } = require('../../../util/Util'),
-    {
         haveCollection,
         findMany,
         countRows
     } = require('../../../database/mongoDbDriverConnection'),
-    FindInGroup = require('../group'),
-    FindInChannel = require('../channel'),
     {
         user,
         device,
@@ -17,9 +11,11 @@ let {
         listOfUserGroup,
         listOfUserChannel
     } = require('../../create/user');
+import Util from '../../../util/Util';
+import FindInGroup from '../../../model/find/group';
+import FindInChannel from '../../../model/find/channel';
 
-
-module.exports = {
+export default {
 
     async userPhone(phone) {
 
@@ -30,7 +26,7 @@ module.exports = {
             phone: 1
         });
 
-        return !isUndefined(`${data?.phone}`);
+        return data?.phone;
 
     },
 
@@ -41,11 +37,10 @@ module.exports = {
             authCode: authCode
         }, {
             _id: 0,
-            phone: 1,
             authCode: 1
         });
 
-        return isNotEmptyArr(data);
+        return data?.authCode;
 
     },
 
@@ -88,7 +83,7 @@ module.exports = {
             password: 1
         });
 
-        return !isUndefined(data?.password);
+        return data?.password;
 
     },
 
@@ -121,7 +116,7 @@ module.exports = {
             tblChatId: 1
         });
 
-        return !isUndefined(result?.tblChatId) ? result?.tblChatId : false;
+        return !Util.isUndefined(result?.tblChatId) ? result?.tblChatId : false;
 
     },
 
@@ -133,7 +128,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(`${data._id}`);
+        return !Util.isUndefined(`${data._id}`);
 
     },
 
@@ -154,14 +149,14 @@ module.exports = {
             tblChatId: 1
         });
 
-        return !isUndefined(result?.tblChatId) ? result?.tblChatId : false;
+        return !Util.isUndefined(result?.tblChatId) ? result?.tblChatId : false;
 
     },
 
 
     async getListOfMessage(data) {
 
-        if (!isUndefined(data.type)) {
+        if (!Util.isUndefined(data.type)) {
 
             let queryResult = await findMany({
                 type: data.type
@@ -178,7 +173,7 @@ module.exports = {
             return queryFilter;
         }
 
-        if (!isUndefined(data.search)) {
+        if (!Util.isUndefined(data.search)) {
 
             let queryResult = await findMany({
                 text: {$regex: new RegExp(data.search)}
@@ -264,7 +259,7 @@ module.exports = {
             ]
         });
 
-        return isNotEmptyArr(result._id) ? `${result._id}` : false;
+        return Util.isNotEmptyArr(result._id) ? `${result._id}` : false;
 
     },
 
@@ -278,7 +273,7 @@ module.exports = {
             username: 1
         });
 
-        return !isUndefined(data?.password);
+        return !Util.isUndefined(data?.password);
 
     },
 
@@ -292,7 +287,7 @@ module.exports = {
             userTargetId: 1
         });
 
-        return !isUndefined(data?.userTargetId) ? data?.userTargetId : false;
+        return !Util.isUndefined(data?.userTargetId) ? data?.userTargetId : false;
 
     },
 
@@ -310,7 +305,7 @@ module.exports = {
             username: 1
         });
 
-        return isUndefined(data) ? false : data;
+        return Util.isUndefined(data) ? false : data;
 
     },
 
@@ -328,7 +323,7 @@ module.exports = {
             username: 1
         });
 
-        return isUndefined(data) ? false : data;
+        return Util.isUndefined(data) ? false : data;
 
     },
 
@@ -339,7 +334,7 @@ module.exports = {
             _id: id
         });
 
-        return isUndefined(data) ? false : data;
+        return Util.isUndefined(data) ? false : data;
 
     },
 
@@ -352,7 +347,7 @@ module.exports = {
             _id: 1
         });
 
-        return isNotEmptyArr(data);
+        return Util.isNotEmptyArr(data);
 
     },
 
@@ -365,7 +360,7 @@ module.exports = {
             _id: 1
         });
 
-        return isNotEmptyArr(data);
+        return Util.isNotEmptyArr(data);
 
     },
 
@@ -385,7 +380,7 @@ module.exports = {
             tblChatId: 1
         });
 
-        return isNotEmptyArr(data) ? data : false;
+        return Util.isNotEmptyArr(data) ? data : false;
 
     },
 
@@ -399,7 +394,7 @@ module.exports = {
             groupId: 1
         });
 
-        return isNotEmptyArr(data) ? data : false;
+        return Util.isNotEmptyArr(data) ? data : false;
 
     },
 
@@ -412,12 +407,12 @@ module.exports = {
             groupId: 1
         });
 
-        if (!isNotEmptyArr(data))
+        if (!Util.isNotEmptyArr(data))
             return false;
 
         data?.filter(async d => !(await FindInGroup.isOwner(userId, d.groupId)));
 
-        return isNotEmptyArr(data) ? data : false;
+        return Util.isNotEmptyArr(data) ? data : false;
 
     },
 
@@ -430,7 +425,7 @@ module.exports = {
             channelId: 1
         });
 
-        return isNotEmptyArr(data) ? data : false;
+        return Util.isNotEmptyArr(data) ? data : false;
 
     },
 
@@ -443,12 +438,12 @@ module.exports = {
             channelId: 1
         });
 
-        if (!isNotEmptyArr(data))
+        if (!Util.isNotEmptyArr(data))
             return false;
 
         data?.filter(async d => !(await FindInChannel.isOwner(userId, d.channelId)));
 
-        return isNotEmptyArr(data) ? data : false;
+        return Util.isNotEmptyArr(data) ? data : false;
 
     },
 

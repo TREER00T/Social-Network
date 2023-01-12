@@ -1,5 +1,5 @@
-let Generate = require('../../../src/util/Generate');
-let Validation = require('../../../src/util/Validation');
+import Generate from '../src/util/Generate';
+import Validation from '../src/util/Validation';
 
 describe('Generate module', () => {
 
@@ -7,12 +7,11 @@ describe('Generate module', () => {
             phoneNumber: '09000000000',
             expiresIn: '12h',
             type: 'at'
-        },'09000000000'),
+        }, '09000000000'),
         encryptToken = Generate.getJwtEncrypt(token);
 
 
     it('should be verify jwt payload', async () => {
-
         expect(await Validation.getJwtVerify(token)).toMatchObject({
             phoneNumber: '09000000000',
             expiresIn: '12h',

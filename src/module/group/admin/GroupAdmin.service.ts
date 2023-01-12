@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
+import Insert from "../../../model/add/group";
 
-let Insert = require("../../../model/add/group"),
-    Delete = require("../../../model/remove/group");
+let Delete = require("../../../model/remove/group");
 
 @Injectable()
 export class GroupAdminService {

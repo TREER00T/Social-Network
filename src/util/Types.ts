@@ -34,15 +34,12 @@ type TSaveMessage = {
     message: JsonObject
 }
 
-type TUpdateMessage = TSaveMessage;
-
 export {
     MessagePayload,
     Activities,
     FileUploaded,
     IResponse,
     Token,
-    TUpdateMessage,
     TSaveMessage,
     JsonObject
 }

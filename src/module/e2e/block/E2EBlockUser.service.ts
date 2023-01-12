@@ -1,8 +1,7 @@
 import {Injectable} from '@nestjs/common';
-
-let Find = require("../../../model/find/user"),
-    Insert = require("../../../model/add/user"),
-    Delete = require("../../../model/remove/user");
+import Find from "../../../model/find/user";
+import Insert from "../../../model/add/user";
+import Delete from "../../../model/remove/user";
 
 @Injectable()
 export class E2EBlockUserService {

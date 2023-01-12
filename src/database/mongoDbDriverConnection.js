@@ -1,83 +1,85 @@
 require("dotenv").config();
-let { MongoClient } = require("mongodb"),
-  client = new MongoClient(`mongodb://${process.env.HOST}:${process.env.MONGO_PORT}`),
-  db = client.db(process.env.DATABASE);
+let {MongoClient} = require("mongodb"),
+    client = new MongoClient(`mongodb://${process.env.HOST}:${process.env.MONGO_PORT}`),
+    db = client.db(process.env.DATABASE);
 
 module.exports = {
 
-  async insertOne(obj, name) {
+    async insertOne(obj, name) {
 
-    return await db.collection(name).insertOne(obj);
+        return await db.collection(name).insertOne(obj);
 
-  },
+    },
 
-  async updateOne(obj, filter, name) {
+    async updateOne(obj, filter, name) {
 
-    await db.collection(name).updateOne(filter, obj);
+        await db.collection(name).updateOne(filter, obj);
 
-  },
+    },
 
-  async dropCollection(name) {
+    async dropCollection(name) {
 
-    db.listCollections({ name: name }).next((err, isExist) => {
+        db.listCollections({name: name}).next((err, isExist) => {
 
-      if (isExist)
-        db.collection(name).drop();
-    });
+            if (isExist)
+                db.collection(name).drop();
+        });
 
-  },
+    },
 
-  createCollection(name) {
+    createCollection(name) {
 
-    db.listCollections({ name: name }).next((err, isExist) => {
+        db.listCollections({name: name}).next((err, isExist) => {
 
-      if (!isExist)
-        db.createCollection(name);
-    });
+            if (!isExist)
+                db.createCollection(name);
+        });
 
-  },
+    },
 
-  async deleteMany(filter, name) {
+    async deleteMany(filter, name) {
 
-    await db.collection(name).deleteMany(filter);
+        await db.collection(name).deleteMany(filter);
 
-  },
+    },
 
-  async countRows(name) {
+    async countRows(name) {
 
-    return await db.collection(name).countDocuments();
+        return await db.collection(name).countDocuments();
 
-  },
+    },
 
-  async findMany(filter, projection, name) {
+    async findMany(filter, projection, name) {
 
-    let result;
+        let result;
 
-    if (typeof projection === "string")
-      result = await db.collection(projection).find(filter);
+        if (typeof projection === "string")
+            result = await db.collection(projection).find(filter);
 
-    else
-      result = await db.collection(name).find(filter, projection);
+        else
+            result = await db.collection(name).find(filter, {
+                projection: projection
+            });
 
-    if (typeof filter === "string")
-      result = await db.collection(filter).find();
+        if (typeof filter === "string")
+            result = await db.collection(filter).find();
 
-    return result;
+        return result;
 
-  },
+    },
 
-  async haveCollection(name) {
+    async haveCollection(name) {
 
-    return new Promise(res => {
+        return new Promise(res => {
 
-      db.listCollections({ name: name }).next((err, isExist) => {
+            db.listCollections({name: name}).next((err, isExist) => {
 
-        res(isExist);
+                res(isExist);
 
-      });
+            });
 
-    });
+        });
 
-  }
+    }
 
 };

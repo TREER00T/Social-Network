@@ -42,5 +42,4 @@ export class DataQuery {
     @IsOptional()
     @Length(1)
     roomId?: string;
-
 }

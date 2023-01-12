@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 import {JWK, JWE} from "node-jose";
 import * as crypto from "crypto";
 import * as dotenv from "dotenv";

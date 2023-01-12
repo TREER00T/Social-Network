@@ -1,8 +1,8 @@
 import {Injectable} from "@nestjs/common";
 import {Server} from "socket.io";
+import Find from "../../model/find/user";
 
 let Update = require("../../model/update/user"),
-    Find = require("../../model/find/user"),
     Redis = require("../../database/redisDbDriver");
 
 
@@ -13,13 +13,9 @@ export class SocketGatewayService {
         await Update.userOnline(userPhone, status);
     }
 
-    private async getUsersFromListOfUser(userId: string): Promise<string[]> {
-        return await Find.getUsersFromListOfUser(userId);
-    }
-
     async sendUserOnlineStatusForSpecificUsers(io: Server, status: boolean, userId: string) {
 
-        let users = await this.getUsersFromListOfUser(userId);
+        let users = await Find.getUsersFromListOfUser(userId);
 
         for (const u of users) {
             let user = await Redis.get(u);

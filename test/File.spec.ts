@@ -1,4 +1,4 @@
-let File = require('../../../src/util/File');
+import File from '../src/util/File';
 
 let simpleImageBase64 =
     'iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAMAAAAOusbgAAAAflBMVEX/3wAAAAD/5AD53gDAqwAyKwD/' +

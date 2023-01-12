@@ -1,6 +1,5 @@
 import {Injectable} from '@nestjs/common';
-
-let Find = require("../../../model/find/user");
+import Find from "../../../model/find/user";
 
 @Injectable()
 export class PersonaDevicesService {
