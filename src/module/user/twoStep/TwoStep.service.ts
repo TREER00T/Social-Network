@@ -2,12 +2,11 @@ import {Injectable} from '@nestjs/common';
 import Generate from "../../../util/Generate";
 import {TwoStepDto} from "./TwoStep.dto";
 import Device from "../../base/Device";
-
-let Find = require("../../../model/find/user");
+import Find from "../../../model/find/user";
 
 @Injectable()
 export class TwoStepService {
-    async isValidPassword(userPhone: string, password: string): Promise<object> {
+    async isValidPassword(userPhone: string, password: string): Promise<boolean> {
         return await Find.isValidPassword(userPhone, Generate.getHashData(password.trim(), userPhone));
     }
 

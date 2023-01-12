@@ -3,6 +3,7 @@ import {IResponse} from "./Types";
 
 // instance of response object express
 let res: Response;
+
 export default {
 
     builder(obj: IResponse, data?: any, option?: object) {

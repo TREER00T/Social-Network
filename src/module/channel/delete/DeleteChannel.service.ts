@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
+import DeleteInUser from "../../../model/remove/user";
 
-let Delete = require("../../../model/remove/channel"),
-    DeleteInUser = require("../../../model/remove/user");
+let Delete = require("../../../model/remove/channel");
 
 @Injectable()
 export class DeleteChannelService {

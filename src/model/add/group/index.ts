@@ -1,18 +1,16 @@
 let {
-        group,
-        groupUser,
-        groupAdmin
-    } = require('../../create/group'),
-    {
-        isUndefined
-    } = require('../../../util/Util');
+    group,
+    groupUser,
+    groupAdmin
+} = require('../../create/group');
+import Util from '../../../util/Util';
 
 
-module.exports = {
+export default {
 
     async group(name, inviteLink, defaultColor, img) {
 
-        let resultObject = !isUndefined(img) ? {img: img} : {};
+        let resultObject = !Util.isUndefined(img) ? {img: img} : {};
 
         let data = await group()({
             ...resultObject,

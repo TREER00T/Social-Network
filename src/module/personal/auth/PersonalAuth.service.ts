@@ -1,8 +1,8 @@
 import {Injectable} from '@nestjs/common';
 import Generate from "../../../util/Generate";
+import Find from "../../../model/find/user";
 
-let Update = require("../../../model/update/user"),
-    Find = require("../../../model/find/user");
+let Update = require("../../../model/update/user");
 
 
 @Injectable()

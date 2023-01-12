@@ -1,4 +1,4 @@
-import fs from "fs";
+import * as fs from "fs";
 import * as dotenv from "dotenv";
 import Generate from "../util/Generate";
 import Util from "../util/Util";
@@ -72,8 +72,8 @@ export default {
         });
     },
 
-    async isExistFolder() {
-        return await fs.promises.readdir(cacheFolderPath);
+    isExistFolder() {
+        return fs.existsSync(cacheFolderPath);
     },
 
 
@@ -96,7 +96,7 @@ export default {
     },
 
     async mkdirForUploadFile() {
-        let isExistFolder = await this.isExistFolder();
+        let isExistFolder = this.isExistFolder();
 
         if (!isExistFolder) {
             await fs.promises.mkdir(cacheFolderPath, {recursive: true});
@@ -105,7 +105,7 @@ export default {
                 await fs.promises.mkdir(cacheFolderPath + item);
 
 
-            await fs.promises.copyFile("../../config/.htaccess", cacheFolderPath + ".htaccess");
+            await fs.promises.copyFile("config/.htaccess", cacheFolderPath + ".htaccess");
         }
 
         return !!isExistFolder;

@@ -13,7 +13,7 @@ module.exports = {
 
         let objSchema = new Schema(obj);
 
-        return mongoose.model(name, objSchema);
+        return mongoose.models?.[name] || mongoose.model(name, objSchema);
 
     }
 

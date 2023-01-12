@@ -19,7 +19,7 @@ export class VerifyAuthCodeController {
 
         let havePassword = await this.appService.havePassword(dto.phone);
 
-        if (!havePassword)
+        if (havePassword)
             return Json.builder(Response.HTTP_ACCEPTED, await this.appService.generateToken(dto));
 
         await this.appService.updateApiKey(dto.phone);

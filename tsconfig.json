@@ -7,7 +7,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2020",
+    "target": "es2017",
     "sourceMap": true,
     "allowJs": true,
     "outDir": "./dist",

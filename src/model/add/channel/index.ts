@@ -1,18 +1,16 @@
 let {
-        channel,
-        channelUser,
-        channelAdmin
-    } = require('../../create/channel'),
-    {
-        isUndefined
-    } = require('../../../util/Util');
+    channel,
+    channelUser,
+    channelAdmin
+} = require('../../create/channel');
+import Util from '../../../util/Util';
 
 
-module.exports = {
+export default {
 
     async channel(name, inviteLink, defaultColor, img) {
 
-        let resultObject = !isUndefined(img) ? {img: img} : {};
+        let resultObject = !Util.isUndefined(img) ? {img: img} : {};
 
         let data = await channel()({
             ...resultObject,

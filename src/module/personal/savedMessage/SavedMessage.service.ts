@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
+import Delete from "../../../model/remove/user";
 
-let Delete = require("../../../model/remove/user"),
-    Create = require("../../../model/create/user");
+let Create = require("../../../model/create/user");
 
 @Injectable()
 export class SavedMessageService {

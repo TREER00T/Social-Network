@@ -2,10 +2,10 @@ import {Injectable} from "@nestjs/common";
 import {GenerateUserDto} from "./GenerateUser.dto";
 import Generate from "../../../util/Generate";
 import Util from "../../../util/Util";
+import Find from "../../../model/find/user";
+import Insert from "../../../model/add/user";
 
-let Find = require("../../../model/find/user"),
-    Insert = require("../../../model/add/user"),
-    Update = require("../../../model/update/user"),
+let Update = require("../../../model/update/user"),
     CreateUser = require("../../../model/create/user");
 
 @Injectable()

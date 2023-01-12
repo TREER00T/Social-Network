@@ -1,17 +1,15 @@
 import {IsIP, IsNotEmpty, IsString} from "class-validator";
 
 export class UserDeviceInfo {
+    @IsIP()
+    @IsNotEmpty()
+    deviceIp: string;
 
-  @IsIP()
-  @IsNotEmpty()
-  deviceIp: string;
+    @IsString()
+    @IsNotEmpty()
+    deviceName: string;
 
-  @IsString()
-  @IsNotEmpty()
-  deviceName: string;
-
-  @IsString()
-  @IsNotEmpty()
-  deviceLocation: string;
-
+    @IsString()
+    @IsNotEmpty()
+    deviceLocation: string;
 }

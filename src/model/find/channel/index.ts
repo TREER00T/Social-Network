@@ -1,14 +1,11 @@
 let {
-        isUndefined
-    } = require('../../../util/Util'),
-    {
-        channel,
-        channelUser,
-        channelAdmin
-    } = require('../../create/channel');
+    channel,
+    channelUser,
+    channelAdmin
+} = require('../../create/channel');
+import Util from '../../../util/Util';
 
-
-module.exports = {
+export default {
 
     async id(id) {
 
@@ -16,7 +13,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -28,7 +25,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -42,7 +39,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -55,7 +52,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -68,7 +65,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -81,7 +78,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 

@@ -4,8 +4,7 @@ import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
 import {UserInput} from "./UserInput";
 import {JsonObject} from "../../util/Types";
-
-let Find = require("../../model/find/user");
+import Find from "../../model/find/user";
 
 export abstract class HandleMessage extends UserInput {
 

@@ -1,7 +1,4 @@
 let {
-        isUndefined
-    } = require('../../../util/Util'),
-    {
         group,
         groupUser,
         groupAdmin
@@ -9,9 +6,9 @@ let {
     {
         countRows
     } = require('../../../database/mongoDbDriverConnection');
+import Util from '../../../util/Util';
 
-
-module.exports = {
+export default {
 
     async id(id) {
 
@@ -19,7 +16,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -32,7 +29,7 @@ module.exports = {
             publicLink: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -46,7 +43,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -59,7 +56,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -72,7 +69,7 @@ module.exports = {
             _id: 1
         });
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 

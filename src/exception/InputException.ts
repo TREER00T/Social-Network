@@ -1,4 +1,4 @@
-import WFL from "wfl";
+import * as WFL from "wfl";
 
 export function InputException(error) {
   WFL.warning(error);

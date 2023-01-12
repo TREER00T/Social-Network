@@ -1,5 +1,5 @@
 import {TokenExpiredError, JsonWebTokenError} from "jsonwebtoken";
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 import {JWK, parse} from "node-jose";
 import Json from "../util/ReturnJson";
 import Response from "../util/Response";
@@ -9,11 +9,6 @@ import {ValidationException} from "../exception/ValidationException";
 dotenv.config();
 
 export default {
-
-    // Checks phone number E.g : 09030207892 return true
-    isPhoneNumber(data: string): boolean {
-        return /\+?^\d+$/.test(data);
-    },
 
     requestEndpointHandler(requestMethod: string): string {
         const arrayOfHttpMethods = [

@@ -2,8 +2,7 @@ import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
 import {User} from "./User";
 import PromiseVerify from "./PromiseVerify";
-
-let Find = require("../../model/find/channel");
+import Find from "../../model/find/channel";
 
 export abstract class Channel extends User {
 

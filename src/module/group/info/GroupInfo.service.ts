@@ -1,6 +1,5 @@
 import {Injectable} from '@nestjs/common';
-
-let Find = require("../../../model/find/group");
+import Find from "../../../model/find/group";
 
 @Injectable()
 export class GroupInfoService {

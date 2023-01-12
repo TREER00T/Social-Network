@@ -1,8 +1,7 @@
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
 import {AbstractRoom} from "./AbstractRoom";
-
-let Find = require("../../../model/find/channel");
+import Find from "../../../model/find/channel";
 
 export class AbstractChannel extends AbstractRoom {
 

@@ -1,15 +1,12 @@
 let {
-        isUndefined
-    } = require('../../../util/Util'),
-    {
         findMany
     } = require('../../../database/mongoDbDriverConnection'),
     {user} = require('../../create/user'),
     {group} = require('../../create/group'),
     {channel} = require('../../create/channel');
+import Util from '../../../util/Util';
 
-
-module.exports = {
+export default {
 
     async isMessageBelongForThisUserInRoom(messageId, senderId, tableName) {
 
@@ -21,7 +18,7 @@ module.exports = {
             senderId: 1
         }, tableName);
 
-        return !isUndefined(data?._id);
+        return !Util.isUndefined(data?._id);
 
     },
 
@@ -36,7 +33,7 @@ module.exports = {
                 img: 1,
                 name: 1,
                 defaultColor: 1
-            }, filter = {
+            }, filter: any = {
                 name: {$regex: like},
                 $or: [{
                     username: {$regex: like}

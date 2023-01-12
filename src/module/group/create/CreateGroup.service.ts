@@ -1,10 +1,10 @@
 import {Injectable} from '@nestjs/common';
 import Generate from "../../../util/Generate";
 import Util from "../../../util/Util";
+import Insert from "../../../model/add/group";
+import InsertInUser from "../../../model/add/user";
 
-let Insert = require("../../../model/add/group"),
-    InsertInUser = require("../../../model/add/user"),
-    Create = require("../../../model/create/group");
+let Create = require("../../../model/create/group");
 
 @Injectable()
 export class CreateGroupService {

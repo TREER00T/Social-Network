@@ -1,10 +1,10 @@
 import {Injectable} from '@nestjs/common';
 import Generate from "../../../util/Generate";
 import Util from "../../../util/Util";
+import Insert from "../../../model/add/channel";
+import InsertInUser from "../../../model/add/user";
 
-let Insert = require("../../../model/add/channel"),
-    InsertInUser = require("../../../model/add/user"),
-    Create = require("../../../model/create/channel");
+let Create = require("../../../model/create/channel");
 
 @Injectable()
 export class CreateChannelService {

@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
+import Find from "../../../model/find/user";
 
-let Find = require("../../../model/find/user"),
-    Update = require("../../../model/update/user");
+let Update = require("../../../model/update/user");
 
 @Injectable()
 export class PersonalUsernameService {

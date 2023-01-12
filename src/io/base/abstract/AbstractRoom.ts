@@ -1,6 +1,5 @@
 import {SocketGatewayController} from "../SocketGateway.controller";
-
-let CommonFind = require("../../../model/find/common");
+import CommonFind from "../../../model/find/common";
 
 export class AbstractRoom extends SocketGatewayController {
 

@@ -6,12 +6,15 @@ let {
         listOfUserGroup,
         listOfUserChannel
     } = require('../../create/user'),
-    {dropCollection, deleteMany} = require('../../../database/mongoDbDriverConnection'),
-    FindInCommon = require('../../find/common'),
-    DeleteInCommon = require('../../remove/common'),
-    {isUndefined} = require('../../../Util/Util');
+    {
+        deleteMany,
+        dropCollection
+    } = require('../../../database/mongoDbDriverConnection');
+import Util from '../../../util/Util';
+import FindInCommon from '../../../model/find/common';
+import DeleteInCommon from '../../../model/remove/common';
 
-module.exports = {
+export default {
 
     async chat(tableName) {
 
@@ -150,7 +153,7 @@ module.exports = {
         for (const item of listOfId) {
             let id = await FindInCommon.isForwardData(`${phone}SavedMessage`, item);
 
-            if (!isUndefined(id))
+            if (!Util.isUndefined(id))
                 await DeleteInCommon.forwardMessage(id);
         }
 

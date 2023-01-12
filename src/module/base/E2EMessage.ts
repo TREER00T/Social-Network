@@ -2,10 +2,8 @@ import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
 import {Message} from "./dto/Message";
 import {User} from "./User";
-
-
-let CommonInsert = require("../../model/add/common"),
-    Find = require("../../model/find/user");
+import CommonInsert from "../../model/add/common";
+import Find from "../../model/find/user";
 
 export abstract class E2EMessage extends User {
 

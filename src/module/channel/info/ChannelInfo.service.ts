@@ -1,6 +1,5 @@
 import {Injectable} from '@nestjs/common';
-
-let Find = require("../../../model/find/channel");
+import Find from "../../../model/find/channel";
 
 @Injectable()
 export class ChannelInfoService {

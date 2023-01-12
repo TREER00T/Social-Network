@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
+import Insert from "../../../model/add/channel";
 
-let Insert = require("../../../model/add/channel"),
-    Delete = require("../../../model/remove/channel");
+let Delete = require("../../../model/remove/channel");
 
 @Injectable()
 export class ChannelAdminService {

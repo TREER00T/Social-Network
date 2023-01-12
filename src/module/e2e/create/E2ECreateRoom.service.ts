@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
+import Insert from "../../../model/add/user";
 
-let Insert = require("../../../model/add/user"),
-    Create = require("../../../model/create/user");
+let Create = require("../../../model/create/user");
 
 @Injectable()
 export class E2ECreateRoomService {
