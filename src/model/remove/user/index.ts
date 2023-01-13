@@ -10,19 +10,20 @@ let {
         deleteMany,
         dropCollection
     } = require('../../../database/mongoDbDriverConnection');
-import Util from '../../../util/Util';
 import FindInCommon from '../../../model/find/common';
 import DeleteInCommon from '../../../model/remove/common';
+import {ListOfChannelId, ListOfGroupId, ListOfUserTableChat} from "../../../util/Types";
+
 
 export default {
 
-    async chat(tableName) {
+    async chat(tableName: string) {
 
         await dropCollection(tableName);
 
     },
 
-    async chatInListOfE2EChat(fromUser, toUser, userId) {
+    async chatInListOfE2EChat(fromUser: string, toUser: string, userId: string) {
 
         await listOfUserE2E().deleteOne({
             fromUser: fromUser, toUser: toUser, userId: userId
@@ -30,7 +31,7 @@ export default {
 
     },
 
-    async userInUsersBlockList(userId, id) {
+    async userInUsersBlockList(userId: string, id: string) {
 
         await userBlockList().deleteOne({
             userTargetId: id, userId: userId
@@ -38,7 +39,7 @@ export default {
 
     },
 
-    async groupInListOfUserGroup(id) {
+    async groupInListOfUserGroup(id: string) {
 
         await listOfUserGroup().deleteMany({
             groupId: id
@@ -46,7 +47,7 @@ export default {
 
     },
 
-    async channelInListOfUserChannel(id) {
+    async channelInListOfUserChannel(id: string) {
 
         await listOfUserChannel().deleteMany({
             channelId: id
@@ -54,7 +55,7 @@ export default {
 
     },
 
-    async userFromGroup(groupId, userId) {
+    async userFromGroup(groupId: string, userId: string) {
 
         await listOfUserGroup().deleteOne({
             groupId: groupId, userId: userId
@@ -62,7 +63,7 @@ export default {
 
     },
 
-    async userFromChannel(channelId, userId) {
+    async userFromChannel(channelId: string, userId: string) {
 
         await listOfUserChannel().deleteOne({
             channelId: channelId, userId: userId
@@ -70,13 +71,13 @@ export default {
 
     },
 
-    async savedMessage(phone) {
+    async savedMessage(phone: string) {
 
         await dropCollection(`${phone}SavedMessage`);
 
     },
 
-    async userInAllUsersBlockList(id) {
+    async userInAllUsersBlockList(id: string) {
 
         await userBlockList().deleteMany({
             userId: id
@@ -84,13 +85,13 @@ export default {
 
     },
 
-    async userInUsersTable(id) {
+    async userInUsersTable(id: string) {
 
         await user().findByIdAndDelete(id);
 
     },
 
-    async userInAllUsersGroup(array, id) {
+    async userInAllUsersGroup(array: ListOfGroupId, id: string) {
 
         // Drop user created group
         array.map(async e => await dropCollection(e.groupId));
@@ -101,7 +102,7 @@ export default {
 
     },
 
-    async userInAllUsersChannel(array, id) {
+    async userInAllUsersChannel(array: ListOfChannelId, id: string) {
 
         // Drop user created channelContent
         array.map(async e => await dropCollection(e.channelId));
@@ -112,7 +113,7 @@ export default {
 
     },
 
-    async userDataInJoinedChannels(arr, userId) {
+    async userDataInJoinedChannels(arr: ListOfChannelId, userId: string) {
         // Delete the list of messages of any channelContent sent by the user
         for (const item of arr) {
             await deleteMany({
@@ -121,7 +122,7 @@ export default {
         }
     },
 
-    async userDataInJoinedGroups(arr, userId) {
+    async userDataInJoinedGroups(arr: ListOfGroupId, userId: string) {
         // Delete the list of messages of any group sent by the user
         for (const item of arr) {
             await deleteMany({
@@ -130,7 +131,7 @@ export default {
         }
     },
 
-    async userInAllUsersE2E(array, id) {
+    async userInAllUsersE2E(array: ListOfUserTableChat, id: string) {
 
         array.map(async e => await dropCollection(e.tblChatId));
 
@@ -140,7 +141,7 @@ export default {
 
     },
 
-    async userInDevices(id) {
+    async userInDevices(id: string) {
 
         await device().deleteMany({
             userId: id
@@ -148,12 +149,12 @@ export default {
 
     },
 
-    async itemInSavedMessage(phone, listOfId) {
+    async itemInSavedMessage(phone: string, listOfId: string[]) {
 
         for (const item of listOfId) {
             let id = await FindInCommon.isForwardData(`${phone}SavedMessage`, item);
 
-            if (!Util.isUndefined(id))
+            if (id)
                 await DeleteInCommon.forwardMessage(id);
         }
 

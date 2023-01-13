@@ -1,5 +1,5 @@
-import * as WFL from "wfl";
+let Influx = require('../database/influxDbDriver');
 
 export function FileException(error) {
-  WFL.error(error);
+    Influx.writeInStringField('file_exception', error);
 }

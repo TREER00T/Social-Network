@@ -13,12 +13,12 @@ let {
     {
         insertOne
     } = require('../../../database/mongoDbDriverConnection');
-import Util from '../../../util/Util';
+import {TUserDeviceInfo} from "../../../util/Types";
 
 
 export default {
 
-    async phoneAndAuthCode(phone, authCode, defaultColor) {
+    async phoneAndAuthCode(phone: string, authCode: number, defaultColor: string) {
 
         return await user()({
             phone: phone,
@@ -29,7 +29,7 @@ export default {
     },
 
 
-    async chatIdInListOfUserE2E(fromUser, toUser, userId, tableName) {
+    async chatIdInListOfUserE2E(fromUser: string, toUser: string, userId: string, tableName: string) {
 
         await listOfUserE2E()({
             toUser: toUser,
@@ -41,7 +41,7 @@ export default {
     },
 
 
-    async addUserToUsersBlockList(userId, userTargetId) {
+    async addUserToUsersBlockList(userId: string, userTargetId: string) {
 
         await userBlockList()({
             userId: userId,
@@ -51,7 +51,7 @@ export default {
     },
 
 
-    async userDeviceInformation(user) {
+    async userDeviceInformation(user: TUserDeviceInfo) {
 
         await device()({
             userId: user.id,
@@ -62,7 +62,7 @@ export default {
 
     },
 
-    async groupIntoListOfUserGroup(groupId, userId) {
+    async groupIntoListOfUserGroup(groupId: string, userId: string) {
 
         await listOfUserGroup()({
             userId: userId,
@@ -71,7 +71,7 @@ export default {
 
     },
 
-    async channelIntoListOfUserChannels(channelId, userId) {
+    async channelIntoListOfUserChannels(channelId: string, userId: string) {
 
         await listOfUserChannel()({
             userId: userId,
@@ -80,9 +80,9 @@ export default {
 
     },
 
-    async messageIntoUserSavedMessage(phone, message) {
+    async messageIntoUserSavedMessage(phone: string, message) {
 
-        if (!Util.isUndefined(message?.forwardDataId)) {
+        if (message?.forwardDataId) {
             let data = await forwardContent()({
                 conversationId: `${phone}SavedMessages`,
                 conversationType: 'Personal'

@@ -1,13 +1,13 @@
 let {forwardContent} = require('../../create/common'),
     {insertOne} = require('../../../database/mongoDbDriverConnection'),
     UpdateInCommon = require('../../update/common');
-import Util from '../../../util/Util';
+import {JsonObject} from "../../../util/Types";
 
 export default {
 
-    async message(tableName, data, forwardData) {
+    async message(tableName: string, data: JsonObject, forwardData) {
 
-        if (!Util.isUndefined(data?.forwardDataId)) {
+        if (data?.forwardDataId) {
             let data = await forwardContent()({
                 conversationId: tableName,
                 conversationType: forwardData?.conversationType

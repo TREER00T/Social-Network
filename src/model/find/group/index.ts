@@ -6,21 +6,20 @@ let {
     {
         countRows
     } = require('../../../database/mongoDbDriverConnection');
-import Util from '../../../util/Util';
 
 export default {
 
-    async id(id) {
+    async id(id: string) {
 
         let data = await group().findById(id, {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async isPublicKeyUsed(publicLink) {
+    async isPublicKeyUsed(publicLink: string) {
 
         let data = await group().find({
             publicLink: publicLink
@@ -29,11 +28,11 @@ export default {
             publicLink: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async isOwner(adminId, groupId) {
+    async isOwner(adminId: string, groupId: string) {
 
         let data = await groupAdmin().findOne({
             adminId: adminId,
@@ -43,11 +42,11 @@ export default {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async isJoined(groupId, userId) {
+    async isJoined(groupId: string, userId: string) {
 
         let data = await groupUser().findOne({
             groupId: groupId,
@@ -56,11 +55,11 @@ export default {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async isAdmin(groupId, userId) {
+    async isAdmin(groupId: string, userId: string) {
 
         let data = await groupAdmin().findOne({
             userId: userId,
@@ -69,44 +68,38 @@ export default {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async getCountOfListMessage(groupId) {
+    async getCountOfListMessage(groupId: string) {
 
         return await countRows(`${groupId}GroupContents`);
 
     },
 
 
-    async getInfo(groupId) {
+    async getInfo(groupId: string) {
 
-        let data = await group().find({groupId: groupId});
-
-        return data;
+        return await group().find({groupId: groupId});
 
     },
 
 
-    async getCountOfUsers(groupId) {
+    async getCountOfUsers(groupId: string) {
 
-        let count = await group().find({groupId: groupId}).countDocuments();
-
-        return count;
+        return await group().find({groupId: groupId}).countDocuments();
 
     },
 
-    async getAllUsers(groupId) {
+    async getAllUsers(groupId: string) {
 
-        let data = await groupUser().find({
+        return await groupUser().find({
             groupId: groupId
         }, {
             _id: 0,
             userId: 1
         });
-
-        return data;
 
     }
 
