@@ -3,21 +3,20 @@ let {
     channelUser,
     channelAdmin
 } = require('../../create/channel');
-import Util from '../../../util/Util';
 
 export default {
 
-    async id(id) {
+    async id(id: string) {
 
         let data = await channel().findById(id, {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async isPublicKeyUsed(publicLink) {
+    async isPublicKeyUsed(publicLink: string) {
 
         let data = await channel().findOne({
             publicLink: publicLink
@@ -25,11 +24,11 @@ export default {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async isOwner(adminId, channelId) {
+    async isOwner(adminId: string, channelId: string) {
 
         let data = await channelAdmin().findOne({
             adminId: adminId,
@@ -39,11 +38,11 @@ export default {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async isOwnerOrAdmin(adminId, channelId) {
+    async isOwnerOrAdmin(adminId: string, channelId: string) {
 
         let data = await channelAdmin().findOne({
             adminId: adminId,
@@ -52,11 +51,11 @@ export default {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async isJoined(channelId, userId) {
+    async isJoined(channelId: string, userId: string) {
 
         let data = await channelUser().findOne({
             userId: userId,
@@ -65,11 +64,11 @@ export default {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async isAdmin(channelId, userId) {
+    async isAdmin(channelId: string, userId: string) {
 
         let data = await channelAdmin().findOne({
             userId: userId,
@@ -78,37 +77,31 @@ export default {
             _id: 1
         });
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async getInfo(channelId) {
+    async getInfo(channelId: string) {
 
-        let data = await channel().find({
+        return await channel().find({
             _id: channelId
         });
 
-        return data;
-
     },
 
 
-    async getCountOfUsers(channelId) {
+    async getCountOfUsers(channelId: string) {
 
-        let count = await channel().find({channelId: channelId}).countDocuments();
-
-        return count;
+        return await channel().find({channelId: channelId}).countDocuments();
 
     },
 
-    async getAllUsers(channelId) {
+    async getAllUsers(channelId: string) {
 
-        let data = await channelUser().find({channelId: channelId}, {
+        return await channelUser().find({channelId: channelId}, {
             _id: 0,
             userId: 1
         });
-
-        return data;
 
     }
 

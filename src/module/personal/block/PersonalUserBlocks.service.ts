@@ -1,5 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import Find from "../../../model/find/user";
+import {ListOfUserTargetId} from "../../../util/Types";
 
 @Injectable()
 export class PersonalUserBlocksService {
@@ -7,7 +8,7 @@ export class PersonalUserBlocksService {
         return await Find.getListOfBlockedUsers(userId);
     }
 
-    async userDetails(listOfUserId: object[]) {
+    async userDetails(listOfUserId: ListOfUserTargetId) {
         return await Find.getUserDetailsInUsersTable(listOfUserId);
     }
 }

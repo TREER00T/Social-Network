@@ -4,11 +4,11 @@ let {
     channelAdmin
 } = require('../../create/channel');
 import Util from '../../../util/Util';
-
+import {HasOwner} from "../../../util/Types";
 
 export default {
 
-    async channel(name, inviteLink, defaultColor, img) {
+    async channel(name: string, inviteLink: string, defaultColor: string, img: string) {
 
         let resultObject = !Util.isUndefined(img) ? {img: img} : {};
 
@@ -23,7 +23,7 @@ export default {
 
     },
 
-    async admin(userId, channelId, isOwner) {
+    async admin(userId: string, channelId: string, isOwner: HasOwner) {
 
         await channelAdmin()({
             adminId: userId,
@@ -33,7 +33,7 @@ export default {
 
     },
 
-    async user(userId, channelId) {
+    async user(userId: string, channelId: string) {
 
         await channelUser()({
             userId: userId,

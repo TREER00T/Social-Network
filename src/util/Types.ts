@@ -21,6 +21,13 @@ type IFile = {
     name: string
 }
 
+type TUserDeviceInfo = {
+    ip: string,
+    id?: string,
+    name: string,
+    location: string
+}
+
 type MessagePayload = {
     file: IFile,
     tableName: string,
@@ -34,12 +41,47 @@ type TSaveMessage = {
     message: JsonObject
 }
 
+type ListOfUserTargetId = Array<{
+    userTargetId: string
+}>
+
+type ListOfUserId = Array<{
+    userId: string
+}>
+
+type ListOfGroupId = Array<{
+    groupId: string
+}>
+
+type ListOfChannelId = Array<{
+    channelId: string
+}>
+
+type ListOfUserTableChat = Array<{
+    tblChatId: string
+}>
+
+type AuthMsgBelongingToBetweenTwoUsers = {
+    fromUser: string,
+    toUser: string
+}
+
+type HasOwner = 0 | 1;
+
 export {
     MessagePayload,
     Activities,
     FileUploaded,
+    ListOfUserTargetId,
+    HasOwner,
+    ListOfChannelId,
+    ListOfGroupId,
+    ListOfUserId,
     IResponse,
     Token,
+    TUserDeviceInfo,
     TSaveMessage,
+    ListOfUserTableChat,
+    AuthMsgBelongingToBetweenTwoUsers,
     JsonObject
 }

@@ -91,6 +91,9 @@ $ npm run start:prod
 ```bash
 # unit tests
 $ npm run test
+
+# end to end tests
+$ npm run test:e2e
 ```
 
 ## Licensing

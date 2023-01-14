@@ -4,11 +4,11 @@ let {
     {user} = require('../../create/user'),
     {group} = require('../../create/group'),
     {channel} = require('../../create/channel');
-import Util from '../../../util/Util';
+
 
 export default {
 
-    async isMessageBelongForThisUserInRoom(messageId, senderId, tableName) {
+    async isMessageBelongForThisUserInRoom(messageId: string | string[], senderId: string, tableName: string) {
 
         let data = await findMany({
             _id: {$in: messageId},
@@ -18,11 +18,11 @@ export default {
             senderId: 1
         }, tableName);
 
-        return !Util.isUndefined(data?._id);
+        return data?._id;
 
     },
 
-    async searchWithNameInTableUsersGroupsAndChannels(value) {
+    async searchWithNameInTableUsersGroupsAndChannels(value: string) {
 
         if (!value)
             return false;
@@ -57,7 +57,7 @@ export default {
 
     },
 
-    async getListOfUserGroupsChannelsOrE2EsActivity(userId, type) {
+    async getListOfUserGroupsChannelsOrE2EsActivity(userId: string, type: string) {
 
         let objKey = type === 'channel' ? 'channelId' :
             type === 'e2e' ? 'userId' : 'groupId';
@@ -83,11 +83,11 @@ export default {
     },
 
 
-    async getListOfUsersActivity(userId) {
+    async getListOfUsersActivity(userId: string) {
 
-        let channelData = await module.exports.getListOfUserGroupsChannelsOrE2EsActivity(userId, 'channel'),
-            groupData = await module.exports.getListOfUserGroupsChannelsOrE2EsActivity(userId, 'group'),
-            e2eData = await module.exports.getListOfUserGroupsChannelsOrE2EsActivity(userId, 'e2e');
+        let channelData = await this.getListOfUserGroupsChannelsOrE2EsActivity(userId, 'channel'),
+            groupData = await this.getListOfUserGroupsChannelsOrE2EsActivity(userId, 'group'),
+            e2eData = await this.getListOfUserGroupsChannelsOrE2EsActivity(userId, 'e2e');
 
         return {
             users: e2eData,
@@ -97,7 +97,7 @@ export default {
 
     },
 
-    async isForwardData(tableName, id) {
+    async isForwardData(tableName: string, id: string) {
 
         if (!id)
             return false;

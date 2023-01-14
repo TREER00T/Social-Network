@@ -1,6 +1,6 @@
 {
   "name": "social-network-server",
-  "version": "2.0.21",
+  "version": "2.0.22",
   "description": "A simple social network with socket.io and rest api in nest.js",
   "author": "Ali Azmoodeh Valadi",
   "private": true,
@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@influxdata/influxdb-client": "^1.33.0",
     "@nestjs/common": "^9.2.1",
     "@nestjs/core": "^9.2.1",
     "@nestjs/platform-express": "^9.2.1",
@@ -42,7 +43,6 @@
     "rxjs": "^7.8.0",
     "socket.io": "^4.5.4",
     "swagger-ui-express": "^4.6.0",
-    "wfl": "^1.0.9",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
@@ -80,16 +80,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "wfl": {
-    "size": "15m",
-    "where": {
-      "error": "18m",
-      "info": "18m",
-      "warning": "18m"
-    },
-    "path": "../cache/Logger",
-    "offset": "1d",
-    "accessToDelete": false
   }
 }

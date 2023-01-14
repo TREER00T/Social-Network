@@ -3,14 +3,13 @@ let {
     groupUser,
     groupAdmin
 } = require('../../create/group');
-import Util from '../../../util/Util';
-
+import {HasOwner} from "../../../util/Types";
 
 export default {
 
-    async group(name, inviteLink, defaultColor, img) {
+    async group(name: string, inviteLink: string, defaultColor: string, img: string) {
 
-        let resultObject = !Util.isUndefined(img) ? {img: img} : {};
+        let resultObject = img ? {img: img} : {};
 
         let data = await group()({
             ...resultObject,
@@ -23,7 +22,7 @@ export default {
 
     },
 
-    async admin(userId, groupId, isOwner) {
+    async admin(userId: string, groupId: string, isOwner: HasOwner) {
 
         await groupAdmin()({
             adminId: userId,
@@ -33,7 +32,7 @@ export default {
 
     },
 
-    async user(userId, groupId) {
+    async user(userId: string, groupId: string) {
 
         await groupUser()({
             userId: userId,

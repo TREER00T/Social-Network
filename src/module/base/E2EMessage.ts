@@ -4,6 +4,7 @@ import {Message} from "./dto/Message";
 import {User} from "./User";
 import CommonInsert from "../../model/add/common";
 import Find from "../../model/find/user";
+import {AuthMsgBelongingToBetweenTwoUsers} from "../../util/Types";
 
 export abstract class E2EMessage extends User {
 
@@ -22,7 +23,7 @@ export abstract class E2EMessage extends User {
         });
     }
 
-    async isExistChatRoom(obj) {
+    async isExistChatRoom(obj: AuthMsgBelongingToBetweenTwoUsers) {
         return await Find.isExistChatRoom(obj);
     }
 
