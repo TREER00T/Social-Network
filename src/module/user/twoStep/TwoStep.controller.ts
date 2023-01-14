@@ -1,4 +1,4 @@
-import {Controller, Post, Body} from '@nestjs/common';
+import {Controller, Post, Body, Request} from '@nestjs/common';
 import {TwoStepService} from './TwoStep.service';
 import {User} from "../../base/User";
 import Json from "../../../util/ReturnJson";
@@ -12,7 +12,7 @@ export class TwoStepController extends User {
     }
 
     @Post()
-    async validationPassword(@Body() dto: TwoStepDto) {
+    async validationPassword(@Body() dto: TwoStepDto, @Request() req) {
         this.init();
 
         let isValidaPassword = await this.appService.isValidPassword(this.phoneNumber, dto.password);
@@ -21,6 +21,6 @@ export class TwoStepController extends User {
             return Json.builder(Response.HTTP_FORBIDDEN);
 
         return Json.builder(Response.HTTP_ACCEPTED,
-            await this.appService.getUserApiKey(this.phoneNumber, dto));
+            await this.appService.getUserApiKey(this.phoneNumber, dto, req.ip, req.headers['user-agent']));
     }
 }

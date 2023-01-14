@@ -121,14 +121,6 @@ paths:
           type: number
           required: true
         - in: body
-          name: deviceName
-          type: string
-          required: true
-        - in: body
-          name: deviceIp
-          type: string
-          required: true
-        - in: body
           name: deviceLocation
           type: string
           required: true
@@ -165,14 +157,6 @@ paths:
       parameters:
         - in: body
           name: password
-          type: string
-          required: true
-        - in: body
-          name: deviceName
-          type: string
-          required: true
-        - in: body
-          name: deviceIp
           type: string
           required: true
         - in: body
