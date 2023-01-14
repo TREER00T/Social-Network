@@ -12,8 +12,8 @@ export default {
 
     requestEndpointHandler(requestMethod: string): string {
         const arrayOfHttpMethods = [
-            "/api/auth/generate/user",
-            "/api/auth/verify/otp"
+            "/api/v1/auth/generate/user",
+            "/api/v1/auth/verify/otp"
         ];
 
         //                                                      Searching in string to ensure exactly string

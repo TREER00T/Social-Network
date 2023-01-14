@@ -8,39 +8,50 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - db:/var/lib/mongo
+      - mongo:/var/lib/mongo
 
   redis:
-    image: 'bitnami/redis:latest'
+    image: redis
     restart: always
     ports:
       - '6379:6379'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
     volumes:
-      - db:/var/lib/redis
+      - redis:/var/lib/redis
 
-  app:
+  influxdb:
+    image: influxdb
+    restart: always
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb:/var/lib/influxdb
+
+  src:
     restart: always
     build:
       context: ./
       dockerfile: Dockerfile
-    container_name: app
+    container_name: src
     image: social_network
     depends_on:
       - mongo
       - redis
+      - influxdb
     links:
       - redis
       - mongo
+      - influxdb
     ports:
       - '3000:3000'
       - '4000:4000'
+      - '80:80'
     volumes:
-      - ./:/app/
+      - ./:/src/
 
 volumes:
   mongo:
     driver: local
   redis:
+    driver: local
+  influxdb:
     driver: local
