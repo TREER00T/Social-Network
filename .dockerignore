@@ -1,0 +1,13 @@
+.env
+/node_modules/
+view/node_modules/
+.idea
+package-lock.json
+view/package-lock.json
+dist
+view/src
+view/public
+view/jsconfig.json
+view/package.json
+view/package-lock.json
+view/tailwind.config.json

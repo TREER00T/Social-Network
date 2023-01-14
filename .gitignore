@@ -1,4 +1,7 @@
 /node_modules/
+view/node_modules/
+view/build/
 .idea
 package-lock.json
+view/package-lock.json
 dist

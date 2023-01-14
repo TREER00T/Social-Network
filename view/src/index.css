@@ -1,0 +1,89 @@
+/** {*/
+/*    box-sizing: border-box;*/
+/*    background: rgb(0 100 0/0.1) !important;*/
+/*}*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --blue-5: #2675EC;
+    --gray-2: #e8e8e8;
+    --glass-shadow: rgba(0, 0, 0, 0.1);
+    --glass-back: rgba(255, 255, 255, 0.88);
+    --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -youbkit-touch-callout: none;
+    -youbkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.navbar {
+    position: fixed;
+    padding: 2% 1.5%;
+    width: 100%;
+    border-bottom: 1px solid var(--gray-2);
+}
+
+.navbar a {
+    padding: 1.5%;
+    margin-left: 2%;
+    margin-right: 2%;
+    font-weight: bold;
+    transition-property: border-bottom;
+    transition-duration: 150ms;
+}
+
+.navbar a:hover, .active-nav-item {
+    border-bottom: solid 3px var(--blue-5);
+    cursor: pointer;
+}
+
+.preview-background {
+    height: 300%;
+    margin-top: 15%;
+    border-radius: 20px;
+}
+
+.vertical {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.glass-tem {
+    background: var(--glass-back);
+    box-shadow: 0 4px 30px var(--glass-shadow);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+@media screen and (orientation: landscape) {
+
+    .navbar {
+        padding: 1% 1%;
+    }
+
+    .navbar a {
+        padding: 0.8%;
+        margin-left: 2%;
+        margin-right: 2%;
+    }
+
+}
