@@ -8,16 +8,12 @@ module.exports = {
 
         await user().updateOne({phone: phone}, {$set: {authCode: authCode}});
 
-        return true;
-
     },
 
 
     async apikey(phone, key) {
 
         await user().updateOne({phone: phone}, {$set: {apiKey: key}});
-
-        return true;
 
     },
 
@@ -26,8 +22,6 @@ module.exports = {
 
         await user().updateOne({phone: phone}, {$set: {isActive: status}});
 
-        return true;
-
     },
 
 
@@ -35,16 +29,12 @@ module.exports = {
 
         await user().updateOne({phone: phone}, {$set: {username: username}});
 
-        return true;
-
     },
 
 
     async bio(phone, bio = '') {
 
         await user().updateOne({phone: phone}, {$set: {bio: bio}});
-
-        return true;
 
     },
 
@@ -61,8 +51,6 @@ module.exports = {
             }
         });
 
-        return true;
-
     },
 
     async passwordAndEmail(phone, password = '', email = '') {
@@ -73,23 +61,17 @@ module.exports = {
             }
         });
 
-        return true;
-
     },
 
     async password(phone, password) {
 
         await user().updateOne({phone: phone}, {$set: {password: password}});
 
-        return true;
-
     },
 
     async img(phone, url) {
 
         await user().updateOne({phone: phone}, {$set: {img: url}});
-
-        return true;
 
     },
 

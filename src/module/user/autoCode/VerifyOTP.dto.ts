@@ -1,7 +1,7 @@
 import {IsInt, IsNotEmpty, IsPhoneNumber, IsString, Length} from "class-validator";
 import { UserDeviceInfo } from "../../base/dto/UserDeviceInfo";
 
-export class VerifyAuthCodeDto extends UserDeviceInfo {
+export class VerifyOTPDto extends UserDeviceInfo {
   @IsString()
   @IsNotEmpty()
   @IsPhoneNumber()
@@ -10,5 +10,5 @@ export class VerifyAuthCodeDto extends UserDeviceInfo {
 
   @IsInt()
   @Length(6, 6)
-  authCode: number;
+  code: number;
 }

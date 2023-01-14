@@ -104,7 +104,7 @@ paths:
             $ref: '#/definitions/StatusWithDataObject'
 
 
-  /auth/verify/authCode:
+  /auth/verify/otp:
     post:
       tags:
         - Auth
@@ -117,7 +117,7 @@ paths:
           type: number
           required: true
         - in: body
-          name: authCode
+          name: code
           type: number
           required: true
         - in: body

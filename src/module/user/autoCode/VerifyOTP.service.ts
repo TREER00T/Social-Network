@@ -1,23 +1,36 @@
 import {Injectable} from '@nestjs/common';
-import {VerifyAuthCodeDto} from "./VerifyAuthCode.dto";
+import {VerifyOTPDto} from "./VerifyOTP.dto";
 import Generate from "../../../util/Generate";
 import Device from "../../base/Device";
 import Token from "../../../util/Token";
 import Find from "../../../model/find/user";
+import {TToken} from "../../../util/Types";
 
-let Update = require("../../../model/update/user");
+let Update = require("../../../model/update/user")
 
 @Injectable()
-export class VerifyAuthCodeService {
-    async validationAuthCode(dto: VerifyAuthCodeDto): Promise<boolean> {
-        return await Find.isValidAuthCode(dto.phone, dto.authCode);
+export class VerifyOTPService {
+    async validationOTPCode(dto: VerifyOTPDto): Promise<boolean> {
+        return await Find.isValidAuthCode(dto.phone, dto.code);
     }
 
     async havePassword(userPhone: string): Promise<boolean> {
         return await Find.password(userPhone);
     }
 
-    async generateToken(dto: VerifyAuthCodeDto): Promise<object> {
+    async generateToken(dto: VerifyOTPDto): Promise<TToken> {
+
+        let userPhone = dto.phone;
+
+        let user = await Find.userId(userPhone);
+
+        return {
+            ...await Token.setup(userPhone, user._id)
+        }
+
+    }
+
+    async generateTokenWithApiKey(dto: VerifyOTPDto): Promise<object> {
 
         let userPhone = dto.phone;
 

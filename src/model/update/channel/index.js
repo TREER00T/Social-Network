@@ -7,23 +7,17 @@ module.exports = {
 
         await channel().findByIdAndUpdate(id, {img: url});
 
-        return true;
-
     },
 
     async name(id, name) {
 
         await channel().findByIdAndUpdate(id, {name: name});
 
-        return true;
-
     },
 
     async description(id, description = '') {
 
         await channel().findByIdAndUpdate(id, {description: description});
-
-        return true;
 
     },
 
@@ -34,8 +28,6 @@ module.exports = {
             publicLink: ''
         });
 
-        return true;
-
     },
 
     async publicLink(id, link) {
@@ -44,8 +36,6 @@ module.exports = {
             inviteLink: '',
             publicLink: link
         });
-
-        return true;
 
     }
 
