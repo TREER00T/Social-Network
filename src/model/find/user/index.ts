@@ -32,6 +32,18 @@ export default {
 
     },
 
+    async userId(phone: string) {
+
+        let data = await user().findOne({
+            phone: phone
+        }, {
+            _id: 1
+        });
+
+        return data?._id?.toString();
+
+    },
+
     async isValidAuthCode(phone: string, authCode: number) {
 
         let data = await user().findOne({

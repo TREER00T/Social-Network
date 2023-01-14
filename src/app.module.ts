@@ -2,7 +2,7 @@ import {Module} from "@nestjs/common";
 import {RouterModule} from "@nestjs/core";
 import {GenerateUserModule} from "./module/user/gen/GenerateUser.module";
 import {TwoStepModule} from "./module/user/twoStep/TwoStep.module";
-import {VerifyAuthCodeModule} from "./module/user/autoCode/VerifyAuthCode.module";
+import {VerifyOTPModule} from "./module/user/autoCode/VerifyOTP.module";
 import {RefreshTokenModule} from "./module/user/refresh/RefreshToken.module";
 import {E2ECreateRoomModule} from "./module/e2e/create/E2ECreateRoom.module";
 import {E2EBlockUserModule} from "./module/e2e/block/E2EBlockUser.module";
@@ -56,7 +56,7 @@ import {CommonController} from "./io/common/Common.controller";
         // Auth module
         GenerateUserModule,
         TwoStepModule,
-        VerifyAuthCodeModule,
+        VerifyOTPModule,
         RefreshTokenModule,
 
         // E2E module
@@ -128,8 +128,8 @@ import {CommonController} from "./io/common/Common.controller";
                                 path: "verify",
                                 children: [
                                     {
-                                        path: "authCode",
-                                        module: VerifyAuthCodeModule
+                                        path: "otp",
+                                        module: VerifyOTPModule
                                     },
                                     {
                                         path: "twoStep",

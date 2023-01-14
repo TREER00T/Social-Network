@@ -1,7 +1,7 @@
 import {Message} from "../module/base/dto/Message";
 
 type JsonObject = { [key: string]: any }
-type Token = { accessToken: string, refreshToken: string }
+type TToken = { accessToken: string, refreshToken: string }
 
 type IResponse = { code: number, message: string }
 
@@ -78,7 +78,7 @@ export {
     ListOfGroupId,
     ListOfUserId,
     IResponse,
-    Token,
+    TToken,
     TUserDeviceInfo,
     TSaveMessage,
     ListOfUserTableChat,
