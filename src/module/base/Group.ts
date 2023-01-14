@@ -4,7 +4,7 @@ import Response from "../../util/Response";
 import PromiseVerify from "./PromiseVerify";
 import Find from "../../model/find/group";
 
-export class Group extends User {
+export abstract class Group extends User {
 
     async isGroupExist(roomId: string) {
         let isExist = await Find.id(roomId);
