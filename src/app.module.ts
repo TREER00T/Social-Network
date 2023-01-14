@@ -109,7 +109,7 @@ import {CommonController} from "./io/common/Common.controller";
 
         RouterModule.register([
             {
-                path: "api",
+                path: "api/v1",
                 children: [
 
                     // Authentication

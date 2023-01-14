@@ -20,7 +20,7 @@ export async function resApi(url, option) {
     if (apiKey)
         baseHeader.apiKey = apiKey;
 
-    let responseOfRequest = async (url) => await fetch(`http://localhost:3000/api/${url}`, {
+    let responseOfRequest = async (url) => await fetch(`http://localhost:3000/api/v1/${url}`, {
         mode: 'cors',
         ...(option?.headers ? {
             headers: {
