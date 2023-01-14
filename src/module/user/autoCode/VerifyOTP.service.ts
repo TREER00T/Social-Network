@@ -30,15 +30,15 @@ export class VerifyOTPService {
 
     }
 
-    async generateTokenWithApiKey(dto: VerifyOTPDto): Promise<object> {
+    async generateTokenWithApiKey(dto: VerifyOTPDto, deviceIp: string, deviceName: string): Promise<object> {
 
         let userPhone = dto.phone;
 
         let user = await Find.getApiKeyAndUserId(userPhone);
 
         await Device.insert(user._id, {
-            ip: dto.deviceIp,
-            name: dto.deviceName,
+            ip: deviceIp,
+            name: deviceName,
             location: dto.deviceLocation
         });
 

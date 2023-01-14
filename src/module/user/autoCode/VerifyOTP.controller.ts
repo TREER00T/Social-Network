@@ -1,4 +1,4 @@
-import {Body, Controller, Post} from '@nestjs/common';
+import {Body, Controller, Post, Request} from '@nestjs/common';
 import {VerifyOTPService} from './VerifyOTP.service';
 import {VerifyOTPDto} from "./VerifyOTP.dto";
 import Json from "../../../util/ReturnJson";
@@ -10,7 +10,7 @@ export class VerifyOTPController {
     }
 
     @Post()
-    async validationOTPCode(@Body() dto: VerifyOTPDto) {
+    async validationOTPCode(@Body() dto: VerifyOTPDto, @Request() req) {
 
         let isValidCode = await this.appService.validationOTPCode(dto);
 
@@ -21,7 +21,7 @@ export class VerifyOTPController {
 
         if (!havePassword)
             return Json.builder(Response.HTTP_ACCEPTED,
-                await this.appService.generateTokenWithApiKey(dto));
+                await this.appService.generateTokenWithApiKey(dto, req.ip, req.headers['user-agent']));
 
         await this.appService.updateApiKey(dto.phone);
 
