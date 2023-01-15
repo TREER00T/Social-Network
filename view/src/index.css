@@ -7,6 +7,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    :root {
+        --color-blue-50: rgb(191, 217, 255, 51)
+    }
+}
+
 :root {
     --blue-5: #2675EC;
     --gray-2: #e8e8e8;

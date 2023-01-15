@@ -4,7 +4,7 @@ import DialogException from "component/DialogException";
 import {useCookies} from 'react-cookie';
 
 function ErrorHandler({redirectTo, statusCode, errMsg, setCookie}) {
-    const [cookies, setCookies] = useCookies(['']);
+    const [, setCookies] = useCookies(['']);
 
     if (statusCode && isSuccess(statusCode) && setCookie) {
         if (typeof setCookie !== 'object')
