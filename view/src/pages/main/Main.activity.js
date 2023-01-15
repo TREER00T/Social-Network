@@ -1,5 +1,5 @@
 import Preview from 'img/preview.svg';
-import Community from 'img/Community.svg';
+import Community from 'img/community.svg';
 import {Link} from 'react-router-dom';
 import Navbar from "pages/main/Navbar";
 

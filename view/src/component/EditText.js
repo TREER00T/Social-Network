@@ -12,7 +12,7 @@ function EditText({getText, label, className, maxLength, minLength}) {
     };
 
     return (
-        <div className={className + " flex w-full items-end gap-4"}>
+        <div className={className + " flex items-end gap-4"}>
             <Input variant="outlined"
                    label={label}
                    value={text}

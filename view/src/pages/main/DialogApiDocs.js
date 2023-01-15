@@ -14,16 +14,18 @@ export default function DialogApiDocs({className, children}) {
 
     return (
         <Fragment>
-            <a className={className} onClick={() => handleOpen("sm")}>
+            <span className={className +
+            ' font-bold ml-7 hover:cursor-pointer'} onClick={() => handleOpen("sm")}>
                 {children}
-            </a>
+            </span>
             <Dialog
                 size="md"
                 handler={handleOpen}
                 open={open}>
                 <DialogHeader>Api Documentation</DialogHeader>
                 <DialogBody divider>
-                    <Button className="mr-1 outline-none"><a href="http://localhost:3000/apiDocs">Restful-Api</a></Button>
+                    <Button className="mr-1 outline-none"><a
+                        href="http://localhost:3000/apiDocs">Restful-Api</a></Button>
                     <Button className="outline-none"><a href="http://localhost:17892/socket-docs">Socket.io</a></Button>
                 </DialogBody>
                 <DialogFooter>
