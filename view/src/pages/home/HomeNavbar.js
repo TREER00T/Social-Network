@@ -3,14 +3,20 @@ import Menu from "img/menu.svg";
 import SearchOn from "img/search-on.svg";
 import SearchOff from "img/search-off.svg";
 import Add from "img/add.svg";
-import {forwardRef, useState} from "react";
+import {useRef, useState} from "react";
 import EditText from "component/EditText";
-import DropdownMenu from "component/DropdownMenu";
+import useOutsideAlerter from "common/useOutsideAlerter";
+import HomeNavbarDropDownMenu from "pages/home/HomeNavbarDropDownMenu";
 
-const HomeNavbar = forwardRef(({getSearchText}, ref) => {
+function HomeNavbar({getSearchText}) {
 
+    const wrapperRef = useRef('dropdownMenu');
     const [hasSearchOff, setHasSearchOff] = useState(true);
-    const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(true);
+    const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(false);
+
+    useOutsideAlerter(wrapperRef, () => {
+        setHasOpenedOptionMenu(false);
+    });
 
     const handleSearchState = () => {
         setHasSearchOff(!hasSearchOff);
@@ -19,7 +25,7 @@ const HomeNavbar = forwardRef(({getSearchText}, ref) => {
     };
 
     return (
-        <div className="flex my-2 mx-3 relative" ref={ref}>
+        <div className="flex my-2 mx-3 relative" ref={wrapperRef}>
 
             <ImageButton src={Menu}/>
 
@@ -43,12 +49,12 @@ const HomeNavbar = forwardRef(({getSearchText}, ref) => {
 
             </div>
             {
-                hasOpenedOptionMenu ? <DropdownMenu className="inset-y-0 right-0"/> : <></>
+                hasOpenedOptionMenu ? <HomeNavbarDropDownMenu className="inset-y-0 right-0"/> : <></>
             }
         </div>
     );
 
 
-});
+}
 
 export default HomeNavbar;

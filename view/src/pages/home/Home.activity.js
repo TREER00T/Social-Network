@@ -12,7 +12,7 @@ function HomeActivity() {
             <HomeNavbar/>
 
             {/* Body */}
-            <div className="flex">
+            <div className="flex mt-3">
 
                 {/* List Of Channel, Group, E2E Or Saved Message */}
                 <ListOfChat/>
