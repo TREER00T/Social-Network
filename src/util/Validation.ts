@@ -10,15 +10,18 @@ dotenv.config();
 
 export default {
 
-    requestEndpointHandler(requestMethod: string): string {
-        const arrayOfHttpMethods = [
+    requestEndpointHandler(requestEndpoint: string): string {
+        const arrayOfHttpUrls = [
             "/api/v1/auth/generate/user",
-            "/api/v1/auth/verify/otp"
+            "/api/v1/auth/generate/user/",
+            "/api/v1/auth/verify/otp",
+            "/api/v1/auth/verify/otp/"
         ];
 
         //                                                      Searching in string to ensure exactly string
         //                                                      In some case it was break something like this: /api/channel/1452/us
-        return arrayOfHttpMethods.includes(requestMethod) ? "" : requestMethod.match(/\d+/g)?.length > 0 ? "AuthRoute" : "";
+        return arrayOfHttpUrls.includes(requestEndpoint) || /\/api\/v1\/common\/search[\/]?(.*)/.test(requestEndpoint)
+            ? requestEndpoint.match(/\d+/g)?.length > 0 ? "AuthRoute" : "" : "";
     },
 
     // Verify jwt and check jwt expired time

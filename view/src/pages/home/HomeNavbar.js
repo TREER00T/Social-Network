@@ -16,6 +16,7 @@ function HomeNavbar({getSearchText}) {
 
     useOutsideAlerter(wrapperRef, () => {
         setHasOpenedOptionMenu(false);
+        setHasSearchOff(true);
     });
 
     const handleSearchState = () => {
@@ -37,6 +38,7 @@ function HomeNavbar({getSearchText}) {
                 {
                     hasSearchOff ? <></> :
                         <EditText className="mr-5"
+                                  ref={wrapperRef}
                                   getText={getSearchText} label="Search"/>
                 }
                 {

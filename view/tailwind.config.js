@@ -15,7 +15,7 @@ module.exports = withMT({
                 400: '#1a65b6', // light
                 500: '#1c6cc2', // dark
                 600: '#1d6abb', // darker
-                700: '#16589d', // darkest
+                700: '#16589d'  // darkest
             },
             orange: {
                 500: '#FF843A'
@@ -23,6 +23,7 @@ module.exports = withMT({
             gray: {
                 100: '#e7e7e7',
                 600: '#707070',
+                700: '#565656',
                 900: '#242526'
             }
         },
