@@ -1,7 +1,7 @@
 import {Input} from "@material-tailwind/react";
 import {useState} from "react";
 
-function EditText({getText, label, className, maxLength, minLength}) {
+function EditText({getText, label, className, ref, maxLength, minLength}) {
 
     let [text, setText] = useState('');
 
@@ -12,7 +12,7 @@ function EditText({getText, label, className, maxLength, minLength}) {
     };
 
     return (
-        <div className={className + " flex items-end gap-4"}>
+        <div ref={ref} className={className + " flex items-end gap-4"}>
             <Input variant="outlined"
                    label={label}
                    value={text}

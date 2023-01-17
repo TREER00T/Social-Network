@@ -2,7 +2,7 @@ function ImageButton({className, onClick, onChange, ref, src}) {
 
     return (
         <div
-            className={className + ' bg-blue-gray-50 rounded-lg hover:cursor-pointer'}
+            className={className + ' bg-blue-gray-50 rounded-lg drop-shadow-lg hover:cursor-pointer'}
             onChange={onChange}
             ref={ref}
             onClick={onClick}>

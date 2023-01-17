@@ -36,175 +36,179 @@ securityDefinitions:
 
 paths:
 
-  - on: connection
-    events:
-      - name: onlineStatus
-        description: By notifying all sockets known to the user.
+  /*:
+    - on: connection
+      events:
+        - name: onlineStatus
+          description: By notifying all sockets known to the user.
 
-  - on: disconnect
-    events:
-      - name: onlineStatus
-        description: By notifying all sockets known to the user.
+    - on: disconnect
+      events:
+        - name: onlineStatus
+          description: By notifying all sockets known to the user.
 
-  - on: onUserActivities
-    description: Return list of user chats
-    tags:
-      - E2E
-    parameters:
-      - name: type
-        type: string
-        description: The activity type => [ 'e2e' , 'channel', 'group' , 'all' ]
-        required: true
-    events:
-      - name: emitUserActivities
-        description: Emitting list of rooms
+  /common:
+    - on: onUserActivities
+      description: Return list of user chats
+      tags:
+        - E2E
+      parameters:
+        - name: type
+          type: string
+          description: The activity type => [ 'e2e' , 'channel', 'group' , 'all' ]
+          required: true
+      events:
+        - name: emitUserActivities
+          description: Emitting list of rooms
+  /e2e:
+    - on: onPvTyping
+      tags:
+        - E2E
+      parameters:
+        - $ref:
+            - components/ReceiverId
+            - components/SenderId
+      events:
+        - $ref:
+            - components/emitPvTypingError
+            - components/emitPvTyping
 
-  - on: onPvTyping
-    tags:
-      - E2E
-    parameters:
-      - $ref:
-          - components/ReceiverId
-          - components/SenderId
-    events:
-      - $ref:
-          - components/emitPvTypingError
-          - components/emitPvTyping
+    - on: onPvMessage
+      tags:
+        - E2E
+      parameters:
+        - $ref:
+            - components/ReceiverId
+            - components/SenderId
+            - components/DataMessage
+      events:
+        - $ref:
+            - components/emitPvMessageError
+            - components/emitPvMessage
 
-  - on: onPvMessage
-    tags:
-      - E2E
-    parameters:
-      - $ref:
-          - components/ReceiverId
-          - components/SenderId
-          - components/DataMessage
-    events:
-      - $ref:
-          - components/emitPvMessageError
-          - components/emitPvMessage
+    - on: onPvEditMessage
+      tags:
+        - E2E
+      parameters:
+        - $ref:
+            - components/ReceiverId
+            - components/SenderId
+            - components/DataMessage
+            - components/MessageId
+      events:
+        - $ref:
+            - components/emitPvEditMessageError
+            - components/emitPvEditMessage
 
-  - on: onPvEditMessage
-    tags:
-      - E2E
-    parameters:
-      - $ref:
-          - components/ReceiverId
-          - components/SenderId
-          - components/DataMessage
-          - components/MessageId
-    events:
-      - $ref:
-          - components/emitPvEditMessageError
-          - components/emitPvEditMessage
+    - on: onPvDeleteMessage
+      tags:
+        - E2E
+      parameters:
+        - $ref:
+            - components/ReceiverId
+            - components/ListOfId
+      events:
+        - $ref:
+            - components/emitPvDeleteMessageError
+            - components/emitPvDeleteMessage
 
-  - on: onPvDeleteMessage
-    tags:
-      - E2E
-    parameters:
-      - $ref:
-          - components/ReceiverId
-          - components/ListOfId
-    events:
-      - $ref:
-          - components/emitPvDeleteMessageError
-          - components/emitPvDeleteMessage
+  /group:
+    - on: onLeaveUserFromGroup
+      tags:
+        - Group
+      parameters:
+        - $ref:
+            - components/GroupId
+      events:
+        - $ref:
+            - components/emitLeaveUserFromGroupError
+            - components/emitLeaveUserFromGroup
 
-  - on: onLeaveUserFromGroup
-    tags:
-      - Group
-    parameters:
-      - $ref:
-          - components/GroupId
-    events:
-      - $ref:
-          - components/emitLeaveUserFromGroupError
-          - components/emitLeaveUserFromGroup
+    - on: onGroupMessage
+      tags:
+        - Group
+      parameters:
+        - $ref:
+            - components/GroupId
+            - components/DataMessage
+      events:
+        - $ref:
+            - components/emitGroupMessageError
+            - components/emitGroupMessage
 
-  - on: onGroupMessage
-    tags:
-      - Group
-    parameters:
-      - $ref:
-          - components/GroupId
-          - components/DataMessage
-    events:
-      - $ref:
-          - components/emitGroupMessageError
-          - components/emitGroupMessage
+    - on: onGroupEditMessage
+      tags:
+        - Group
+      parameters:
+        - $ref:
+            - components/DataMessage
+            - components/GroupId
+            - components/MessageId
+      events:
+        - $ref:
+            - components/emitGroupEditMessageError
+            - components/emitGroupEditMessage
 
-  - on: onGroupEditMessage
-    tags:
-      - Group
-    parameters:
-      - $ref:
-          - components/DataMessage
-          - components/GroupId
-          - components/MessageId
-    events:
-      - $ref:
-          - components/emitGroupEditMessageError
-          - components/emitGroupEditMessage
+    - on: onGroupDeleteMessage
+      tags:
+        - Group
+      parameters:
+        - $ref:
+            - components/GroupId
+            - components/ListOfId
+      events:
+        - $ref:
+            - components/emitGroupDeleteMessageError
+            - components/emitGroupDeleteMessage
 
-  - on: onGroupDeleteMessage
-    tags:
-      - Group
-    parameters:
-      - $ref:
-          - components/GroupId
-          - components/ListOfId
-    events:
-      - $ref:
-          - components/emitGroupDeleteMessageError
-          - components/emitGroupDeleteMessage
+  /channel:
+    - on: onLeaveChannel
+      tags:
+        - Channel
+      parameters:
+        - $ref:
+            - components/ChannelId
+      events:
+        - $ref:
+            - components/emitLeaveUserFromChannelError
+            - components/emitLeaveUserFromChannel
 
-  - on: onLeaveChannel
-    tags:
-      - Channel
-    parameters:
-      - $ref:
-          - components/ChannelId
-    events:
-      - $ref:
-          - components/emitLeaveUserFromChannelError
-          - components/emitLeaveUserFromChannel
+    - on: onChannelMessage
+      tags:
+        - Channel
+      parameters:
+        - $ref:
+            - components/ChannelId
+            - components/DataMessage
+      events:
+        - $ref:
+            - components/emitChannelMessageError
+            - components/emitChannelMessage
 
-  - on: onChannelMessage
-    tags:
-      - Channel
-    parameters:
-      - $ref:
-          - components/ChannelId
-          - components/DataMessage
-    events:
-      - $ref:
-          - components/emitChannelMessageError
-          - components/emitChannelMessage
+    - on: onChannelEditMessage
+      tags:
+        - Channel
+      parameters:
+        - $ref:
+            - components/DataMessage
+            - components/ChannelId
+            - components/MessageId
+      events:
+        - $ref:
+            - components/emitChannelEditMessageError
+            - components/emitChannelEditMessage
 
-  - on: onChannelEditMessage
-    tags:
-      - Channel
-    parameters:
-      - $ref:
-          - components/DataMessage
-          - components/ChannelId
-          - components/MessageId
-    events:
-      - $ref:
-          - components/emitChannelEditMessageError
-          - components/emitChannelEditMessage
-
-  - on: onChannelDeleteMessage
-    tags:
-      - Channel
-    parameters:
-      - $ref:
-          - components/ChannelId
-          - components/ListOfId
-    events:
-      - $ref:
-          - components/emitChannelDeleteMessageError
-          - components/emitChannelDeleteMessage
+    - on: onChannelDeleteMessage
+      tags:
+        - Channel
+      parameters:
+        - $ref:
+            - components/ChannelId
+            - components/ListOfId
+      events:
+        - $ref:
+            - components/emitChannelDeleteMessageError
+            - components/emitChannelDeleteMessage
 
 
 definitions:
