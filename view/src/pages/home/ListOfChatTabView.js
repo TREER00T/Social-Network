@@ -7,9 +7,10 @@ function Item({img, _id, name, defaultColor}) {
             {
                 img ?
                     <img className="h-10 w-10 rounded-full" src={img} alt="User Avatar"/> :
-                    <div className="h-10 w-10 rounded-full" style={{
-                        color: defaultColor
-                    }}>{name.slice(0, 2)}</div>
+                    <div className="flex flex-col h-10 w-10 rounded-full place-content-center" style={{
+                        color: 'white',
+                        backgroundColor: defaultColor
+                    }}><span className="text-center">{name.slice(0, 2)}</span></div>
             }
             <img className="h-10 w-10 rounded-full" src={img} alt="User Avatar"/>
             <div className="ml-3 overflow-hidden">

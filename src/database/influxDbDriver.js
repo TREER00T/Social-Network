@@ -14,11 +14,9 @@ module.exports = {
 
     writeInStringField(key, value) {
         const point = new Point('mem')
-            .floatField(key, value);
+            .stringField(key, value);
 
         writeApi.writePoint(point);
-
-        writeApi.close();
     }
 
 }

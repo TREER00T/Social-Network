@@ -20,14 +20,18 @@ export async function resApi(url, option) {
     if (apiKey)
         baseHeader.apiKey = apiKey;
 
+    let orgHeader = option?.headers;
+
+    if (option?.headers)
+        delete option.headers;
+
+
     let responseOfRequest = async (url) => await fetch(`http://localhost:3000/api/v1/${url}`, {
         mode: 'cors',
-        ...(option?.headers ? {
-            headers: {
-                ...baseHeader,
-                ...option.headers
-            }
-        } : {headers: baseHeader}),
+        headers: orgHeader ? {
+            ...baseHeader,
+            ...orgHeader
+        } : baseHeader,
         ...option
     }).then(res => res.json());
 
@@ -35,7 +39,7 @@ export async function resApi(url, option) {
 
     // token or api key was invalid or access token was expired
     if ([519, 800, 804].includes(res?.code)) {
-        baseHeader.authorization = `Bearer ${refreshToken}`;
+        option.headers.authorization = `Bearer ${refreshToken}`;
 
         let firstRequestFailedMethod = option?.method ? option?.method : 'GET';
         option.method = 'POST';
@@ -43,11 +47,10 @@ export async function resApi(url, option) {
         let refreshTokenResponse = await responseOfRequest('auth/user/refresh/token')
             .then(res => res.json());
 
-        baseHeader.refreshToken = refreshTokenResponse?.data?.refreshToken;
-        baseHeader.accessToken = refreshTokenResponse?.data?.accessToken;
+        option.headers.authorization = refreshTokenResponse?.data?.accessToken;
 
-        cookies.set('refreshToken', baseHeader.refreshToken);
-        cookies.set('accessToken', baseHeader.accessToken);
+        cookies.set('refreshToken', refreshTokenResponse?.data?.refreshToken);
+        cookies.set('accessToken', option.headers.authorization);
 
         option.method = firstRequestFailedMethod;
 

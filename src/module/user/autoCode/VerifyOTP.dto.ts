@@ -1,14 +1,17 @@
-import {IsInt, IsNotEmpty, IsPhoneNumber, IsString, Length} from "class-validator";
-import { UserDeviceInfo } from "../../base/dto/UserDeviceInfo";
+import {IsInt, IsNotEmpty, IsPhoneNumber, IsString, Length, Max, Min} from "class-validator";
+import {UserDeviceInfo} from "../../base/dto/UserDeviceInfo";
+import {Type} from "class-transformer";
 
 export class VerifyOTPDto extends UserDeviceInfo {
-  @IsString()
-  @IsNotEmpty()
-  @IsPhoneNumber()
-  @Length(6, 16)
-  phone: string;
+    @IsString()
+    @IsNotEmpty()
+    @IsPhoneNumber()
+    @Length(6, 16)
+    phone: string;
 
-  @IsInt()
-  @Length(6, 6)
-  code: number;
+    @Type(() => Number)
+    @IsInt()
+    @Min(100000)
+    @Max(999999)
+    code: number;
 }

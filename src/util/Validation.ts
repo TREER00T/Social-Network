@@ -20,8 +20,11 @@ export default {
 
         //                                                      Searching in string to ensure exactly string
         //                                                      In some case it was break something like this: /api/channel/1452/us
-        return arrayOfHttpUrls.includes(requestEndpoint) || /\/api\/v1\/common\/search[\/]?(.*)/.test(requestEndpoint)
-            ? requestEndpoint.match(/\d+/g)?.length > 0 ? "AuthRoute" : "" : "";
+        return arrayOfHttpUrls.includes(requestEndpoint)
+            ? "" :
+            requestEndpoint.match(/\d+/g)?.length > 0
+                ? "AuthRoute" :
+                /\/api\/v1\/common\/search[\/]?(.*)/.test(requestEndpoint) ? '' : "AuthRoute";
     },
 
     // Verify jwt and check jwt expired time
