@@ -12,11 +12,14 @@ function VerifyPasswordActivity() {
 
     const [password, setPassword] = useState('');
     const [cookies] = useCookies(['accessToken', 'phone']);
+    const [hasClicked, setHasClicked] = useState(false);
     const [data, setData] = useState({});
     const isValidPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/g.test(password);
 
     const getText = (d) => {
         setPassword(d);
+    }, handleOpenDialog = () => {
+        setHasClicked(!hasClicked);
     }, response = async () => {
         let location = await fetch('https://get.geojs.io/v1/ip/geo.json');
 
@@ -38,8 +41,10 @@ function VerifyPasswordActivity() {
 
             <ErrorHandler
                 setCookie={getAuthExpirePayload(data?.data)}
-                statusCode={data?.code}
+                statusCode={data?.statusCode}
                 errMsg={data?.message}
+                visibility={hasClicked}
+                handler={handleOpenDialog}
                 redirectTo="/home"/>
 
             <div className="flex flex-col items-center">

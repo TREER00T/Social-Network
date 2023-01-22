@@ -1,15 +1,14 @@
 import Settings from 'img/settings.svg';
-import DropdownMenu from "component/DropdownMenu";
+import Logout from 'img/logout.svg';
+import {DropdownMenu, DropDownItem} from "component/DropdownMenu";
 import {Navigate} from "react-router-dom";
 
-function HomeNavbarUserMenu({className}) {
+function HomeNavbarUserMenu({className, getHasClicked}) {
     return (
         <DropdownMenu className={className}>
-            {
-                [
-                    {name: 'Settings', img: Settings, navigate: () => (<Navigate to="/home/settings"/>)}
-                ]
-            }
+            <DropDownItem key="settings" name="Settings" img={Settings} navigate={<Navigate to="/home/settings"/>}/>
+            <DropDownItem key="logout" name="Logout" img={Logout} navigate={<Navigate to="/user/login"/>}
+                          haveAction={true} getHasClicked={getHasClicked}/>
         </DropdownMenu>
     );
 }

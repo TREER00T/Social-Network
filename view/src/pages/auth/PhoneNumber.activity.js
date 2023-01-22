@@ -11,11 +11,14 @@ function PhoneNumberActivity() {
 
     const [phone, setPhone] = useState('');
     const [cookies] = useCookies(['accessToken']);
+    const [hasClicked, setHasClicked] = useState(false);
     const [data, setData] = useState({});
     const isPhoneNumber = /(\+\d{1,3}\s?)?((\(\d{3}\)\s?)|(\d{3})(\s|-?))(\d{3}(\s|-?))(\d{4})(\s?(([E|e]xt[:|.|]?)|x|X)(\s?\d+))?/g.test(phone);
 
     const getText = (d) => {
         setPhone(d);
+    }, handleOpenDialog = () => {
+        setHasClicked(!hasClicked);
     }, response = async () => {
         let data = await resApi('auth/generate/user', {
             method: 'POST',
@@ -24,6 +27,7 @@ function PhoneNumberActivity() {
             }
         });
         setData(data);
+        setHasClicked(!hasClicked);
     };
 
     return (
@@ -33,7 +37,9 @@ function PhoneNumberActivity() {
             <ErrorHandler
                 redirectTo="/user/login/verify/otp"
                 setCookie={{key: 'phone', value: phone}}
-                statusCode={data?.code}/>
+                visibility={hasClicked}
+                handler={handleOpenDialog}
+                statusCode={data?.statusCode}/>
 
             <div className="flex flex-col items-center">
 
@@ -41,7 +47,7 @@ function PhoneNumberActivity() {
                 <div className="w-2/6 text-center">
                     <EditText maxLength={16} getText={getText} label="Phone Number"/>
                     {
-                        isPhoneNumber ?
+                        isPhoneNumber && !hasClicked ?
                             <Button className="mt-10" onClick={() => response()}>Send Code</Button> :
                             <Button className="mt-10" disabled>Send Code</Button>
                     }

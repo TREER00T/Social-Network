@@ -15,7 +15,7 @@ export default function DialogApiDocs({className, children}) {
     return (
         <Fragment>
             <span className={className +
-            ' font-bold ml-7 hover:cursor-pointer'} onClick={() => handleOpen("sm")}>
+            ' font-bold ml-7 hover:cursor-pointer'} onClick={() => handleOpen()}>
                 {children}
             </span>
             <Dialog
@@ -32,7 +32,7 @@ export default function DialogApiDocs({className, children}) {
                     <Button
                         variant="text"
                         color="blue"
-                        onClick={() => handleOpen(null)}
+                        onClick={() => handleOpen()}
                         className="mr-1 outline-none">
                         <span>Cancel</span>
                     </Button>

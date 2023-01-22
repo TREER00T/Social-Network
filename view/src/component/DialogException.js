@@ -7,17 +7,13 @@ import {
     DialogFooter,
 } from "@material-tailwind/react";
 
-export function DialogException({children}) {
-    const [open, setOpen] = useState(true);
-
-    const handleOpen = () => setOpen(!open);
-
+export function DialogException({children, visibility, handler}) {
     return (
         <Fragment>
             <Dialog
-                open={open}
-                size={'xs'}
-                handler={handleOpen}
+                open={visibility}
+                size='xs'
+                handler={handler}
                 animate={{
                     mount: {scale: 1, y: 0},
                     unmount: {scale: 0.9, y: -100},
@@ -30,7 +26,7 @@ export function DialogException({children}) {
                     <Button
                         variant="text"
                         color="blue"
-                        onClick={handleOpen}
+                        onClick={() => handler()}
                         className="mr-1 outline-none">
                         <span>OK</span>
                     </Button>

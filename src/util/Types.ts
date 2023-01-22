@@ -3,7 +3,7 @@ import {Message} from "../module/base/dto/Message";
 type JsonObject = { [key: string]: any }
 type TToken = { accessToken: string, refreshToken: string }
 
-type IResponse = { code: number, message: string }
+type IResponse = { statusCode: number, message: string }
 
 type FileUploaded = {
     url: string

@@ -10,32 +10,43 @@ import {getAuthExpirePayload} from "util/Utils";
 
 function VerifyOTPCodeActivity() {
     const [otpCode, setOtpCode] = useState('');
+    const [hasClicked, setHasClicked] = useState(false);
     const [cookies] = useCookies(['accessToken', 'phone']);
     const [data, setData] = useState({});
-    const isOTPCode = /^[0-9]{6,6}$/g.test(otpCode);
+    const isOTPCode = /^(1[0-9]{5}|2[0-9]{5}|[3-9][0-9]{5}|[1-9][0-9]{6})$/.test(otpCode);
 
     const getText = (d) => {
         setOtpCode(d);
+    }, handleOpenDialog = () => {
+        setHasClicked(!hasClicked);
     }, response = async () => {
+        let location = await fetch('https://get.geojs.io/v1/ip/geo.json');
+
         let data = await resApi('auth/verify/otp', {
             method: 'POST',
             body: {
                 phone: cookies?.phone,
-                code: otpCode
+                code: otpCode,
+                deviceLocation: `${location?.country} ${location?.longitude},${location?.latitude}`
             }
         });
         setData(data);
+        setHasClicked(!hasClicked);
     };
 
     return (
         <div>
             {cookies?.accessToken ? <Navigate to="/home"/> : <></>}
+            {cookies?.phone ? <></> : <Navigate to="/user/login"/>}
 
             {
-                data?.code === 209 ? <Navigate to="/user/login/verify/twoStep"/> :
+                data?.statusCode === 209 ? <Navigate to="/user/login/verify/twoStep"/> :
                     <ErrorHandler
                         setCookie={getAuthExpirePayload(data?.data)}
-                        statusCode={data?.code}
+                        errMsg={data?.message}
+                        visibility={hasClicked}
+                        handler={handleOpenDialog}
+                        statusCode={data?.statusCode}
                         redirectTo="/home"/>
             }
 
