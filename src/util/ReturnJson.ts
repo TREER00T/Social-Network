@@ -10,7 +10,7 @@ export default {
         if (!res)
             return;
         let jsonContent = JSON.parse(JSON.stringify(this.jsonObject(obj, data, option)));
-        res.status(obj.code);
+        res.status(obj.statusCode);
         res.send(jsonContent);
     },
 
@@ -21,7 +21,7 @@ export default {
     jsonObject(obj: IResponse, data?: any, option?: object) {
 
         let objectBuilder = {
-            code: obj.code,
+            code: obj.statusCode,
             message: obj.message,
             data: data
         };

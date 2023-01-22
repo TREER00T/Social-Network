@@ -6,13 +6,13 @@ function Item({img, _id, name, defaultColor}) {
         <li className="flex py-4 first:pt-0 last:pb-0">
             {
                 img ?
-                    <img className="h-10 w-10 rounded-full" src={img} alt="User Avatar"/> :
-                    <div className="flex flex-col h-10 w-10 rounded-full place-content-center" style={{
+                    <img className="h-10 rounded-full" src={img} alt="User Avatar"/> :
+                    <div className="flex flex-col w-10 h-10 rounded-full place-content-center" style={{
                         color: 'white',
                         backgroundColor: defaultColor
                     }}><span className="text-center">{name.slice(0, 2)}</span></div>
             }
-            <img className="h-10 w-10 rounded-full" src={img} alt="User Avatar"/>
+            <img className="h-10 rounded-full" src={img} alt="User Avatar"/>
             <div className="ml-3 overflow-hidden">
                 <p className="text-sm font-medium text-slate-900">{name}</p>
             </div>

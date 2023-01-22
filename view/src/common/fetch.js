@@ -38,7 +38,7 @@ export async function resApi(url, option) {
     let res = await responseOfRequest(url);
 
     // token or api key was invalid or access token was expired
-    if ([519, 800, 804].includes(res?.code)) {
+    if ([519, 800, 804].includes(res?.statusCode)) {
         option.headers.authorization = `Bearer ${refreshToken}`;
 
         let firstRequestFailedMethod = option?.method ? option?.method : 'GET';

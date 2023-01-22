@@ -3,7 +3,7 @@ import {getExpireTime, isSuccess} from "util/Utils";
 import DialogException from "component/DialogException";
 import {useCookies} from 'react-cookie';
 
-function ErrorHandler({redirectTo, statusCode, errMsg, setCookie}) {
+function ErrorHandler({redirectTo, statusCode, errMsg, setCookie, visibility, handler}) {
     const [, setCookies] = useCookies(['']);
 
     if (statusCode && isSuccess(statusCode) && setCookie) {
@@ -18,13 +18,9 @@ function ErrorHandler({redirectTo, statusCode, errMsg, setCookie}) {
     }
 
     return (
-        <>
-            {
-                statusCode && isSuccess(statusCode) ?
-                    <Navigate to={redirectTo}/> :
-                    statusCode ? <DialogException children={errMsg}/> : <></>
-            }
-        </>
+        statusCode && isSuccess(statusCode) ?
+            <Navigate to={redirectTo}/> :
+            statusCode ? <DialogException children={errMsg} visibility={visibility} handler={handler}/> : <></>
     )
 }
 
