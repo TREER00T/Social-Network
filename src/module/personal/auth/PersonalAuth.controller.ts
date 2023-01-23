@@ -19,6 +19,8 @@ export class PersonalAuthController extends User {
 
         await this.appService.twoAuth(this.phoneNumber, dto.email, dto.password);
 
+        await this.appService.updateTwoStepVerificationState(this.phoneNumber, true);
+
         return Json.builder(Response.HTTP_OK);
     }
 
@@ -27,6 +29,8 @@ export class PersonalAuthController extends User {
         this.init();
 
         await this.appService.twoAuth(this.phoneNumber);
+
+        await this.appService.updateTwoStepVerificationState(this.phoneNumber, false);
 
         return Json.builder(Response.HTTP_OK);
     }
@@ -38,10 +42,10 @@ export class PersonalAuthController extends User {
         let oldPassword = dto.old,
             newPassword = dto.new;
 
-        let isValidPassword = await this.appService.isValidPassword(
+        let isValidOldPassword = await this.appService.isValidPassword(
             this.phoneNumber, Generate.getHashData(oldPassword, this.phoneNumber));
 
-        if (!isValidPassword)
+        if (!isValidOldPassword)
             return Json.builder(Response.HTTP_FORBIDDEN);
 
         await this.appService.updatePassword(

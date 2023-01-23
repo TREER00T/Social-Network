@@ -8,7 +8,7 @@ const apiKey = cookies.get('apiKey');
 export async function resApi(url, option) {
 
     let baseHeader = {
-        'Content-type': 'application/json; charset=UTF-8'
+        'Content-type': option.headers['Content-type'] ?? 'application/json; charset=UTF-8'
     }
 
     if (option?.body)

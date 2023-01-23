@@ -7,13 +7,14 @@ import AccessAccount from "img/access-account.svg";
 import EditText from "component/EditText";
 import Button from "component/Button";
 import {getAuthExpirePayload} from "util/Utils";
+import {isValidOTPCode} from "util/Utils";
 
 function VerifyOTPCodeActivity() {
     const [otpCode, setOtpCode] = useState('');
     const [hasClicked, setHasClicked] = useState(false);
     const [cookies] = useCookies(['accessToken', 'phone']);
     const [data, setData] = useState({});
-    const isOTPCode = /^(1[0-9]{5}|2[0-9]{5}|[3-9][0-9]{5}|[1-9][0-9]{6})$/.test(otpCode);
+    const isOTPCode = isValidOTPCode(otpCode);
 
     const getText = (d) => {
         setOtpCode(d);

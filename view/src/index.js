@@ -13,9 +13,10 @@ import VerifyOTPCodeActivity from "pages/auth/verify/VerifyOTPCode.activity";
 import CreateSavedMessageActivity from "pages/create/savedMessage/CreateSavedMessage.activity";
 import CreateChannelActivity from "pages/create/channel/CreateChannel.activity";
 import CreateGroupActivity from "pages/create/group/CreateGroup.activity";
-import PrivacyActivity from "pages/setting/privacy/Privacy.activity";
-import DevicesActivity from "pages/setting/devices/Devices.activity";
+import PrivacyActivity from "pages/setting/Privacy.activity";
+import DevicesActivity from "pages/setting/Devices.activity";
 import UserProfileSettingActivity from "pages/setting/UserProfileSetting.activity";
+import BlockedUsersActivity from "pages/setting/BlockedUsers.activity";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -32,6 +33,7 @@ root.render(
                     <Route path="home/settings" element={<UserProfileSettingActivity/>}/>
                     <Route path="home/settings/privacy" element={<PrivacyActivity/>}/>
                     <Route path="home/settings/devices" element={<DevicesActivity/>}/>
+                    <Route path="home/settings/blockedUsers" element={<BlockedUsersActivity/>}/>
                     <Route path="home/create/group" element={<CreateGroupActivity/>}/>
                     <Route path="home/create/channel" element={<CreateChannelActivity/>}/>
                     <Route path="home/create/savedMessage" element={<CreateSavedMessageActivity/>}/>

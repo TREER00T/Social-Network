@@ -13,13 +13,14 @@ module.exports = {
             email: String,
             phone: String,
             apiKey: String,
-            isActive: Boolean,
             authCode: Number,
             username: String,
             password: String,
             lastName: String,
+            isActive: Boolean,
             isBlocked: Boolean,
-            defaultColor: String
+            defaultColor: String,
+            twoStepVerification:Boolean
         }, 'user');
 
     },

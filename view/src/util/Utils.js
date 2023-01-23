@@ -44,3 +44,19 @@ export function getAuthExpirePayload(data) {
 
     return result;
 }
+
+export function isPassword(password) {
+    return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/g.test(password);
+}
+
+export function isValidOTPCode(otpCode) {
+    return /^(1[0-9]{5}|2[0-9]{5}|[3-9][0-9]{5}|[1-9][0-9]{6})$/.test(otpCode);
+}
+
+export function isValidPhoneNumber(phone) {
+    return /(\+\d{1,3}\s?)?((\(\d{3}\)\s?)|(\d{3})(\s|-?))(\d{3}(\s|-?))(\d{4})(\s?(([E|e]xt[:|.|]?)|x|X)(\s?\d+))?/g.test(phone);
+}
+
+export function isEmail(email) {
+    return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(email);
+}

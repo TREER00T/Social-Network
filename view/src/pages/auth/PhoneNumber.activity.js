@@ -6,6 +6,7 @@ import Button from "component/Button";
 import AccessAccount from 'img/access-account.svg';
 import {resApi} from 'common/fetch';
 import ErrorHandler from "component/ErrorHandler";
+import {isValidPhoneNumber} from "util/Utils";
 
 function PhoneNumberActivity() {
 
@@ -13,7 +14,7 @@ function PhoneNumberActivity() {
     const [cookies] = useCookies(['accessToken']);
     const [hasClicked, setHasClicked] = useState(false);
     const [data, setData] = useState({});
-    const isPhoneNumber = /(\+\d{1,3}\s?)?((\(\d{3}\)\s?)|(\d{3})(\s|-?))(\d{3}(\s|-?))(\d{4})(\s?(([E|e]xt[:|.|]?)|x|X)(\s?\d+))?/g.test(phone);
+    const isPhoneNumber = isValidPhoneNumber(phone);
 
     const getText = (d) => {
         setPhone(d);
