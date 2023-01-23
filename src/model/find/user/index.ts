@@ -310,7 +310,10 @@ export default {
             _id: 1,
             img: 1,
             name: 1,
-            username: 1
+            lastName: 1,
+            isActive: 1,
+            username: 1,
+            defaultColor: 1
         });
 
         return Util.isUndefined(data) ? false : data;

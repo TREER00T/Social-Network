@@ -10,6 +10,7 @@ import useOutsideAlerter from "common/useOutsideAlerter";
 import HomeNavbarDropDownMenu from "pages/home/HomeNavbarDropDownMenu";
 import HomeNavbarUserMenu from "pages/home/HomeNavbarUserMenu";
 import AgreeDialog from "component/AgreeDialog";
+import {removeAllCookie} from "common/removeAllCookie";
 
 function HomeNavbar({getSearchText}) {
 
@@ -35,11 +36,7 @@ function HomeNavbar({getSearchText}) {
     }, handleAccessToLogout = (d) => {
         setAccessToLogout(d);
         if (d)
-            document.cookie.split(";").forEach((c) => {
-                document.cookie = c
-                    .replace(/^ +/, "")
-                    .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-            });
+            removeAllCookie();
     }, handleClickedLogout = (d) => {
         setHasClickedLogout(d);
     };

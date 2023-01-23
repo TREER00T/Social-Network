@@ -7,6 +7,7 @@ import AccessAccount from "img/access-account.svg";
 import EditText from "component/EditText";
 import Button from "component/Button";
 import {getAuthExpirePayload} from "util/Utils";
+import {isPassword} from "util/Utils";
 
 function VerifyPasswordActivity() {
 
@@ -14,7 +15,7 @@ function VerifyPasswordActivity() {
     const [cookies] = useCookies(['accessToken', 'phone']);
     const [hasClicked, setHasClicked] = useState(false);
     const [data, setData] = useState({});
-    const isValidPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/g.test(password);
+    const isValidPassword = isPassword(password);
 
     const getText = (d) => {
         setPassword(d);

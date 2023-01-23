@@ -26,7 +26,7 @@ function Item({obj}) {
 
 export default function SettingSidebar({userInfo, children}) {
     return (
-        <div className="flex flex-wrap bg-gray-100">
+        <div className="flex flex-wrap bg-gray-80">
 
             {/* Sidebar Menu */}
             <div className="w-3/12 bg-white rounded p-3 shadow-lg h-screen sticky top-0">
@@ -51,12 +51,10 @@ export default function SettingSidebar({userInfo, children}) {
             </div>
 
             {/* Menu Item Body */}
-            <div className="w-9/12">
-                <div className="p-4 text-gray-500 scrollbar-hide">
-                    {
-                        children
-                    }
-                </div>
+            <div className="w-9/12 p-4">
+                {
+                    children
+                }
             </div>
         </div>
     )

@@ -79,6 +79,12 @@ module.exports = {
 
         await updateOne(data, {_id: id}, `${phone}SavedMessage`);
 
+    },
+
+    async twoStepVerificationState(userPhone, state) {
+
+        await user().updateOne({phone: userPhone}, {$set: {twoStepVerification: state}});
+
     }
 
 }

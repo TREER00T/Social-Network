@@ -7,6 +7,10 @@ let Update = require("../../../model/update/user");
 
 @Injectable()
 export class PersonalAuthService {
+    async updateTwoStepVerificationState(userPhone: string, state: boolean) {
+        await Update.twoStepVerificationState(userPhone, state);
+    }
+
     async twoAuth(usrPhone: string, email: string = '', password: string = '') {
         return await Update.passwordAndEmail(usrPhone, Generate.getHashData(password, usrPhone), email);
     }
