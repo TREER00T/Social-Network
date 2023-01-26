@@ -1,24 +1,26 @@
 import Cookies from "universal-cookie";
+import config from 'config';
 
 const cookies = new Cookies();
 const accessToken = cookies.get('accessToken');
-const refreshToken = cookies.get('refreshToken');
 const apiKey = cookies.get('apiKey');
+const getInStorage = key => localStorage.getItem(key);
+const setInStorage = (key, value) => localStorage.setItem(key, value);
 
-export async function resApi(url, option) {
+export async function resApi(endPoint, option) {
 
     let baseHeader = {
-        'Content-type': option.headers['Content-type'] ?? 'application/json; charset=UTF-8'
+        'Content-type': option?.headers?.['Content-type'] ?? 'application/json; charset=UTF-8'
     }
 
     if (option?.body)
         option.body = JSON.stringify(option.body);
 
     if (accessToken)
-        baseHeader.authorization = `Bearer ${accessToken}`;
+        baseHeader.authorization = `Bearer ${getInStorage('accessToken')}`;
 
     if (apiKey)
-        baseHeader.apiKey = apiKey;
+        baseHeader.apiKey = getInStorage('apiKey');
 
     let orgHeader = option?.headers;
 
@@ -26,7 +28,7 @@ export async function resApi(url, option) {
         delete option.headers;
 
 
-    let responseOfRequest = async (url) => await fetch(`http://localhost:3000/api/v1/${url}`, {
+    let responseOfRequest = async (endPoint) => await fetch(`${config.url.rest}${endPoint}`, {
         mode: 'cors',
         headers: orgHeader ? {
             ...baseHeader,
@@ -35,11 +37,11 @@ export async function resApi(url, option) {
         ...option
     }).then(res => res.json());
 
-    let res = await responseOfRequest(url);
+    let res = await responseOfRequest(endPoint);
 
     // token or api key was invalid or access token was expired
     if ([519, 800, 804].includes(res?.statusCode)) {
-        option.headers.authorization = `Bearer ${refreshToken}`;
+        option.headers.authorization = `Bearer ${getInStorage('refreshToken')}`;
 
         let firstRequestFailedMethod = option?.method ? option?.method : 'GET';
         option.method = 'POST';
@@ -49,12 +51,12 @@ export async function resApi(url, option) {
 
         option.headers.authorization = refreshTokenResponse?.data?.accessToken;
 
-        cookies.set('refreshToken', refreshTokenResponse?.data?.refreshToken);
-        cookies.set('accessToken', option.headers.authorization);
+        setInStorage('refreshToken', refreshTokenResponse?.data?.refreshToken);
+        setInStorage('accessToken', option.headers.authorization);
 
         option.method = firstRequestFailedMethod;
 
-        return responseOfRequest(url);
+        return responseOfRequest(endPoint);
     }
 
     return res;

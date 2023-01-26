@@ -13,7 +13,8 @@ import {JsonObject} from "../../util/Types";
 import {AbstractRoom} from "../base/abstract/AbstractRoom";
 
 @WebSocketGateway(Number(process.env.SOCKET_IO_PORT), {
-    namespace: '/e2e'
+    namespace: '/e2e',
+    cors: true
 })
 @Controller()
 export class E2EController extends AbstractRoom {

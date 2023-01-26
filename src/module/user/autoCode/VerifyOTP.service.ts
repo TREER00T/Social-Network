@@ -36,6 +36,11 @@ export class VerifyOTPService {
 
         let user = await Find.getApiKeyAndUserId(userPhone);
 
+        if (!user.apiKey) {
+            user.apiKey = Generate.getRandomHash(50);
+            await Update.apikey(userPhone, user.apiKey);
+        }
+
         await Device.insert(user._id, {
             ip: deviceIp,
             name: deviceName,

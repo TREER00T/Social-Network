@@ -11,7 +11,7 @@ import {SocketGatewayService} from "./SocketGateway.service";
 import Util from "../../util/Util";
 import Response from "../../util/Response";
 import {HandleMessage} from "../../module/base/HandleMessage";
-import {TSaveMessage} from "../../util/Types";
+import {TSaveMessage, Users} from "../../util/Types";
 import CommonDelete from "../../model/remove/common";
 import CommonInsert from "../../model/add/common";
 
@@ -19,10 +19,6 @@ let Redis = require("../../database/redisDbDriver"),
     CommonUpdate = require("../../model/update/common");
 
 dotenv.config();
-
-type Users = {
-    [key: string]: string
-}
 
 @Controller()
 export class SocketGatewayController extends HandleMessage implements OnGatewayDisconnect, OnGatewayInit, OnGatewayConnection {
@@ -45,15 +41,15 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
     async handleDisconnect(client: Socket) {
         let socketId = client.id;
 
-        Redis.get(socketId)
-            .then(async (socket) => {
-                delete this.users[socketId];
-                await this.socketGatewayService.updateUserStatus(socket.id, 0);
-                await this.socketGatewayService.sendUserOnlineStatusForSpecificUsers(this.io, false, socket.id);
-            })
-            .then(async () => await Redis.remove(socketId));
-
-        this.leaveUserInAllRooms(client);
+        if (this.canActive) {
+            Redis.get(this.getUserId(socketId))
+                .then(async (socket) => {
+                    delete this.users[socketId];
+                    await this.socketGatewayService.updateUserStatus(socket.id, 0);
+                    await this.socketGatewayService.sendUserOnlineStatusForSpecificUsers(this.io, false, socket.id);
+                })
+                .then(async () => await Redis.remove(socketId));
+        }
     }
 
     async handleConnection(client: Socket, ...args: any[]) {
@@ -96,35 +92,13 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
         return this.canActive = false;
     }
 
-    joinUserInRoom(socket: Socket, roomId: string, type: string) {
-        if (!this.io.sockets.adapter.rooms.get(roomId + type)) {
+    handleUserJoinState(socket: Socket, roomId: string, type: string) {
+        let isRoomAddedInList = this.io.sockets.adapter.rooms.get(roomId + type);
+
+        if (!isRoomAddedInList)
             socket.join(roomId + type);
-
-            if (!this.users[socket.id][type + 'Rooms'])
-                this.users[socket.id][type + 'Rooms'] = [];
-
-            this.users[socket.id][type + 'Rooms'].push(roomId + type);
-        }
-    }
-
-    leaveUserInRoom(socket: Socket, roomId: string, type: string) {
-        let isRoomAddedInList = this.users[socket.id][type + 'Rooms']?.includes(roomId + type);
-
-        if (isRoomAddedInList) {
+        else
             socket.leave(roomId + type);
-
-            let index = this.users[socket.id][type + 'Rooms']?.indexOf(roomId);
-            this.users[socket.id][type + 'Rooms']?.splice(index, 1);
-        }
-    }
-
-    leaveUserInAllRooms(socket: Socket) {
-        let arrayOfRoomTypes = ['channel', 'group'];
-        arrayOfRoomTypes.forEach(typeRoom => {
-            this.users[socket.id][typeRoom + 'Rooms']?.forEach(item => {
-                socket.leave(item + typeRoom);
-            });
-        });
     }
 
     emitToSpecificSocket =

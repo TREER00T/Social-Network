@@ -6,13 +6,13 @@ import {useCookies} from "react-cookie";
 import Button from "component/Button";
 
 
-function Item({userInfo}) {
+function Item({data: {img, defaultColor, name, lastName, isActive, _id}}) {
 
     const handleDisableBlockedUser = async () => {
         await resApi('e2e/room/user/block', {
             method: 'PUT',
             body: {
-                targetUserId: userInfo?._id
+                targetUserId: _id
             }
         });
     };
@@ -22,23 +22,23 @@ function Item({userInfo}) {
             <th scope="row"
                 className="flex items-center px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                 {
-                    userInfo?.img ?
-                        <img className="w-10 h-10 rounded-full" src={userInfo?.img} alt="User Avatar"/> :
+                    img ?
+                        <img className="w-10 h-10 rounded-full" src={img} alt="User Avatar"/> :
                         <div className="flex flex-col w-10 h-10 rounded-full place-content-center" style={{
                             color: 'white',
-                            backgroundColor: userInfo?.defaultColor
-                        }}><span className="text-center">{userInfo?.name?.slice(0, 2)}</span></div>
+                            backgroundColor: defaultColor
+                        }}><span className="text-center">{name?.slice(0, 2)}</span></div>
                 }
                 <div className="pl-3">
-                    <div className="text-base font-semibold">{userInfo?.name} {userInfo?.lastName}</div>
+                    <div className="text-base font-semibold">{name} {lastName}</div>
                 </div>
             </th>
             <td className="px-6 py-4">
                 <div className="flex items-center">
                     <div
-                        className={(userInfo?.isActive ? "bg-red-500" : "bg-green-500") + " h-2.5 w-2.5 rounded-full mr-2"}/>
+                        className={(isActive ? "bg-red-500" : "bg-green-500") + " h-2.5 w-2.5 rounded-full mr-2"}/>
                     {
-                        userInfo?.isActive ? 'Online' : 'Offline'
+                        isActive ? 'Online' : 'Offline'
                     }
                 </div>
             </td>

@@ -22,13 +22,13 @@ export default {
             algorithm: "RS256"
         };
 
-        return jwt.sign(payload, process.env.PRAIVATE_KEY, SIGN_OPTIONS);
+        return jwt.sign(payload, process.env.JWT_PRAIVATE_KEY, SIGN_OPTIONS);
     },
 
 
     // The jwt encrypt with JWK library
     async getJwtEncrypt(raw, format = "compact", contentAlg = "A256GCM", alg = "RSA-OAEP"): Promise<string> {
-        let publicKey = await JWK.asKey(process.env.JWT_PUBLIC_KEY, "pem");
+        let publicKey = await JWK.asKey(process.env.JWE_PUBLIC_KEY, "pem");
         const buffer = Buffer.from(JSON.stringify(raw));
 
         return await JWE.createEncrypt({

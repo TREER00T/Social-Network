@@ -19,14 +19,14 @@ export function getAuthExpirePayload(data) {
     let result = [
         {
             key: 'accessToken',
-            value: data?.accessToken,
+            value: true,
             option: {
                 expires: getTokenExpireTime()
             }
         },
         {
             key: 'refreshToken',
-            value: data?.refreshToken,
+            value: true,
             option: {
                 expires: getTokenExpireTime()
             }
@@ -36,7 +36,7 @@ export function getAuthExpirePayload(data) {
     if (data?.apiKey)
         result.push({
             key: 'apiKey',
-            value: data?.apiKey,
+            value: true,
             option: {
                 expires: getApiKeyExpireTime()
             }

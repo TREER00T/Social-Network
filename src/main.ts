@@ -12,7 +12,9 @@ import {ValidationPipe} from "@nestjs/common";
 async function bootstrap() {
 
     dotenv.config();
-    const app = await NestFactory.create(AppModule, {bodyParser: true, rawBody: true, cors: true});
+    const app = await NestFactory.create(AppModule, {
+        bodyParser: true, rawBody: true, cors: true
+    });
 
     Swagger.restApi(app);
     Swagger.socketIo();

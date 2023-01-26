@@ -12,7 +12,8 @@ import {Activities} from "../../util/Types";
 import Response from "../../util/Response";
 
 @WebSocketGateway(Number(process.env.SOCKET_IO_PORT), {
-    namespace: '/common'
+    namespace: '/common',
+    cors: true
 })
 @Controller()
 export class CommonController extends SocketGatewayController {

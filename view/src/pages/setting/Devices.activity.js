@@ -4,21 +4,21 @@ import {resApi} from "common/fetch";
 import {Navigate} from "react-router-dom";
 import SettingSidebar from "pages/setting/SettingSidebar";
 
-function Item({data}) {
+function Item({data: {deviceIp, createdAt, deviceName, deviceLocation}}) {
     return (
         <tr className="bg-white hover:bg-gray-50">
             <th scope="row"
                 className="flex items-center px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                {data.deviceIp}
+                {deviceIp}
             </th>
             <td className="px-6 py-4">
-                {data.createdAt}
+                {createdAt}
             </td>
             <td className="px-6 py-4">
-                {data.deviceName}
+                {deviceName}
             </td>
             <td className="px-6 py-4">
-                {data.deviceLocation}
+                {deviceLocation}
             </td>
         </tr>
     )

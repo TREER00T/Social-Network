@@ -33,7 +33,7 @@ export default {
         return new Promise(async res => {
 
             try {
-                jwt.verify(token, process.env.PUBLIC_KEY, {}, (err, decoded) => {
+                jwt.verify(token, process.env.JWT_PUBLIC_KEY, {}, (err, decoded) => {
 
                     if (err instanceof TokenExpiredError) {
                         res("TOKEN_EXP");
