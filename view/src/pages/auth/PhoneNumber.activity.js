@@ -37,7 +37,7 @@ function PhoneNumberActivity() {
 
             <ErrorHandler
                 redirectTo="/user/login/verify/otp"
-                setCookie={{key: 'phone', value: phone}}
+                setCookie={{key: 'phone', value: true}}
                 visibility={hasClicked}
                 handler={handleOpenDialog}
                 statusCode={data?.statusCode}/>

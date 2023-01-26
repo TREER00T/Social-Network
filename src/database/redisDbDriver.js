@@ -14,7 +14,7 @@ module.exports = {
     async get(key) {
         let data = await client.get(key);
 
-        if (typeof data === "object")
+        if (data?.indexOf('{"', 0))
             return JSON.parse(data);
 
         return data;

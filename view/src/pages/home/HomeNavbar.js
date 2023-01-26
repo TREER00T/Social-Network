@@ -12,7 +12,7 @@ import HomeNavbarUserMenu from "pages/home/HomeNavbarUserMenu";
 import AgreeDialog from "component/AgreeDialog";
 import {removeAllCookie} from "common/removeAllCookie";
 
-function HomeNavbar({getSearchText}) {
+function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
 
     const wrapperRef = useRef('navbar');
     const [hasSearchOff, setHasSearchOff] = useState(true);
@@ -25,10 +25,12 @@ function HomeNavbar({getSearchText}) {
         setHasOpenedOptionMenu(false);
         setHasSearchOff(true);
         setHasOpenedUserMenu(false);
+        hasSearchViewOpen(hasSearchOff);
     });
 
     const handleSearchState = () => {
         setHasSearchOff(!hasSearchOff);
+        hasSearchViewOpen(hasSearchOff);
     }, handleOptionMenuState = () => {
         setHasOpenedOptionMenu(!hasOpenedOptionMenu);
     }, handleUserMenu = () => {
@@ -56,7 +58,7 @@ function HomeNavbar({getSearchText}) {
                 {
                     hasSearchOff ? <></> :
                         <EditText className="mr-5"
-                                  getText={getSearchText} label="Search"/>
+                                  getText={getTextSearched} label="Search"/>
                 }
                 <ImageButton src={hasSearchOff ? SearchOn : SearchOff} onClick={handleSearchState}/>
 

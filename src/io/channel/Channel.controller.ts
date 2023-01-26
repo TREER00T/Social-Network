@@ -12,7 +12,8 @@ import Response from "../../util/Response";
 import {AbstractChannel} from "../base/abstract/AbstractChannel";
 
 @WebSocketGateway(Number(process.env.SOCKET_IO_PORT), {
-    namespace: '/channel'
+    namespace: '/channel',
+    cors: true
 })
 @Controller()
 export class ChannelController extends AbstractChannel {
@@ -29,7 +30,7 @@ export class ChannelController extends AbstractChannel {
         if (haveErr)
             return socket.emit('emitLeaveChannelError', haveErr);
 
-        this.leaveUserInRoom(socket, channelId, 'channel');
+        this.handleUserJoinState(socket, channelId, 'channel');
 
         socket.emit('emitLeaveUserFromChannel', Response.HTTP_OK);
     }
@@ -58,7 +59,7 @@ export class ChannelController extends AbstractChannel {
         if (message?.code)
             return socket.emit('emitChannelMessage', message);
 
-        this.joinUserInRoom(socket, channelId, 'channel');
+        this.handleUserJoinState(socket, channelId, 'channel');
 
         this.emitToSpecificSocket(channelId, 'emitChannelMessage', message);
 
@@ -87,7 +88,7 @@ export class ChannelController extends AbstractChannel {
         if (haveErr)
             return socket.emit('emitChannelEditMessageError', haveErr);
 
-        this.joinUserInRoom(socket, channelId, 'channel');
+        this.handleUserJoinState(socket, channelId, 'channel');
 
         let isUserMessage = this.isUserMessage(senderId, messageId, `${channelId}ChannelContents`);
 
@@ -138,7 +139,7 @@ export class ChannelController extends AbstractChannel {
         if (!isUserMessage)
             return socket.emit('emitChannelDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-        this.joinUserInRoom(socket, channelId, 'channel');
+        this.handleUserJoinState(socket, channelId, 'channel');
 
         this.emitToSpecificSocket(channelId, 'emitChannelDeleteMessage', Response.HTTP_OK);
 

@@ -23,7 +23,7 @@ export default function TabView({className, headers, getColumnSelected}) {
 
     return (
         <div className={className}>
-            <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+            <ul className="flex text-sm font-medium text-center text-gray-500">
                 {
                     headers.map(e => <TabHeader key={e} onClick={handleClick}
                                                 clickedIndex={clickedIndex}>{e}</TabHeader>)

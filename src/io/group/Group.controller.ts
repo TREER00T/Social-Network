@@ -12,7 +12,8 @@ import {AbstractGroup} from "../base/abstract/AbstractGroup";
 import Response from "../../util/Response";
 
 @WebSocketGateway(Number(process.env.SOCKET_IO_PORT), {
-    namespace: '/group'
+    namespace: '/group',
+    cors: true
 })
 @Controller()
 export class GroupController extends AbstractGroup {
@@ -29,7 +30,7 @@ export class GroupController extends AbstractGroup {
         if (haveErr)
             return socket.emit('emitLeaveUserFromGroupError', haveErr);
 
-        this.leaveUserInRoom(socket, groupId, 'group');
+        this.handleUserJoinState(socket, groupId, 'group');
         socket.emit('emitLeaveUserFromGroup', Response.HTTP_OK);
     }
 
@@ -56,7 +57,7 @@ export class GroupController extends AbstractGroup {
         if (message?.code)
             return socket.emit('emitGroupMessage', message);
 
-        this.joinUserInRoom(socket, groupId, 'group');
+        this.handleUserJoinState(socket, groupId, 'group');
 
         this.emitToSpecificSocket(groupId, 'emitGroupMessage', message);
 
@@ -84,7 +85,7 @@ export class GroupController extends AbstractGroup {
         if (haveErr)
             return socket.emit('emitGroupEditMessageError', haveErr);
 
-        this.joinUserInRoom(socket, groupId, 'group');
+        this.handleUserJoinState(socket, groupId, 'group');
 
         let isUserMessage = this.isUserMessage(senderId, messageId, `${groupId}GroupContents`);
 
@@ -134,7 +135,7 @@ export class GroupController extends AbstractGroup {
         if (!isUserMessage)
             return socket.emit('emitGroupDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-        this.joinUserInRoom(socket, groupId, 'group');
+        this.handleUserJoinState(socket, groupId, 'group');
 
         this.emitToSpecificSocket(groupId, 'emitGroupDeleteMessage', Response.HTTP_OK);
 

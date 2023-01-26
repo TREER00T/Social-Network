@@ -8,13 +8,18 @@ function ErrorHandler({redirectTo, statusCode, errMsg, setCookie, visibility, ha
 
     if (statusCode && isSuccess(statusCode) && setCookie) {
         if (typeof setCookie !== 'object')
-            setCookie.forEach(cookie => setCookies(cookie.key, cookie.value, cookie?.option ? cookie?.option : {
-                expires: getExpireTime()
-            }));
-        else
+            setCookie.forEach(cookie => {
+                localStorage.setItem(cookie.key, cookie.value);
+                setCookies(cookie.key, cookie.value, cookie?.option ? cookie?.option : {
+                    expires: getExpireTime()
+                });
+            });
+        else {
+            localStorage.setItem(setCookie.key, setCookie.value);
             setCookie(setCookie.key, setCookie.value, setCookie?.option ? setCookie?.option : {
                 maxAge: getExpireTime()
             });
+        }
     }
 
     return (

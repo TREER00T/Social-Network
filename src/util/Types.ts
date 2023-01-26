@@ -14,6 +14,9 @@ type Activities = {
     type: string // 'all' | 'group' | 'channel' | 'e2e'
 }
 
+type Users = {
+    [key: string]: string
+}
 
 type IFile = {
     size: number,
@@ -77,6 +80,7 @@ export {
     ListOfChannelId,
     ListOfGroupId,
     ListOfUserId,
+    Users,
     IResponse,
     TToken,
     TUserDeviceInfo,

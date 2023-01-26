@@ -50,7 +50,7 @@ export default {
             channelData = await channel().find(filter, projection);
 
         return {
-            users: userData,
+            e2es: userData,
             groups: groupData,
             channels: channelData
         }
@@ -90,7 +90,7 @@ export default {
             e2eData = await this.getListOfUserGroupsChannelsOrE2EsActivity(userId, 'e2e');
 
         return {
-            users: e2eData,
+            e2es: e2eData,
             groups: groupData,
             channels: channelData
         }

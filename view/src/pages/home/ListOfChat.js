@@ -1,11 +1,11 @@
 import ListOfChatTabView from "pages/home/ListOfChatTabView";
 
-function ListOfChat() {
+function ListOfChat({dataSearched, hasSearchViewOpen}) {
 
     return (
-        <div className="flex flex-col w-96 ml-3">
+        <div className="flex flex-col ml-3">
 
-            <ListOfChatTabView/>
+            <ListOfChatTabView dataSearched={dataSearched} hasSearchViewOpen={hasSearchViewOpen}/>
 
         </div>
     );
