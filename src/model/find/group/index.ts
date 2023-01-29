@@ -15,7 +15,7 @@ export default {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
@@ -28,7 +28,7 @@ export default {
             publicLink: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
@@ -42,7 +42,7 @@ export default {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
@@ -55,20 +55,20 @@ export default {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
     async isAdmin(groupId: string, userId: string) {
 
         let data = await groupAdmin().findOne({
-            userId: userId,
+            adminId: userId,
             groupId: groupId
         }, {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
@@ -81,14 +81,14 @@ export default {
 
     async getInfo(groupId: string) {
 
-        return await group().find({groupId: groupId});
+        return await group().find({_id: groupId})[0];
 
     },
 
 
     async getCountOfUsers(groupId: string) {
 
-        return await group().find({groupId: groupId}).countDocuments();
+        return await group().find({_id: groupId}).countDocuments();
 
     },
 

@@ -1,9 +1,9 @@
 let {
+        channel,
         channelUser,
         channelAdmin
     } = require('../../create/channel'),
-    {dropCollection} = require('../../../database/mongoDbDriverConnection'),
-    {channel} = require("../../create/channel");
+    {dropCollection} = require('../../../database/mongoDbDriverConnection');
 
 
 module.exports = {
@@ -51,7 +51,7 @@ module.exports = {
 
         await channelAdmin().deleteOne({
             channelId: channelId,
-            userId: userId
+            adminId: userId
         });
 
     }

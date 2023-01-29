@@ -28,10 +28,7 @@ export abstract class Group extends User {
             Find.isOwner(this.userId, roomId)
         ]);
 
-        if (typeof isOwner !== "boolean")
-            return isOwner;
-
-        if (!isOwner)
+        if (typeof isOwner !== 'string')
             return Json.builder(Response.HTTP_FORBIDDEN);
     }
 
