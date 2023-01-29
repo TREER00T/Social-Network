@@ -1,6 +1,6 @@
 import {Controller, Post, Body, UploadedFile, UseInterceptors} from '@nestjs/common';
 import {FileInterceptor} from "@nestjs/platform-express";
-import {Message} from "../../../base/dto/Message";
+import {PersonalMessage} from "../../../base/dto/PersonalMessage";
 import {SavedMessage} from "../../../base/SavedMessage";
 import PromiseVerify from "../../../base/PromiseVerify";
 
@@ -8,8 +8,8 @@ import PromiseVerify from "../../../base/PromiseVerify";
 export class PersonalUploadFileController extends SavedMessage {
     @Post()
     @UseInterceptors(FileInterceptor("file"))
-    async save(@UploadedFile() file: Express.Multer.File, @Body() msg: Message) {
-        this.init();
+    async save(@UploadedFile() file: Express.Multer.File, @Body() msg: PersonalMessage) {
+        await this.init();
 
         let message = await PromiseVerify.all([
             this.isUndefined(file),
@@ -17,7 +17,7 @@ export class PersonalUploadFileController extends SavedMessage {
             this.handleMessage(msg)
         ]);
 
-        if (message?.code)
+        if (message?.statusCode)
             return message;
 
         return await this.saveAndGetId({

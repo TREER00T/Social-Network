@@ -1,5 +1,6 @@
 require("dotenv").config();
 let {MongoClient} = require("mongodb"),
+    ObjectId = require("mongodb").ObjectId,
     client = new MongoClient(`mongodb://${process.env.HOST}:${process.env.MONGO_PORT}`),
     db = client.db(process.env.DATABASE);
 
@@ -13,7 +14,10 @@ module.exports = {
 
     async updateOne(obj, filter, name) {
 
-        await db.collection(name).updateOne(filter, obj);
+        if (filter?._id)
+            filter._id = new ObjectId(filter._id);
+
+        await db.collection(name).updateOne(filter, {$set: obj}, {upsert: true});
 
     },
 
@@ -39,6 +43,9 @@ module.exports = {
 
     async deleteMany(filter, name) {
 
+        if (filter?._id?.$in)
+            filter?._id?.$in = filter?._id?.$in.map(e => new ObjectId(e));
+
         await db.collection(name).deleteMany(filter);
 
     },
@@ -51,11 +58,16 @@ module.exports = {
 
     async findMany(filter, projection, name) {
 
+        if (filter?._id && !filter?._id?.$in)
+            filter.id = new ObjectId(filter._id);
+
+        if (filter?._id && filter?._id?.$in)
+            filter?._id?.$in = filter?._id?.$in.map(e => new ObjectId(e));
+
         let result;
 
         if (typeof projection === "string")
             result = await db.collection(projection).find(filter);
-
         else
             result = await db.collection(name).find(filter, {
                 projection: projection

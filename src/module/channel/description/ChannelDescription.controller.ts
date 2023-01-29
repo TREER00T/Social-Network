@@ -13,7 +13,7 @@ export class ChannelDescriptionController extends Channel {
 
     @Put()
     async update(@Body("channelId") channelId: string, @Body("description") description: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),

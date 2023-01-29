@@ -11,8 +11,10 @@ export class ChannelUserController extends Channel {
         super();
     }
 
-    @Get("/all")
+    @Get()
     async listOfUsers(@Body("channelId") channelId: string) {
+        await this.init();
+
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),
             this.isOwnerOrAdmin(channelId)
@@ -26,8 +28,10 @@ export class ChannelUserController extends Channel {
                 await this.appService.listOfUser(channelId)));
     }
 
-    @Delete("/leave")
+    @Delete()
     async leaveUser(@Body("channelId") channelId: string) {
+        await this.init();
+
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId)
         ]);
@@ -45,8 +49,10 @@ export class ChannelUserController extends Channel {
         return Json.builder(Response.HTTP_OK);
     }
 
-    @Post("/join")
+    @Post()
     async joinUser(@Body("channelId") channelId: string) {
+        await this.init();
+
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId)
         ]);

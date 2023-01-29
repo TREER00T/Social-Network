@@ -1,25 +1,33 @@
 import TabView from "component/TabView";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {resApi} from "common/fetch";
 import Io from 'common/io';
+import SavedMessage from "img/saved-message.svg";
 
 let {socket} = new Io('common');
 
-function Item({data: {img, _id, name, defaultColor, type}}) {
+function Item({data: {img, _id, name, defaultColor, type}, getType}) {
+
+    const isSavedMessage = type === 'SA';
+
+    const handleClick = () => {
+        getType(type);
+    };
+
     return (
-        <li className="flex py-4 first:pt-0 last:pb-0 hover:cursor-pointer hover:bg-gray-600">
+        <li className="flex py-2 hover:cursor-pointer hover:bg-gray-100 hover:rounded-lg"
+            onClick={handleClick}>
             {
                 img ?
-                    <img className="h-10 rounded-full" src={img} alt="User Avatar"/> :
-                    <div className="flex flex-col w-10 h-10 rounded-full place-content-center" style={{
+                    <img className="ml-2 h-12 rounded-full" src={img} alt="User Avatar"/> :
+                    <div className="flex flex-col ml-2 w-12 h-12 rounded-full place-content-center mr-3" style={{
                         color: 'white',
                         backgroundColor: defaultColor
-                    }}><span className="text-center">{name.slice(0, 2)}</span></div>
+                    }}>{isSavedMessage ? <img className="h-6 rounded-full" src={SavedMessage} alt="User Avatar"/> :
+                        <span className="text-center">{name.slice(0, 2)}</span>}</div>
             }
-            <img className="h-10 rounded-full" src={img} alt="User Avatar"/>
-            <div className="ml-3 overflow-hidden">
-                <p className="text-sm font-medium text-slate-900">{name}</p>
-            </div>
+            <span
+                className="py-4 my-auto text-sm font-medium text-slate-900">{name}</span>
         </li>
     )
 }
@@ -49,7 +57,7 @@ export default function ListOfChatTabView({dataSearched, hasSearchViewOpen}) {
                         _id: localStorage.getItem('phone'),
                         type: 'SA',
                         name: 'Saved Message',
-                        defaultColor: '#2073f8'
+                        defaultColor: '#418aff'
                     });
 
                 setUserActivities(result);
@@ -89,7 +97,27 @@ export default function ListOfChatTabView({dataSearched, hasSearchViewOpen}) {
                     <></>
             }
 
-            <ul role="list" className="divide-y divide-slate-200">
+            <ul role="list" className="divide-y divide-slate-200 pt-3">
+
+                {
+                    [
+                        {
+                            type: 'SA',
+                            name: 'Saved Message',
+                            defaultColor: '#418aff'
+                        },
+                        {
+                            type: 'SA',
+                            name: 'Saved Message',
+                            defaultColor: '#e33737'
+                        },
+                        {
+                            type: 'SA',
+                            name: 'Saved Message',
+                            defaultColor: '#ffae00'
+                        }
+                    ].map(e => <Item data={e}/>)
+                }
 
                 {
                     searchData ? searchData.map(e => <Item

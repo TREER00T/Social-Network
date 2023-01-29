@@ -1,4 +1,4 @@
-import {Controller, Get, Query} from '@nestjs/common';
+import {Body, Controller, Get} from '@nestjs/common';
 import {DataQuery} from "../../base/dto/DataQuery";
 import {E2EMessage} from "../../base/E2EMessage";
 import PromiseVerify from "../../base/PromiseVerify";
@@ -6,8 +6,8 @@ import PromiseVerify from "../../base/PromiseVerify";
 @Controller()
 export class E2EChatsController extends E2EMessage {
     @Get()
-    async allChats(@Query() dto: DataQuery) {
-        this.init();
+    async allChats(@Body() dto: DataQuery) {
+        await this.init();
 
         let e2eChatName = await PromiseVerify.all([
             this.isUndefined(dto?.to),

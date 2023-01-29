@@ -13,7 +13,7 @@ export class ChannelNameController extends Channel {
 
     @Put()
     async update(@Body("channelId") channelId: string, @Body("name") name: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),

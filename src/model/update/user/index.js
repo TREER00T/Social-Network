@@ -41,9 +41,6 @@ module.exports = {
 
     async name(phone, firstName, lastName) {
 
-        if (typeof lastName === 'string')
-            lastName = lastName.toString().trim();
-
         await user().updateOne({phone: phone}, {
             $set: {
                 name: firstName,
@@ -57,7 +54,8 @@ module.exports = {
 
         await user().updateOne({phone: phone}, {
             $set: {
-                password: password, email: email
+                password: password,
+                email: email
             }
         });
 

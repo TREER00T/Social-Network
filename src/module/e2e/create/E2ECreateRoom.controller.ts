@@ -13,7 +13,7 @@ export class E2ECreateRoomController extends User {
 
     @Post()
     async createRoom(@Body("targetUserId") targetUserId: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await this.verifyUser(targetUserId);
 

@@ -18,7 +18,7 @@ export abstract class User extends HandleMessage {
     async init() {
         let tokenPayload = await Util.getTokenPayLoad();
         this.userId = tokenPayload.id;
-        this.phoneNumber = tokenPayload.phone;
+        this.phoneNumber = tokenPayload.phoneNumber;
     }
 
     async verifyUser(userId) {
@@ -58,15 +58,11 @@ export abstract class User extends HandleMessage {
     async getListOfMessageFromRoom(dto: DataQuery, tableName: string) {
         let query = OptionQuerySearch.build(dto);
 
-        let totalPages = await this.getListOfMessageCount(tableName, query.limit);
-
         let listOfMessage = await this.getListOfMessage(tableName, query);
 
         return Json.builder(
             Response.HTTP_OK,
-            listOfMessage, {
-                totalPages: totalPages
-            }
+            listOfMessage
         );
     }
 

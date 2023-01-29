@@ -12,7 +12,7 @@ export class PersonalUserInfoController extends User {
 
     @Get()
     async userInfo() {
-        this.init();
+        await this.init();
 
         return Json.builder(Response.HTTP_OK, await this.appService.userInfo(this.userId));
     }

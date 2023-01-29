@@ -1,3 +1,5 @@
+import Util from "../../../util/Util";
+
 let {
         findMany
     } = require('../../../database/mongoDbDriverConnection'),
@@ -16,9 +18,9 @@ export default {
         }, {
             _id: 1,
             senderId: 1
-        }, tableName);
+        }, tableName).toArray();
 
-        return data?._id;
+        return !Util.isUndefined(data);
 
     },
 
@@ -34,10 +36,10 @@ export default {
                 name: 1,
                 defaultColor: 1
             }, filter: any = {
-                name: {$regex: like},
-                $or: [{
-                    username: {$regex: like}
-                }]
+                $or: [
+                    {username: {$regex: like}},
+                    {name: {$regex: like}}
+                ]
             };
 
         let userData = await user().find(filter, projection);
@@ -67,7 +69,7 @@ export default {
         }, {
             _id: 0,
             [objKey]: 1
-        }, `listOfUser${type}s`);
+        }, `listOfUser${type}s`).toArray();
 
         listOfId.map(e => `${e[objKey]}`);
 
@@ -78,7 +80,7 @@ export default {
             img: 1,
             name: 1,
             defaultColor: 1
-        }, `${type === 'e2e' ? 'user' : type}s`);
+        }, `${type === 'e2e' ? 'user' : type}s`).toArray();
 
     },
 
@@ -102,13 +104,14 @@ export default {
         if (!id)
             return false;
 
-        return await findMany({
+        let data = await findMany({
             _id: id
         }, {
             _id: 0,
             forwardDataId: 1
-        }, tableName);
+        }, tableName).toArray();
 
+        return data[0]?.forwardDataId;
     }
 
 }

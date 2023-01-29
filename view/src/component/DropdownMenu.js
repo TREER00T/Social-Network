@@ -27,7 +27,7 @@ export function DropDownItem({getHasClicked, name, img, haveAction, navigate}) {
 export function DropdownMenu({className, children}) {
     return (
         <div
-            className={"z-10 absolute mt-14 divide-y divide-gray-100 shadow w-44 " + className}>
+            className={`z-10 absolute mt-14 divide-y divide-gray-100 shadow w-44 ${className}`}>
             <ul className="py-2 rounded-lg text-sm bg-blue-200">
                 {
                     children[0].img ?

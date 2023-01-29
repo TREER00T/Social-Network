@@ -15,7 +15,7 @@ export class PersonalAuthController extends User {
 
     @Put("/enable")
     async enableTwoAuth(@Body() dto: LoginTwoRefactorCode) {
-        this.init();
+        await this.init();
 
         await this.appService.twoAuth(this.phoneNumber, dto.email, dto.password);
 
@@ -26,7 +26,7 @@ export class PersonalAuthController extends User {
 
     @Put("/disable")
     async disableTwoAuth() {
-        this.init();
+        await this.init();
 
         await this.appService.twoAuth(this.phoneNumber);
 
@@ -37,7 +37,7 @@ export class PersonalAuthController extends User {
 
     @Put("/rest/password")
     async restPassword(@Body() dto: AuthPasswordDto) {
-        this.init();
+        await this.init();
 
         let oldPassword = dto.old,
             newPassword = dto.new;

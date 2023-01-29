@@ -51,7 +51,7 @@ export class E2EController extends AbstractRoom {
 
         let message = await this.handleMessage(data);
 
-        if (message?.code)
+        if (message?.statusCode)
             return socket.emit('emitPvMessage', message);
 
         this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvMessage', message);
@@ -94,7 +94,7 @@ export class E2EController extends AbstractRoom {
 
         let message = await this.handleMessage(data);
 
-        if (message?.code)
+        if (message?.statusCode)
             return socket.emit('emitPvEditMessage', message);
 
         this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvEditMessage', message);

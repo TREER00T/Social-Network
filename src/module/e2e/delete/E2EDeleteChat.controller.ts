@@ -37,7 +37,7 @@ export class E2EDeleteChatController extends E2EMessage {
     }
 
     async validation(targetUserId: string): Promise<any> {
-        this.init();
+        await this.init();
 
         return await PromiseVerify.all([
             this.verifyUser(targetUserId),

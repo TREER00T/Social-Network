@@ -20,7 +20,7 @@ export class ChannelController extends AbstractChannel {
 
     @SubscribeMessage("onLeaveUserChannel")
     async leaveUserFromChannel(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
-        let channelId = data?.channelId;
+        let channelId = data?.roomId;
 
         let haveErr = PromiseVerify.all([
             this.isUndefined(channelId),
@@ -37,7 +37,7 @@ export class ChannelController extends AbstractChannel {
 
     @SubscribeMessage("onChannelMessage")
     async sendMessageInChannel(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
-        let channelId = data?.channelId,
+        let channelId = data?.roomId,
             senderId = this.getUserId(socket.id);
 
         let haveErr = PromiseVerify.all([
@@ -50,13 +50,13 @@ export class ChannelController extends AbstractChannel {
         if (haveErr)
             return socket.emit('emitChannelMessageError', haveErr);
 
-        delete data.channelId;
+        delete data.roomId;
         data.senderId = senderId;
 
 
         let message = await this.handleMessage(data);
 
-        if (message?.code)
+        if (message?.statusCode)
             return socket.emit('emitChannelMessage', message);
 
         this.handleUserJoinState(socket, channelId, 'channel');
@@ -74,7 +74,7 @@ export class ChannelController extends AbstractChannel {
     @SubscribeMessage("onChannelEditMessage")
     async updateMessageInChannel(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
         let messageId = data?.messageId,
-            channelId = data?.channelId,
+            channelId = data?.roomId,
             senderId = this.getUserId(socket.id);
 
         let haveErr = await PromiseVerify.all([
@@ -95,7 +95,7 @@ export class ChannelController extends AbstractChannel {
         if (!isUserMessage)
             return socket.emit('emitChannelEditMessageError', Response.HTTP_FORBIDDEN);
 
-        delete data.channelId;
+        delete data.roomId;
         delete data.messageId;
 
         data.senderId = senderId;
@@ -103,7 +103,7 @@ export class ChannelController extends AbstractChannel {
 
         let message = await this.handleMessage(data);
 
-        if (message?.code)
+        if (message?.statusCode)
             return socket.emit('emitChannelEditMessageError', message);
 
         this.emitToSpecificSocket(channelId, 'emitChannelEditMessage', message);
@@ -117,7 +117,7 @@ export class ChannelController extends AbstractChannel {
     @SubscribeMessage("onChannelDeleteMessage")
     async removeMessageInChannel(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
         let listOfId = data?.listOfId,
-            channelId = data?.channelId,
+            channelId = data?.roomId,
             senderId = this.getUserId(socket.id);
 
         if (!Array.isArray(listOfId) && listOfId.length === 0)

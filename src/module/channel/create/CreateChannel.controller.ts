@@ -16,7 +16,7 @@ export class CreateChannelController extends User {
     @Post()
     @UseInterceptors(FileInterceptor("avatar"))
     async createChannel(@UploadedFile() avatar: Express.Multer.File, @Body("name") name: string) {
-        this.init();
+        await this.init();
 
         let avatarUrl;
 

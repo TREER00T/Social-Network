@@ -17,7 +17,7 @@ export class ChannelUploadAvatarController extends Channel {
     @Put()
     @UseInterceptors(FileInterceptor("avatar"))
     async save(@UploadedFile() avatar: Express.Multer.File, @Body("channelId") channelId: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(avatar),

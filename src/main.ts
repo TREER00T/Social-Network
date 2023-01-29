@@ -26,18 +26,12 @@ async function bootstrap() {
         Json.initializationRes(res);
 
         if (Validation.requestEndpointHandler(req.url) === "AuthRoute") {
-            let token,
-                apiKey;
-
-            try {
-                token = req.headers?.authorization;
-                apiKey = req.headers?.apiKey ? req.headers?.apiKey : req.query?.apiKey;
-            } catch (e) {
-            }
+            let token = req.headers?.authorization,
+                apiKey = req.headers?.['x-api-key']?.toString();
 
             let tokenPayload = await Util.tokenVerify(token);
 
-            if (!apiKey || !tokenPayload)
+            if (!tokenPayload)
                 return Json.builder(Res.HTTP_UNAUTHORIZED_INVALID_TOKEN);
 
             let isValidApiKey = await Util.isValidApiKey(tokenPayload.phoneNumber, apiKey);
@@ -46,9 +40,8 @@ async function bootstrap() {
                 return Json.builder(Res.HTTP_UNAUTHORIZED_INVALID_API_KEY);
 
             next();
-        }
-
-        next();
+        } else
+            next();
 
     });
 

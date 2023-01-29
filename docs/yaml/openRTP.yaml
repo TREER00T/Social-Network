@@ -118,7 +118,7 @@ paths:
         - Group
       parameters:
         - $ref:
-            - components/GroupId
+            - components/RoomId
       events:
         - $ref:
             - components/emitLeaveUserFromGroupError
@@ -129,7 +129,7 @@ paths:
         - Group
       parameters:
         - $ref:
-            - components/GroupId
+            - components/RoomId
             - components/DataMessage
       events:
         - $ref:
@@ -142,7 +142,7 @@ paths:
       parameters:
         - $ref:
             - components/DataMessage
-            - components/GroupId
+            - components/RoomId
             - components/MessageId
       events:
         - $ref:
@@ -154,7 +154,7 @@ paths:
         - Group
       parameters:
         - $ref:
-            - components/GroupId
+            - components/RoomId
             - components/ListOfId
       events:
         - $ref:
@@ -167,7 +167,7 @@ paths:
         - Channel
       parameters:
         - $ref:
-            - components/ChannelId
+            - components/RoomId
       events:
         - $ref:
             - components/emitLeaveUserFromChannelError
@@ -178,7 +178,7 @@ paths:
         - Channel
       parameters:
         - $ref:
-            - components/ChannelId
+            - components/RoomId
             - components/DataMessage
       events:
         - $ref:
@@ -191,7 +191,7 @@ paths:
       parameters:
         - $ref:
             - components/DataMessage
-            - components/ChannelId
+            - components/RoomId
             - components/MessageId
       events:
         - $ref:
@@ -203,7 +203,7 @@ paths:
         - Channel
       parameters:
         - $ref:
-            - components/ChannelId
+            - components/RoomId
             - components/ListOfId
       events:
         - $ref:
@@ -218,7 +218,7 @@ definitions:
     - name: isOnline
       type: boolean
   Status Code & Message:
-    - name: code
+    - name: statusCode
       type: integer
       description: Http status code
     - name: message
@@ -317,14 +317,9 @@ components:
         name: senderId
         type: integer
         required: true
-    GroupId:
+    RoomId:
       - in: param
-        name: groupId
-        type: integer
-        required: true
-    CahnnelId:
-      - in: param
-        name: channelId
+        name: roomId
         type: integer
         required: true
     ListOfId:

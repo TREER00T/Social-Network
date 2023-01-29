@@ -1,4 +1,4 @@
-import {Controller, Get} from '@nestjs/common';
+import {Body, Controller, Get} from '@nestjs/common';
 import {ChannelChatsService} from './ChannelChats.service';
 import Util from "../../../util/Util";
 import Json from "../../../util/ReturnJson";
@@ -13,8 +13,8 @@ export class ChannelChatsController extends Channel {
     }
 
     @Get()
-    async listOfChat(dto: DataQuery) {
-        this.init();
+    async listOfChat(@Body() dto: DataQuery) {
+        await this.init();
 
         if (Util.isUndefined(dto?.roomId))
             return Json.builder(Response.HTTP_BAD_REQUEST);

@@ -13,11 +13,11 @@ export class TwoStepController extends User {
 
     @Post()
     async validationPassword(@Body() dto: TwoStepDto, @Request() req) {
-        this.init();
+        await this.init();
 
-        let isValidaPassword = await this.appService.isValidPassword(this.phoneNumber, dto.password);
+        let isValidPassword = await this.appService.isValidPassword(this.phoneNumber, dto.password);
 
-        if (!isValidaPassword)
+        if (!isValidPassword)
             return Json.builder(Response.HTTP_FORBIDDEN);
 
         return Json.builder(Response.HTTP_ACCEPTED,

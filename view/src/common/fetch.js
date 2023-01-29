@@ -20,7 +20,7 @@ export async function resApi(endPoint, option) {
         baseHeader.authorization = `Bearer ${getInStorage('accessToken')}`;
 
     if (apiKey)
-        baseHeader.apiKey = getInStorage('apiKey');
+        baseHeader['x-api-key'] = getInStorage('apiKey');
 
     let orgHeader = option?.headers;
 

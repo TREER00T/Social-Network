@@ -14,7 +14,7 @@ export class GroupLinkController extends Group {
 
     @Put("/invite")
     async invite(@Body("groupId") groupId: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId),
@@ -34,8 +34,8 @@ export class GroupLinkController extends Group {
     }
 
     @Put("/public")
-    async public(@Body("groupId") groupId: string, @Body("publicLink") publicLink: string) {
-        this.init();
+    async public(@Body("groupId") groupId: string, @Body("link") publicLink: string) {
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId),

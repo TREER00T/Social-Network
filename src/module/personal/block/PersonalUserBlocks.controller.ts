@@ -13,7 +13,7 @@ export class PersonalUserBlocksController extends User {
 
     @Get()
     async listOfUserBlocks() {
-        this.init();
+        await this.init();
 
         let listOfBlockedUsers = await this.appService.listOfBlockedUsers(this.userId);
 

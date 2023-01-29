@@ -7,11 +7,11 @@ let res: Response;
 export default {
 
     builder(obj: IResponse, data?: any, option?: object) {
-        if (!res)
-            return;
         let jsonContent = JSON.parse(JSON.stringify(this.jsonObject(obj, data, option)));
+        if (!res)
+            return jsonContent;
         res.status(obj.statusCode);
-        res.send(jsonContent);
+        return jsonContent;
     },
 
     initializationRes(response: Response) {
@@ -19,7 +19,6 @@ export default {
     },
 
     jsonObject(obj: IResponse, data?: any, option?: object) {
-
         let objectBuilder = {
             code: obj.statusCode,
             message: obj.message,

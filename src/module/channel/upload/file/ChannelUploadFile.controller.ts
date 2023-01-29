@@ -1,7 +1,7 @@
 import {Body, Controller, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
 import {Channel} from "../../../base/Channel";
 import {FileInterceptor} from "@nestjs/platform-express";
-import {Message} from "../../../base/dto/Message";
+import {RoomMessage} from "../../../base/dto/RoomMessage";
 import Util from "../../../../util/Util";
 import PromiseVerify from "../../../base/PromiseVerify";
 
@@ -9,11 +9,11 @@ import PromiseVerify from "../../../base/PromiseVerify";
 export class ChannelUploadFileController extends Channel {
     @Post()
     @UseInterceptors(FileInterceptor("file"))
-    async save(@UploadedFile() file: Express.Multer.File, @Body() msg: Message) {
-        this.init();
+    async save(@UploadedFile() file: Express.Multer.File, @Body() msg: RoomMessage) {
+        await this.init();
 
         let receiverId = msg?.receiverId,
-            channelId = msg?.channelId;
+            channelId = msg?.roomId;
 
         if (!Util.isUndefined(receiverId))
             delete msg?.receiverId;
@@ -27,10 +27,10 @@ export class ChannelUploadFileController extends Channel {
         ]);
 
         // In this case will be error
-        if (message?.code)
+        if (message?.statusCode)
             return message;
 
-        delete message?.channelId;
+        delete message?.roomId;
 
         message.senderId = this.userId;
 
