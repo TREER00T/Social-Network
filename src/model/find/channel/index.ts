@@ -12,7 +12,7 @@ export default {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
@@ -24,7 +24,7 @@ export default {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
@@ -38,7 +38,7 @@ export default {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
@@ -51,7 +51,7 @@ export default {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
@@ -64,20 +64,20 @@ export default {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
     async isAdmin(channelId: string, userId: string) {
 
         let data = await channelAdmin().findOne({
-            userId: userId,
+            adminId: userId,
             channelId: channelId
         }, {
             _id: 1
         });
 
-        return data?._id;
+        return data?._id?.toString();
 
     },
 
@@ -85,14 +85,14 @@ export default {
 
         return await channel().find({
             _id: channelId
-        });
+        })[0];
 
     },
 
 
     async getCountOfUsers(channelId: string) {
 
-        return await channel().find({channelId: channelId}).countDocuments();
+        return await channel().find({_id: channelId}).countDocuments();
 
     },
 

@@ -13,7 +13,7 @@ export class ChannelInfoController extends Channel {
 
     @Get()
     async channelInfo(@Body("channelId") channelId: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),

@@ -76,7 +76,7 @@ export default {
     },
 
     makeIdForPublicLink(id): string {
-        return `+${id.toString().trim()}`;
+        return `+${id?.toString()?.trim()}`;
     }
 
 };

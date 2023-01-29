@@ -13,9 +13,9 @@ export class PersonalNameController extends User {
 
     @Put()
     async updateFirstNameOrLastName(@Body() dto: PersonalNameDto) {
-        this.init();
+        await this.init();
 
-        await this.appService.updateFirstNameOrLastName(this.userId, dto);
+        await this.appService.updateFirstNameOrLastName(this.phoneNumber, dto);
 
         return Json.builder(Response.HTTP_OK);
     }

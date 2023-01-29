@@ -16,7 +16,7 @@ export class PersonalUploadAvatarController extends User {
     @Put()
     @UseInterceptors(FileInterceptor("avatar"))
     async save(@UploadedFile() avatar: Express.Multer.File) {
-        this.init();
+        await this.init();
 
         if (Util.isUndefined(avatar))
             return Json.builder(Response.HTTP_BAD_REQUEST);

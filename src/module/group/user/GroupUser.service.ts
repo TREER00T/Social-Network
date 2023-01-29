@@ -24,7 +24,7 @@ export class GroupUserService {
     }
 
     async leaveUser(groupId: string, userId: string) {
-        await Delete.user(userId, groupId);
+        await Delete.user(groupId, userId);
         await DeleteInUser.userFromGroup(groupId, userId);
     }
 }

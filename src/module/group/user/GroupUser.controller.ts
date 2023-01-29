@@ -11,8 +11,10 @@ export class GroupUserController extends Group {
         super();
     }
 
-    @Get("/all")
+    @Get()
     async listOfUsers(@Body("groupId") groupId: string) {
+        await this.init();
+
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId)
         ]);
@@ -25,8 +27,10 @@ export class GroupUserController extends Group {
                 await this.appService.listOfUser(groupId)));
     }
 
-    @Delete("/leave")
+    @Delete()
     async leaveUser(@Body("groupId") groupId: string) {
+        await this.init();
+
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId)
         ]);
@@ -44,8 +48,10 @@ export class GroupUserController extends Group {
         return Json.builder(Response.HTTP_OK);
     }
 
-    @Post("/join")
+    @Post()
     async joinUser(@Body("groupId") groupId: string) {
+        await this.init();
+
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId)
         ]);

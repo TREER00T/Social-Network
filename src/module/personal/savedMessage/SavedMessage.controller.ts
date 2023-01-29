@@ -13,7 +13,7 @@ export class SavedMessageController extends SavedMessage {
 
     @Get("exist")
     async hasExist() {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.verifySavedMessage()
@@ -27,14 +27,7 @@ export class SavedMessageController extends SavedMessage {
 
     @Post()
     async createSavedMessage() {
-        this.init();
-
-        let haveErr = await PromiseVerify.all([
-            this.verifySavedMessage()
-        ]);
-
-        if (haveErr)
-            return haveErr;
+        await this.init();
 
         await this.appService.addSavedMessage(this.phoneNumber);
 
@@ -43,14 +36,7 @@ export class SavedMessageController extends SavedMessage {
 
     @Delete()
     async deleteSavedMessage() {
-        this.init();
-
-        let haveErr = await PromiseVerify.all([
-            this.verifySavedMessage()
-        ]);
-
-        if (haveErr)
-            return haveErr;
+        await this.init();
 
         await this.appService.removeSavedMessage(this.phoneNumber);
 

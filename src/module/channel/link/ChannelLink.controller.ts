@@ -14,7 +14,7 @@ export class ChannelLinkController extends Channel {
 
     @Put("/invite")
     async invite(@Body("channelId") channelId: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),
@@ -34,8 +34,8 @@ export class ChannelLinkController extends Channel {
     }
 
     @Put("/public")
-    async public(@Body("channelId") channelId: string, @Body("publicLink") publicLink: string) {
-        this.init();
+    async public(@Body("channelId") channelId: string, @Body("link") publicLink: string) {
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),

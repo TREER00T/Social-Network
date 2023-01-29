@@ -12,7 +12,7 @@ export class PersonalAccountController extends User {
 
     @Delete()
     async deleteAccount() {
-        this.init();
+        await this.init();
 
         await this.appService.deleteAccount(this.phoneNumber, this.userId);
 

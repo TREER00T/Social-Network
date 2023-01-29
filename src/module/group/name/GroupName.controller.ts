@@ -13,7 +13,7 @@ export class GroupNameController extends Group {
 
     @Put()
     async update(@Body("groupId") groupId: string, @Body("name") name: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId),

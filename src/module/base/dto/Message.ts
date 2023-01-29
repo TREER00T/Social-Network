@@ -39,26 +39,7 @@ export class Message {
     locationLon?: string;
 
     @IsString()
-    @IsNotEmpty()
-    senderId: string;
-
-    @IsString()
     @IsOptional()
     @IsNotEmpty()
     messageId?: string;
-
-    @IsString()
-    @IsOptional()
-    @IsNotEmpty()
-    receiverId?: string;
-
-    @IsString()
-    @IsOptional()
-    @IsNotEmpty()
-    channelId?: string;
-
-    @IsString()
-    @IsOptional()
-    @IsNotEmpty()
-    groupId?: string;
 }

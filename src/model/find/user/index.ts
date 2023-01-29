@@ -1,3 +1,5 @@
+import {ObjectId} from "mongodb";
+
 let {
         haveCollection,
         findMany,
@@ -145,30 +147,27 @@ export default {
     },
 
 
-    async getTableNameForListOfE2EMessage(fromUser: string, toUser: string, userId: string) {
+    async getTableNameForListOfE2EMessage(fromUser: string, toUser: string) {
 
         let result = await listOfUserE2E().findOne({
-            toUser: toUser,
-            fromUser: fromUser,
-            userId: userId,
             $or: [
-                {toUser: fromUser},
-                {fromUser: toUser},
-                {userId: userId}
+                {fromUser: toUser, toUser: fromUser},
+                {fromUser: fromUser, toUser: toUser}
             ]
         }, {
             _id: 0,
             tblChatId: 1
         });
 
-        return result?.tblChatId;
+
+        return result?.tblChatId?.toString();
 
     },
 
 
     async getListOfMessage(data) {
 
-        if (!Util.isUndefined(data.type)) {
+        if (!Util.isUndefined(data?.type)) {
 
             let queryResult = await findMany({
                 type: data.type
@@ -176,13 +175,14 @@ export default {
 
             let queryFilter = await queryResult.sort({
                 [data.order === 'id' ? '_id' : data.order]: data.sort.toLowerCase(),
-                $limit: data.limit
             });
+
+            queryResult.limit(data.limit);
 
             if (data.startFrom !== 0)
                 queryFilter.skip(data.startFrom);
 
-            return queryFilter;
+            return queryFilter.toArray();
         }
 
         if (!Util.isUndefined(data.search)) {
@@ -191,28 +191,31 @@ export default {
                 text: {$regex: new RegExp(data.search)}
             }, data.tableName);
 
+
             let queryFilter = await queryResult.sort({
-                [data.order === 'id' ? '_id' : data.order]: 'desc',
-                $limit: data.limit
+                [data.order === 'id' ? '_id' : data.order]: data.sort.toLowerCase()
             });
+
+            queryResult.limit(data.limit);
 
             if (data.startFrom !== 0)
                 queryFilter.skip(data.startFrom);
 
-            return queryFilter;
+            return queryFilter.toArray();
         }
 
         let queryResult = await findMany(data.tableName);
 
         let queryFilter = await queryResult.sort({
             [data.order === 'id' ? '_id' : data.order]: data.sort.toLowerCase(),
-            $limit: data.limit
         });
+
+        queryResult.limit(data.limit);
 
         if (data.startFrom !== 0)
             queryFilter.skip(data.startFrom);
 
-        return queryFilter;
+        return queryFilter.toArray();
 
     },
 
@@ -259,15 +262,13 @@ export default {
     async isBlock(from: string, targetId: string) {
 
         let result = await userBlockList().findOne({
-            userId: from,
-            userTargetId: targetId,
             $or: [
-                {userId: targetId},
-                {userTargetId: from}
+                {userId: targetId, userTargetId: from},
+                {userId: from, userTargetId: targetId}
             ]
         });
 
-        return Util.isNotEmptyArr(result._id) ? `${result._id}` : false;
+        return Util.isNotEmptyArr(result?._id?.toString()) ? `${result?._id}` : false;
 
     },
 
@@ -295,17 +296,17 @@ export default {
             userTargetId: 1
         });
 
-        return data?.userTargetId;
+        return data[0]?.userTargetId ? data : false;
 
     },
 
 
     async getUserDetailsInUsersTable(array: ListOfUserTargetId) {
 
-        array.map(e => e.userTargetId);
+        let arr = array.map(e => new ObjectId(e.userTargetId));
 
         let data = await user().find({
-            id: {$in: array}
+            _id: {$in: arr}
         }, {
             _id: 1,
             img: 1,
@@ -323,10 +324,10 @@ export default {
 
     async getUserDetailsInUsersTableForMember(array: ListOfUserId) {
 
-        array.map(e => e.userId);
+        let arr = array.map(e => new ObjectId(e.userId));
 
         let data = await user().find({
-            id: {$in: array}
+            _id: {$in: arr}
         }, {
             _id: 1,
             img: 1,
@@ -342,7 +343,7 @@ export default {
     async getListOfDevices(id: string) {
 
         let data = await device().find({
-            _id: id
+            userId: id
         });
 
         return Util.isUndefined(data) ? false : data;
@@ -358,7 +359,7 @@ export default {
             _id: 1
         });
 
-        return Util.isNotEmptyArr(data);
+        return data?._id?.toString();
 
     },
 
@@ -371,7 +372,7 @@ export default {
             _id: 1
         });
 
-        return Util.isNotEmptyArr(data);
+        return data?._id?.toString();
 
     },
 

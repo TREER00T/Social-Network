@@ -12,5 +12,4 @@ export class SavedMessageService {
     async removeSavedMessage(userPhone: string) {
         await Delete.savedMessage(userPhone);
     }
-
 }

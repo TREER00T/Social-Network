@@ -17,7 +17,7 @@ import {PersonalNameModule} from "./module/personal/name/PersonalName.module";
 import {PersonalAuthModule} from "./module/personal/auth/PersonalAuth.module";
 import {PersonalUploadAvatarModule} from "./module/personal/upload/avatar/PersonalUploadAvatar.module";
 import {PersonalUserBlocksModule} from "./module/personal/block/PersonalUserBlocks.module";
-import {PersonaDevicesModule} from "./module/personal/device/PersonaDevices.module";
+import {PersonalDevicesModule} from "./module/personal/device/PersonalDevices.module";
 import {SavedMessageModule} from "./module/personal/savedMessage/SavedMessage.module";
 import {PersonalAccountModule} from "./module/personal/account/PersonalAccount.module";
 import {PersonalMessageModule} from "./module/personal/message/PersonalMessage.module";
@@ -75,7 +75,7 @@ import {CommonController} from "./io/common/Common.controller";
         PersonalAuthModule,
         PersonalUploadAvatarModule,
         PersonalUserBlocksModule,
-        PersonaDevicesModule,
+        PersonalDevicesModule,
         SavedMessageModule,
         PersonalAccountModule,
         PersonalMessageModule,
@@ -145,38 +145,33 @@ import {CommonController} from "./io/common/Common.controller";
                         path: "e2e",
                         children: [
                             {
-                                path: "room",
+                                path: "/",
+                                module: E2EDeleteChatModule
+                            },
+                            {
+                                path: "create",
+                                module: E2ECreateRoomModule
+                            },
+                            {
+                                path: "uploadFile",
+                                module: E2EUploadFileModule
+                            },
+                            {
+                                path: "user",
                                 children: [
                                     {
-                                        path: "/",
-                                        module: E2EDeleteChatModule
+                                        path: "block",
+                                        module: E2EBlockUserModule
                                     },
                                     {
-                                        path: "create",
-                                        module: E2ECreateRoomModule
-                                    },
-                                    {
-                                        path: "uploadFile",
-                                        module: E2EUploadFileModule
-                                    },
-                                    {
-                                        path: "user",
-                                        children: [
-                                            {
-                                                path: "block",
-                                                module: E2EBlockUserModule
-                                            },
-                                            {
-                                                path: "/info",
-                                                module: E2EUserInfoModule
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        path: "chats",
-                                        module: E2EChatsModule
+                                        path: "info",
+                                        module: E2EUserInfoModule
                                     }
                                 ]
+                            },
+                            {
+                                path: "chats",
+                                module: E2EChatsModule
                             }
                         ]
                     },
@@ -211,7 +206,7 @@ import {CommonController} from "./io/common/Common.controller";
                             },
                             {
                                 path: "devices",
-                                module: PersonaDevicesModule
+                                module: PersonalDevicesModule
                             },
                             {
                                 path: "savedMessage",
@@ -279,11 +274,11 @@ import {CommonController} from "./io/common/Common.controller";
                                 module: GroupLinkModule
                             },
                             {
-                                path: "user",
+                                path: "users",
                                 module: GroupUserModule
                             },
                             {
-                                path: "admin",
+                                path: "admins",
                                 module: GroupAdminModule
                             },
                             {
@@ -335,11 +330,11 @@ import {CommonController} from "./io/common/Common.controller";
                                 module: ChannelLinkModule
                             },
                             {
-                                path: "user",
+                                path: "users",
                                 module: ChannelUserModule
                             },
                             {
-                                path: "admin",
+                                path: "admins",
                                 module: ChannelAdminModule
                             },
                             {

@@ -1,4 +1,4 @@
-import {Controller, Delete, Param} from '@nestjs/common';
+import {Body, Controller, Delete} from '@nestjs/common';
 import {DeleteGroupService} from './DeleteGroup.service';
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
@@ -14,8 +14,8 @@ export class DeleteGroupController extends Group {
     }
 
     @Delete()
-    async removeGroup(@Param("groupId") groupId: string) {
-        this.init();
+    async removeGroup(@Body("groupId") groupId: string) {
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId),

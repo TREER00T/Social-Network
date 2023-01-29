@@ -1,4 +1,4 @@
-import {IsEmail, IsNotEmpty, IsString, Min} from "class-validator";
+import {IsEmail, IsNotEmpty, IsString, Length} from "class-validator";
 
 export class LoginTwoRefactorCode {
     @IsEmail()
@@ -6,6 +6,6 @@ export class LoginTwoRefactorCode {
 
     @IsString()
     @IsNotEmpty()
-    @Min(6)
+    @Length(6)
     password: string;
 }

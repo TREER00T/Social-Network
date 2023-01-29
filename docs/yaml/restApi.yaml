@@ -198,7 +198,7 @@ paths:
             $ref: '#/definitions/StatusWithDataObject'
 
 
-  /e2e/room/create:
+  /e2e/create:
     post:
       tags:
         - E2E
@@ -251,7 +251,7 @@ paths:
             $ref: '#/definitions/StatusWithDataObject'
 
 
-  /e2e/room/uploadFile:
+  /e2e/uploadFile:
     post:
       tags:
         - E2E
@@ -327,7 +327,7 @@ paths:
             type: object
             $ref: '#/definitions/StatusWithDataObject'
 
-  /e2e/room/user/block:
+  /e2e/user/block:
     put:
       tags:
         - E2E
@@ -374,7 +374,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /e2e/room/chats:
+  /e2e/chats:
     get:
       tags:
         - E2E
@@ -382,31 +382,31 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: query
+        - in: body
           name: to
           type: number
           required: true
-        - in: query
+        - in: body
           name: search
           type: number
           required: true
-        - in: query
+        - in: body
           name: limit
           type: number
           required: false
-        - in: query
+        - in: body
           name: page
           type: number
           required: false
-        - in: query
+        - in: body
           name: sort
           type: string
           required: false
-        - in: query
+        - in: body
           name: order
           type: string
           required: false
-        - in: query
+        - in: body
           name: type
           type: string
           required: false
@@ -446,7 +446,7 @@ paths:
             $ref: '#/definitions/Status'
 
 
-  /e2e/room/user/info:
+  /e2e/user/info:
     get:
       tags:
         - E2E
@@ -493,7 +493,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /e2e/room/{id}/me:
+  /e2e/{id}/me:
     delete:
       tags:
         - E2E
@@ -545,7 +545,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /e2e/room/{id}/us:
+  /e2e/{id}/us:
     delete:
       tags:
         - E2E
@@ -1169,31 +1169,31 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: query
+        - in: body
           name: to
           type: number
           required: true
-        - in: query
+        - in: body
           name: search
           type: number
           required: true
-        - in: query
+        - in: body
           name: limit
           type: number
           required: false
-        - in: query
+        - in: body
           name: page
           type: number
           required: false
-        - in: query
+        - in: body
           name: sort
           type: string
           required: false
-        - in: query
+        - in: body
           name: order
           type: string
           required: false
-        - in: query
+        - in: body
           name: type
           type: string
           required: false
@@ -1397,7 +1397,7 @@ paths:
           type: number
           required: true
         - in: body
-          name: id
+          name: messageId
           type: number
           required: true
       security:
@@ -1671,7 +1671,7 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: id
+          name: groupId
           type: number
           required: true
       security:
@@ -1724,7 +1724,7 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: groupId
           type: number
           required: true
         - in: body
@@ -1786,7 +1786,7 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: groupId
           type: number
           required: true
         - in: body
@@ -1846,6 +1846,10 @@ paths:
       consumes:
         - multipart/form-data
       parameters:
+        - in: body
+          name: groupId
+          type: number
+          required: true
         - in: formData
           name: image
           type: file
@@ -1905,7 +1909,7 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: groupId
           type: number
           required: true
       security:
@@ -1962,11 +1966,11 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: groupId
           type: number
           required: true
         - in: body
-          name: publicLink
+          name: link
           type: string
           required: true
       security:
@@ -2014,7 +2018,128 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /group/user/join:
+  /group/admins:
+    post:
+      tags:
+        - Group
+      summary: Add admin for group chat room
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: groupId
+          type: number
+          required: true
+        - in: body
+          name: userId
+          type: number
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        409:
+          description: Conflict
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
+          description: Created
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+    delete:
+      tags:
+        - Group
+      summary: Delete admin for group chat room
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: groupId
+          type: number
+          required: true
+        - in: body
+          name: userId
+          type: number
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        409:
+          description: Conflict
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+
+  /group/users:
     post:
       tags:
         - Group
@@ -2023,7 +2148,7 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: groupId
           type: number
           required: true
         - in: body
@@ -2074,23 +2199,15 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
-
-
-  /group/admin/add:
-    post:
+    get:
       tags:
         - Group
-      summary: Add admin for group chat room
+      summary: Return list of users information in group chat room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
-        - in: body
-          name: id
-          type: number
-          required: true
-        - in: body
-          name: userId
+        - in: query
+          name: groupId
           type: number
           required: true
       security:
@@ -2112,86 +2229,8 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-        409:
-          description: Conflict
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        400:
-          description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        201:
-          description: Created
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-
-
-
-  /group/admin/remove:
-    delete:
-      tags:
-        - Group
-      summary: Delete admin for group chat room
-      consumes:
-        - application/x-www-form-urlencoded
-      parameters:
-        - in: body
-          name: id
-          type: number
-          required: true
-        - in: body
-          name: userId
-          type: number
-          required: true
-      security:
-        - apiKey: [ ]
-        - token: [ ]
-      responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        409:
-          description: Conflict
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        404:
-          description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        400:
-          description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2199,12 +2238,12 @@ paths:
           description: OK
           schema:
             type: object
+            $ref: '#/definitions/StatusWithDataAndOptionObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
             $ref: '#/definitions/Status'
-
-
-
-
-  /group/user/leave:
     delete:
       tags:
         - Group
@@ -2266,31 +2305,31 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: query
+        - in: body
           name: to
           type: number
           required: true
-        - in: query
+        - in: body
           name: search
           type: number
           required: true
-        - in: query
+        - in: body
           name: limit
           type: number
           required: false
-        - in: query
+        - in: body
           name: page
           type: number
           required: false
-        - in: query
+        - in: body
           name: sort
           type: string
           required: false
-        - in: query
+        - in: body
           name: order
           type: string
           required: false
-        - in: query
+        - in: body
           name: type
           type: string
           required: false
@@ -2339,57 +2378,7 @@ paths:
         - application/json
       parameters:
         - in: query
-          name: id
-          type: number
-          required: true
-      security:
-        - apiKey: [ ]
-        - token: [ ]
-      responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        404:
-          description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        200:
-          description: OK
-          schema:
-            type: object
-            $ref: '#/definitions/StatusWithDataAndOptionObject'
-        400:
-          description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-
-
-
-
-  /group/user/all:
-    get:
-      tags:
-        - Group
-      summary: Return list of users information in group chat room
-      consumes:
-        - application/json
-      parameters:
-        - in: query
-          name: id
+          name: groupId
           type: number
           required: true
       security:
@@ -2574,7 +2563,7 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: id
+          name: channelId
           type: number
           required: true
       security:
@@ -2627,7 +2616,7 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: channelId
           type: number
           required: true
         - in: body
@@ -2689,7 +2678,7 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: channelId
           type: number
           required: true
         - in: body
@@ -2749,6 +2738,10 @@ paths:
       consumes:
         - multipart/form-data
       parameters:
+        - in: body
+          name: channelId
+          type: number
+          required: true
         - in: formData
           name: image
           type: file
@@ -2808,7 +2801,7 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: channelId
           type: number
           required: true
       security:
@@ -2865,11 +2858,11 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: channelId
           type: number
           required: true
         - in: body
-          name: publicLink
+          name: link
           type: string
           required: true
       security:
@@ -2917,70 +2910,8 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /channel/user/join:
-    post:
-      tags:
-        - Channel
-      summary: Join user into channel chat room
-      consumes:
-        - application/x-www-form-urlencoded
-      parameters:
-        - in: body
-          name: id
-          type: number
-          required: true
-        - in: body
-          name: userId
-          type: number
-          required: false
-      security:
-        - apiKey: [ ]
-        - token: [ ]
-      responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        404:
-          description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        400:
-          description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        201:
-          description: Created
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        403:
-          description: Forbidden
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
 
-
-
-  /channel/admin/add:
+  /channel/admins:
     post:
       tags:
         - Channel
@@ -2989,7 +2920,7 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
+          name: channelId
           type: number
           required: true
         - in: body
@@ -3040,10 +2971,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
-
-
-  /channel/admin/remove:
     delete:
       tags:
         - Channel
@@ -3107,7 +3034,52 @@ paths:
 
 
 
-  /channel/user/leave:
+  /channel/users:
+    get:
+      tags:
+        - Channel
+      summary: Return list of users information in channel chat room
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: channelId
+          type: number
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataAndOptionObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
     delete:
       tags:
         - Channel
@@ -3158,6 +3130,65 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+    post:
+      tags:
+        - Channel
+      summary: Join user into channel chat room
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: id
+          type: number
+          required: true
+        - in: body
+          name: userId
+          type: number
+          required: false
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
+          description: Created
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
 
   /channel/chats:
@@ -3168,31 +3199,31 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: query
+        - in: body
           name: to
           type: number
           required: true
-        - in: query
+        - in: body
           name: search
           type: number
           required: true
-        - in: query
+        - in: body
           name: limit
           type: number
           required: false
-        - in: query
+        - in: body
           name: page
           type: number
           required: false
-        - in: query
+        - in: body
           name: sort
           type: string
           required: false
-        - in: query
+        - in: body
           name: order
           type: string
           required: false
-        - in: query
+        - in: body
           name: type
           type: string
           required: false
@@ -3240,7 +3271,7 @@ paths:
         - application/json
       parameters:
         - in: query
-          name: id
+          name: channelId
           type: number
           required: true
       security:
@@ -3277,58 +3308,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
-
-
-  /channel/user/all:
-    get:
-      tags:
-        - Channel
-      summary: Return list of users information in channel chat room
-      consumes:
-        - application/json
-      parameters:
-        - in: query
-          name: id
-          type: number
-          required: true
-      security:
-        - apiKey: [ ]
-        - token: [ ]
-      responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        404:
-          description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        200:
-          description: OK
-          schema:
-            type: object
-            $ref: '#/definitions/StatusWithDataAndOptionObject'
-        400:
-          description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-
-
-
 
   /common/search:
     get:
@@ -3491,14 +3470,14 @@ definitions:
         description: types -> Image , Document , Video , Voice
   Status:
     properties:
-      code:
+      statusCode:
         type: integer
         format: int32
       message:
         type: string
   StatusWithDataObject:
     properties:
-      code:
+      statusCode:
         type: integer
         format: int32
       message:
@@ -3509,7 +3488,7 @@ definitions:
           - array
   StatusWithDataAndOptionObject:
     properties:
-      code:
+      statusCode:
         type: integer
         format: int32
       message:

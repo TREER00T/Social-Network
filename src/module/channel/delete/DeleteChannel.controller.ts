@@ -1,4 +1,4 @@
-import {Controller, Delete, Param} from '@nestjs/common';
+import {Body, Controller, Delete} from '@nestjs/common';
 import {DeleteChannelService} from './DeleteChannel.service';
 import {Channel} from "../../base/Channel";
 import Response from "../../../util/Response";
@@ -14,8 +14,8 @@ export class DeleteChannelController extends Channel {
     }
 
     @Delete()
-    async removeChannel(@Param("channelId") channelId: string) {
-        this.init();
+    async removeChannel(@Body("channelId") channelId: string) {
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),

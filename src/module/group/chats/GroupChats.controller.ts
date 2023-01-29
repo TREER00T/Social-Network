@@ -1,4 +1,4 @@
-import {Controller, Get} from '@nestjs/common';
+import {Body, Controller, Get} from '@nestjs/common';
 import {GroupChatsService} from './GroupChats.service';
 import Util from "../../../util/Util";
 import Json from "../../../util/ReturnJson";
@@ -13,19 +13,19 @@ export class GroupChatsController extends Group {
     }
 
     @Get()
-    async listOfChat(dto: DataQuery) {
-        this.init();
+    async listOfChat(@Body() dto: DataQuery) {
+        await this.init();
 
         if (Util.isUndefined(dto?.roomId))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
-        let hasFoundChannelNameInListOfUserChannels = await this
+        let hasFoundGroupNameInListOfUserGroups = await this
             .appService.getGroupNameFromListOfUserGroups(dto.roomId, this.userId);
 
-        if (!hasFoundChannelNameInListOfUserChannels)
+        if (!hasFoundGroupNameInListOfUserGroups)
             return Json.builder(Response.HTTP_USER_NOT_FOUND);
 
         return await this.getListOfMessageFromRoom(dto,
-            `${hasFoundChannelNameInListOfUserChannels}GroupContents`);
+            `${hasFoundGroupNameInListOfUserGroups}GroupContents`);
     }
 }

@@ -17,7 +17,7 @@ export class GroupUploadAvatarController extends Group {
     @Put()
     @UseInterceptors(FileInterceptor("avatar"))
     async save(@UploadedFile() avatar: Express.Multer.File, @Body("groupId") groupId: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(avatar),

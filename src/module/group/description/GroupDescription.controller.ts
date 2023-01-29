@@ -13,7 +13,7 @@ export class GroupDescriptionController extends Group {
 
     @Put()
     async update(@Body("groupId") groupId: string, @Body("description") description: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId),

@@ -20,7 +20,7 @@ export class GroupController extends AbstractGroup {
 
     @SubscribeMessage("onLeaveUserFromGroup")
     async leaveUserFromGroup(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
-        let groupId = data?.groupId;
+        let groupId = data?.roomId;
 
         let haveErr = PromiseVerify.all([
             this.isUndefined(groupId),
@@ -36,7 +36,7 @@ export class GroupController extends AbstractGroup {
 
     @SubscribeMessage("onGroupMessage")
     async sendMessageInGroup(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
-        let groupId = data?.groupId,
+        let groupId = data?.roomId,
             senderId = this.getUserId(socket.id);
 
         let haveErr = PromiseVerify.all([
@@ -48,13 +48,13 @@ export class GroupController extends AbstractGroup {
         if (haveErr)
             return socket.emit('emitGroupMessageError', haveErr);
 
-        delete data.groupId;
+        delete data.roomId;
         data.senderId = senderId;
 
 
         let message = await this.handleMessage(data);
 
-        if (message?.code)
+        if (message?.statusCode)
             return socket.emit('emitGroupMessage', message);
 
         this.handleUserJoinState(socket, groupId, 'group');
@@ -72,7 +72,7 @@ export class GroupController extends AbstractGroup {
     @SubscribeMessage("onGroupEditMessage")
     async updateMessageInGroup(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
         let messageId = data?.messageId,
-            groupId = data?.groupId,
+            groupId = data?.roomId,
             senderId = this.getUserId(socket.id);
 
         let haveErr = await PromiseVerify.all([
@@ -92,7 +92,7 @@ export class GroupController extends AbstractGroup {
         if (!isUserMessage)
             return socket.emit('emitGroupEditMessageError', Response.HTTP_FORBIDDEN);
 
-        delete data.groupId;
+        delete data.roomId;
         delete data.messageId;
 
         data.senderId = senderId;
@@ -100,7 +100,7 @@ export class GroupController extends AbstractGroup {
 
         let message = await this.handleMessage(data);
 
-        if (message?.code)
+        if (message?.statusCode)
             return socket.emit('emitGroupEditMessageError', message);
 
         this.emitToSpecificSocket(groupId, 'emitGroupEditMessage', message);
@@ -114,7 +114,7 @@ export class GroupController extends AbstractGroup {
     @SubscribeMessage("onGroupDeleteMessage")
     async removeMessageInGroup(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
         let listOfId = data?.listOfId,
-            groupId = data?.groupId,
+            groupId = data?.roomId,
             senderId = this.getUserId(socket.id);
 
         if (!Array.isArray(listOfId) && listOfId.length === 0)

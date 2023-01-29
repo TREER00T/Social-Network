@@ -13,14 +13,14 @@ export class PersonalUsernameController extends User {
 
     @Put("/:username")
     async updateUsername(@Param("username") username: string) {
-        this.init();
+        await this.init();
 
         if (Util.isUndefined(username))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
         let isExistUsername = await this.appService.isExistUsername(username);
 
-        if (!isExistUsername)
+        if (isExistUsername)
             return Json.builder(Response.HTTP_CONFLICT);
 
         let hasUpdate = this.appService.updateUsername(this.phoneNumber, username);

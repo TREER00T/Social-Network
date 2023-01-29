@@ -1,4 +1,5 @@
 let {
+        group,
         groupUser,
         groupAdmin
     } = require('../../create/group'),
@@ -14,7 +15,9 @@ module.exports = {
 
     async group(groupId) {
 
-        await dropCollection(`${groupId}GroupContents`);
+        await group().deleteOne({
+            _id: groupId
+        });
 
     },
 
@@ -47,7 +50,7 @@ module.exports = {
 
         await groupAdmin().deleteOne({
             groupId: groupId,
-            userId: userId
+            adminId: userId
         });
 
     }

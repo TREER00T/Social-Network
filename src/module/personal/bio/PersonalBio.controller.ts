@@ -13,7 +13,7 @@ export class PersonalBioController extends User {
 
     @Put()
     async updateBio(@Body("bio") bio: string) {
-        this.init();
+        await this.init();
 
         if (Util.isUndefined(bio))
             return Json.builder(Response.HTTP_BAD_REQUEST);

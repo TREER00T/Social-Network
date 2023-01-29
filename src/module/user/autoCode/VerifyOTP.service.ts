@@ -22,10 +22,10 @@ export class VerifyOTPService {
 
         let userPhone = dto.phone;
 
-        let user = await Find.userId(userPhone);
+        let userId = await Find.userId(userPhone);
 
         return {
-            ...await Token.setup(userPhone, user._id)
+            ...await Token.setup(userPhone, userId)
         }
 
     }
@@ -58,7 +58,7 @@ export class VerifyOTPService {
 
         let haveApiKey = await Find.getApiKey(userPhone);
 
-        if (!haveApiKey)
+        if (haveApiKey)
             return false;
 
         return await Update.apikey(userPhone, Generate.getRandomHash(50));

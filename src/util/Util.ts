@@ -3,7 +3,6 @@ import {JsonObject} from "./Types";
 import Find from "../model/find/user";
 
 let tokenPayload,
-    apiKey,
     IN_VALID_MESSAGE_TYPE = "IN_VALID_MESSAGE_TYPE",
     IN_VALID_OBJECT_KEY = "IN_VALID_OBJECT_KEY";
 
@@ -15,20 +14,19 @@ export default {
     validateMessage(jsonObject) {
 
         let arrayOfValidJsonObjectKey = [
-                "text", "type",
-                "isReply", "isForward",
-                "targetReplyId", "forwardDataId",
-                "locationLat", "locationLon",
-                "senderId", "id",
-                "receiverId", "channelId",
-                "groupId"
+                'text', 'type',
+                'isReply', 'isForward',
+                'targetReplyId', 'forwardDataId',
+                'locationLat', 'locationLon',
+                'senderId', 'messageId',
+                'receiverId', 'roomId'
             ],
             arrayOfMessageType = [
-                "None", "Image",
-                "Video", "Voice",
-                "Location", "Document"
+                'None', 'Image',
+                'Video', 'Voice',
+                'Location', 'Document'
             ],
-            isTypeInMessageType = arrayOfMessageType.includes(jsonObject.type);
+            isTypeInMessageType = arrayOfMessageType.includes(jsonObject?.type);
 
 
         if (!isTypeInMessageType)
@@ -43,38 +41,36 @@ export default {
         }
 
 
-        const MESSAGE_WITHOUT_FILE = "None",
-            MESSAGE_TYPE_LOCATION = "Location";
+        const MESSAGE_WITHOUT_FILE = 'None',
+            MESSAGE_TYPE_LOCATION = 'Location';
 
-        let isUndefined = (data) => {
-                return !data || data?.length === 0;
-            },
-            isReplyInJsonObject = !isUndefined(jsonObject?.isReply),
-            isForwardInJsonObject = !isUndefined(jsonObject?.isForward),
+        let haveReplyId = jsonObject?.isReply,
+            haveForwardId = jsonObject?.isForward,
             isNoneMessageType = jsonObject?.type === MESSAGE_WITHOUT_FILE,
             isMessageTypeLocation = jsonObject?.type === MESSAGE_TYPE_LOCATION,
-            isMessageTypeNull = isUndefined(jsonObject?.type),
-            isTextNull = isUndefined(jsonObject?.text),
-            isSenderIdNull = isUndefined(jsonObject?.senderId),
-            isLocationLatNull = isUndefined(jsonObject?.locationLat),
-            isLocationLonNull = isUndefined(jsonObject?.locationLon);
+            haveMessageType = jsonObject?.type,
+            haveRoomId = jsonObject?.roomId,
+            haveText = jsonObject?.text,
+            haveSenderId = jsonObject?.senderId,
+            haveLocationLat = jsonObject?.locationLat,
+            haveLocationLon = jsonObject?.locationLon;
 
 
-        if ((isMessageTypeLocation && (isLocationLonNull || isLocationLatNull)) || isMessageTypeNull || isSenderIdNull ||
-            (isMessageTypeNull && !isNoneMessageType && !isMessageTypeLocation) || (isTextNull && isNoneMessageType))
+        if ((isMessageTypeLocation && (!haveLocationLon || !haveLocationLat)) || !haveMessageType || (!haveSenderId && haveRoomId) ||
+            (!haveMessageType && !isNoneMessageType && !isMessageTypeLocation) || (!haveText && isNoneMessageType))
             return IN_VALID_OBJECT_KEY;
 
-        if (isMessageTypeLocation && !isLocationLonNull && !isLocationLatNull) {
+        if (isMessageTypeLocation && haveLocationLon && haveLocationLat) {
             jsonObject.location = [jsonObject.locationLat, jsonObject.locationLon];
             delete jsonObject.locationLat;
             delete jsonObject.locationLon;
         }
 
-        jsonObject.type = isTextNull ? "Image" : MESSAGE_WITHOUT_FILE;
+        jsonObject.type = haveText ? jsonObject?.type ? jsonObject?.type : 'Image' : MESSAGE_WITHOUT_FILE;
 
-        jsonObject.isReply = isReplyInJsonObject ? 1 : 0;
+        jsonObject.isReply = haveReplyId ?? false;
 
-        jsonObject.isForward = isForwardInJsonObject ? 1 : 0;
+        jsonObject.isForward = haveForwardId ?? false;
 
         return jsonObject;
     },
@@ -124,10 +120,9 @@ export default {
     async tokenVerify(bearerHeader: string) {
         let token = await this.handleToken(bearerHeader);
 
-        if (!token)
-            return false;
+        tokenPayload = token;
 
-        return tokenPayload = token;
+        return token;
     },
 
     async isAccessToken(bearerHeader: string) {
@@ -147,25 +142,15 @@ export default {
         if (typeof isSetUserToken !== "string")
             return false;
 
-        let decodeToken = await Validation.getJwtDecrypt(isSetUserToken)
-            .then(async decode => Validation.getJwtVerify(await decode));
-
-        return decodeToken;
+        return await Validation.getJwtVerify(await Validation.getJwtDecrypt(isSetUserToken));
     },
 
     async getTokenPayLoad(): Promise<JsonObject> {
-        return await tokenPayload;
+        return tokenPayload;
     },
 
     async isValidApiKey(phone: string, key: string) {
-        if (!key)
-            return false;
-
-        let result = await Find.getApiKey(phone);
-
-        apiKey = result;
-
-        return result === key;
+        return await Find.getApiKey(phone) === key;
     }
 
 };

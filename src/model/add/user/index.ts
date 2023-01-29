@@ -80,25 +80,27 @@ export default {
 
     },
 
-    async messageIntoUserSavedMessage(phone: string, message) {
+    async messageIntoUserSavedMessage(phone: string, userId: string, message) {
+
+        message.senderId = message.senderId ?? userId;
 
         if (message?.forwardDataId) {
             let data = await forwardContent()({
-                conversationId: `${phone}SavedMessages`,
+                conversationId: `${phone}SavedMessage`,
                 conversationType: 'Personal'
             }).save();
 
             message.forwardDataId = `${data._id}`;
             message.isForward = 1;
 
-            let insertedData = await insertOne(message, `${phone}SavedMessages`);
+            let insertedData = await insertOne(message, `${phone}SavedMessage`);
 
             await UpdateInCommon.messageIdFromTableForwardContents(message.forwardDataId, insertedData.insertedId);
 
             return;
         }
 
-        await insertOne(message, `${phone}SavedMessages`);
+        await insertOne(message, `${phone}SavedMessage`);
 
     }
 

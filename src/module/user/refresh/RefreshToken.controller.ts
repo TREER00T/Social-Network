@@ -9,7 +9,8 @@ export class RefreshTokenController extends User {
 
     @Post()
     async refreshToken() {
-        this.init();
+        await this.init();
+
         return Json.builder(Response.HTTP_ACCEPTED, await Token.setup(this.phoneNumber, this.userId));
     }
 

@@ -2,7 +2,7 @@ import {Body, Controller, Post, UploadedFile, UseInterceptors} from '@nestjs/com
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
 import {FileInterceptor} from "@nestjs/platform-express";
-import {Message} from "../../base/dto/Message";
+import {RoomMessage} from "../../base/dto/RoomMessage";
 import {E2EMessage} from "../../base/E2EMessage";
 import PromiseVerify from "../../base/PromiseVerify";
 
@@ -11,8 +11,8 @@ export class E2EUploadFileController extends E2EMessage {
 
     @Post()
     @UseInterceptors(FileInterceptor("file"))
-    async save(@UploadedFile() file: Express.Multer.File, @Body() msg: Message) {
-        this.init();
+    async save(@UploadedFile() file: Express.Multer.File, @Body() msg: RoomMessage) {
+        await this.init();
 
         let targetUserId = msg?.receiverId;
 
@@ -23,7 +23,7 @@ export class E2EUploadFileController extends E2EMessage {
             this.handleMessage(msg)
         ]);
 
-        if (message?.code)
+        if (message?.statusCode)
             return message;
 
         let isExistChatRoom = await this.isExistChatRoom({

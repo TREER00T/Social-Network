@@ -12,7 +12,7 @@ export class E2EBlockUserController extends User {
 
     @Put()
     async handleUserBlockState(@Body("targetUserId") targetUserId: string) {
-        this.init();
+        await this.init();
 
         let haveErr = await this.verifyUser(targetUserId);
 

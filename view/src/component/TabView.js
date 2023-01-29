@@ -4,7 +4,7 @@ import {useState} from "react";
 function TabHeader({children, clickedIndex, onClick, onChange}) {
     return (
         <li onClick={onClick}
-            className="mr-5">
+            className="mr-10 last:mr-0">
             <span
                 onChange={onChange}
                 className={(clickedIndex === children ? "text-white bg-blue-200 active drop-shadow-lg" :
@@ -23,7 +23,7 @@ export default function TabView({className, headers, getColumnSelected}) {
 
     return (
         <div className={className}>
-            <ul className="flex text-sm font-medium text-center text-gray-500">
+            <ul className="flex text-sm font-medium text-center text-gray-500 place-content-center">
                 {
                     headers.map(e => <TabHeader key={e} onClick={handleClick}
                                                 clickedIndex={clickedIndex}>{e}</TabHeader>)

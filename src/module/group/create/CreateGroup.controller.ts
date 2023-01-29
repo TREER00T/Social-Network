@@ -16,7 +16,7 @@ export class CreateGroupController extends User {
     @Post()
     @UseInterceptors(FileInterceptor("avatar"))
     async createGroup(@UploadedFile() avatar: Express.Multer.File, @Body("name") name: string) {
-        this.init();
+        await this.init();
 
         let avatarUrl;
 

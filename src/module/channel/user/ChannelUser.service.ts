@@ -24,7 +24,7 @@ export class ChannelUserService {
     }
 
     async leaveUser(channelId: string, userId: string) {
-        await Delete.user(userId, channelId);
+        await Delete.user(channelId, userId);
         await DeleteInUser.userFromChannel(channelId, userId);
     }
 }

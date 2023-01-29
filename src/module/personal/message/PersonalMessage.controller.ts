@@ -1,10 +1,10 @@
-import {Body, Controller, Delete, Get, Post, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Put} from '@nestjs/common';
 import {PersonalAccount} from './PersonalMessage.service';
 import {DataQuery} from "../../base/dto/DataQuery";
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
 import Util from "../../../util/Util";
-import {Message} from "../../base/dto/Message";
+import {PersonalMessage} from "../../base/dto/PersonalMessage";
 import {InputException} from "../../../exception/InputException";
 import {SavedMessage} from "../../base/SavedMessage";
 import PromiseVerify from "../../base/PromiseVerify";
@@ -16,8 +16,8 @@ export class PersonalMessageController extends SavedMessage {
     }
 
     @Get()
-    async listOfMessage(@Query() dto: DataQuery) {
-        this.init();
+    async listOfMessage(@Body() dto: DataQuery) {
+        await this.init();
 
         let haveErr = await PromiseVerify.all([
             this.verifySavedMessage()
@@ -30,8 +30,8 @@ export class PersonalMessageController extends SavedMessage {
     }
 
     @Delete()
-    async deleteMessage(@Body() data: string) {
-        this.init();
+    async deleteMessage(@Body('listOfId') data: string) {
+        await this.init();
 
         let messageIdOrListOfMessageId;
 
@@ -57,31 +57,35 @@ export class PersonalMessageController extends SavedMessage {
     }
 
     @Post()
-    async addMessage(@Body() msg: Message) {
-        this.init();
+    async addMessage(@Body() msg: PersonalMessage) {
+        await this.init();
 
         let message = await this.handleSavedMessage(msg);
 
-        if (message?.code)
+        if (message?.statusCode)
             return message;
 
-        await this.appService.addMessage(this.phoneNumber, message);
+        await this.appService.addMessage(this.phoneNumber, this.userId, message);
 
         return Json.builder(Response.HTTP_CREATED);
     }
 
     @Put()
-    async updateMessage(@Body() msg: Message) {
-        this.init();
+    async updateMessage(@Body() msg: PersonalMessage) {
+        await this.init();
+
+        if (!msg?.messageId)
+            return Json.builder(Response.HTTP_BAD_REQUEST);
 
         let message = await this.handleSavedMessage(msg);
+        let messageId = message.messageId;
 
-        if (message?.code)
+        if (message?.statusCode)
             return message;
 
-        delete message?.id;
+        delete message.messageId;
 
-        await this.appService.updateMessage(this.phoneNumber, message.senderId, message);
+        await this.appService.updateMessage(this.phoneNumber, messageId, message);
 
         return Json.builder(Response.HTTP_OK);
     }
