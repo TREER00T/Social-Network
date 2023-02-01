@@ -1,7 +1,7 @@
 import {useState} from "react";
 
 
-function TabHeader({children, clickedIndex, onClick, onChange}) {
+function Header({children, clickedIndex, onClick, onChange}) {
     return (
         <li onClick={onClick}
             className="mr-10 last:mr-0">
@@ -13,7 +13,7 @@ function TabHeader({children, clickedIndex, onClick, onChange}) {
     )
 }
 
-export default function TabView({className, headers, getColumnSelected}) {
+export default function TabHeaderView({className, headers, getColumnSelected}) {
     const [clickedIndex, setOnClickedIndex] = useState(headers[0]);
 
     const handleClick = e => {
@@ -25,8 +25,8 @@ export default function TabView({className, headers, getColumnSelected}) {
         <div className={className}>
             <ul className="flex text-sm font-medium text-center text-gray-500 place-content-center">
                 {
-                    headers.map(e => <TabHeader key={e} onClick={handleClick}
-                                                clickedIndex={clickedIndex}>{e}</TabHeader>)
+                    headers.map(e => <Header key={e} onClick={handleClick}
+                                                clickedIndex={clickedIndex}>{e}</Header>)
                 }
             </ul>
         </div>

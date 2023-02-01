@@ -11,7 +11,7 @@ export class E2EUserInfoController extends User {
     }
 
     @Get()
-    async userInfo(@Query('userId') userId: string) {
+    async userInfo(@Query("userId") userId: string) {
         await this.init();
 
         let haveErr = await this.verifyUser(userId);

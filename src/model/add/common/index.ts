@@ -1,11 +1,14 @@
+import {TE2EMessage} from "../../../module/base/dto/TE2EMessage";
+import {RoomMessage} from "../../../module/base/dto/RoomMessage";
+import {JsonObject} from "../../../util/Types"
+
 let {forwardContent} = require('../../create/common'),
     {insertOne} = require('../../../database/mongoDbDriverConnection'),
     UpdateInCommon = require('../../update/common');
-import {JsonObject} from "../../../util/Types";
 
 export default {
 
-    async message(tableName: string, data: JsonObject, forwardData) {
+    async message(tableName: string, data: JsonObject | TE2EMessage | RoomMessage, forwardData) {
 
         if (data?.forwardDataId) {
             let data = await forwardContent()({

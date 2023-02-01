@@ -107,6 +107,9 @@ import {CommonController} from "./io/common/Common.controller";
         ChannelInfoModule,
         ChannelUserModule,
 
+        // Common module
+        ContentSearchModule,
+
         RouterModule.register([
             {
                 path: "api/v1",

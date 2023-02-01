@@ -28,6 +28,18 @@ export default {
 
     },
 
+    async links(channelId: string) {
+
+        return await channel().find({
+            _id: channelId
+        }, {
+            _id: 0,
+            publicLink: 1,
+            inviteLink: 1
+        });
+
+    },
+
     async isOwner(adminId: string, channelId: string) {
 
         let data = await channelAdmin().findOne({
@@ -83,9 +95,7 @@ export default {
 
     async getInfo(channelId: string) {
 
-        return await channel().find({
-            _id: channelId
-        })[0];
+        return await channel().findById(channelId);
 
     },
 

@@ -1,6 +1,5 @@
 import {Body, Controller, Delete, Get, Post, Put} from '@nestjs/common';
-import {PersonalAccount} from './PersonalMessage.service';
-import {DataQuery} from "../../base/dto/DataQuery";
+import {PersonalMessageService} from './PersonalMessage.service';
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
 import Util from "../../../util/Util";
@@ -8,15 +7,16 @@ import {PersonalMessage} from "../../base/dto/PersonalMessage";
 import {InputException} from "../../../exception/InputException";
 import {SavedMessage} from "../../base/SavedMessage";
 import PromiseVerify from "../../base/PromiseVerify";
+import {PersonalDataQuery} from "../../base/dto/PersonalDataQuery";
 
 @Controller()
 export class PersonalMessageController extends SavedMessage {
-    constructor(private readonly appService: PersonalAccount) {
+    constructor(private readonly appService: PersonalMessageService) {
         super();
     }
 
     @Get()
-    async listOfMessage(@Body() dto: DataQuery) {
+    async listOfMessage(@Body() dto: PersonalDataQuery) {
         await this.init();
 
         let haveErr = await PromiseVerify.all([
@@ -65,6 +65,8 @@ export class PersonalMessageController extends SavedMessage {
         if (message?.statusCode)
             return message;
 
+        message.roomType = 'Personal';
+
         await this.appService.addMessage(this.phoneNumber, this.userId, message);
 
         return Json.builder(Response.HTTP_CREATED);
@@ -84,6 +86,9 @@ export class PersonalMessageController extends SavedMessage {
             return message;
 
         delete message.messageId;
+        delete message?.roomType;
+        delete message?.messageCreatedBySenderId;
+        delete message?.messageSentRoomId;
 
         await this.appService.updateMessage(this.phoneNumber, messageId, message);
 

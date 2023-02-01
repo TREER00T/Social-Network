@@ -1,4 +1,4 @@
-import {Controller, Delete, Param} from '@nestjs/common';
+import {Body, Controller, Delete, Param} from '@nestjs/common';
 import {E2EDeleteChatService} from './E2EDeleteChat.service';
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
@@ -12,24 +12,27 @@ export class E2EDeleteChatController extends E2EMessage {
         super();
     }
 
-    @Delete("/:id/us")
-    async deleteChatForUs(@Param("id") targetUserId: string) {
-        let e2eChatName = await this.validation(targetUserId);
+    @Delete("/:targetUserId/us")
+    async deleteChatForUs(@Param("targetUserId") targetUserId: string, @Body("roomId") roomId: string) {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(roomId),
+            this.validation(targetUserId)
+        ]);
 
-        if (typeof e2eChatName !== "string")
-            return e2eChatName;
+        if (haveErr)
+            return haveErr;
 
-        await this.appService.deleteChatForUs(e2eChatName, this.userId, targetUserId);
+        await this.appService.deleteChatForUs(roomId, this.userId, targetUserId);
 
         return Json.builder(Response.HTTP_OK);
     }
 
-    @Delete("/:id/me")
-    async deleteChatForMe(@Param("id") targetUserId: string) {
-        let e2eChatName = await this.validation(targetUserId);
+    @Delete("/:targetUserId/me")
+    async deleteChatForMe(@Param("targetUserId") targetUserId: string) {
+        let haveErr = await this.validation(targetUserId);
 
-        if (typeof e2eChatName !== "string")
-            return e2eChatName;
+        if (haveErr)
+            return haveErr;
 
         await this.appService.deleteChatForMe(this.userId, targetUserId);
 
@@ -40,8 +43,7 @@ export class E2EDeleteChatController extends E2EMessage {
         await this.init();
 
         return await PromiseVerify.all([
-            this.verifyUser(targetUserId),
-            this.getNameOfE2EChat(targetUserId)
+            this.verifyUser(targetUserId)
         ]);
     }
 }

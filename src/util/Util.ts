@@ -18,8 +18,9 @@ export default {
                 'isReply', 'isForward',
                 'targetReplyId', 'forwardDataId',
                 'locationLat', 'locationLon',
-                'senderId', 'messageId',
-                'receiverId', 'roomId'
+                'messageId', 'roomId',
+                'messageCreatedBySenderId', 'messageSentRoomId',
+                'roomType'
             ],
             arrayOfMessageType = [
                 'None', 'Image',
@@ -46,15 +47,22 @@ export default {
 
         let haveReplyId = jsonObject?.isReply,
             haveForwardId = jsonObject?.isForward,
+            isFile = jsonObject?.type !== 'None' && jsonObject?.type !== 'Location' && isTypeInMessageType,
             isNoneMessageType = jsonObject?.type === MESSAGE_WITHOUT_FILE,
             isMessageTypeLocation = jsonObject?.type === MESSAGE_TYPE_LOCATION,
             haveMessageType = jsonObject?.type,
             haveRoomId = jsonObject?.roomId,
             haveText = jsonObject?.text,
-            haveSenderId = jsonObject?.senderId,
+            haveSenderId = jsonObject?.messageCreatedBySenderId,
             haveLocationLat = jsonObject?.locationLat,
             haveLocationLon = jsonObject?.locationLon;
 
+        if (isFile) {
+            delete jsonObject?.locationLon;
+            delete jsonObject?.forwardDataId;
+            delete jsonObject?.isForward;
+            delete jsonObject?.locationLat;
+        }
 
         if ((isMessageTypeLocation && (!haveLocationLon || !haveLocationLat)) || !haveMessageType || (!haveSenderId && haveRoomId) ||
             (!haveMessageType && !isNoneMessageType && !isMessageTypeLocation) || (!haveText && isNoneMessageType))

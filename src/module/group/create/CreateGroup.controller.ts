@@ -30,7 +30,7 @@ export class CreateGroupController extends User {
                 format: Util.getFileFormat(avatar.originalname)
             });
 
-        let groupId = await this.appService.createGroupAndReturnId(name, avatarUrl.url);
+        let groupId = await this.appService.createGroupAndReturnId(name, avatarUrl?.url);
 
         await this.appService.createGroupContent(this.userId, groupId);
 

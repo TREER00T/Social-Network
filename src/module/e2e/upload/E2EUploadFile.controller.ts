@@ -2,23 +2,22 @@ import {Body, Controller, Post, UploadedFile, UseInterceptors} from '@nestjs/com
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
 import {FileInterceptor} from "@nestjs/platform-express";
-import {RoomMessage} from "../../base/dto/RoomMessage";
-import {E2EMessage} from "../../base/E2EMessage";
 import PromiseVerify from "../../base/PromiseVerify";
+import {E2EMessage} from "../../base/E2EMessage";
+import {TE2EMessage} from "../../base/dto/TE2EMessage";
 
 @Controller()
 export class E2EUploadFileController extends E2EMessage {
 
     @Post()
     @UseInterceptors(FileInterceptor("file"))
-    async save(@UploadedFile() file: Express.Multer.File, @Body() msg: RoomMessage) {
+    async save(@UploadedFile() file: Express.Multer.File, @Body() msg: TE2EMessage) {
         await this.init();
 
         let targetUserId = msg?.receiverId;
 
         let message = await PromiseVerify.all([
             this.isUndefined(file),
-            this.isUndefined(msg?.senderId),
             this.verifyUser(targetUserId),
             this.handleMessage(msg)
         ]);
@@ -34,7 +33,7 @@ export class E2EUploadFileController extends E2EMessage {
         if (!isExistChatRoom)
             return Json.builder(Response.HTTP_NOT_FOUND);
 
-        delete message?.receiverId;
+        delete message.receiverId;
 
         return await this.saveAndGetId({
             file: {
@@ -42,7 +41,7 @@ export class E2EUploadFileController extends E2EMessage {
                 buffer: file.buffer,
                 name: file.originalname
             },
-            tableName: `${this.userId}And${targetUserId}E2EContents`,
+            tableName: msg.roomId,
             message: message,
             conversationType: "E2E"
         });

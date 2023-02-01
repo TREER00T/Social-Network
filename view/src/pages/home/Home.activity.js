@@ -1,21 +1,27 @@
 import HomeNavbar from "pages/home/HomeNavbar";
-import ListOfChat from "pages/home/ListOfChat";
+import ListOfChatWithTabView from "pages/home/ListOfChatWithTabView";
 import ChatNavbar from "pages/home/ChatNavbar";
 import ChatContent from "pages/home/ChatContent";
 import {Navigate} from "react-router-dom";
 import {useCookies} from "react-cookie";
 import {useState} from "react";
+import NotFound from "component/NotFound";
 
 function HomeActivity() {
 
-    const [cookies] = useCookies(['accessToken']);
     const [search, setSearch] = useState('');
+    const [cookies] = useCookies(['accessToken']);
     const [hasSearchViewOpen, setHasSearchViewOpen] = useState('');
+    const [tabViewItemClickedData, setTabViewItemClickedData] = useState({});
 
-    const handleTextSearched = d => {
+    const handleTabViewItemClickedData = d => {
+        setTabViewItemClickedData(d);
+    }, handleTextSearched = d => {
         setSearch(d);
     }, handleHasSearchViewOpen = d => {
         setHasSearchViewOpen(d);
+    }, handleNavbarBackButton = () => {
+        setTabViewItemClickedData({});
     };
 
     return (
@@ -25,24 +31,32 @@ function HomeActivity() {
             {/*}*/}
 
             {/* Navbar */}
-            <HomeNavbar getTextSearched={handleTextSearched} hasSearchViewOpen={handleHasSearchViewOpen}/>
+            <HomeNavbar
+                getTextSearched={handleTextSearched}
+                hasSearchViewOpen={handleHasSearchViewOpen}/>
 
             {/* Body */}
             <div className="flex mt-3">
 
                 {/* List Of Channel, Group, E2E Or Saved Message */}
-                <ListOfChat dataSearched={search} hasSearchViewOpen={hasSearchViewOpen}/>
+                <ListOfChatWithTabView
+                    dataSearched={search}
+                    hasSearchViewOpen={hasSearchViewOpen}
+                    getItemData={handleTabViewItemClickedData}/>
 
-                {/* Chat Body */}
-                <div className="flex flex-col">
+                {
+                    /* Chat Body */
+                    tabViewItemClickedData?.type ?
+                        <div className="flex flex-col ml-6">
 
-                    {/* Chat NavBar */}
-                    <ChatNavbar/>
+                            {/* Chat NavBar */}
+                            <ChatNavbar data={tabViewItemClickedData} backButton={handleNavbarBackButton}/>
 
-                    {/* Chat Contents */}
-                    <ChatContent/>
+                            {/* Chat Contents */}
+                            <ChatContent data={tabViewItemClickedData}/>
 
-                </div>
+                        </div> : <NotFound/>
+                }
 
             </div>
 

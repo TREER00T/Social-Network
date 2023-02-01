@@ -16,4 +16,8 @@ export class GroupLinkService {
     async hasExistPublicLink(link: string) {
         return await Find.isPublicKeyUsed(link);
     }
+
+    async getInviteAndPublicLink(groupId: string) {
+        return await Find.links(groupId);
+    }
 }

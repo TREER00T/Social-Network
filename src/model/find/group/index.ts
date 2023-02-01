@@ -24,11 +24,22 @@ export default {
         let data = await group().find({
             publicLink: publicLink
         }, {
-            _id: 0,
-            publicLink: 1
+            _id: 1
         });
 
         return data?._id?.toString();
+
+    },
+
+    async links(groupId: string) {
+
+        return await group().find({
+            _id: groupId
+        }, {
+            _id: 0,
+            publicLink: 1,
+            inviteLink: 1
+        });
 
     },
 
@@ -81,7 +92,7 @@ export default {
 
     async getInfo(groupId: string) {
 
-        return await group().find({_id: groupId})[0];
+        return await group().findById(groupId);
 
     },
 

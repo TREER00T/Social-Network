@@ -82,7 +82,7 @@ export default {
 
     async messageIntoUserSavedMessage(phone: string, userId: string, message) {
 
-        message.senderId = message.senderId ?? userId;
+        message.messageCreatedBySenderId = message.messageCreatedBySenderId ?? userId;
 
         if (message?.forwardDataId) {
             let data = await forwardContent()({

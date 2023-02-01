@@ -5,7 +5,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import {ThemeProvider} from "@material-tailwind/react";
 import PhoneNumberActivity from "pages/auth/PhoneNumber.activity";
 import {CookiesProvider} from 'react-cookie';
-import NotFound from "./pages/NotFound";
+import NotFoundActivity from "pages/NotFound.activity";
 import VerifyPasswordActivity from "pages/auth/verify/VerifyPassword.activity";
 import MainActivity from "pages/main/Main.activity";
 import HomeActivity from "pages/home/Home.activity";
@@ -37,7 +37,7 @@ root.render(
                     <Route path="home/create/group" element={<CreateGroupActivity/>}/>
                     <Route path="home/create/channel" element={<CreateChannelActivity/>}/>
                     <Route path="home/create/savedMessage" element={<CreateSavedMessageActivity/>}/>
-                    <Route path='*' element={<NotFound/>}/>
+                    <Route path='*' element={<NotFoundActivity/>}/>
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>

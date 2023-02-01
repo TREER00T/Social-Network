@@ -1,4 +1,6 @@
 import {RoomMessage} from "../module/base/dto/RoomMessage";
+import {PersonalMessage} from "../module/base/dto/PersonalMessage";
+import {TE2EMessage} from "../module/base/dto/TE2EMessage";
 
 type JsonObject = { [key: string]: any }
 type TToken = { accessToken: string, refreshToken: string }
@@ -34,7 +36,7 @@ type TUserDeviceInfo = {
 type MessagePayload = {
     file: IFile,
     tableName: string,
-    message: RoomMessage,
+    message: RoomMessage | PersonalMessage | TE2EMessage,
     conversationType: string
 }
 

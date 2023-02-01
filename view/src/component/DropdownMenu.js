@@ -18,7 +18,7 @@ export function DropDownItem({getHasClicked, name, img, haveAction, navigate}) {
                 className="block font-bold text-white">{name}</span>
 
             {
-                hasClicked && !haveAction ? navigate : <></>
+                hasClicked && !haveAction && navigate ? navigate : <></>
             }
         </li>
     );
@@ -31,7 +31,8 @@ export function DropdownMenu({className, children}) {
             <ul className="py-2 rounded-lg text-sm bg-blue-200">
                 {
                     children[0].img ?
-                        children.map(e => <DropDownItem
+                        children.map((e, i) => <DropDownItem
+                            key={i}
                             navigate={e.navigate}
                             name={e.name}
                             img={e.img}/>) : children

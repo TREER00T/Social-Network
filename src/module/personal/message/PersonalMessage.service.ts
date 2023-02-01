@@ -6,7 +6,7 @@ import Insert from "../../../model/add/user";
 let Update = require("../../../model/update/user");
 
 @Injectable()
-export class PersonalAccount {
+export class PersonalMessageService {
     async addMessage(userPhone: string, userId: string, message: PersonalMessage) {
         await Insert.messageIntoUserSavedMessage(userPhone, userId, message);
     }

@@ -16,4 +16,8 @@ export class E2EBlockUserService {
     async hasUserBlocked(userIdWhichCreatedChat: string, targetUserId: string) {
         return await Find.isBlock(userIdWhichCreatedChat, targetUserId);
     }
+
+    async hasBlockedByUser(userIdWhichCreatedChat: string, targetUserId: string) {
+        return await Find.hasBlockedByUser(userIdWhichCreatedChat, targetUserId);
+    }
 }

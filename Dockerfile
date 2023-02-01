@@ -1,23 +1,19 @@
 FROM node:18.12.1
 
-WORKDIR /src
-
 COPY . /src
+COPY ./view /view
 
-RUN npm i
+WORKDIR /src
+RUN npm i --force
 RUN node cmd.js serve
-
-EXPOSE 3000
-CMD npm run start:prod
+RUN npm run build
+RUN npm run start:prod
 
 WORKDIR /view
-
 RUN npm i
-
-EXPOSE 80
-
 RUN npm run build
-
 RUN npm i -g serve
+
+EXPOSE 3000 80
 
 CMD serve -s build -p 80

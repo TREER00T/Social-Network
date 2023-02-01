@@ -19,6 +19,6 @@ export class ContentSearchController {
         if (Util.isUndefined(result))
             return Json.builder(Response.HTTP_NOT_FOUND);
 
-        Json.builder(Response.HTTP_OK, result);
+        return Json.builder(Response.HTTP_OK, result);
     }
 }

@@ -14,10 +14,10 @@ export default {
 
         let data = await findMany({
             _id: {$in: messageId},
-            senderId: senderId
+            messageCreatedBySenderId: senderId
         }, {
             _id: 1,
-            senderId: 1
+            messageCreatedBySenderId: 1
         }, tableName).toArray();
 
         return !Util.isUndefined(data);

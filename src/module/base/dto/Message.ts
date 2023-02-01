@@ -42,4 +42,14 @@ export class Message {
     @IsOptional()
     @IsNotEmpty()
     messageId?: string;
+
+    @IsString()
+    @IsOptional()
+    @IsNotEmpty()
+    messageCreatedBySenderId?: string;
+
+    @IsString()
+    @IsOptional()
+    @IsNotEmpty()
+    messageSentRoomId?: string;
 }

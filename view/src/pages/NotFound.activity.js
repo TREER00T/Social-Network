@@ -1,7 +1,7 @@
 import PageNotFound from 'img/page-not-found.svg';
 import React, { useEffect } from 'react';
 
-export default function NotFound() {
+export default function NotFoundActivity() {
     useEffect(() => {
         document.title = 'Not Found';
     }, []);

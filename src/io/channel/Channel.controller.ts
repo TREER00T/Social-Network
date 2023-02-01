@@ -30,7 +30,7 @@ export class ChannelController extends AbstractChannel {
         if (haveErr)
             return socket.emit('emitLeaveChannelError', haveErr);
 
-        this.handleUserJoinState(socket, channelId, 'channel');
+        this.leaveUserFromRoom(socket, channelId, 'channel');
 
         socket.emit('emitLeaveUserFromChannel', Response.HTTP_OK);
     }
@@ -51,8 +51,8 @@ export class ChannelController extends AbstractChannel {
             return socket.emit('emitChannelMessageError', haveErr);
 
         delete data.roomId;
-        data.senderId = senderId;
-
+        data.messageCreatedBySenderId = senderId;
+        data.messageSentRoomId = `${channelId}ChannelContents`;
 
         let message = await this.handleMessage(data);
 
@@ -97,8 +97,9 @@ export class ChannelController extends AbstractChannel {
 
         delete data.roomId;
         delete data.messageId;
-
-        data.senderId = senderId;
+        delete data?.roomType;
+        delete data?.messageCreatedBySenderId;
+        delete data?.messageSentRoomId;
 
 
         let message = await this.handleMessage(data);

@@ -1,9 +1,8 @@
-import Json from "../../util/ReturnJson";
-import Response from "../../util/Response";
-import {RoomMessage} from "./dto/RoomMessage";
 import {User} from "./User";
-import PromiseVerify from "./PromiseVerify";
+import Json from "../../util/ReturnJson";
 import Find from "../../model/find/user";
+import Response from "../../util/Response";
+import PromiseVerify from "./PromiseVerify";
 import {PersonalMessage} from "./dto/PersonalMessage";
 
 export abstract class SavedMessage extends User {
@@ -14,7 +13,7 @@ export abstract class SavedMessage extends User {
             return Json.builder(Response.HTTP_NOT_FOUND);
     }
 
-    async handleSavedMessage(msg: RoomMessage | PersonalMessage) {
+    async handleSavedMessage(msg: PersonalMessage) {
         return await PromiseVerify.all([
             this.verifySavedMessage(),
             this.handleMessage(msg)

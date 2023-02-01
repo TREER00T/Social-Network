@@ -16,10 +16,10 @@ function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
 
     const wrapperRef = useRef('navbar');
     const [hasSearchOff, setHasSearchOff] = useState(true);
-    const [hasClickedLogout, setHasClickedLogout] = useState(false);
     const [accessToLogout, setAccessToLogout] = useState(false);
-    const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(false);
+    const [hasClickedLogout, setHasClickedLogout] = useState(false);
     const [hasOpenedUserMenu, setHasOpenedUserMenu] = useState(false);
+    const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(false);
 
     useOutsideAlerter(wrapperRef, () => {
         setHasOpenedOptionMenu(false);
@@ -35,11 +35,11 @@ function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
         setHasOpenedOptionMenu(!hasOpenedOptionMenu);
     }, handleUserMenu = () => {
         setHasOpenedUserMenu(!hasOpenedUserMenu);
-    }, handleAccessToLogout = (d) => {
+    }, handleAccessToLogout = d => {
         setAccessToLogout(d);
         if (d)
             removeAllCookie();
-    }, handleClickedLogout = (d) => {
+    }, handleClickedLogout = d => {
         setHasClickedLogout(d);
     };
 
@@ -48,7 +48,7 @@ function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
         <div className="flex my-2 mx-3 relative" ref={wrapperRef}>
 
             <ImageButton src={Menu} onClick={handleUserMenu}
-                         ref={wrapperRef}/>
+                         innerRef={wrapperRef}/>
 
             <span className="mt-1 ml-3 font-bold text-blue-100 text-xl">
                 Telegram
@@ -76,7 +76,7 @@ function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
                 handler={handleClickedLogout}
                 accessToNavigate={hasClickedLogout}
                 getAccessToAction={handleAccessToLogout}
-                children='Do you want to logout?'/>
+                children="Do you want to logout?"/>
 
             {
                 accessToLogout ? <Navigate to="/user/login"/> : <></>
