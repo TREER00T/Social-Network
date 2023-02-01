@@ -1,4 +1,4 @@
-import {Body, Controller, Put} from '@nestjs/common';
+import {Body, Controller, Get, Put} from '@nestjs/common';
 import {GroupLinkService} from './GroupLink.service';
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
@@ -10,6 +10,22 @@ import {Group} from "../../base/Group";
 export class GroupLinkController extends Group {
     constructor(private readonly appService: GroupLinkService) {
         super();
+    }
+
+    @Get()
+    async getInviteAndPublicLink(@Body("groupId") groupId: string) {
+        await this.init();
+
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(groupId),
+            this.isOwner(groupId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        return Json.builder(Response.HTTP_OK,
+            await this.appService.getInviteAndPublicLink(groupId));
     }
 
     @Put("/invite")
@@ -28,7 +44,7 @@ export class GroupLinkController extends Group {
 
         await this.appService.updateInviteLink(groupId, link);
 
-        return Json.builder(Response.HTTP_OK, {
+        return Json.builder(Response.HTTP_CREATED, {
             inviteLink: link
         });
     }
@@ -55,7 +71,7 @@ export class GroupLinkController extends Group {
         await this.appService.updatePublicLink(groupId, link);
 
         return Json.builder(Response.HTTP_CREATED, {
-            inviteLink: link
+            publicLink: link
         });
     }
 }

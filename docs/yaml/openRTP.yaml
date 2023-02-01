@@ -1,6 +1,6 @@
 info:
   title: Social Network Socket.io API
-  version: 2.0.0
+  version: 2.1.0
   contact:
     email: treeroot.ir@gmail.com
     phone: '+989030207892'
@@ -67,7 +67,6 @@ paths:
       parameters:
         - $ref:
             - components/ReceiverId
-            - components/SenderId
       events:
         - $ref:
             - components/emitPvTypingError
@@ -79,7 +78,7 @@ paths:
       parameters:
         - $ref:
             - components/ReceiverId
-            - components/SenderId
+            - components/MessageCreatedBySenderId
             - components/DataMessage
       events:
         - $ref:
@@ -92,7 +91,6 @@ paths:
       parameters:
         - $ref:
             - components/ReceiverId
-            - components/SenderId
             - components/DataMessage
             - components/MessageId
       events:
@@ -214,7 +212,7 @@ paths:
 definitions:
   Online Status:
     - name: userId
-      type: integer
+      type: string
     - name: isOnline
       type: boolean
   Status Code & Message:
@@ -305,22 +303,22 @@ components:
     ReceiverId:
       - in: param
         name: receiverId
-        type: integer
+        type: string
         required: true
-    UploadedId:
+    MessageCreatedBySenderId:
       - in: param
-        name: id
-        type: integer
+        name: messageCreatedBySenderId
+        type: string
         required: true
-    SenderId:
+    MessageSentRoomId:
       - in: param
-        name: senderId
-        type: integer
+        name: messageSentRoomId
+        type: string
         required: true
     RoomId:
       - in: param
         name: roomId
-        type: integer
+        type: string
         required: true
     ListOfId:
       - in: param
@@ -330,7 +328,7 @@ components:
     MessageId:
       - in: param
         name: messageId
-        type: integer
+        type: string
         required: true
     DataMessage:
       - in: param
@@ -342,16 +340,16 @@ components:
         type: string
       - in: param
         name: targetReplyId
-        type: integer
+        type: string
       - in: param
         name: forwardDataId
-        type: integer
+        type: string
       - in: param
         name: locationLat
-        type: integer
+        type: string
       - in: param
         name: locationLon
-        type: integer
+        type: string
       - in: param
         name: isReply
         type: boolean

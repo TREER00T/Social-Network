@@ -56,6 +56,14 @@ export default {
         statusCode: 209,
         message: 'OK , But you need to two step verification'
     },
+    HTTP_OK_BUT_ME_BLOCKED_BY_TARGET_USER_ID: {
+        statusCode: 210,
+        message: 'OK , But me blocked by target user id'
+    },
+    HTTP_OK_BUT_TARGET_USER_ID_BLOCKED_BY_ME: {
+        statusCode: 211,
+        message: 'OK , But target user id blocked by me'
+    },
     HTTP_IM_USED: {
         statusCode: 226,
         message: 'IM Used'

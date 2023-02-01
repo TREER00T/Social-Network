@@ -12,14 +12,9 @@ export class GroupUploadFileController extends Group {
     async save(@UploadedFile() file: Express.Multer.File, @Body() msg: RoomMessage) {
         await this.init();
 
-        let receiverId = msg?.receiverId,
-            groupId = msg?.roomId;
-
-        if (!Util.isUndefined(receiverId))
-            delete msg?.receiverId;
+        let groupId = msg.roomId;
 
         let message = await PromiseVerify.all([
-            this.isUndefined(groupId),
             this.isUndefined(file),
             this.isUserJoined(groupId),
             this.handleMessage(msg)
@@ -29,9 +24,10 @@ export class GroupUploadFileController extends Group {
         if (message?.statusCode)
             return message;
 
-        delete message?.roomId;
+        delete message.roomId;
 
-        message.senderId = this.userId;
+        message.messageCreatedBySenderId = this.userId;
+        message.messageSentRoomId = `${groupId}GroupContents`;
 
         return await this.saveAndGetId({
             file: {

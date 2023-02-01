@@ -2,7 +2,7 @@ swagger: "2.0"
 info:
   title: Social Network API
   description: Social Network API Documentation
-  version: 2.0.0
+  version: 2.1.0
   contact:
     email: treeroot.ir@gmail.com
   license:
@@ -29,7 +29,7 @@ securityDefinitions:
     description: REST API uses a persistent Api Key.
     type: apiKey
     in: header
-    name: apiKey
+    name: x-api-key
   token:
     description: REST API uses a persistent JWT Token.
     type: apiKey
@@ -52,8 +52,10 @@ paths:
       parameters:
         - in: body
           name: phone
-          type: integer
+          type: string
           required: true
+          minLength: 6
+          maxLength: 16
       responses:
         400:
           description: Bad Request
@@ -114,12 +116,16 @@ paths:
       parameters:
         - in: body
           name: phone
-          type: number
+          type: string
           required: true
+          minLength: 6
+          maxLength: 16
         - in: body
           name: code
           type: number
           required: true
+          maxLength: 999999
+          minLength: 100000
         - in: body
           name: deviceLocation
           type: string
@@ -159,6 +165,7 @@ paths:
           name: password
           type: string
           required: true
+          minLength: 6
         - in: body
           name: deviceLocation
           type: string
@@ -207,8 +214,8 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: userId
-          type: number
+          name: targetUserId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -248,7 +255,7 @@ paths:
           description: Created
           schema:
             type: object
-            $ref: '#/definitions/StatusWithDataObject'
+            $ref: '#/definitions/Status'
 
 
   /e2e/uploadFile:
@@ -261,37 +268,25 @@ paths:
       parameters:
         - in: formData
           name: receiverId
-          type: number
+          type: string
           required: true
         - in: formData
           name: file
           type: file
           required: true
         - in: formData
-          name: senderId
-          type: number
-          required: true
-        - in: formData
           name: isReply
           type: boolean
           required: false
         - in: formData
-          name: isForward
-          type: boolean
-          required: false
-        - in: formData
           name: targetReplyId
-          type: number
-          required: false
-        - in: formData
-          name: forwardDataId
-          type: number
+          type: string
           required: false
         - in: formData
           name: type
           schema:
             $ref: '#/definitions/FileType'
-          required: false
+          required: true
       security:
         - apiKey: [ ]
         - token: [ ]
@@ -331,13 +326,13 @@ paths:
     put:
       tags:
         - E2E
-      summary: Block OR UnBlock User In end to end message room
+      summary: Block Or UnBlock User In end to end message room
       consumes:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
-          type: number
+          name: targetUserId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -373,6 +368,56 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+    get:
+      tags:
+        - E2E
+      summary: Check Block Or UnBlock User In end to end message room
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: targetUserId
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        210:
+          description: OK , But me blocked by target user id
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        211:
+          description: OK , But target user id blocked by me
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
   /e2e/chats:
     get:
@@ -383,13 +428,15 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: to
-          type: number
+          name: roomId
+          type: string
           required: true
+          minLength: 1
         - in: body
           name: search
-          type: number
+          type: string
           required: true
+          minLength: 1
         - in: body
           name: limit
           type: number
@@ -445,7 +492,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /e2e/user/info:
     get:
       tags:
@@ -455,8 +501,8 @@ paths:
         - application/json
       parameters:
         - in: query
-          name: id
-          type: number
+          name: userId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -493,17 +539,17 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /e2e/{id}/me:
+  /e2e/{targetUserId}/me:
     delete:
       tags:
         - E2E
-      summary: delete all message for me in end to end message
+      summary: Delete all message for me in end to end message
       consumes:
         - application/json
       parameters:
         - in: path
-          name: id
-          type: number
+          name: targetUserId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -545,17 +591,21 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /e2e/{id}/us:
+  /e2e/{targetUserId}/us:
     delete:
       tags:
         - E2E
-      summary: delete all message for us in end to end message
+      summary: Delete all message for us in end to end message
       consumes:
         - application/json
       parameters:
         - in: path
-          name: id
-          type: number
+          name: targetUserId
+          type: string
+          required: true
+        - in: body
+          name: roomId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -630,8 +680,7 @@ paths:
             type: object
             $ref: '#/definitions/StatusWithDataObject'
 
-
-  /personal/username/{id}:
+  /personal/username/{username}:
     put:
       tags:
         - Personal
@@ -720,7 +769,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /personal/name:
     put:
       tags:
@@ -767,8 +815,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
-
   /personal/twoAuth/enable:
     put:
       tags:
@@ -785,6 +831,7 @@ paths:
           name: password
           type: string
           required: true
+          minLength: 6
       security:
         - apiKey: [ ]
         - token: [ ]
@@ -864,10 +911,12 @@ paths:
           name: old
           type: string
           required: true
+          minLength: 6
         - in: body
           name: new
           type: string
           required: true
+          minLength: 6
       security:
         - apiKey: [ ]
         - token: [ ]
@@ -946,7 +995,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /personal/blockUsers:
     get:
       tags:
@@ -984,7 +1032,6 @@ paths:
             type: object
             $ref: '#/definitions/StatusWithDataObject'
 
-
   /personal/devices:
     get:
       tags:
@@ -1016,7 +1063,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
 
   /personal/savedMessage/exist:
     get:
@@ -1091,7 +1137,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
     post:
       tags:
         - Personal
@@ -1122,12 +1167,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-        409:
-          description: Conflict
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-
 
   /personal/account:
     delete:
@@ -1170,12 +1209,8 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: to
-          type: number
-          required: true
-        - in: body
           name: search
-          type: number
+          type: string
           required: true
         - in: body
           name: limit
@@ -1226,7 +1261,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataAndOptionObject'
-
     post:
       tags:
         - Personal
@@ -1235,41 +1269,45 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
+          name: messageCreatedBySenderId
+          type: string
+          required: false
+        - in: body
+          name: messageSentRoomId
+          type: string
+          required: false
+        - in: body
           name: text
           type: string
           required: false
         - in: body
           name: type
           type: string
-          required: false
+          required: true
         - in: body
           name: isReply
-          type: string
+          type: boolean
           required: false
         - in: body
           name: isForward
-          type: string
+          type: boolean
           required: false
         - in: body
           name: targetReplyId
-          type: number
+          type: string
           required: false
         - in: body
           name: forwardDataId
-          type: number
+          type: string
           required: false
         - in: body
           name: locationLat
-          type: number
+          type: string
           required: false
         - in: body
           name: locationLon
-          type: number
+          type: string
           required: false
-        - in: body
-          name: senderId
-          type: number
-          required: true
       security:
         - apiKey: [ ]
         - token: [ ]
@@ -1304,7 +1342,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
     delete:
       tags:
         - Personal
@@ -1313,7 +1350,7 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: body
+          name: listOfId
           required: true
           schema:
             type: object
@@ -1352,7 +1389,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
     put:
       tags:
         - Personal
@@ -1367,38 +1403,34 @@ paths:
         - in: body
           name: type
           type: string
-          required: false
+          required: true
         - in: body
           name: isReply
-          type: string
+          type: boolean
           required: false
         - in: body
           name: isForward
-          type: string
+          type: boolean
           required: false
         - in: body
           name: targetReplyId
-          type: number
+          type: string
           required: false
         - in: body
           name: forwardDataId
-          type: number
+          type: string
           required: false
         - in: body
           name: locationLat
-          type: number
+          type: string
           required: false
         - in: body
           name: locationLon
-          type: number
+          type: string
           required: false
         - in: body
-          name: senderId
-          type: number
-          required: true
-        - in: body
           name: messageId
-          type: number
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -1461,21 +1493,9 @@ paths:
           type: string
           required: false
         - in: formData
-          name: isForward
-          type: string
-          required: false
-        - in: formData
           name: targetReplyId
           type: number
           required: false
-        - in: formData
-          name: forwardDataId
-          type: number
-          required: false
-        - in: formData
-          name: senderId
-          type: number
-          required: true
         - in: formData
           name: file
           type: file
@@ -1589,29 +1609,21 @@ paths:
           type: string
           required: false
         - in: formData
+          name: roomId
+          type: string
+          required: true
+        - in: formData
           name: type
           type: string
-          required: false
+          required: true
         - in: formData
           name: isReply
-          type: string
-          required: false
-        - in: formData
-          name: isForward
           type: string
           required: false
         - in: formData
           name: targetReplyId
           type: number
           required: false
-        - in: formData
-          name: forwardDataId
-          type: number
-          required: false
-        - in: formData
-          name: senderId
-          type: number
-          required: true
         - in: formData
           name: file
           type: file
@@ -1661,8 +1673,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
-  /group/{id}:
+  /group/{groupId}:
     delete:
       tags:
         - Group
@@ -1670,9 +1681,9 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: path
+        - in: body
           name: groupId
-          type: number
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -1714,7 +1725,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /group/name:
     put:
       tags:
@@ -1725,7 +1735,7 @@ paths:
       parameters:
         - in: body
           name: groupId
-          type: number
+          type: string
           required: true
         - in: body
           name: name
@@ -1776,7 +1786,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /group/description:
     put:
       tags:
@@ -1787,7 +1796,7 @@ paths:
       parameters:
         - in: body
           name: groupId
-          type: number
+          type: string
           required: true
         - in: body
           name: description
@@ -1846,12 +1855,12 @@ paths:
       consumes:
         - multipart/form-data
       parameters:
-        - in: body
+        - in: formData
           name: groupId
-          type: number
+          type: string
           required: true
         - in: formData
-          name: image
+          name: avatar
           type: file
           required: true
       security:
@@ -1899,7 +1908,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /group/link/invite:
     put:
       tags:
@@ -1910,7 +1918,64 @@ paths:
       parameters:
         - in: body
           name: groupId
-          type: number
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
+          description: Created
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+  /group/link:
+    get:
+      tags:
+        - Group
+      summary: Return Public And Invite Link
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: groupId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -1967,7 +2032,7 @@ paths:
       parameters:
         - in: body
           name: groupId
-          type: number
+          type: string
           required: true
         - in: body
           name: link
@@ -2028,11 +2093,11 @@ paths:
       parameters:
         - in: body
           name: groupId
-          type: number
+          type: string
           required: true
         - in: body
-          name: userId
-          type: number
+          name: targetUserId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -2087,11 +2152,11 @@ paths:
       parameters:
         - in: body
           name: groupId
-          type: number
+          type: string
           required: true
         - in: body
-          name: userId
-          type: number
+          name: targetUserId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -2138,7 +2203,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /group/users:
     post:
       tags:
@@ -2149,12 +2213,8 @@ paths:
       parameters:
         - in: body
           name: groupId
-          type: number
+          type: string
           required: true
-        - in: body
-          name: userId
-          type: number
-          required: false
       security:
         - apiKey: [ ]
         - token: [ ]
@@ -2206,9 +2266,9 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: query
+        - in: body
           name: groupId
-          type: number
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -2252,8 +2312,8 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
-          type: number
+          name: groupId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -2295,8 +2355,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
-
   /group/chats:
     get:
       tags:
@@ -2306,12 +2364,12 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: to
-          type: number
+          name: roomId
+          type: string
           required: true
         - in: body
           name: search
-          type: number
+          type: string
           required: true
         - in: body
           name: limit
@@ -2368,7 +2426,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /group/info:
     get:
       tags:
@@ -2377,9 +2434,9 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: query
+        - in: body
           name: groupId
-          type: number
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -2415,7 +2472,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-
 
   /channel/create:
     post:
@@ -2477,33 +2533,25 @@ paths:
         - multipart/form-data
       parameters:
         - in: formData
+          name: roomId
+          type: string
+          required: true
+        - in: formData
           name: text
           type: string
           required: false
         - in: formData
           name: type
           type: string
-          required: false
+          required: true
         - in: formData
           name: isReply
-          type: string
-          required: false
-        - in: formData
-          name: isForward
           type: string
           required: false
         - in: formData
           name: targetReplyId
           type: number
           required: false
-        - in: formData
-          name: forwardDataId
-          type: number
-          required: false
-        - in: formData
-          name: senderId
-          type: number
-          required: true
         - in: formData
           name: file
           type: file
@@ -2553,8 +2601,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
-  /channel/{id}:
+  /channel/{channelId}:
     delete:
       tags:
         - Channel
@@ -2562,9 +2609,9 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: path
+        - in: body
           name: channelId
-          type: number
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -2606,7 +2653,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /channel/name:
     put:
       tags:
@@ -2617,7 +2663,7 @@ paths:
       parameters:
         - in: body
           name: channelId
-          type: number
+          type: string
           required: true
         - in: body
           name: name
@@ -2668,7 +2714,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /channel/description:
     put:
       tags:
@@ -2679,7 +2724,7 @@ paths:
       parameters:
         - in: body
           name: channelId
-          type: number
+          type: string
           required: true
         - in: body
           name: description
@@ -2738,12 +2783,12 @@ paths:
       consumes:
         - multipart/form-data
       parameters:
-        - in: body
+        - in: formData
           name: channelId
-          type: number
+          type: string
           required: true
         - in: formData
-          name: image
+          name: avatar
           type: file
           required: true
       security:
@@ -2791,18 +2836,17 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
-  /channel/link/invite:
-    put:
+  /channel/link:
+    get:
       tags:
         - Channel
-      summary: Change channel chat room to invite link
+      summary: Return Public And Invite Link
       consumes:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
           name: channelId
-          type: number
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -2849,6 +2893,63 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
+  /channel/link/invite:
+    put:
+      tags:
+        - Channel
+      summary: Change channel chat room to invite link
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: channelId
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
+          description: Created
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
   /channel/link/public:
     put:
       tags:
@@ -2859,7 +2960,7 @@ paths:
       parameters:
         - in: body
           name: channelId
-          type: number
+          type: string
           required: true
         - in: body
           name: link
@@ -2910,7 +3011,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /channel/admins:
     post:
       tags:
@@ -2921,11 +3021,11 @@ paths:
       parameters:
         - in: body
           name: channelId
-          type: number
+          type: string
           required: true
         - in: body
-          name: userId
-          type: number
+          name: targetUserId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -2979,12 +3079,12 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
-          type: number
+          name: channelId
+          type: string
           required: true
         - in: body
-          name: userId
-          type: number
+          name: targetUserId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -3031,9 +3131,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
-
-
   /channel/users:
     get:
       tags:
@@ -3042,9 +3139,9 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: query
+        - in: body
           name: channelId
-          type: number
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -3088,8 +3185,8 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
-          type: number
+          name: channelId
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -3138,13 +3235,9 @@ paths:
         - application/x-www-form-urlencoded
       parameters:
         - in: body
-          name: id
-          type: number
+          name: channelId
+          type: string
           required: true
-        - in: body
-          name: userId
-          type: number
-          required: false
       security:
         - apiKey: [ ]
         - token: [ ]
@@ -3190,7 +3283,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-
   /channel/chats:
     get:
       tags:
@@ -3200,12 +3292,12 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: to
-          type: number
+          name: roomId
+          type: string
           required: true
         - in: body
           name: search
-          type: number
+          type: string
           required: true
         - in: body
           name: limit
@@ -3270,9 +3362,9 @@ paths:
       consumes:
         - application/json
       parameters:
-        - in: query
+        - in: body
           name: channelId
-          type: number
+          type: string
           required: true
       security:
         - apiKey: [ ]
@@ -3351,20 +3443,14 @@ paths:
             type: object
             $ref: '#/definitions/StatusWithDataObject'
 
-
-
 definitions:
   ListOfIdForDeleteMessage:
     properties:
       listOfId:
         type:
-          - number
+          - string
           - array
   ResponseInviteLinkInDataObject:
-    properties:
-      inviteLink:
-        type: string
-  ResponseListOfUsersInDataObject:
     properties:
       inviteLink:
         type: string
@@ -3372,11 +3458,17 @@ definitions:
     properties:
       img:
         type: string
-      id:
-        type: number
       username:
         type: string
       name:
+        type: string
+      defaultColor:
+        type: string
+      lastName:
+        type: string
+      isActive:
+        type: boolean
+      bio:
         type: string
   ResponseInfoInOptionObject:
     properties:
@@ -3384,7 +3476,7 @@ definitions:
         type: number
   ResponseInfoInDataObject:
     properties:
-      id:
+      _id:
         type: number
       img:
         type: string
@@ -3400,8 +3492,26 @@ definitions:
         type: string
   ResponseListOfBlockUsersInDataObject:
     properties:
-      userId:
+      _id:
         type: number
+      img:
+        type: string
+      name:
+        type: string
+      lastName:
+        type: string
+      isActive:
+        type: boolean
+      username:
+        type: string
+      defaultColor:
+        type: string
+  ResponseListOfLoggedDevicesInDataObject:
+    properties:
+      _id:
+        type: string
+      userId:
+        type: string
       deviceIp:
         type: string
       createdAt:
@@ -3410,21 +3520,9 @@ definitions:
         type: string
       deviceLocation:
         type: string
-      id:
-        type: number
-  ResponseListOfLoggedDevicesInDataObject:
-    properties:
-      img:
-        type: string
-      name:
-        type: string
-      username:
-        type: string
-      id:
-        type: number
   ReponseCommonSearchInDataObject:
     properties:
-      id:
+      _id:
         type: number
       name:
         type: string
@@ -3432,14 +3530,8 @@ definitions:
         type: string
       defaultColor:
         type: string
-      type:
-        type: string
-        description: rows type -> group , user , channel
   ListOfMessageForEachChatRoomInDataObject:
     properties:
-      to:
-        type: number
-        description: target user id
       limit:
         type: number
         default: 15
@@ -3451,7 +3543,7 @@ definitions:
       order:
         type: string
         default: id
-        description: order based on desired column, columns ->  text , date , type , isReply , fileUrl , senderId , fileName , fileSize , location , isForward , targetReplyId , forwardDataId
+        description: order based on desired column, columns ->  text , date , type , isReply , fileUrl , forwardData , fileName , fileSize , location , isForward , targetReplyId , forwardDataId
       sort:
         type: number
         default: DESC
@@ -3462,6 +3554,9 @@ definitions:
       search:
         type: string
         description: search in text column
+      forwardData:
+        type: object
+        description: Contains map of forward data like img, _id, name,... into this chat room
   FileType:
     properties:
       type:
@@ -3519,11 +3614,7 @@ definitions:
         type: string
   ReponseUploadFileInDataObject:
     properties:
-      insertId:
-        type: number
-  ResponseListOfMessageForEachChatRoomInOptionObject:
-    properties:
-      totalPages:
+      insertedId:
         type: number
   ResponseUserInfromationInDataObject:
     properties:
@@ -3558,13 +3649,15 @@ definitions:
       defaultColor:
         type: string
       phone:
-        type: number
+        type: string
+      _id:
+        type: string
       email:
         type: string
   ResponseListOfMessageForEachChatRoomInDataObject:
     properties:
-      id:
-        type: number
+      _id:
+        type: string
       text:
         type: string
       date:
@@ -3575,17 +3668,19 @@ definitions:
         type: boolean
       fileUrl:
         type: string
-      senderId:
-        type: number
+      messageCreatedBySenderId:
+        type: string
+      messageSentRoomId:
+        type: string
       fileName:
         type: string
       fileSize:
         type: string
       location:
-        type: string
+        type: array
       isForward:
         type: boolean
       targetReplyId:
-        type: number
+        type: string
       forwardDataId:
-        type: number
+        type: string

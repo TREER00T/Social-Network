@@ -16,4 +16,8 @@ export class ChannelLinkService {
     async hasExistPublicLink(link: string) {
         return await Find.isPublicKeyUsed(link);
     }
+
+    async getInviteAndPublicLink(channelId: string) {
+        return await Find.links(channelId);
+    }
 }

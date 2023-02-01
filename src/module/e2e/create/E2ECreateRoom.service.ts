@@ -1,12 +1,13 @@
 import {Injectable} from '@nestjs/common';
 import Insert from "../../../model/add/user";
+import Generate from "../../../util/Generate";
 
 let Create = require("../../../model/create/user");
 
 @Injectable()
 export class E2ECreateRoomService {
     async initializationRoom(targetUserId: string, userIdWhichCreatedChat: string) {
-        let tableName = `${userIdWhichCreatedChat}And${targetUserId}E2EContents`;
+        let tableName = `${Generate.getRandomHash(20)}E2EContents`;
 
         Create.e2eContent(userIdWhichCreatedChat, targetUserId);
 

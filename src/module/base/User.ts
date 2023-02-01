@@ -5,10 +5,11 @@ import {HandleMessage} from "./HandleMessage";
 import PromiseVerify from "./PromiseVerify";
 import File from "../../util/File";
 import OptionQuerySearch from "../../util/OptionQuerySearch";
-import {DataQuery} from "./dto/DataQuery";
 import {MessagePayload} from "../../util/Types";
 import CommonInsert from "../../model/add/common";
 import Find from "../../model/find/user";
+import {PersonalDataQuery} from "./dto/PersonalDataQuery";
+import {RoomDataQuery} from "./dto/RoomDataQuery";
 
 export abstract class User extends HandleMessage {
 
@@ -55,7 +56,7 @@ export abstract class User extends HandleMessage {
         });
     }
 
-    async getListOfMessageFromRoom(dto: DataQuery, tableName: string) {
+    async getListOfMessageFromRoom(dto: RoomDataQuery | PersonalDataQuery, tableName: string) {
         let query = OptionQuerySearch.build(dto);
 
         let listOfMessage = await this.getListOfMessage(tableName, query);

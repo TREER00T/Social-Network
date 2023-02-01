@@ -1,4 +1,4 @@
-import {Body, Controller, Put} from '@nestjs/common';
+import {Body, Controller, Get, Put} from '@nestjs/common';
 import {E2EBlockUserService} from './E2EBlockUser.service';
 import {User} from "../../base/User";
 import Response from "../../../util/Response";
@@ -8,6 +8,28 @@ import Json from "../../../util/ReturnJson";
 export class E2EBlockUserController extends User {
     constructor(private readonly appService: E2EBlockUserService) {
         super();
+    }
+
+    @Get()
+    async hasUserBlock(@Body("targetUserId") targetUserId: string) {
+        await this.init();
+
+        let haveErr = await this.verifyUser(targetUserId);
+
+        if (haveErr)
+            return haveErr;
+
+        let hasBlockedByMe = this.appService.hasBlockedByUser(this.userId, targetUserId);
+
+        if (hasBlockedByMe)
+            return Json.builder(Response.HTTP_OK_BUT_TARGET_USER_ID_BLOCKED_BY_ME);
+
+        let hasMeBlockedByTargetUserId = this.appService.hasBlockedByUser(targetUserId, this.userId);
+
+        if (hasMeBlockedByTargetUserId)
+            return Json.builder(Response.HTTP_OK_BUT_ME_BLOCKED_BY_TARGET_USER_ID);
+
+        return Json.builder(Response.HTTP_NOT_FOUND);
     }
 
     @Put()

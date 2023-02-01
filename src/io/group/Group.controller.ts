@@ -30,7 +30,7 @@ export class GroupController extends AbstractGroup {
         if (haveErr)
             return socket.emit('emitLeaveUserFromGroupError', haveErr);
 
-        this.handleUserJoinState(socket, groupId, 'group');
+        this.leaveUserFromRoom(socket, groupId, 'group');
         socket.emit('emitLeaveUserFromGroup', Response.HTTP_OK);
     }
 
@@ -49,7 +49,8 @@ export class GroupController extends AbstractGroup {
             return socket.emit('emitGroupMessageError', haveErr);
 
         delete data.roomId;
-        data.senderId = senderId;
+        data.messageCreatedBySenderId = senderId;
+        data.messageSentRoomId = `${groupId}GroupContents`;
 
 
         let message = await this.handleMessage(data);
@@ -94,9 +95,9 @@ export class GroupController extends AbstractGroup {
 
         delete data.roomId;
         delete data.messageId;
-
-        data.senderId = senderId;
-
+        delete data?.roomType;
+        delete data?.messageCreatedBySenderId;
+        delete data?.messageSentRoomId;
 
         let message = await this.handleMessage(data);
 

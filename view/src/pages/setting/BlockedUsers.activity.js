@@ -36,7 +36,7 @@ function Item({data: {img, defaultColor, name, lastName, isActive, _id}}) {
             <td className="px-6 py-4">
                 <div className="flex items-center">
                     <div
-                        className={(isActive ? "bg-red-500" : "bg-green-500") + " h-2.5 w-2.5 rounded-full mr-2"}/>
+                        className={(isActive ? "bg-green-500" : "bg-red-500") + " h-2.5 w-2.5 rounded-full mr-2"}/>
                     {
                         isActive ? 'Online' : 'Offline'
                     }

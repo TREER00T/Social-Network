@@ -1,4 +1,4 @@
-import {Body, Controller, Put} from '@nestjs/common';
+import {Body, Controller, Get, Put} from '@nestjs/common';
 import {ChannelLinkService} from './ChannelLink.service';
 import {Channel} from "../../base/Channel";
 import Json from "../../../util/ReturnJson";
@@ -10,6 +10,22 @@ import PromiseVerify from "../../base/PromiseVerify";
 export class ChannelLinkController extends Channel {
     constructor(private readonly appService: ChannelLinkService) {
         super();
+    }
+
+    @Get()
+    async getInviteAndPublicLink(@Body("channelId") channelId: string) {
+        await this.init();
+
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(channelId),
+            this.isOwner(channelId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        return Json.builder(Response.HTTP_OK,
+            this.appService.getInviteAndPublicLink(channelId));
     }
 
     @Put("/invite")
@@ -28,7 +44,7 @@ export class ChannelLinkController extends Channel {
 
         await this.appService.updateInviteLink(channelId, link);
 
-        return Json.builder(Response.HTTP_OK, {
+        return Json.builder(Response.HTTP_CREATED, {
             inviteLink: link
         });
     }
@@ -55,7 +71,7 @@ export class ChannelLinkController extends Channel {
         await this.appService.updatePublicLink(channelId, link);
 
         return Json.builder(Response.HTTP_CREATED, {
-            inviteLink: link
+            publicLink: link
         });
     }
 }

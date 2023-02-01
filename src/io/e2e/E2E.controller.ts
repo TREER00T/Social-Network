@@ -28,8 +28,6 @@ export class E2EController extends AbstractRoom {
         if (typeof d !== "object")
             return;
 
-        delete data.receiverId;
-
         data.senderId = d.senderId;
 
         this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvTyping', data);
@@ -42,72 +40,82 @@ export class E2EController extends AbstractRoom {
         if (typeof d !== "object")
             return;
 
-        let receiverId = data.receiverId;
+        let haveErr = PromiseVerify.all([
+            this.isUndefined(data?.roomId)
+        ]);
 
-        delete data.receiverId;
+        if (haveErr)
+            return socket.emit('emitPvMessageError', haveErr);
 
-        data.senderId = d.senderId;
-
+        data.messageCreatedBySenderId = d.senderId;
+        data.messageSentRoomId = data.roomId;
 
         let message = await this.handleMessage(data);
 
         if (message?.statusCode)
-            return socket.emit('emitPvMessage', message);
+            return socket.emit('emitPvMessageError', message);
 
         this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvMessage', message);
 
         await this.saveMessage({
             conversationType: 'E2E',
-            tableName: `${d.senderId}And${receiverId}E2EContents`,
+            tableName: data.roomId,
             message: message
         });
     }
 
     @SubscribeMessage("onPvEditMessage")
     async updatePvMessage(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
-        let messageId = data?.messageId;
-
-        let haveErr = await PromiseVerify.all([
-            this.isUndefined(messageId)
-        ]);
-
-        if (haveErr)
-            return socket.emit('emitPvEditMessageError', haveErr);
-
+        let messageId = data?.messageId,
+            roomId = data?.roomId;
 
         let d = await this.verifyPv(socket, 'emitPvEditMessageError', data);
 
         if (typeof d !== "object")
             return;
 
-        let receiverId = data.receiverId;
-        let isUserMessage = this.isUserMessage(d.senderId, messageId, `${d.senderId}And${receiverId}E2EContents`);
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(messageId),
+            this.isUndefined(roomId)
+        ]);
+
+        if (haveErr)
+            return socket.emit('emitPvEditMessageError', haveErr);
+
+        let isUserMessage = this.isUserMessage(d.senderId, messageId, roomId);
 
         if (!isUserMessage)
             return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
-        delete data.receiverId;
         delete data.messageId;
-
-        data.senderId = d.senderId;
-
+        delete data?.roomType;
+        delete data?.messageCreatedBySenderId;
+        delete data?.messageSentRoomId;
 
         let message = await this.handleMessage(data);
 
         if (message?.statusCode)
-            return socket.emit('emitPvEditMessage', message);
+            return socket.emit('emitPvEditMessageError', message);
 
         this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvEditMessage', message);
 
         await this.updateMessage({
-            tableName: `${d.senderId}And${receiverId}E2EContents`,
+            tableName: roomId,
             message: message
         }, messageId);
     }
 
     @SubscribeMessage("onPvDeleteMessage")
     async removePvMessage(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
-        let listOfId = data?.listOfId;
+        let listOfId = data?.listOfId,
+            roomId = data?.roomId;
+
+        let haveErr = PromiseVerify.all([
+            this.isUndefined(roomId)
+        ]);
+
+        if (haveErr)
+            return socket.emit('emitPvMessageError', haveErr);
 
         if (!Array.isArray(listOfId) && listOfId.length === 0)
             return socket.emit('emitPvDeleteMessageError', Response.HTTP_BAD_REQUEST);
@@ -118,16 +126,14 @@ export class E2EController extends AbstractRoom {
         if (typeof d !== "object")
             return;
 
-        let receiverId = data.receiverId;
-        let isUserMessage = this.isUserMessage(d.senderId, listOfId, `${d.senderId}And${receiverId}E2EContents`);
+        let isUserMessage = this.isUserMessage(d.senderId, listOfId, roomId);
 
         if (!isUserMessage)
             return socket.emit('emitPvDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-
         this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvDeleteMessage', Response.HTTP_OK);
 
-        await this.removeMessage(`${d.senderId}And${receiverId}E2EContents`, listOfId);
+        await this.removeMessage(roomId, listOfId);
     }
 
     async verifyPv(socket: Socket, errEmit: string, data: JsonObject) {

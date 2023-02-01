@@ -117,7 +117,7 @@ export default {
         // Delete the list of messages of any channelContent sent by the user
         for (const item of arr) {
             await deleteMany({
-                senderId: userId
+                messageCreatedBySenderId: userId
             }, `${item.channelId}ChannelContents`);
         }
     },
@@ -126,7 +126,7 @@ export default {
         // Delete the list of messages of any group sent by the user
         for (const item of arr) {
             await deleteMany({
-                senderId: userId
+                messageCreatedBySenderId: userId
             }, `${item.groupId}GroupContents`);
         }
     },

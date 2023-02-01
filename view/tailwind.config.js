@@ -6,6 +6,9 @@ module.exports = withMT({
         "./src/**/*.{js,jsx,ts,tsx}"
     ],
     theme: {
+        maxWidth: {
+            '4xl': '950px',
+        },
         colors: {
             white: 'white',
             blue: {

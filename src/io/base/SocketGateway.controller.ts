@@ -93,11 +93,16 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
     }
 
     handleUserJoinState(socket: Socket, roomId: string, type: string) {
-        let isRoomAddedInList = this.io.sockets.adapter.rooms.get(roomId + type);
+        let isRoomAddedInSocketList = this.io.sockets.adapter.rooms.get(roomId + type);
 
-        if (!isRoomAddedInList)
+        if (!isRoomAddedInSocketList)
             socket.join(roomId + type);
-        else
+    }
+
+    leaveUserFromRoom(socket: Socket, roomId: string, type: string) {
+        let isRoomAddedInSocketList = this.io.sockets.adapter.rooms.get(roomId + type);
+
+        if (isRoomAddedInSocketList)
             socket.leave(roomId + type);
     }
 

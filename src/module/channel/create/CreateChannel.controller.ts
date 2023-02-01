@@ -30,7 +30,7 @@ export class CreateChannelController extends User {
                 format: Util.getFileFormat(avatar.originalname)
             });
 
-        let channelId = await this.appService.createChannelAndReturnId(name, avatarUrl.url);
+        let channelId = await this.appService.createChannelAndReturnId(name, avatarUrl?.url);
 
         await this.appService.createChannelContent(this.userId, channelId);
 

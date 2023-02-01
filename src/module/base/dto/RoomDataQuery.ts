@@ -1,7 +1,7 @@
-import {Message} from "./Message";
 import {IsNotEmpty, IsString, Length} from "class-validator";
+import {DataQuery} from "./DataQuery";
 
-export class RoomMessage extends Message {
+export class RoomDataQuery extends DataQuery {
     @IsString()
     @IsNotEmpty()
     @Length(1)

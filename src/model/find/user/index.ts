@@ -1,4 +1,8 @@
 import {ObjectId} from "mongodb";
+import Util from '../../../util/Util';
+import FindInGroup from '../../../model/find/group';
+import FindInChannel from '../../../model/find/channel';
+import {AuthMsgBelongingToBetweenTwoUsers, ListOfUserId, ListOfUserTargetId} from "../../../util/Types";
 
 let {
         haveCollection,
@@ -13,10 +17,6 @@ let {
         listOfUserGroup,
         listOfUserChannel
     } = require('../../create/user');
-import Util from '../../../util/Util';
-import FindInGroup from '../../../model/find/group';
-import FindInChannel from '../../../model/find/channel';
-import {AuthMsgBelongingToBetweenTwoUsers, ListOfUserId, ListOfUserTargetId} from "../../../util/Types";
 
 
 export default {
@@ -118,19 +118,17 @@ export default {
 
     async isExistChatRoom(data: AuthMsgBelongingToBetweenTwoUsers) {
 
-        let result = await listOfUserE2E().findOne({
-            toUser: data.toUser,
-            fromUser: data.fromUser,
+        let result = await listOfUserE2E().find({
             $or: [
-                {toUser: data.fromUser},
-                {fromUser: data.toUser}
+                {fromUser: data.toUser, toUser: data.fromUser},
+                {fromUser: data.fromUser, toUser: data.toUser}
             ]
         }, {
             _id: 0,
             tblChatId: 1
         });
 
-        return result?.tblChatId;
+        return result[0]?.tblChatId;
 
     },
 
@@ -146,76 +144,66 @@ export default {
 
     },
 
-
-    async getTableNameForListOfE2EMessage(fromUser: string, toUser: string) {
-
-        let result = await listOfUserE2E().findOne({
-            $or: [
-                {fromUser: toUser, toUser: fromUser},
-                {fromUser: fromUser, toUser: toUser}
-            ]
-        }, {
-            _id: 0,
-            tblChatId: 1
-        });
-
-
-        return result?.tblChatId?.toString();
-
-    },
-
-
     async getListOfMessage(data) {
 
-        if (!Util.isUndefined(data?.type)) {
+        const queryFilter = async queryResult => {
+            let query = await queryResult.sort({
+                [data.order === 'id' ? '_id' : data.order]: data.sort?.toLowerCase()
+            });
+
+            queryResult.limit(data.limit);
+
+            if (data.startFrom !== 0)
+                query.skip(data.startFrom);
+
+            let result = await query.toArray();
+
+            return result.map(async d => {
+                if (!d?.messageCreatedBySenderId || !d?.messageSentRoomId)
+                    return d;
+
+                let haveFromE2ERoom = /(.*?)E2EContents/.test(d.messageSentRoomId);
+                let haveFromGroupRoom = /(.*?)GroupContents/.test(d.messageSentRoomId);
+                let haveFromChannelRoom = /(.*?)ChannelContents/.test(d.messageSentRoomId);
+                let haveFromPersonalRoom = /(.*?)SavedMessage/.test(d.messageSentRoomId);
+
+                const getChannelInfo = async () => await FindInChannel.getInfo(d.messageSentRoomId),
+                    getUserInfo = async () => await this.getUserPvDetails(d.messageCreatedBySenderId);
+
+                if (haveFromPersonalRoom || haveFromGroupRoom || haveFromE2ERoom)
+                    d.forwardData = await getUserInfo();
+
+                if (haveFromChannelRoom)
+                    d.forwardData = await getChannelInfo();
+
+                delete d.messageCreatedBySenderId;
+                delete d.messageSentRoomId;
+
+                return d;
+            });
+        }
+
+        if (data.type) {
 
             let queryResult = await findMany({
                 type: data.type
             }, data.tableName);
 
-            let queryFilter = await queryResult.sort({
-                [data.order === 'id' ? '_id' : data.order]: data.sort.toLowerCase(),
-            });
-
-            queryResult.limit(data.limit);
-
-            if (data.startFrom !== 0)
-                queryFilter.skip(data.startFrom);
-
-            return queryFilter.toArray();
+            return queryFilter(queryResult);
         }
 
-        if (!Util.isUndefined(data.search)) {
+        if (data.search) {
 
             let queryResult = await findMany({
                 text: {$regex: new RegExp(data.search)}
             }, data.tableName);
 
-
-            let queryFilter = await queryResult.sort({
-                [data.order === 'id' ? '_id' : data.order]: data.sort.toLowerCase()
-            });
-
-            queryResult.limit(data.limit);
-
-            if (data.startFrom !== 0)
-                queryFilter.skip(data.startFrom);
-
-            return queryFilter.toArray();
+            return queryFilter(queryResult);
         }
 
         let queryResult = await findMany(data.tableName);
 
-        let queryFilter = await queryResult.sort({
-            [data.order === 'id' ? '_id' : data.order]: data.sort.toLowerCase(),
-        });
-
-        queryResult.limit(data.limit);
-
-        if (data.startFrom !== 0)
-            queryFilter.skip(data.startFrom);
-
-        return queryFilter.toArray();
+        return queryFilter(queryResult);
 
     },
 
@@ -268,7 +256,18 @@ export default {
             ]
         });
 
-        return Util.isNotEmptyArr(result?._id?.toString()) ? `${result?._id}` : false;
+        return Util.isNotEmptyArr(result?.[0]?._id?.toString());
+
+    },
+
+    async hasBlockedByUser(from: string, targetId: string) {
+
+        let result = await userBlockList().findOne({
+            userId: from,
+            userTargetId: targetId
+        });
+
+        return result?._id?.toString();
 
     },
 
@@ -317,7 +316,7 @@ export default {
             defaultColor: 1
         });
 
-        return Util.isUndefined(data) ? false : data;
+        return !Util.isNotEmptyArr(data) ? false : data;
 
     },
 
@@ -335,7 +334,7 @@ export default {
             username: 1
         });
 
-        return Util.isUndefined(data) ? false : data;
+        return !Util.isNotEmptyArr(data) ? false : data;
 
     },
 
@@ -346,7 +345,7 @@ export default {
             userId: id
         });
 
-        return Util.isUndefined(data) ? false : data;
+        return !Util.isNotEmptyArr(data) ? false : data;
 
     },
 

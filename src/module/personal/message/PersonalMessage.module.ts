@@ -1,10 +1,10 @@
 import {Module} from "@nestjs/common";
 import {PersonalMessageController} from "./PersonalMessage.controller";
-import {PersonalAccount} from "./PersonalMessage.service";
+import {PersonalMessageService} from "./PersonalMessage.service";
 
 @Module({
     controllers: [PersonalMessageController],
-    providers: [PersonalAccount]
+    providers: [PersonalMessageService]
 })
 export class PersonalMessageModule {
 }
