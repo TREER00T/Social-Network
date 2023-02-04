@@ -20,18 +20,14 @@ export class PersonalUploadFileController extends SavedMessage {
         if (message?.statusCode)
             return message;
 
-        message.messageCreatedBySenderId = this.userId;
-        message.messageSentRoomId = `${this.phoneNumber}SavedMessage`;
-
         return await this.saveAndGetId({
             file: {
                 size: file.size,
                 buffer: file.buffer,
                 name: file.originalname
             },
-            tableName: `${this.phoneNumber}SavedMessage`,
-            message: message,
-            conversationType: "Personal"
+            tableName: `${this.userId}SavedMessage`,
+            message: message
         });
     }
 }

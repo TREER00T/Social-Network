@@ -6,10 +6,6 @@ let {
         listOfUserGroup,
         listOfUserChannel
     } = require('../../create/user'),
-    UpdateInCommon = require('../../../model/update/common'),
-    {
-        forwardContent
-    } = require('../../create/common'),
     {
         insertOne
     } = require('../../../database/mongoDbDriverConnection');
@@ -56,6 +52,7 @@ export default {
         await device()({
             userId: user.id,
             deviceIp: user.ip,
+            createdAt: new Date(),
             deviceName: user.name,
             deviceLocation: user.location
         }).save();
@@ -80,27 +77,12 @@ export default {
 
     },
 
-    async messageIntoUserSavedMessage(phone: string, userId: string, message) {
+    async messageIntoUserSavedMessage(userId: string, message) {
 
-        message.messageCreatedBySenderId = message.messageCreatedBySenderId ?? userId;
+        message.messageCreatedBySenderId = userId;
+        message.messageSentRoomId = `${userId}SavedMessage`;
 
-        if (message?.forwardDataId) {
-            let data = await forwardContent()({
-                conversationId: `${phone}SavedMessage`,
-                conversationType: 'Personal'
-            }).save();
-
-            message.forwardDataId = `${data._id}`;
-            message.isForward = 1;
-
-            let insertedData = await insertOne(message, `${phone}SavedMessage`);
-
-            await UpdateInCommon.messageIdFromTableForwardContents(message.forwardDataId, insertedData.insertedId);
-
-            return;
-        }
-
-        await insertOne(message, `${phone}SavedMessage`);
+        await insertOne(message, message.messageSentRoomId);
 
     }
 

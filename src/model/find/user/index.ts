@@ -73,6 +73,20 @@ export default {
     },
 
 
+    async haveFirstName(phone: string) {
+
+        let data = await user().findOne({
+            phone: phone
+        }, {
+            _id: 0,
+            name: 1
+        });
+
+        return data?.name;
+
+    },
+
+
     async password(phone: string) {
 
         let data = await user().findOne({
@@ -104,14 +118,12 @@ export default {
 
     async getApiKey(phone: string) {
 
-        let data = await user().findOne({
+        return await user().findOne({
             phone: phone
         }, {
             _id: 0,
             apiKey: 1
         });
-
-        return data?.apiKey;
 
     },
 
@@ -375,9 +387,9 @@ export default {
 
     },
 
-    async isSavedMessageCreated(phone: string) {
+    async isSavedMessageCreated(userId: string) {
 
-        return await haveCollection(`${phone}SavedMessage`);
+        return await haveCollection(`${userId}SavedMessage`);
 
     },
 
@@ -470,6 +482,12 @@ export default {
         data?.map(d => d.toUser);
 
         return data;
+    },
+
+    async hasLogout(userId:string) {
+        let data = await user().findById(userId);
+
+        return data?.hasLogout;
     }
 
 }

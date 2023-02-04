@@ -20,7 +20,7 @@ export default {
 
     jsonObject(obj: IResponse, data?: any, option?: object) {
         let objectBuilder = {
-            code: obj.statusCode,
+            statusCode: obj.statusCode,
             message: obj.message,
             data: data
         };

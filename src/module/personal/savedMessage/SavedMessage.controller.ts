@@ -29,7 +29,7 @@ export class SavedMessageController extends SavedMessage {
     async createSavedMessage() {
         await this.init();
 
-        await this.appService.addSavedMessage(this.phoneNumber);
+        await this.appService.addSavedMessage(this.userId);
 
         return Json.builder(Response.HTTP_CREATED);
     }
@@ -38,7 +38,7 @@ export class SavedMessageController extends SavedMessage {
     async deleteSavedMessage() {
         await this.init();
 
-        await this.appService.removeSavedMessage(this.phoneNumber);
+        await this.appService.removeSavedMessage(this.userId);
 
         return Json.builder(Response.HTTP_OK);
     }

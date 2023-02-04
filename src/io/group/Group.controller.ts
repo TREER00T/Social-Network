@@ -52,19 +52,17 @@ export class GroupController extends AbstractGroup {
         data.messageCreatedBySenderId = senderId;
         data.messageSentRoomId = `${groupId}GroupContents`;
 
-
         let message = await this.handleMessage(data);
 
         if (message?.statusCode)
-            return socket.emit('emitGroupMessage', message);
+            return socket.emit('emitGroupMessageError', message);
 
         this.handleUserJoinState(socket, groupId, 'group');
 
         this.emitToSpecificSocket(groupId, 'emitGroupMessage', message);
 
         await this.saveMessage({
-            conversationType: 'Group',
-            tableName: `${groupId}GroupContents`,
+            tableName: data.messageSentRoomId,
             message: message
         });
     }
@@ -95,7 +93,6 @@ export class GroupController extends AbstractGroup {
 
         delete data.roomId;
         delete data.messageId;
-        delete data?.roomType;
         delete data?.messageCreatedBySenderId;
         delete data?.messageSentRoomId;
 

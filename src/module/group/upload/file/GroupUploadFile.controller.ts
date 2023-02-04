@@ -1,7 +1,6 @@
 import {Body, Controller, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
 import {FileInterceptor} from "@nestjs/platform-express";
 import {RoomMessage} from "../../../base/dto/RoomMessage";
-import Util from "../../../../util/Util";
 import PromiseVerify from "../../../base/PromiseVerify";
 import {Group} from "../../../base/Group";
 
@@ -35,9 +34,8 @@ export class GroupUploadFileController extends Group {
                 buffer: file.buffer,
                 name: file.originalname
             },
-            tableName: `${groupId}GroupContents`,
-            message: message,
-            conversationType: "Group"
+            tableName: message.messageSentRoomId,
+            message: message
         });
     }
 }

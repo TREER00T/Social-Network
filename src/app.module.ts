@@ -1,4 +1,4 @@
-import {Module} from "@nestjs/common";
+import {MiddlewareConsumer, Module, NestModule} from "@nestjs/common";
 import {RouterModule} from "@nestjs/core";
 import {GenerateUserModule} from "./module/user/gen/GenerateUser.module";
 import {TwoStepModule} from "./module/user/twoStep/TwoStep.module";
@@ -49,6 +49,8 @@ import {ChannelController} from "./io/channel/Channel.controller";
 import {E2EController} from "./io/e2e/E2E.controller";
 import {GroupController} from "./io/group/Group.controller";
 import {CommonController} from "./io/common/Common.controller";
+import {UserProfileModule} from "./module/user/profile/UserProfile.module";
+import {LoggerMiddleware} from "./LoggerMiddleware";
 
 @Module({
     imports: [
@@ -58,6 +60,7 @@ import {CommonController} from "./io/common/Common.controller";
         TwoStepModule,
         VerifyOTPModule,
         RefreshTokenModule,
+        UserProfileModule,
 
         // E2E module
         E2ECreateRoomModule,
@@ -139,6 +142,10 @@ import {CommonController} from "./io/common/Common.controller";
                                         module: TwoStepModule
                                     }
                                 ]
+                            },
+                            {
+                                path: "profile/name",
+                                module: UserProfileModule
                             }
                         ]
                     },
@@ -369,5 +376,8 @@ import {CommonController} from "./io/common/Common.controller";
     // Socket.io
     providers: [ChannelController, E2EController, GroupController, CommonController]
 })
-export class AppModule {
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(LoggerMiddleware).forRoutes('*');
+    }
 }

@@ -73,15 +73,21 @@ module.exports = {
 
     },
 
-    async itemInSavedMessage(phone, id, data) {
+    async itemInSavedMessage(userId, messageId, data) {
 
-        await updateOne(data, {_id: id}, `${phone}SavedMessage`);
+        await updateOne(data, {_id: messageId}, `${userId}SavedMessage`);
 
     },
 
     async twoStepVerificationState(userPhone, state) {
 
         await user().updateOne({phone: userPhone}, {$set: {twoStepVerification: state}});
+
+    },
+
+    async logoutUser(phone, hasLogout) {
+
+        await user().updateOne({phone: phone}, {$set: {hasLogout: hasLogout}});
 
     }
 

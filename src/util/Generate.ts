@@ -10,7 +10,7 @@ export default {
 
     // Generates verification code E.g : 335496
     getVerificationCode(): number {
-        return Math.floor(100000 + Math.random() * 999999);
+        return Math.floor(100000 + Math.random() * 900000);
     },
 
 

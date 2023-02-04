@@ -11,7 +11,15 @@ dotenv.config();
 export default {
 
     requestEndpointHandler(requestEndpoint: string): string {
-        const arrayOfHttpUrls = [
+        let arrayOfHttpUrlsRequireJwtToken = [
+            "/api/v1/auth/profile/name",
+            "/api/v1/auth/profile/name/"
+        ];
+
+        if (arrayOfHttpUrlsRequireJwtToken.includes(requestEndpoint))
+            return "RequireJwtToken";
+
+        let arrayOfHttpUrlsRequireJwtTokenAndApiKey = [
             "/api/v1/auth/generate/user",
             "/api/v1/auth/generate/user/",
             "/api/v1/auth/verify/otp",
@@ -20,15 +28,15 @@ export default {
 
         //                                                      Searching in string to ensure exactly string
         //                                                      In some case it was break something like this: /api/channel/1452/us
-        return arrayOfHttpUrls.includes(requestEndpoint)
+        return arrayOfHttpUrlsRequireJwtTokenAndApiKey.includes(requestEndpoint)
             ? "" :
             requestEndpoint.match(/\d+/g)?.length > 0
-                ? "AuthRoute" :
-                /\/api\/v1\/common\/search[\/]?(.*)/.test(requestEndpoint) ? '' : "AuthRoute";
+                ? "RequireJwtTokenAndApiKey" :
+                /\/api\/v1\/common\/search[\/]?(.*)/.test(requestEndpoint) ? '' : "RequireJwtTokenAndApiKey";
     },
 
     // Verify jwt and check jwt expired time
-    async getJwtVerify(token): Promise<any> {
+    async getJwtVerify(token, response?): Promise<any> {
 
         return new Promise(async res => {
 
@@ -37,11 +45,15 @@ export default {
 
                     if (err instanceof TokenExpiredError) {
                         res("TOKEN_EXP");
+                        if (response)
+                            response.send(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
                         return Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
                     }
 
                     if (err instanceof JsonWebTokenError) {
                         res("IN_VALID_TOKEN");
+                        if (response)
+                            response.send(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
                         return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
                     }
 
@@ -57,7 +69,7 @@ export default {
 
 
     // The jwt decrypt with JWK library and return jwt
-    async getJwtDecrypt(encryptedBody) {
+    async getJwtDecrypt(encryptedBody, res?) {
         try {
             let keystore = JWK.createKeyStore();
             await keystore.add(await JWK.asKey(process.env.JWE_PRAIVATE_KEY, "pem"));
@@ -65,8 +77,11 @@ export default {
             let decryptedVal = await outPut.perform(keystore);
             let token = Buffer.from(decryptedVal.plaintext).toString();
 
-            if (!decryptedVal?.plaintext)
+            if (!decryptedVal?.plaintext) {
+                if (res)
+                    res.send(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
                 return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
+            }
 
             return token.replace(/["]+/g, "");
 

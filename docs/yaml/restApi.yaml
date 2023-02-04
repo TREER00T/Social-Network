@@ -48,7 +48,7 @@ paths:
         - Auth
       summary: Adds a new user
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: phone
@@ -56,6 +56,37 @@ paths:
           required: true
           minLength: 6
           maxLength: 16
+      responses:
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        201:
+          description: Created
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+
+  /auth/profile/name:
+    put:
+      tags:
+        - Auth
+      summary: Update first and last name
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: firstName
+          type: string
+          required: true
+          minLength: 3
+        - in: body
+          name: lastName
+          type: string
+          required: false
       responses:
         400:
           description: Bad Request
@@ -112,7 +143,7 @@ paths:
         - Auth
       summary: Validation Verification code
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: phone
@@ -133,6 +164,11 @@ paths:
       responses:
         209:
           description: OK , But you need to two step verification
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        212:
+          description: OK , But you first name required
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -159,7 +195,7 @@ paths:
         - Auth
       summary: User Validation for 2-step verification
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: password
@@ -203,7 +239,11 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StatusWithDataObject'
-
+        212:
+          description: OK , But you first name required
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
   /e2e/create:
     post:
@@ -211,7 +251,7 @@ paths:
         - E2E
       summary: Create New end to end message room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: targetUserId
@@ -328,7 +368,7 @@ paths:
         - E2E
       summary: Block Or UnBlock User In end to end message room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: targetUserId
@@ -373,7 +413,7 @@ paths:
         - E2E
       summary: Check Block Or UnBlock User In end to end message room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: targetUserId
@@ -775,7 +815,7 @@ paths:
         - Personal
       summary: Update user first and last name
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: lastName
@@ -821,7 +861,7 @@ paths:
         - Personal
       summary: Enable two auth
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: email
@@ -905,7 +945,7 @@ paths:
         - Personal
       summary: Reset password for twwo auth
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: old
@@ -1199,6 +1239,36 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+    post:
+      tags:
+        - Personal
+      summary: Logout from Account
+      consumes:
+        - application/json
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
 
   /personal/message:
     get:
@@ -1266,7 +1336,7 @@ paths:
         - Personal
       summary: Insert message in saved message
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: messageCreatedBySenderId
@@ -1347,7 +1417,7 @@ paths:
         - Personal
       summary: Delete message in saved message
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: listOfId
@@ -1394,7 +1464,7 @@ paths:
         - Personal
       summary: Update message in saved message
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: text
@@ -1731,7 +1801,7 @@ paths:
         - Group
       summary: Change group chat room name
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: groupId
@@ -1792,7 +1862,7 @@ paths:
         - Group
       summary: Change group chat room description
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: groupId
@@ -1914,7 +1984,7 @@ paths:
         - Group
       summary: Change group chat room to invite link
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: groupId
@@ -1971,7 +2041,7 @@ paths:
         - Group
       summary: Return Public And Invite Link
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: groupId
@@ -2028,7 +2098,7 @@ paths:
         - Group
       summary: Change group chat room to public link
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: groupId
@@ -2089,7 +2159,7 @@ paths:
         - Group
       summary: Add admin for group chat room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: groupId
@@ -2148,7 +2218,7 @@ paths:
         - Group
       summary: Delete admin for group chat room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: groupId
@@ -2209,7 +2279,7 @@ paths:
         - Group
       summary: Join user into group chat room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: groupId
@@ -2309,7 +2379,7 @@ paths:
         - Group
       summary: Leave User from group chat room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: groupId
@@ -2659,7 +2729,7 @@ paths:
         - Channel
       summary: Change group channel room name
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: channelId
@@ -2720,7 +2790,7 @@ paths:
         - Channel
       summary: Change channel chat room description
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: channelId
@@ -2842,7 +2912,7 @@ paths:
         - Channel
       summary: Return Public And Invite Link
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: channelId
@@ -2899,7 +2969,7 @@ paths:
         - Channel
       summary: Change channel chat room to invite link
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: channelId
@@ -2956,7 +3026,7 @@ paths:
         - Channel
       summary: Change channel chat room to public link
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: channelId
@@ -3017,7 +3087,7 @@ paths:
         - Channel
       summary: Add admin for channel chat room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: channelId
@@ -3076,7 +3146,7 @@ paths:
         - Channel
       summary: Delete admin for channel chat room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: channelId
@@ -3182,7 +3252,7 @@ paths:
         - Channel
       summary: Leave User from channel chat room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: channelId
@@ -3232,7 +3302,7 @@ paths:
         - Channel
       summary: Join user into channel chat room
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       parameters:
         - in: body
           name: channelId

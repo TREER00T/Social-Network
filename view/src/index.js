@@ -17,6 +17,7 @@ import PrivacyActivity from "pages/setting/Privacy.activity";
 import DevicesActivity from "pages/setting/Devices.activity";
 import UserProfileSettingActivity from "pages/setting/UserProfileSetting.activity";
 import BlockedUsersActivity from "pages/setting/BlockedUsers.activity";
+import AddNameForProfile from "pages/auth/profile/name/AddNameForProfile.activity";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -29,6 +30,7 @@ root.render(
                     <Route path="user/login" element={<PhoneNumberActivity/>}/>
                     <Route path="user/login/verify/otp" element={<VerifyOTPCodeActivity/>}/>
                     <Route path="user/login/verify/password" element={<VerifyPasswordActivity/>}/>
+                    <Route path="user/profile" element={<AddNameForProfile/>}/>
                     <Route path="home" element={<HomeActivity/>}/>
                     <Route path="home/settings" element={<UserProfileSettingActivity/>}/>
                     <Route path="home/settings/privacy" element={<PrivacyActivity/>}/>

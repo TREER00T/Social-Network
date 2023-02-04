@@ -1,34 +1,53 @@
+import Cookies from "universal-cookie";
+
 export function isSuccess(resCode) {
     // Validation http status code
     return [200, 201, 202].includes(resCode);
 }
 
-function getTokenExpireTime() {
-    return new Date().getDate() + 1;
+function setMonth(number) {
+    const expireDate = new Date();
+    expireDate.setMonth(expireDate.getMonth() + number);
+    return expireDate;
 }
 
-function getApiKeyExpireTime() {
-    return new Date().getTime() + (10 * 365 * 24 * 60 * 60);
+function setYear(number) {
+    const expireDate = new Date();
+    expireDate.setFullYear(expireDate.getFullYear() + number);
+    return expireDate;
+}
+
+function getRefreshTokenExpireTime() {
+    return setMonth(2);
+}
+
+function getAccessTokenExpireTime() {
+    return setMonth(1);
 }
 
 export function getExpireTime() {
-    return new Date().getTime() + (10 * 365 * 24 * 60 * 60);
+    return setYear(1);
 }
 
 export function getAuthExpirePayload(data) {
+    if (!data)
+        return;
+
     let result = [
         {
             key: 'accessToken',
-            value: true,
+            value: data?.accessToken,
             option: {
-                expires: getTokenExpireTime()
+                expires: getAccessTokenExpireTime(),
+                path: '/'
             }
         },
         {
             key: 'refreshToken',
-            value: true,
+            value: data?.refreshToken,
             option: {
-                expires: getTokenExpireTime()
+                expires: getRefreshTokenExpireTime(),
+                path: '/'
             }
         }
     ];
@@ -36,17 +55,33 @@ export function getAuthExpirePayload(data) {
     if (data?.apiKey)
         result.push({
             key: 'apiKey',
-            value: true,
+            value: data.apiKey,
             option: {
-                expires: getApiKeyExpireTime()
+                expires: getExpireTime(),
+                path: '/'
             }
         });
 
     return result;
 }
 
+export const handleStorage = cookie => {
+    const cookies = new Cookies();
+
+    if (cookie.value) {
+        cookies.set(cookie.key, cookie.value, cookie?.option ? cookie?.option : {
+            expires: getExpireTime(),
+            path: '/'
+        });
+    }
+}
+
 export function isPassword(password) {
     return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/g.test(password);
+}
+
+export function haveName(name) {
+    return /^(?!\s*$)([^\s]{3,}(\s+[^\s]+)*)$/.test(name);
 }
 
 export function isValidOTPCode(otpCode) {

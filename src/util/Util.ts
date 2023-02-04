@@ -18,9 +18,7 @@ export default {
                 'isReply', 'isForward',
                 'targetReplyId', 'forwardDataId',
                 'locationLat', 'locationLon',
-                'messageId', 'roomId',
-                'messageCreatedBySenderId', 'messageSentRoomId',
-                'roomType'
+                'messageCreatedBySenderId', 'messageSentRoomId'
             ],
             arrayOfMessageType = [
                 'None', 'Image',
@@ -29,6 +27,16 @@ export default {
             ],
             isTypeInMessageType = arrayOfMessageType.includes(jsonObject?.type);
 
+        if (jsonObject?.forwardDataId || jsonObject?.isForward) {
+            jsonObject.type = 'Forward';
+            jsonObject.isReply = false;
+            jsonObject.isForward = true;
+
+            delete jsonObject?.text;
+            delete jsonObject?.locationLat;
+            delete jsonObject?.locationLon;
+            delete jsonObject?.targetReplyId;
+        }
 
         if (!isTypeInMessageType)
             return IN_VALID_MESSAGE_TYPE;
@@ -41,30 +49,26 @@ export default {
                 return IN_VALID_OBJECT_KEY;
         }
 
+        let isFile = jsonObject?.type !== 'None' && jsonObject?.type !== 'Location' && isTypeInMessageType;
+
+        if (isFile) {
+            delete jsonObject?.locationLon;
+            delete jsonObject?.locationLat;
+        }
 
         const MESSAGE_WITHOUT_FILE = 'None',
             MESSAGE_TYPE_LOCATION = 'Location';
 
         let haveReplyId = jsonObject?.isReply,
             haveForwardId = jsonObject?.isForward,
-            isFile = jsonObject?.type !== 'None' && jsonObject?.type !== 'Location' && isTypeInMessageType,
             isNoneMessageType = jsonObject?.type === MESSAGE_WITHOUT_FILE,
             isMessageTypeLocation = jsonObject?.type === MESSAGE_TYPE_LOCATION,
             haveMessageType = jsonObject?.type,
-            haveRoomId = jsonObject?.roomId,
             haveText = jsonObject?.text,
-            haveSenderId = jsonObject?.messageCreatedBySenderId,
             haveLocationLat = jsonObject?.locationLat,
             haveLocationLon = jsonObject?.locationLon;
 
-        if (isFile) {
-            delete jsonObject?.locationLon;
-            delete jsonObject?.forwardDataId;
-            delete jsonObject?.isForward;
-            delete jsonObject?.locationLat;
-        }
-
-        if ((isMessageTypeLocation && (!haveLocationLon || !haveLocationLat)) || !haveMessageType || (!haveSenderId && haveRoomId) ||
+        if ((isMessageTypeLocation && (!haveLocationLon || !haveLocationLat)) || !haveMessageType ||
             (!haveMessageType && !isNoneMessageType && !isMessageTypeLocation) || (!haveText && isNoneMessageType))
             return IN_VALID_OBJECT_KEY;
 
@@ -125,16 +129,16 @@ export default {
         return data?.length > 0;
     },
 
-    async tokenVerify(bearerHeader: string) {
-        let token = await this.handleToken(bearerHeader);
+    async tokenVerify(bearerHeader: string, res) {
+        let token = await this.handleToken(bearerHeader, res);
 
         tokenPayload = token;
 
         return token;
     },
 
-    async isAccessToken(bearerHeader: string) {
-        let token = await this.handleToken(bearerHeader);
+    async isAccessToken(bearerHeader: string, res?) {
+        let token = await this.handleToken(bearerHeader, res);
 
         if (!token)
             return false;
@@ -144,13 +148,13 @@ export default {
         return token.type === "at";
     },
 
-    async handleToken(bearerHeader: string) {
+    async handleToken(bearerHeader: string, res?) {
         let isSetUserToken = Validation.getSplitBearerJwt(bearerHeader);
 
         if (typeof isSetUserToken !== "string")
             return false;
 
-        return await Validation.getJwtVerify(await Validation.getJwtDecrypt(isSetUserToken));
+        return await Validation.getJwtVerify(await Validation.getJwtDecrypt(isSetUserToken, res), res);
     },
 
     async getTokenPayLoad(): Promise<JsonObject> {

@@ -11,7 +11,7 @@ import {isValidPhoneNumber} from "util/Utils";
 function PhoneNumberActivity() {
 
     const [phone, setPhone] = useState('');
-    const [cookies] = useCookies(['accessToken']);
+    const [cookies] = useCookies(['apiKey']);
     const [hasClicked, setHasClicked] = useState(false);
     const [data, setData] = useState({});
     const isPhoneNumber = isValidPhoneNumber(phone);
@@ -33,11 +33,11 @@ function PhoneNumberActivity() {
 
     return (
         <div>
-            {cookies?.accessToken ? <Navigate to="/home"/> : <></>}
+            {cookies?.apiKey ? <Navigate to="/home"/> : <></>}
 
             <ErrorHandler
                 redirectTo="/user/login/verify/otp"
-                setCookie={{key: 'phone', value: true}}
+                setCookie={{key: 'phone', value: phone}}
                 visibility={hasClicked}
                 handler={handleOpenDialog}
                 statusCode={data?.statusCode}/>

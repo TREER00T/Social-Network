@@ -20,6 +20,13 @@ export class TwoStepController extends User {
         if (!isValidPassword)
             return Json.builder(Response.HTTP_FORBIDDEN);
 
+        let haveFirstName = await this.appService.haveFirstName(this.phoneNumber);
+
+        if (!haveFirstName)
+            return Json.builder(Response.HTTP_OK_BUT_REQUIRE_FIRST_NAME);
+
+        await this.appService.logoutUser(this.phoneNumber);
+
         return Json.builder(Response.HTTP_ACCEPTED,
             await this.appService.getUserApiKey(this.phoneNumber, dto, req.ip, req.headers['user-agent']));
     }

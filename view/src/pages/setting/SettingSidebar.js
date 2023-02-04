@@ -24,22 +24,22 @@ function Item({data: {url, icon, name}}) {
     )
 }
 
-export default function SettingSidebar({userInfo: {img, defaultColor, name, lastName}, children}) {
+export default function SettingSidebar({userInfo, children}) {
     return (
         <div className="flex flex-wrap bg-gray-80">
 
             {/* Sidebar Menu */}
             <div className="w-3/12 bg-white rounded p-3 shadow-lg h-screen sticky top-0">
                 <div className="flex items-center space-x-4 p-2 mb-5">
-                    {img ? <img className="h-12 rounded-full" src={img} alt="My Avatar"/> :
+                    {userInfo?.img ? <img className="h-12 rounded-full" src={userInfo?.img} alt="My Avatar"/> :
                         <div className="flex flex-col w-12 h-12 rounded-full place-content-center" style={{
                             color: 'white',
-                            backgroundColor: defaultColor
-                        }}><span className="text-center">{name?.slice(0, 2)}</span>
+                            backgroundColor: userInfo?.defaultColor
+                        }}><span className="text-center">{userInfo?.name?.slice(0, 2)}</span>
                         </div>
                     }
                     <div className="flex flex-col ml-3 place-content-center">
-                        <h4 className="font-semibold text-lg text-gray-700 capitalize font-poppins tracking-wide">{name} {lastName}</h4>
+                        <h4 className="font-semibold text-lg text-gray-700 capitalize font-poppins tracking-wide">{userInfo?.name} {userInfo?.lastName}</h4>
                         <span className="text-sm tracking-wide flex items-center space-x-1 text-gray-600">Your personal account</span>
                     </div>
                 </div>

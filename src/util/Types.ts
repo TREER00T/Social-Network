@@ -4,6 +4,7 @@ import {TE2EMessage} from "../module/base/dto/TE2EMessage";
 
 type JsonObject = { [key: string]: any }
 type TToken = { accessToken: string, refreshToken: string }
+type TTokenWithApiKey = { accessToken: string, refreshToken: string, apiKey: string }
 
 type IResponse = { statusCode: number, message: string }
 
@@ -36,12 +37,10 @@ type TUserDeviceInfo = {
 type MessagePayload = {
     file: IFile,
     tableName: string,
-    message: RoomMessage | PersonalMessage | TE2EMessage,
-    conversationType: string
+    message: RoomMessage | PersonalMessage | TE2EMessage
 }
 
 type TSaveMessage = {
-    conversationType?: string,
     tableName: string
     message: JsonObject
 }
@@ -86,6 +85,7 @@ export {
     IResponse,
     TToken,
     TUserDeviceInfo,
+    TTokenWithApiKey,
     TSaveMessage,
     ListOfUserTableChat,
     AuthMsgBelongingToBetweenTwoUsers,

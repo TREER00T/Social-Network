@@ -1,26 +1,37 @@
 import {Navigate} from "react-router-dom";
-import {getExpireTime, isSuccess} from "util/Utils";
+import {isSuccess} from "util/Utils";
 import DialogException from "component/DialogException";
-import {useCookies} from 'react-cookie';
+import {useEffect} from "react";
+import {useCookies} from "react-cookie";
+import {getExpireTime} from "util/Utils";
 
 function ErrorHandler({redirectTo, statusCode, errMsg, setCookie, visibility, handler}) {
     const [, setCookies] = useCookies(['']);
-
-    if (statusCode && isSuccess(statusCode) && setCookie) {
-        if (typeof setCookie !== 'object')
-            setCookie.forEach(cookie => {
-                localStorage.setItem(cookie.key, cookie.value);
-                setCookies(cookie.key, cookie.value, cookie?.option ? cookie?.option : {
-                    expires: getExpireTime()
-                });
-            });
-        else {
-            localStorage.setItem(setCookie.key, setCookie.value);
-            setCookie(setCookie.key, setCookie.value, setCookie?.option ? setCookie?.option : {
-                maxAge: getExpireTime()
+    const handleStorage = cookie => {
+        if (cookie.value) {
+            setCookies(cookie.key, cookie.value, cookie?.option ? cookie?.option : {
+                expires: getExpireTime(),
+                path: '/'
             });
         }
     }
+
+    useEffect(() => {
+
+        if (statusCode && isSuccess(statusCode)) {
+
+            if (setCookie && Array.isArray(setCookie))
+                setCookie.forEach(cookie => {
+                    handleStorage(cookie);
+                });
+
+            if (setCookie && typeof setCookie === 'object')
+                handleStorage(setCookie);
+
+        }
+
+    });
+
 
     return (
         statusCode && isSuccess(statusCode) ?
