@@ -18,9 +18,9 @@ module.exports = {
             password: String,
             lastName: String,
             isActive: Boolean,
-            isBlocked: Boolean,
+            hasLogout: Boolean,
             defaultColor: String,
-            twoStepVerification:Boolean
+            twoStepVerification: Boolean
         }, 'user');
 
     },
@@ -58,9 +58,9 @@ module.exports = {
     },
 
 
-    savedMessage(phone) {
+    savedMessage(userId) {
 
-        createCollection(`${phone}SavedMessage`);
+        createCollection(`${userId}SavedMessage`);
 
     },
 

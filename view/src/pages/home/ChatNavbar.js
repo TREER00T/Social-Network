@@ -7,17 +7,20 @@ import ImageButton from "component/ImageButton";
 import GridDotsMenu from "img/grid-dots.svg";
 import BackIcon from "img/arrow-left.svg";
 import BlockUser from "img/hand-stop.svg";
-import {useRef, useState} from "react";
-import {resApi} from 'common/fetch';
+import {useEffect, useRef, useState} from "react";
+import {resApi} from "common/fetch";
 import Trash from "img/trash.svg";
+import Io from 'common/io';
 
-function ChatNavbar({data: {img, defaultColor, _id, name, type}, backButton, scrolled}) {
+function ChatNavbar({data: {img, defaultColor, _id, name, type}, backButton}) {
 
     const isSavedMessage = type === 'SA';
     const wrapperRef = useRef('navbar');
     const [isActive, setIsActive] = useState(true);
     const [hasClearChat, setHasClearChat] = useState(false);
     const [hasBlockUser, setHasBlockUser] = useState(false);
+    const [hasBlockUserByMe, setHasBlockUserByMe] = useState(false);
+    const [hasMeBlockedByUser, setHasMeBlockedByUser] = useState(false);
     const [hasClickedCheckBox, setHasClickedCheckBox] = useState(false);
     const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(false);
 
@@ -57,11 +60,31 @@ function ChatNavbar({data: {img, defaultColor, _id, name, type}, backButton, scr
         setHasBlockUser(!hasBlockUser);
     }, handleClickCheckBoxForClearChatUs = () => {
         setHasClickedCheckBox(!hasClickedCheckBox);
+    }, handleDisableOrEnableMessageForBlockedUser = async () => {
+        let data = await resApi('e2e/user/block', {
+            body: {
+                targetUserId: _id
+            }
+        });
+
+        let mapResult = {
+            210: () => setHasBlockUserByMe(true),
+            211: () => setHasMeBlockedByUser(true)
+        };
+
+        if (data.statusCode === 404)
+            return;
+
+        mapResult[data.statusCode]();
     };
 
     useOutsideAlerter(wrapperRef, () => {
         setHasOpenedOptionMenu(false);
     });
+
+    // useEffect(() => {
+    //    handleDisableOrEnableMessageForBlockedUser();
+    // });
 
     return (
         <div className="flex items-center relative w-screen max-w-4xl pb-1" style={{
@@ -118,7 +141,7 @@ function ChatNavbar({data: {img, defaultColor, _id, name, type}, backButton, scr
                 handler={handleClickedBlockUser}
                 accessToNavigate={hasBlockUser}
                 getAccessToAction={handleAccessToBlockUser}
-                children="Do you want to block this user?"/>
+                children={`Do you want to ${hasBlockUserByMe ? 'UnBlock' : 'block'} this user?`}/>
 
         </div>
     );

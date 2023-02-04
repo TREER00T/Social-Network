@@ -10,7 +10,7 @@ import NotFound from "component/NotFound";
 function HomeActivity() {
 
     const [search, setSearch] = useState('');
-    const [cookies] = useCookies(['accessToken']);
+    const [cookies] = useCookies(['apiKey']);
     const [hasSearchViewOpen, setHasSearchViewOpen] = useState('');
     const [tabViewItemClickedData, setTabViewItemClickedData] = useState({});
 
@@ -27,7 +27,7 @@ function HomeActivity() {
     return (
         <div className="flex flex-col">
             {/*{*/}
-            {/*    cookies?.accessToken ? <></> : <Navigate to="/user/login"/>*/}
+            {/*    cookies?.apiKey ? <></> : <Navigate to="/user/login"/>*/}
             {/*}*/}
 
             {/* Navbar */}

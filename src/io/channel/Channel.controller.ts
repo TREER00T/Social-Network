@@ -57,15 +57,14 @@ export class ChannelController extends AbstractChannel {
         let message = await this.handleMessage(data);
 
         if (message?.statusCode)
-            return socket.emit('emitChannelMessage', message);
+            return socket.emit('emitChannelMessageError', message);
 
         this.handleUserJoinState(socket, channelId, 'channel');
 
         this.emitToSpecificSocket(channelId, 'emitChannelMessage', message);
 
         await this.saveMessage({
-            conversationType: 'Channel',
-            tableName: `${channelId}ChannelContents`,
+            tableName: data.messageSentRoomId,
             message: message
         });
     }
@@ -97,10 +96,8 @@ export class ChannelController extends AbstractChannel {
 
         delete data.roomId;
         delete data.messageId;
-        delete data?.roomType;
         delete data?.messageCreatedBySenderId;
         delete data?.messageSentRoomId;
-
 
         let message = await this.handleMessage(data);
 

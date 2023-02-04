@@ -11,6 +11,7 @@ import HomeNavbarDropDownMenu from "pages/home/HomeNavbarDropDownMenu";
 import HomeNavbarUserMenu from "pages/home/HomeNavbarUserMenu";
 import AgreeDialog from "component/AgreeDialog";
 import {removeAllCookie} from "common/removeAllCookie";
+import {resApi} from "common/fetch";
 
 function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
 
@@ -35,10 +36,14 @@ function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
         setHasOpenedOptionMenu(!hasOpenedOptionMenu);
     }, handleUserMenu = () => {
         setHasOpenedUserMenu(!hasOpenedUserMenu);
-    }, handleAccessToLogout = d => {
+    }, handleAccessToLogout = async d => {
         setAccessToLogout(d);
-        if (d)
+        if (d) {
+            await resApi('personal/account', {
+                method: 'POST'
+            });
             removeAllCookie();
+        }
     }, handleClickedLogout = d => {
         setHasClickedLogout(d);
     };

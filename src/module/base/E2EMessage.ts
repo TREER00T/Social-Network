@@ -6,10 +6,8 @@ import {AuthMsgBelongingToBetweenTwoUsers} from "../../util/Types";
 
 export abstract class E2EMessage extends User {
 
-    async uploadFile(tableName: string, message: TE2EMessage, conversationType: string) {
-        return await CommonInsert.message(tableName, message, {
-            conversationType: conversationType
-        });
+    async uploadFile(tableName: string, message: TE2EMessage) {
+        return await CommonInsert.message(tableName, message);
     }
 
     async isExistChatRoom(obj: AuthMsgBelongingToBetweenTwoUsers) {

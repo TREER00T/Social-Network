@@ -97,21 +97,6 @@ export default {
             channels: channelData
         }
 
-    },
-
-    async isForwardData(tableName: string, id: string) {
-
-        if (!id)
-            return false;
-
-        let data = await findMany({
-            _id: id
-        }, {
-            _id: 0,
-            forwardDataId: 1
-        }, tableName).toArray();
-
-        return data[0]?.forwardDataId;
     }
 
 }

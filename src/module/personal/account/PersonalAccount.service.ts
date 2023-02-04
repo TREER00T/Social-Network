@@ -2,10 +2,12 @@ import {Injectable} from '@nestjs/common';
 import Delete from "../../../model/remove/user";
 import Find from "../../../model/find/user";
 
+let Update = require("../../../model/update/user");
+
 @Injectable()
 export class PersonalAccount {
-    async deleteAccount(userPhone: string, userId: string) {
-        await Delete.savedMessage(userPhone);
+    async deleteAccount(userId: string) {
+        await Delete.savedMessage(userId);
         await Delete.userInAllUsersBlockList(userId);
         await Delete.userInUsersTable(userId);
         await Delete.userInDevices(userId);
@@ -40,5 +42,9 @@ export class PersonalAccount {
             });
 
         });
+    }
+
+    async logoutUser(phone: string) {
+        await Update.logoutUser(phone, true);
     }
 }

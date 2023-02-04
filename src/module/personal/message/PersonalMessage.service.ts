@@ -7,15 +7,15 @@ let Update = require("../../../model/update/user");
 
 @Injectable()
 export class PersonalMessageService {
-    async addMessage(userPhone: string, userId: string, message: PersonalMessage) {
-        await Insert.messageIntoUserSavedMessage(userPhone, userId, message);
+    async addMessage(userId: string, message: PersonalMessage) {
+        await Insert.messageIntoUserSavedMessage(userId, message);
     }
 
-    async removeMessageOrListOfMessage(userPhone: string, data: Array<string>) {
-        await Delete.itemInSavedMessage(userPhone, data);
+    async removeMessageOrListOfMessage(userId: string, data: Array<string>) {
+        await Delete.itemInSavedMessage(userId, data);
     }
 
-    async updateMessage(userPhone: string, messageId: string, message: PersonalMessage) {
-        await Update.itemInSavedMessage(userPhone, messageId, message);
+    async updateMessage(userId: string, messageId: string, message: PersonalMessage) {
+        await Update.itemInSavedMessage(userId, messageId, message);
     }
 }

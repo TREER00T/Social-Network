@@ -16,9 +16,9 @@ export class GenerateUserService {
             isPhoneNumberInDb = await Find.userPhone(userPhone);
 
         if (!isPhoneNumberInDb) {
-            await CreateUser.savedMessage(userPhone);
+            let data = await Insert.phoneAndAuthCode(userPhone, Generate.getVerificationCode(), Util.getRandomHexColor());
 
-            await Insert.phoneAndAuthCode(userPhone, Generate.getVerificationCode(), Util.getRandomHexColor());
+            await CreateUser.savedMessage(data._id?.toString());
 
             return true;
         }

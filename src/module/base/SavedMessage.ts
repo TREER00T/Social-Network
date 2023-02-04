@@ -7,7 +7,7 @@ import {PersonalMessage} from "./dto/PersonalMessage";
 
 export abstract class SavedMessage extends User {
     async verifySavedMessage() {
-        let isSavedMessageCreated = await Find.isSavedMessageCreated(this.phoneNumber);
+        let isSavedMessageCreated = await Find.isSavedMessageCreated(this.userId);
 
         if (!isSavedMessageCreated)
             return Json.builder(Response.HTTP_NOT_FOUND);

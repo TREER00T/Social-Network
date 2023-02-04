@@ -64,6 +64,10 @@ export default {
         statusCode: 211,
         message: 'OK , But target user id blocked by me'
     },
+    HTTP_OK_BUT_REQUIRE_FIRST_NAME: {
+        statusCode: 212,
+        message: 'OK , But you first name required'
+    },
     HTTP_IM_USED: {
         statusCode: 226,
         message: 'IM Used'

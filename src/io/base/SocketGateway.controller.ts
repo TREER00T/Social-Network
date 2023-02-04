@@ -128,15 +128,11 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
     }
 
     async saveMessage(data: TSaveMessage) {
-        await CommonInsert.message(data.tableName, data.message, {
-            conversationType: data.conversationType
-        });
+        await CommonInsert.message(data.tableName, data.message);
     }
 
     async updateMessage(data: TSaveMessage, messageId: string) {
-        await CommonUpdate.message(data.tableName, data.message, {
-            messageId: messageId
-        });
+        await CommonUpdate.message(data.tableName, data.message, messageId);
     }
 
     async removeMessage(tableName: string, listOfId: string[]) {

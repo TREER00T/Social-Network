@@ -4,7 +4,7 @@ import Generate from "../../../util/Generate";
 import Device from "../../base/Device";
 import Token from "../../../util/Token";
 import Find from "../../../model/find/user";
-import {TToken} from "../../../util/Types";
+import {TTokenWithApiKey, TToken} from "../../../util/Types";
 
 let Update = require("../../../model/update/user")
 
@@ -30,13 +30,13 @@ export class VerifyOTPService {
 
     }
 
-    async generateTokenWithApiKey(dto: VerifyOTPDto, deviceIp: string, deviceName: string): Promise<object> {
+    async generateTokenAndAddDeviceInfo(dto: VerifyOTPDto, deviceIp: string, deviceName: string): Promise<TTokenWithApiKey> {
 
         let userPhone = dto.phone;
 
         let user = await Find.getApiKeyAndUserId(userPhone);
 
-        if (!user.apiKey) {
+        if (!user?.apiKey) {
             user.apiKey = Generate.getRandomHash(50);
             await Update.apikey(userPhone, user.apiKey);
         }
@@ -54,7 +54,11 @@ export class VerifyOTPService {
 
     }
 
-    async updateApiKey(userPhone): Promise<boolean | string> {
+    async haveFirstName(userPhone: string) {
+        return await Find.haveFirstName(userPhone);
+    }
+
+    async updateApiKey(userPhone: string): Promise<boolean | string> {
 
         let haveApiKey = await Find.getApiKey(userPhone);
 
@@ -63,6 +67,10 @@ export class VerifyOTPService {
 
         return await Update.apikey(userPhone, Generate.getRandomHash(50));
 
+    }
+
+    async logoutUser(phone: string) {
+        await Update.logoutUser(phone, false);
     }
 
 }

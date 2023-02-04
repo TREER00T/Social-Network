@@ -19,9 +19,19 @@ export class VerifyOTPController {
 
         let havePassword = await this.appService.havePassword(dto.phone);
 
-        if (!havePassword)
-            return Json.builder(Response.HTTP_ACCEPTED,
-                await this.appService.generateTokenWithApiKey(dto, req.ip, req.headers['user-agent']));
+        if (!havePassword) {
+            let data = await this.appService.generateTokenAndAddDeviceInfo(dto, req.ip, req.headers['user-agent']);
+            let haveFirstName = await this.appService.haveFirstName(dto.phone);
+
+            if (!haveFirstName) {
+                delete data.apiKey;
+                return Json.builder(Response.HTTP_OK_BUT_REQUIRE_FIRST_NAME, data);
+            }
+
+            await this.appService.logoutUser(dto.phone);
+
+            return Json.builder(Response.HTTP_ACCEPTED, data);
+        }
 
         await this.appService.updateApiKey(dto.phone);
 

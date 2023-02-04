@@ -4,13 +4,13 @@ import config from 'config';
 const cookies = new Cookies();
 const accessToken = cookies.get('accessToken');
 const apiKey = cookies.get('apiKey');
-const getInStorage = key => localStorage.getItem(key);
-const setInStorage = (key, value) => localStorage.setItem(key, value);
+const getInStorage = key => cookies.get(key);
+const setInStorage = (key, value) => cookies.set(key, value);
 
 export async function resApi(endPoint, option) {
 
     let baseHeader = {
-        'Content-type': option?.headers?.['Content-type'] ?? 'application/json; charset=UTF-8'
+        'Content-type': option?.headers?.['Content-type'] ?? 'application/json'
     }
 
     if (option?.body)
@@ -28,7 +28,7 @@ export async function resApi(endPoint, option) {
         delete option.headers;
 
 
-    let responseOfRequest = async (endPoint) => await fetch(`${config.url.rest}${endPoint}`, {
+    let responseOfRequest = async endPoint => await fetch(`${config.url.rest}${endPoint}`, {
         mode: 'cors',
         headers: orgHeader ? {
             ...baseHeader,
@@ -41,22 +41,21 @@ export async function resApi(endPoint, option) {
 
     // token or api key was invalid or access token was expired
     if ([519, 800, 804].includes(res?.statusCode)) {
-        option.headers.authorization = `Bearer ${getInStorage('refreshToken')}`;
+        baseHeader.authorization = `Bearer ${getInStorage('refreshToken')}`;
 
         let firstRequestFailedMethod = option?.method ? option?.method : 'GET';
         option.method = 'POST';
 
-        let refreshTokenResponse = await responseOfRequest('auth/user/refresh/token')
-            .then(res => res.json());
+        let refreshTokenResponse = await responseOfRequest('auth/refresh/token');
 
-        option.headers.authorization = refreshTokenResponse?.data?.accessToken;
+        baseHeader.authorization = refreshTokenResponse?.data?.accessToken;
 
         setInStorage('refreshToken', refreshTokenResponse?.data?.refreshToken);
-        setInStorage('accessToken', option.headers.authorization);
+        setInStorage('accessToken', baseHeader.authorization);
 
         option.method = firstRequestFailedMethod;
 
-        return responseOfRequest(endPoint);
+        return await responseOfRequest(endPoint);
     }
 
     return res;

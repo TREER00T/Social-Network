@@ -26,7 +26,7 @@ export class PersonalMessageController extends SavedMessage {
         if (haveErr)
             return haveErr;
 
-        return await this.getListOfMessageFromRoom(dto, `${this.phoneNumber}SavedMessage`);
+        return await this.getListOfMessageFromRoom(dto, `${this.userId}SavedMessage`);
     }
 
     @Delete()
@@ -51,7 +51,7 @@ export class PersonalMessageController extends SavedMessage {
         if (haveErr)
             return haveErr;
 
-        await this.appService.removeMessageOrListOfMessage(this.phoneNumber, messageIdOrListOfMessageId);
+        await this.appService.removeMessageOrListOfMessage(this.userId, messageIdOrListOfMessageId);
 
         return Json.builder(Response.HTTP_OK);
     }
@@ -65,9 +65,7 @@ export class PersonalMessageController extends SavedMessage {
         if (message?.statusCode)
             return message;
 
-        message.roomType = 'Personal';
-
-        await this.appService.addMessage(this.phoneNumber, this.userId, message);
+        await this.appService.addMessage(this.userId, message);
 
         return Json.builder(Response.HTTP_CREATED);
     }
@@ -76,21 +74,21 @@ export class PersonalMessageController extends SavedMessage {
     async updateMessage(@Body() msg: PersonalMessage) {
         await this.init();
 
-        if (!msg?.messageId)
+        let messageId = msg?.messageId;
+        if (!messageId)
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
+        delete msg.messageId;
+
         let message = await this.handleSavedMessage(msg);
-        let messageId = message.messageId;
 
         if (message?.statusCode)
             return message;
 
-        delete message.messageId;
-        delete message?.roomType;
         delete message?.messageCreatedBySenderId;
         delete message?.messageSentRoomId;
 
-        await this.appService.updateMessage(this.phoneNumber, messageId, message);
+        await this.appService.updateMessage(this.userId, messageId, message);
 
         return Json.builder(Response.HTTP_OK);
     }

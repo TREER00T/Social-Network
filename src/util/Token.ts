@@ -8,13 +8,13 @@ export default {
             accessToken: await Generate.getJwtEncrypt(Generate.getJwtSign({
                 phoneNumber: userPhone,
                 id: userId,
-                expiresIn: '12h',
+                expiresIn: '30d',
                 type: 'at'
             }, userPhone)),
             refreshToken: await Generate.getJwtEncrypt(Generate.getJwtSign({
                 phoneNumber: userPhone,
                 id: userId,
-                expiresIn: '1d',
+                expiresIn: '60d',
                 type: 'rt'
             }, userPhone))
         }

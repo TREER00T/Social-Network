@@ -5,11 +5,11 @@ let Create = require("../../../model/create/user");
 
 @Injectable()
 export class SavedMessageService {
-    async addSavedMessage(userPhone: string) {
-        await Create.savedMessage(userPhone);
+    async addSavedMessage(userId: string) {
+        await Create.savedMessage(userId);
     }
 
-    async removeSavedMessage(userPhone: string) {
-        await Delete.savedMessage(userPhone);
+    async removeSavedMessage(userId: string) {
+        await Delete.savedMessage(userId);
     }
 }

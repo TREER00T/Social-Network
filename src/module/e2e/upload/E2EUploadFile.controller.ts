@@ -14,7 +14,7 @@ export class E2EUploadFileController extends E2EMessage {
     async save(@UploadedFile() file: Express.Multer.File, @Body() msg: TE2EMessage) {
         await this.init();
 
-        let targetUserId = msg?.receiverId;
+        let targetUserId = msg.receiverId;
 
         let message = await PromiseVerify.all([
             this.isUndefined(file),
@@ -33,7 +33,10 @@ export class E2EUploadFileController extends E2EMessage {
         if (!isExistChatRoom)
             return Json.builder(Response.HTTP_NOT_FOUND);
 
+        message.messageCreatedBySenderId = this.userId;
+        message.messageSentRoomId = `${msg.roomId}E2EContents`;
         delete message.receiverId;
+        delete message.roomId;
 
         return await this.saveAndGetId({
             file: {
@@ -41,9 +44,8 @@ export class E2EUploadFileController extends E2EMessage {
                 buffer: file.buffer,
                 name: file.originalname
             },
-            tableName: msg.roomId,
-            message: message,
-            conversationType: "E2E"
+            tableName: message.messageSentRoomId,
+            message: message
         });
     }
 }

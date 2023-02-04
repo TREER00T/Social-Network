@@ -10,8 +10,6 @@ let {
         deleteMany,
         dropCollection
     } = require('../../../database/mongoDbDriverConnection');
-import FindInCommon from '../../../model/find/common';
-import DeleteInCommon from '../../../model/remove/common';
 import {ListOfChannelId, ListOfGroupId, ListOfUserTableChat} from "../../../util/Types";
 
 
@@ -71,9 +69,9 @@ export default {
 
     },
 
-    async savedMessage(phone: string) {
+    async savedMessage(userId: string) {
 
-        await dropCollection(`${phone}SavedMessage`);
+        await dropCollection(`${userId}SavedMessage`);
 
     },
 
@@ -149,16 +147,9 @@ export default {
 
     },
 
-    async itemInSavedMessage(phone: string, listOfId: string[]) {
+    async itemInSavedMessage(userId: string, listOfId: string[]) {
 
-        for (const item of listOfId) {
-            let id = await FindInCommon.isForwardData(`${phone}SavedMessage`, item);
-
-            if (id)
-                await DeleteInCommon.forwardMessage(id);
-        }
-
-        await deleteMany({_id: {$in: listOfId}}, `${phone}SavedMessage`);
+        await deleteMany({_id: {$in: listOfId}}, `${userId}SavedMessage`);
 
     }
 

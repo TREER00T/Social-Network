@@ -4,6 +4,7 @@ import {resApi} from "common/fetch";
 import Io from 'common/io';
 import SavedMessage from "img/saved-message.svg";
 import NotFound from "component/NotFound";
+import {useCookies} from "react-cookie";
 
 function Item({data: {img, _id, name, defaultColor, type}, getData}) {
 
@@ -86,6 +87,7 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
         }
     ]);
     const [searchData, setSearchData] = useState([]);
+    const [cookies] = useCookies(['phone']);
     const [hasExistSavedMessage, setHasExistSavedMessage] = useState(false);
     const [haveNotActivity, setHaveNotActivity] = useState(false);
     const assign = (o, t) => Object.assign(o ?? {}, {type: t});
@@ -106,7 +108,7 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
 
                 if (hasExistSavedMessage)
                     result.unshift({
-                        _id: localStorage.getItem('phone'),
+                        _id: cookies.phone,
                         type: 'SA',
                         name: 'Saved Message',
                         defaultColor: '#418aff'
@@ -169,7 +171,7 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
                             <Item data={e}
                                   key={i}
                                   getData={getItemData}/>) :
-                        userActivities.map((e,i) =>
+                        userActivities.map((e, i) =>
                             <Item data={e}
                                   key={i}
                                   getData={getItemData}/>)

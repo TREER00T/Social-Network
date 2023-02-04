@@ -34,6 +34,11 @@ export abstract class User extends HandleMessage {
 
         if (!isUserExist)
             return Json.builder(Response.HTTP_USER_NOT_FOUND);
+
+        let hasLogout = await Find.hasLogout(this.userId);
+
+        if (hasLogout)
+            return Json.builder(Response.HTTP_UNAUTHORIZED);
     }
 
     async saveAndGetId(data: MessagePayload) {
@@ -47,9 +52,7 @@ export abstract class User extends HandleMessage {
         data.message['fileSize'] = FileGenerated.size;
         data.message['fileName'] = data.file.name;
 
-        let insertedId = await CommonInsert.message(data.tableName, data.message, {
-            conversationType: data.conversationType
-        });
+        let insertedId = await CommonInsert.message(data.tableName, data.message);
 
         return Json.builder(Response.HTTP_CREATED, {
             insertedId: insertedId

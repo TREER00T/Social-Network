@@ -35,9 +35,8 @@ export class ChannelUploadFileController extends Channel {
                 buffer: file.buffer,
                 name: file.originalname
             },
-            tableName: `${channelId}ChannelContents`,
-            message: message,
-            conversationType: "Channel"
+            tableName: message.messageSentRoomId,
+            message: message
         });
     }
 }

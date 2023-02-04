@@ -6,23 +6,22 @@ import ErrorHandler from "component/ErrorHandler";
 import AccessAccount from "img/access-account.svg";
 import EditText from "component/EditText";
 import Button from "component/Button";
-import {getAuthExpirePayload} from "util/Utils";
-import {isPassword} from "util/Utils";
+import {isPassword, handleStorage, getAuthExpirePayload} from "util/Utils";
 
 function VerifyPasswordActivity() {
 
     const [password, setPassword] = useState('');
-    const [cookies] = useCookies(['accessToken', 'phone']);
+    const [cookies] = useCookies(['apiKey', 'phone']);
     const [hasClicked, setHasClicked] = useState(false);
     const [data, setData] = useState({});
     const isValidPassword = isPassword(password);
 
-    const getText = (d) => {
+    const getText = d => {
         setPassword(d);
     }, handleOpenDialog = () => {
         setHasClicked(!hasClicked);
     }, response = async () => {
-        let location = await fetch('https://get.geojs.io/v1/ip/geo.json');
+        let location = await (await fetch('https://get.geojs.io/v1/ip/geo.json')).json();
 
         let data = await resApi('auth/verify/twoStep', {
             method: 'POST',
@@ -32,21 +31,27 @@ function VerifyPasswordActivity() {
             }
         });
 
+        if (data?.statusCode === 212)
+            getAuthExpirePayload(data?.data).forEach(e => handleStorage(e));
+
         setData(data);
     };
 
     return (
         <div>
-            {cookies?.accessToken ? <Navigate to="/home"/> : <></>}
+            {cookies?.apiKey ? <Navigate to="/home"/> : <></>}
             {cookies?.phone ? <></> : <Navigate to="/user/login"/>}
 
-            <ErrorHandler
-                setCookie={getAuthExpirePayload(data?.data)}
-                statusCode={data?.statusCode}
-                errMsg={data?.message}
-                visibility={hasClicked}
-                handler={handleOpenDialog}
-                redirectTo="/home"/>
+            {
+                data?.statusCode === 212 ? <Navigate to="/user/profile"/> :
+                    <ErrorHandler
+                        setCookie={getAuthExpirePayload(data?.data)}
+                        statusCode={data?.statusCode}
+                        errMsg={data?.message}
+                        visibility={hasClicked}
+                        handler={handleOpenDialog}
+                        redirectTo="/home"/>
+            }
 
             <div className="flex flex-col items-center">
 

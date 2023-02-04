@@ -49,6 +49,7 @@ export class E2EController extends AbstractRoom {
 
         data.messageCreatedBySenderId = d.senderId;
         data.messageSentRoomId = data.roomId;
+        delete data.roomId;
 
         let message = await this.handleMessage(data);
 
@@ -58,7 +59,6 @@ export class E2EController extends AbstractRoom {
         this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvMessage', message);
 
         await this.saveMessage({
-            conversationType: 'E2E',
             tableName: data.roomId,
             message: message
         });
@@ -88,9 +88,9 @@ export class E2EController extends AbstractRoom {
             return socket.emit('emitPvEditMessageError', Response.HTTP_FORBIDDEN);
 
         delete data.messageId;
-        delete data?.roomType;
         delete data?.messageCreatedBySenderId;
         delete data?.messageSentRoomId;
+        delete data.roomId;
 
         let message = await this.handleMessage(data);
 
