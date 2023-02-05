@@ -9,5 +9,5 @@ export class UserDto {
     @IsString()
     @IsNotEmpty()
     @IsOptional()
-    lastName: string;
+    lastName?: string;
 }

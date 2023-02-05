@@ -47,11 +47,9 @@ function PhoneNumberActivity() {
                 <img src={AccessAccount} className="w-2/5 mx-auto sm:my-20 lg:w-1/5" alt="AccessAccount"/>
                 <div className="w-2/6 text-center">
                     <EditText maxLength={16} getText={getText} label="Phone Number"/>
-                    {
-                        isPhoneNumber && !hasClicked ?
-                            <Button className="mt-10" onClick={() => response()}>Send Code</Button> :
-                            <Button className="mt-10" disabled>Send Code</Button>
-                    }
+                    <Button className="mt-10"
+                            disabled={!isPhoneNumber}
+                            onClick={() => response()}>Send Code</Button>
                 </div>
             </div>
         </div>

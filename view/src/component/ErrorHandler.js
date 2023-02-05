@@ -9,6 +9,9 @@ function ErrorHandler({redirectTo, statusCode, errMsg, setCookie, visibility, ha
     const [, setCookies] = useCookies(['']);
     const handleStorage = cookie => {
         if (cookie.value) {
+            if (cookie.option)
+                cookie.option.path = '/';
+
             setCookies(cookie.key, cookie.value, cookie?.option ? cookie?.option : {
                 expires: getExpireTime(),
                 path: '/'

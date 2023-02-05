@@ -9,7 +9,7 @@ import Button from "component/Button";
 function Item({data: {img, defaultColor, name, lastName, isActive, _id}}) {
 
     const handleDisableBlockedUser = async () => {
-        await resApi('e2e/room/user/block', {
+        await resApi('e2e/user/block', {
             method: 'PUT',
             body: {
                 targetUserId: _id
@@ -53,7 +53,7 @@ function Item({data: {img, defaultColor, name, lastName, isActive, _id}}) {
 export default function BlockedUsersActivity() {
 
     const [userInfo, setUserInfo] = useState({});
-    const [cookies] = useCookies(['accessToken']);
+    const [cookies] = useCookies(['apiKey']);
     const [listOfBlockedUsers, setListOfBlockedUsers] = useState([]);
 
     const response = async () => {
@@ -61,44 +61,47 @@ export default function BlockedUsersActivity() {
         setUserInfo(data.data);
     }, handleListOfBlockedUsers = async () => {
         let data = await resApi('personal/blockUsers');
-        setListOfBlockedUsers(data.data);
+        setListOfBlockedUsers(data);
     };
 
     useEffect(() => {
         response();
         handleListOfBlockedUsers();
-    }, [userInfo, listOfBlockedUsers]);
+    }, []);
 
     return (
         <div className="flex flex-col">
             {
-                cookies?.accessToken ? <></> : <Navigate to="/user/login"/>
+                cookies?.apiKey ? <></> : <Navigate to="/user/login"/>
             }
 
 
             {/* Sidebar Menu */}
-            <SettingSidebar data={userInfo}>
+            <SettingSidebar userInfo={userInfo}>
 
                 <div>
                     <span className="font-bold text-blue-100 text-2xl">Block List</span>
                 </div>
 
                 {
-                    listOfBlockedUsers.length !== 0 ?
+                    listOfBlockedUsers.statusCode !== 404 ?
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
 
                             <table className="w-full text-sm text-left text-gray-500">
                                 <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
                                     {
-                                        ['Name', 'Status', 'Action'].map(e => <th scope="col"
-                                                                                  className="px-6 py-3">{e}</th>)
+                                        ['Name', 'Status', 'Action']
+                                            .map((e, i) =>
+                                                <th scope="col"
+                                                    key={i}
+                                                    className="px-6 py-3">{e}</th>)
                                     }
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {
-                                    listOfBlockedUsers.map(e => <Item data={e}/>)
+                                    listOfBlockedUsers?.data?.map((e, i) => <Item key={i} data={e}/>)
                                 }
                                 </tbody>
                             </table>

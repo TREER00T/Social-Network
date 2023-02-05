@@ -12,7 +12,7 @@ export default function PrivacyActivity() {
 
     const [userInfo, setUserInfo] = useState({});
     const [email, setEmail] = useState('');
-    const [cookies] = useCookies(['accessToken']);
+    const [cookies] = useCookies(['apiKey']);
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [oldPassword, setOldPassword] = useState('');
@@ -62,17 +62,17 @@ export default function PrivacyActivity() {
     useEffect(() => {
         response();
         setTwoStepHasEnable(userInfo.twoStepVerification ?? false);
-    }, [userInfo, twoStepHasEnable]);
+    }, []);
 
     return (
         <div className="flex flex-col">
             {
-                cookies?.accessToken ? <></> : <Navigate to="/user/login"/>
+                cookies?.apiKey ? <></> : <Navigate to="/user/login"/>
             }
 
 
             {/* Sidebar Menu */}
-            <SettingSidebar data={userInfo}>
+            <SettingSidebar userInfo={userInfo}>
 
                 <div className="mb-8">
                     <span className="font-bold text-blue-100 text-lg">Two-Step Verification</span>
@@ -92,13 +92,9 @@ export default function PrivacyActivity() {
                                       getText={handleNewPassword}/>
                             <EditText label="Confirm Password" type="password" className="mt-3"
                                       getText={handleConfirmPassword}/>
-                            {
-                                isValidEmail && isValidNewPassword && isValidConfirmPassword && isNewPasswordEqualToConfirmPassword ?
-                                    <Button className="mt-5"
-                                            onClick={handleTwoStepVerificationRequest}>Enable</Button> :
-                                    <Button className="mt-5" disabled>Enable</Button>
-                            }
-
+                            <Button className="mt-5"
+                                    disabled={!isValidEmail || !isValidNewPassword || !isValidConfirmPassword || !isNewPasswordEqualToConfirmPassword}
+                                    onClick={handleTwoStepVerificationRequest}>Enable</Button>
                             <div className="my-8">
                                 <span className="font-bold text-blue-100 text-lg">Change Password</span>
                             </div>

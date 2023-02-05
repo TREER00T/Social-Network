@@ -58,11 +58,9 @@ function VerifyPasswordActivity() {
                 <img src={AccessAccount} className="w-2/5 mx-auto sm:my-20 lg:w-1/5" alt="AccessAccount"/>
                 <div className="w-2/6 text-center">
                     <EditText minLength={6} getText={getText} label="Verify Password"/>
-                    {
-                        isValidPassword ?
-                            <Button className="mt-10" onClick={() => response()}>Verify Password</Button> :
-                            <Button className="mt-10" disabled>Verify Password</Button>
-                    }
+                    <Button className="mt-10"
+                            disabled={!isValidPassword}
+                            onClick={() => response()}>Verify Password</Button>
                 </div>
             </div>
         </div>

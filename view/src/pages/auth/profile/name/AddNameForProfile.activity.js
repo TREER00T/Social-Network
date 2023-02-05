@@ -27,7 +27,7 @@ function AddNameForProfile() {
             method: 'PUT',
             body: {
                 firstName: firstName,
-                lastName: lastName
+                ...(lastName ? {lastName: lastName} : {})
             }
         });
         setData(data);
@@ -55,11 +55,7 @@ function AddNameForProfile() {
                 <div className="w-2/6 text-center">
                     <EditText minLength={3} getText={getFirstName} label="First Name (Require)"/>
                     <EditText className="mt-5" getText={getLastName} label="Last Name (Optional)"/>
-                    {
-                        haveFirstName ?
-                            <Button className="mt-10" onClick={() => response()}>Save</Button> :
-                            <Button className="mt-10" disabled>Save</Button>
-                    }
+                    <Button className="mt-10" disabled={!haveFirstName} onClick={() => response()}>Save</Button>
                 </div>
             </div>
         </div>

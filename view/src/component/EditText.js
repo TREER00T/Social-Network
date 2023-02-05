@@ -1,11 +1,11 @@
 import {Input} from "@material-tailwind/react";
 import {useState} from "react";
 
-function EditText({getText, label, className, ref, type, maxLength, minLength, disabled}) {
+function EditText({getText, label, className, ref, type, maxLength, minLength, disabled, defaultValue}) {
 
     let [text, setText] = useState('');
 
-    const editTextHandler = (e) => {
+    const editTextHandler = e => {
         const {value} = e.target;
         setText(value);
         getText(value);
@@ -15,7 +15,7 @@ function EditText({getText, label, className, ref, type, maxLength, minLength, d
         <div ref={ref} className={className + " flex items-end gap-4"}>
             <Input variant="outlined"
                    label={label}
-                   value={text}
+                   value={defaultValue ?? text}
                    type={type}
                    disabled={disabled}
                    minLength={minLength}

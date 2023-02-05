@@ -118,12 +118,14 @@ export default {
 
     async getApiKey(phone: string) {
 
-        return await user().findOne({
+        let data = await user().findOne({
             phone: phone
         }, {
             _id: 0,
             apiKey: 1
         });
+
+        return data?.apiKey;
 
     },
 
