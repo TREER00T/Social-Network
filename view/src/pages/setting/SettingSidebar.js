@@ -32,10 +32,10 @@ export default function SettingSidebar({userInfo, children}) {
             <div className="w-3/12 bg-white rounded p-3 shadow-lg h-screen sticky top-0">
                 <div className="flex items-center space-x-4 p-2 mb-5">
                     {userInfo?.img ? <img className="h-12 rounded-full" src={userInfo?.img} alt="My Avatar"/> :
-                        <div className="flex flex-col w-12 h-12 rounded-full place-content-center" style={{
+                        <div className="flex flex-col w-12 h-12 rounded-full" style={{
                             color: 'white',
                             backgroundColor: userInfo?.defaultColor
-                        }}><span className="text-center">{userInfo?.name?.slice(0, 2)}</span>
+                        }}><span className="text-center mt-2">{userInfo?.name?.slice(0, 2)}</span>
                         </div>
                     }
                     <div className="flex flex-col ml-3 place-content-center">
@@ -45,7 +45,7 @@ export default function SettingSidebar({userInfo, children}) {
                 </div>
                 <ul className="space-y-2 text-sm">
                     {
-                        settingSidebarItems.map(o => <Item data={o}/>)
+                        settingSidebarItems.map((o, i) => <Item key={i} data={o}/>)
                     }
                 </ul>
             </div>

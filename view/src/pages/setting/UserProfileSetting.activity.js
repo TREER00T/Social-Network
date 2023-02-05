@@ -8,12 +8,13 @@ import EditText from "component/EditText";
 import {Checkbox} from "@material-tailwind/react";
 import {removeAllCookie} from "common/removeAllCookie";
 
-
 export default function UserProfileSettingActivity() {
-    const [cookies] = useCookies(['accessToken']);
+    const [cookies] = useCookies(['apiKey', 'accessToken']);
     const [data, setData] = useState({});
     const [avatar, setAvatar] = useState('');
+    const [avatarFile, setAvatarFile] = useState();
     const [firstName, setFirstName] = useState('');
+    const [phone, setPhone] = useState('');
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
     const [hasCheckBoxChecked, setHasCheckBoxChecked] = useState(false);
@@ -23,19 +24,23 @@ export default function UserProfileSettingActivity() {
     const response = async () => {
         let data = await resApi('personal/user');
         setData(data.data);
+        setAvatar(data?.data?.img);
+        setUsername(data?.data?.username);
+        setLastName(data?.data?.lastName);
+        setFirstName(data?.data?.name);
+        setPhone(data?.data?.phone);
+        setBio(data?.data?.bio);
     }, updateProfile = async () => {
 
-        if (data.img !== avatar)
+        if (avatar && data.img !== avatar) {
             await resApi('personal/upload/avatar', {
-                method: 'PUT',
-                headers: {
-                    'Content-type': avatar.type,
-                    'content-length': avatar.length
-                },
                 body: {
-                    avatar: avatar
-                }
+                    file: avatarFile,
+                    name: 'avatar'
+                },
+                isFile: true
             });
+        }
 
         if (data.name !== firstName || data.lastName !== lastName)
             await resApi('personal/name', {
@@ -76,25 +81,24 @@ export default function UserProfileSettingActivity() {
     }, handleCheckBox = () => {
         setHasCheckBoxChecked(!hasCheckBoxChecked);
     }, handleChangeImage = e => {
-        setAvatar(URL.createObjectURL(e.target.files[0]));
+        if (e.target.files.length > 0) {
+            setAvatarFile(e.target.files[0]);
+            setAvatar(URL.createObjectURL(e.target.files[0]));
+        }
     };
 
     useEffect(() => {
         response();
-        setUsername(data.username ?? '');
-        setLastName(data.lastName ?? '');
-        setFirstName(data.name ?? '');
-        setBio(data.bio ?? '');
-    }, [data, username, lastName, bio, firstName]);
+    }, []);
 
     return (
         <div className="flex flex-col">
             {
-                cookies?.accessToken ? <></> : <Navigate to="/user/login"/>
+                cookies?.apiKey ? <></> : <Navigate to="/user/login"/>
             }
 
             {/* Sidebar Menu */}
-            <SettingSidebar data={data}>
+            <SettingSidebar userInfo={data}>
                 <div className="flex flex-col">
                     <div>
                         <div className="float-left mt-1">
@@ -107,31 +111,34 @@ export default function UserProfileSettingActivity() {
 
                     <div className="flex mt-10 flex-col">
                         <div className="flex">
-                            <EditText label="First Name" getText={handleFirstName}/>
-                            <EditText className="ml-8" label="Last Name" getText={handleLastName}/>
+                            <EditText label="First Name" getText={handleFirstName} defaultValue={firstName}/>
+                            <EditText className="ml-8" label="Last Name" getText={handleLastName}
+                                      defaultValue={lastName}/>
                         </div>
                         <div className="flex">
                             <div className="w-3/5 mt-5">
-                                <EditText label="Username" getText={handleUsername}/>
-                                <EditText label="Bio" className="mt-5" getText={handleBio}/>
-                                <EditText label="Phone Number" className="mt-5"/>
+                                <EditText label="Username" getText={handleUsername} defaultValue={username}/>
+                                <EditText label="Bio" className="mt-5" getText={handleBio} defaultValue={bio}/>
+                                <EditText label="Phone Number" className="mt-5" defaultValue={phone}/>
                             </div>
 
-                            <div className="w-32 h-32 mx-auto my-auto hover:cursor-pointer">
-                                <label htmlFor="upload-avatar">
+                            <div className="w-32 h-32 mx-auto my-auto">
+                                <label htmlFor="upload-avatar" className="hover:cursor-pointer">
+                                    {avatar}
                                     {
                                         avatar ?
                                             <img src={avatar} alt="My Profile"
                                                  className="rounded-full border-2 border-blue-200/100 w-32 h-32"/> :
                                             <div className="flex flex-col w-32 h-32 rounded-full place-content-center"
-                                                 id="upload-avatar"
+                                                 onChange={handleChangeImage}
                                                  style={{
                                                      color: 'white',
                                                      backgroundColor: data.defaultColor
                                                  }}><span className="text-center">{firstName?.slice(0, 2)}</span></div>
                                     }
                                 </label>
-                                <input className="w-0" type="file" id="upload-avatar" onChange={handleChangeImage}/>
+                                <input className="w-0" type="file" id="upload-avatar"
+                                       onChange={handleChangeImage}/>
                             </div>
                         </div>
                     </div>
@@ -144,12 +151,9 @@ export default function UserProfileSettingActivity() {
                         Do you agree with this?
                     </span>
                     <Checkbox color="blue" label="Agree" onClick={handleCheckBox}/>
-                    {
-                        hasCheckBoxChecked ?
-                            <Button className="w-44 mt-3" color="red" onClick={handleDeleteAccount}>Delete
-                                Account</Button> :
-                            <Button className="w-44 mt-3" disabled color="red">Delete Account</Button>
-                    }
+                    <Button className="w-44 mt-3"
+                            color="red" onClick={handleDeleteAccount}
+                            disabled={!hasCheckBoxChecked}>Delete Account</Button>
                     {
                         hasClickedDeleteAccount ? <Navigate to="/"/> : <></>
                     }

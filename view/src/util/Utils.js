@@ -38,16 +38,14 @@ export function getAuthExpirePayload(data) {
             key: 'accessToken',
             value: data?.accessToken,
             option: {
-                expires: getAccessTokenExpireTime(),
-                path: '/'
+                expires: getAccessTokenExpireTime()
             }
         },
         {
             key: 'refreshToken',
             value: data?.refreshToken,
             option: {
-                expires: getRefreshTokenExpireTime(),
-                path: '/'
+                expires: getRefreshTokenExpireTime()
             }
         }
     ];
@@ -57,8 +55,7 @@ export function getAuthExpirePayload(data) {
             key: 'apiKey',
             value: data.apiKey,
             option: {
-                expires: getExpireTime(),
-                path: '/'
+                expires: getExpireTime()
             }
         });
 
@@ -69,6 +66,9 @@ export const handleStorage = cookie => {
     const cookies = new Cookies();
 
     if (cookie.value) {
+        if (cookie.option)
+            cookie.option.path = '/';
+
         cookies.set(cookie.key, cookie.value, cookie?.option ? cookie?.option : {
             expires: getExpireTime(),
             path: '/'

@@ -27,7 +27,7 @@ function Item({data: {deviceIp, createdAt, deviceName, deviceLocation}}) {
 export default function DevicesActivity() {
 
     const [userInfo, setUserInfo] = useState({});
-    const [cookies] = useCookies(['accessToken']);
+    const [cookies] = useCookies(['apiKey']);
     const [listOfDevice, setListOfDevice] = useState([]);
 
     const response = async () => {
@@ -41,18 +41,18 @@ export default function DevicesActivity() {
     useEffect(() => {
         response();
         handleListDevice();
-    }, [userInfo, listOfDevice]);
+    }, []);
 
 
     return (
         <div className="flex flex-col">
             {
-                cookies?.accessToken ? <></> : <Navigate to="/user/login"/>
+                cookies?.apiKey ? <></> : <Navigate to="/user/login"/>
             }
 
 
             {/* Sidebar Menu */}
-            <SettingSidebar data={userInfo}>
+            <SettingSidebar userInfo={userInfo}>
                 <div>
                     <span className="font-bold text-blue-100 text-2xl">Devices connected</span>
                 </div>
@@ -63,14 +63,18 @@ export default function DevicesActivity() {
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
                             {
-                                ['Device Ip', 'Created At', 'Device Name', 'Device Location'].map(e => <th scope="col"
-                                                                                                           className="px-6 py-3">{e}</th>)
+                                ['Device Ip', 'Created At', 'Device Name', 'Device Location']
+                                    .map((e, i) =>
+                                        <th
+                                            scope="col"
+                                            key={i}
+                                            className="px-6 py-3">{e}</th>)
                             }
                         </tr>
                         </thead>
                         <tbody>
                         {
-                            listOfDevice.map(e => <Item data={e}/>)
+                            listOfDevice.map((e, i) => <Item key={i} data={e}/>)
                         }
                         </tbody>
                     </table>

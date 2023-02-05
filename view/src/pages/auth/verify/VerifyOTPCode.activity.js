@@ -62,11 +62,7 @@ function VerifyOTPCodeActivity() {
                 <img src={AccessAccount} className="w-2/5 mx-auto sm:my-20 lg:w-1/5" alt="AccessAccount"/>
                 <div className="w-2/6 text-center">
                     <EditText maxLength={6} getText={getText} label="OTP Code"/>
-                    {
-                        isOTPCode ?
-                            <Button className="mt-10" onClick={() => response()}>Verify Code</Button> :
-                            <Button className="mt-10" disabled>Verify Code</Button>
-                    }
+                    <Button className="mt-10" disabled={!isOTPCode} onClick={() => response()}>Verify Code</Button>
                 </div>
             </div>
         </div>
