@@ -9,35 +9,33 @@ import Button from "component/Button";
 import {isValidOTPCode, handleStorage, getAuthExpirePayload} from "util/Utils";
 
 function VerifyOTPCodeActivity() {
+    const [data, setData] = useState({});
     const [otpCode, setOtpCode] = useState('');
+    const isOTPCode = isValidOTPCode(otpCode);
     const [hasClicked, setHasClicked] = useState(false);
     const [cookies] = useCookies(['apiKey', 'phone']);
-    const [data, setData] = useState({});
-    const isOTPCode = isValidOTPCode(otpCode);
 
-    const getText = (d) => {
-        setOtpCode(d);
-    }, handleOpenDialog = () => {
-        setHasClicked(!hasClicked);
-    }, response = async () => {
-        let location = await (await fetch('https://get.geojs.io/v1/ip/geo.json')).json();
+    const getText = d => setOtpCode(d),
+        handleOpenDialog = () => setHasClicked(!hasClicked),
+        response = async () => {
+            let location = await (await fetch('https://get.geojs.io/v1/ip/geo.json')).json();
 
-        let data = await resApi('auth/verify/otp', {
-            method: 'POST',
-            body: {
-                phone: cookies.phone,
-                code: otpCode,
-                deviceLocation: `${location?.country} ${location?.longitude},${location?.latitude}`
-            }
-        });
+            let data = await resApi('auth/verify/otp', {
+                method: 'POST',
+                body: {
+                    phone: cookies.phone,
+                    code: otpCode,
+                    deviceLocation: `${location?.country} ${location?.longitude},${location?.latitude}`
+                }
+            });
 
-        if (data?.statusCode === 212)
-            getAuthExpirePayload(data?.data).forEach(e => handleStorage(e));
+            if (data?.statusCode === 212)
+                getAuthExpirePayload(data?.data).forEach(e => handleStorage(e));
 
 
-        setData(data);
-        setHasClicked(!hasClicked);
-    };
+            setData(data);
+            setHasClicked(!hasClicked);
+        };
 
     return (
         <div>

@@ -29,25 +29,21 @@ function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
         hasSearchViewOpen(hasSearchOff);
     });
 
-    const handleSearchState = () => {
-        setHasSearchOff(!hasSearchOff);
-        hasSearchViewOpen(hasSearchOff);
-    }, handleOptionMenuState = () => {
-        setHasOpenedOptionMenu(!hasOpenedOptionMenu);
-    }, handleUserMenu = () => {
-        setHasOpenedUserMenu(!hasOpenedUserMenu);
-    }, handleAccessToLogout = async d => {
-        setAccessToLogout(d);
-        if (d) {
-            await resApi('personal/account', {
-                method: 'POST'
-            });
-            removeAllCookie();
-        }
-    }, handleClickedLogout = d => {
-        setHasClickedLogout(d);
-    };
-
+    const handleClickedLogout = d => setHasClickedLogout(d),
+        handleOptionMenuState = () => setHasOpenedOptionMenu(!hasOpenedOptionMenu),
+        handleUserMenu = () => setHasOpenedUserMenu(!hasOpenedUserMenu),
+        handleSearchState = () => {
+            setHasSearchOff(!hasSearchOff);
+            hasSearchViewOpen(hasSearchOff);
+        }, handleAccessToLogout = async d => {
+            setAccessToLogout(d);
+            if (d) {
+                await resApi('personal/account', {
+                    method: 'POST'
+                });
+                removeAllCookie();
+            }
+        };
 
     return (
         <div className="flex my-2 mx-3 relative" ref={wrapperRef}>

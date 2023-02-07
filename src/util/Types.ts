@@ -13,6 +13,11 @@ type FileUploaded = {
     size: string
 }
 
+type RoomId = {
+    type: string,
+    id: string
+}
+
 type Activities = {
     type: string // 'all' | 'group' | 'channel' | 'e2e'
 }
@@ -84,6 +89,7 @@ export {
     Users,
     IResponse,
     TToken,
+    RoomId,
     TUserDeviceInfo,
     TTokenWithApiKey,
     TSaveMessage,

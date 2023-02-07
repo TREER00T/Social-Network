@@ -3,14 +3,37 @@ import Json from "../../util/ReturnJson";
 import Response from "../../util/Response";
 import PromiseVerify from "./PromiseVerify";
 import Find from "../../model/find/group";
+import Util from "../../util/Util";
+import {GroupLinkDto} from "./dto/GroupLink.dto";
+import {RoomId} from "../../util/Types";
 
 export abstract class Group extends User {
 
-    async isGroupExist(roomId: string) {
+    async handleRoomId(dto: GroupLinkDto) {
+        let data = {};
+
+        if (!Util.isUndefined(dto.groupId))
+            data = {type: 'groupId', id: dto.groupId};
+
+        if (!Util.isUndefined(dto.publicLink))
+            data = {type: 'publicLink', id: dto.publicLink};
+
+        if (!Util.isUndefined(dto.inviteLink))
+            data = {type: 'inviteLink', id: dto.inviteLink};
+
+        if (Util.isUndefined(dto.groupId) && Util.isUndefined(dto.inviteLink) && Util.isUndefined(dto.publicLink))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        return data;
+    }
+
+    async isGroupExist(roomId: string | RoomId) {
         let isExist = await Find.id(roomId);
 
         if (!isExist)
             return Json.builder(Response.HTTP_NOT_FOUND);
+
+        return isExist;
     }
 
     async isNotJoinedUser(roomId: string, userId: string = this.userId) {
@@ -37,6 +60,10 @@ export abstract class Group extends User {
 
         if (!isJoined)
             return Json.builder(Response.HTTP_NOT_FOUND);
+    }
+
+    async isOwnerOrAdmin(groupId: string) {
+        return await Find.isOwnerOrAdmin(groupId, this.userId);
     }
 
 }

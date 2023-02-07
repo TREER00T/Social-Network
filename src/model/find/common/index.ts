@@ -38,15 +38,18 @@ export default {
             }, filter: any = {
                 $or: [
                     {username: {$regex: like}},
-                    {name: {$regex: like}}
+                    {name: {$regex: like}},
+                    {lastName: {$regex: like}}
                 ]
             };
 
-        let userData = await user().find(filter, projection);
+        let userData = await user().find(filter, {...projection, bio: 1, lastName: 1, username: 1});
 
         filter.$or[0] = {
             publicLink: {$regex: like}
         };
+
+        filter.$or.pop();
 
         let groupData = await group().find(filter, projection),
             channelData = await channel().find(filter, projection);
@@ -71,11 +74,11 @@ export default {
             [objKey]: 1
         }, `listOfUser${type}s`).toArray();
 
-        listOfId.map(e => `${e[objKey]}`);
 
         return await findMany({
-            _id: {$in: listOfId}
+            _id: {$in: listOfId.map(e => `${e[objKey]}`)}
         }, {
+            ...(type === 'e2e' ? {lastName: 1, bio: 1, username: 1} : {description: 1, publicLink: 1}),
             _id: 1,
             img: 1,
             name: 1,

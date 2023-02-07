@@ -148,9 +148,7 @@ export default {
 
     async isExist(userId: string) {
 
-        let data = await user().findOne({
-            _id: userId
-        }, {
+        let data = await user().findById(userId, {
             _id: 1
         });
 
@@ -234,7 +232,6 @@ export default {
             bio: 1,
             img: 1,
             name: 1,
-            isActive: 1,
             username: 1,
             lastName: 1,
             defaultColor: 1
@@ -252,7 +249,6 @@ export default {
             name: 1,
             email: 1,
             phone: 1,
-            isActive: 1,
             username: 1,
             lastName: 1,
             defaultColor: 1
@@ -325,7 +321,6 @@ export default {
             img: 1,
             name: 1,
             lastName: 1,
-            isActive: 1,
             username: 1,
             defaultColor: 1
         });
@@ -435,7 +430,7 @@ export default {
         if (!Util.isNotEmptyArr(data))
             return false;
 
-        data?.filter(async d => !(await FindInGroup.isOwner(userId, d.groupId)));
+        data = data?.filter(async d => !(await FindInGroup.isOwner(userId, d.groupId)));
 
         return Util.isNotEmptyArr(data) ? data : false;
 
@@ -466,7 +461,7 @@ export default {
         if (!Util.isNotEmptyArr(data))
             return false;
 
-        data?.filter(async d => !(await FindInChannel.isOwner(userId, d.channelId)));
+        data = data?.filter(async d => !(await FindInChannel.isOwner(userId, d.channelId)));
 
         return Util.isNotEmptyArr(data) ? data : false;
 
@@ -481,12 +476,10 @@ export default {
             toUser: 1
         });
 
-        data?.map(d => d.toUser);
-
-        return data;
+        return data?.map(d => d.toUser);
     },
 
-    async hasLogout(userId:string) {
+    async hasLogout(userId: string) {
         let data = await user().findById(userId);
 
         return data?.hasLogout;

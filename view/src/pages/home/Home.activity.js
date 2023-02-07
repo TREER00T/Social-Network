@@ -14,21 +14,16 @@ function HomeActivity() {
     const [hasSearchViewOpen, setHasSearchViewOpen] = useState('');
     const [tabViewItemClickedData, setTabViewItemClickedData] = useState({});
 
-    const handleTabViewItemClickedData = d => {
-        setTabViewItemClickedData(d);
-    }, handleTextSearched = d => {
-        setSearch(d);
-    }, handleHasSearchViewOpen = d => {
-        setHasSearchViewOpen(d);
-    }, handleNavbarBackButton = () => {
-        setTabViewItemClickedData({});
-    };
+    const handleTabViewItemClickedData = d => setTabViewItemClickedData(d),
+        handleTextSearched = d => setSearch(d),
+        handleHasSearchViewOpen = d => setHasSearchViewOpen(d),
+        handleNavbarBackButton = () => setTabViewItemClickedData({});
 
     return (
         <div className="flex flex-col">
-            {/*{*/}
-            {/*    cookies?.apiKey ? <></> : <Navigate to="/user/login"/>*/}
-            {/*}*/}
+            {
+                cookies?.apiKey ? <></> : <Navigate to="/user/login"/>
+            }
 
             {/* Navbar */}
             <HomeNavbar

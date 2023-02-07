@@ -5,11 +5,8 @@ function Navbar({className}) {
     const [isHome, setIsHome] = useState(false);
     const [isSource, setIsSource] = useState(false);
 
-    const handleClickHome = () => {
-        setIsHome(current => !current);
-    }, handleClickSource = () => {
-        setIsSource(current => !current);
-    };
+    const handleClickHome = () => setIsHome(current => !current),
+        handleClickSource = () => setIsSource(current => !current);
 
     return (
         <div className={className + ' navbar'}>

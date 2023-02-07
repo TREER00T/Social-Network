@@ -42,13 +42,10 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
         let socketId = client.id;
 
         if (this.canActive) {
-            Redis.get(this.getUserId(socketId))
-                .then(async (socket) => {
-                    delete this.users[socketId];
-                    await this.socketGatewayService.updateUserStatus(socket.id, 0);
-                    await this.socketGatewayService.sendUserOnlineStatusForSpecificUsers(this.io, false, socket.id);
-                })
-                .then(async () => await Redis.remove(socketId));
+            let socket = await Redis.get(this.getUserId(socketId));
+            delete this.users[socketId];
+            await Redis.remove(socketId);
+            await this.socketGatewayService.sendListOfUserOnlineStatusForSpecificUser(this.io, socket.id, false);
         }
     }
 
@@ -57,21 +54,20 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
         let userApiKey = client.handshake.query?.apiKey;
         let socketId = client.id;
 
-        let isExistUserInRedis = await Redis.get(socketId);
-
-        if (isExistUserInRedis)
-            return this.canActive = true;
-
         let isValidToken = await Util.isAccessToken(accessToken);
 
         if (!isValidToken)
             return this.canActive = false;
 
-
         let tokenPayload = await Util.getTokenPayLoad();
 
         let userPhone = tokenPayload.phoneNumber,
             userId = tokenPayload.id;
+
+        let isExistUserInRedis = await Redis.get(userId);
+
+        if (isExistUserInRedis)
+            return this.canActive = true;
 
         let isValidApiKey = await Util.isValidApiKey(userPhone, userApiKey?.toString());
 
@@ -82,8 +78,7 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
                 socketId: socketId
             });
 
-            await this.socketGatewayService.updateUserStatus(userId, 1);
-            await this.socketGatewayService.sendUserOnlineStatusForSpecificUsers(this.io, true, userId);
+            await this.socketGatewayService.sendListOfUserOnlineStatusForSpecificUser(this.io, userId, true);
             this.users[socketId] = userId;
 
             return this.canActive = true;

@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Post} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post} from '@nestjs/common';
 import {ChannelAdminService} from './ChannelAdmin.service';
 import {Channel} from "../../base/Channel";
 import Json from "../../../util/ReturnJson";
@@ -9,6 +9,27 @@ import PromiseVerify from "../../base/PromiseVerify";
 export class ChannelAdminController extends Channel {
     constructor(private readonly appService: ChannelAdminService) {
         super();
+    }
+
+    @Get()
+    async userAccessResource(@Body("channelId") channelId: string) {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(channelId),
+            this.verifyUser(this.userId),
+            this.isChannelExist(channelId),
+            this.isUserJoined(channelId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        if (await this.isAdmin(channelId, this.userId))
+            return Json.builder(Response.HTTP_ACCESS_RESOURCE_ADMIN);
+
+        if (await this.isOwner(channelId))
+            return Json.builder(Response.HTTP_ACCESS_RESOURCE_OWNER);
+
+        return Json.builder(Response.HTTP_FORBIDDEN);
     }
 
     @Post()

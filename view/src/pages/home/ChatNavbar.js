@@ -10,73 +10,78 @@ import BlockUser from "img/hand-stop.svg";
 import {useEffect, useRef, useState} from "react";
 import {resApi} from "common/fetch";
 import Trash from "img/trash.svg";
-import Io from 'common/io';
+import UserProfile from "component/UserProfile";
 
-function ChatNavbar({data: {img, defaultColor, _id, name, type}, backButton}) {
+function ChatNavbar({
+                        data: {
+                            img,
+                            defaultColor,
+                            lastName,
+                            username,
+                            publicLink,
+                            bio,
+                            description,
+                            _id,
+                            name,
+                            type,
+                            activities
+                        },
+                        backButton
+                    }) {
 
     const isSavedMessage = type === 'SA';
     const wrapperRef = useRef('navbar');
     const [isActive, setIsActive] = useState(true);
     const [hasClearChat, setHasClearChat] = useState(false);
     const [hasBlockUser, setHasBlockUser] = useState(false);
+    const [openUserProfile, setOpenUserProfile] = useState(false);
     const [hasBlockUserByMe, setHasBlockUserByMe] = useState(false);
     const [hasMeBlockedByUser, setHasMeBlockedByUser] = useState(false);
     const [hasClickedCheckBox, setHasClickedCheckBox] = useState(false);
     const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(false);
 
-    const handleBackClick = () => {
-        backButton();
-    }, handleClickMenuOption = () => {
-        setHasOpenedOptionMenu(!hasOpenedOptionMenu);
-    }, handleClickUserProfile = () => {
+    const handleClickUserProfile = () => setOpenUserProfile(!openUserProfile),
+        handleBackClick = () => backButton(),
+        handleClickMenuOption = () => setHasOpenedOptionMenu(!hasOpenedOptionMenu),
+        handleClickedClearChat = () => setHasClearChat(!hasClearChat),
+        handleClickedBlockUser = () => setHasBlockUser(!hasBlockUser),
+        handleClickCheckBoxForClearChatUs = () => setHasClickedCheckBox(!hasClickedCheckBox),
+        handleAccessToClearChat = async d => {
+            if (!d)
+                return;
 
-    }, handleClickedClearChat = () => {
-        setHasClearChat(!hasClearChat);
-    }, handleAccessToClearChat = async d => {
-        if (!d)
-            return;
+            backButton();
 
-        backButton();
-
-        if (hasClickedCheckBox)
-            await resApi(`e2e/${_id}/us`, {
+            await resApi(`e2e/${_id}/${hasClickedCheckBox ? 'us' : 'me'}`, {
                 method: 'DELETE'
             });
-        else
-            await resApi(`e2e/${_id}/me`, {
-                method: 'DELETE'
+        }, handleAccessToBlockUser = async d => {
+            if (!d)
+                return;
+
+            await resApi('e2e/user/block', {
+                method: 'PUT',
+                body: {
+                    targetUserId: _id
+                }
             });
-    }, handleAccessToBlockUser = async d => {
-        if (!d)
-            return;
+        }, handleDisableOrEnableMessageForBlockedUser = async () => {
+            let data = await resApi('e2e/user/block', {
+                body: {
+                    targetUserId: _id
+                }
+            });
 
-        await resApi('e2e/user/block', {
-            method: 'PUT',
-            body: {
-                targetUserId: _id
-            }
-        });
-    }, handleClickedBlockUser = () => {
-        setHasBlockUser(!hasBlockUser);
-    }, handleClickCheckBoxForClearChatUs = () => {
-        setHasClickedCheckBox(!hasClickedCheckBox);
-    }, handleDisableOrEnableMessageForBlockedUser = async () => {
-        let data = await resApi('e2e/user/block', {
-            body: {
-                targetUserId: _id
-            }
-        });
+            let mapResult = {
+                210: () => setHasBlockUserByMe(true),
+                211: () => setHasMeBlockedByUser(true)
+            };
 
-        let mapResult = {
-            210: () => setHasBlockUserByMe(true),
-            211: () => setHasMeBlockedByUser(true)
+            if (data.statusCode === 404)
+                return;
+
+            mapResult[data.statusCode]();
         };
-
-        if (data.statusCode === 404)
-            return;
-
-        mapResult[data.statusCode]();
-    };
 
     useOutsideAlerter(wrapperRef, () => {
         setHasOpenedOptionMenu(false);
@@ -88,10 +93,28 @@ function ChatNavbar({data: {img, defaultColor, _id, name, type}, backButton}) {
 
     return (
         <div className="flex items-center relative w-screen max-w-4xl pb-1" style={{
-            boxShadow: '0 3px 2px -2px gray'
+            boxShadow: '0 2px 2px -2px gray'
         }} ref={wrapperRef}>
 
             <ImageButton src={BackIcon} onClick={handleBackClick}/>
+
+            <UserProfile open={openUserProfile}
+                         handleOpen={handleClickUserProfile}
+                         info={{
+                             img,
+                             defaultColor,
+                             lastName,
+                             publicLink,
+                             isActive,
+                             username,
+                             activities,
+                             bio,
+                             description,
+                             _id,
+                             name,
+                             type
+                         }}/>
+
 
             <div
                 className="flex py-1 px-2 ml-6 mr-auto justify-end hover:cursor-pointer hover:bg-gray-100 hover:rounded-lg items-center"

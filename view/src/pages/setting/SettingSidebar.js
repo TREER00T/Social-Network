@@ -3,12 +3,10 @@ import {settingSidebarItems} from "extra/setting";
 
 function Item({data: {url, icon, name}}) {
 
-    const [hasClicked, setHasClicked] = useState(false);
     const isValidPath = url === window.location.pathname;
+    const [hasClicked, setHasClicked] = useState(false);
 
-    const handleClick = () => {
-        setHasClicked(!hasClicked);
-    };
+    const handleClick = () => setHasClicked(!hasClicked);
 
     return (
         <li>

@@ -26,8 +26,8 @@ function Item({data: {deviceIp, createdAt, deviceName, deviceLocation}}) {
 
 export default function DevicesActivity() {
 
-    const [userInfo, setUserInfo] = useState({});
     const [cookies] = useCookies(['apiKey']);
+    const [userInfo, setUserInfo] = useState({});
     const [listOfDevice, setListOfDevice] = useState([]);
 
     const response = async () => {

@@ -9,83 +9,78 @@ import {Checkbox} from "@material-tailwind/react";
 import {removeAllCookie} from "common/removeAllCookie";
 
 export default function UserProfileSettingActivity() {
-    const [cookies] = useCookies(['apiKey', 'accessToken']);
+    const [bio, setBio] = useState('');
     const [data, setData] = useState({});
-    const [avatar, setAvatar] = useState('');
-    const [avatarFile, setAvatarFile] = useState();
-    const [firstName, setFirstName] = useState('');
     const [phone, setPhone] = useState('');
+    const [avatarFile, setAvatarFile] = useState();
+    const [avatar, setAvatar] = useState('');
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [cookies] = useCookies(['apiKey', 'accessToken']);
     const [hasCheckBoxChecked, setHasCheckBoxChecked] = useState(false);
     const [hasClickedDeleteAccount, setHasClickedDeleteAccount] = useState(false);
-    const [bio, setBio] = useState('');
 
-    const response = async () => {
-        let data = await resApi('personal/user');
-        setData(data.data);
-        setAvatar(data?.data?.img);
-        setUsername(data?.data?.username);
-        setLastName(data?.data?.lastName);
-        setFirstName(data?.data?.name);
-        setPhone(data?.data?.phone);
-        setBio(data?.data?.bio);
-    }, updateProfile = async () => {
+    const handleBio = d => setBio(d),
+        handleFirstName = d => setFirstName(d),
+        handleLastName = d => setLastName(d),
+        handleUsername = d => setUsername(d),
+        handleCheckBox = () => setHasCheckBoxChecked(!hasCheckBoxChecked),
+        response = async () => {
+            let data = await resApi('personal/user');
+            setData(data.data);
+            setAvatar(data?.data?.img);
+            setUsername(data?.data?.username);
+            setLastName(data?.data?.lastName);
+            setFirstName(data?.data?.name);
+            setPhone(data?.data?.phone);
+            setBio(data?.data?.bio);
+        }, updateProfile = async () => {
 
-        if (avatar && data.img !== avatar) {
-            await resApi('personal/upload/avatar', {
-                body: {
-                    file: avatarFile,
-                    name: 'avatar'
-                },
-                isFile: true
+            if (avatar && data.img !== avatar) {
+                await resApi('personal/upload/avatar', {
+                    body: {
+                        file: avatarFile,
+                        name: 'avatar'
+                    },
+                    isFile: true
+                });
+            }
+
+            if (data.name !== firstName || data.lastName !== lastName)
+                await resApi('personal/name', {
+                    method: 'PUT',
+                    body: {
+                        firstName: firstName,
+                        lastName: lastName
+                    }
+                });
+
+            if (data.bio !== bio)
+                await resApi('personal/bio', {
+                    method: 'PUT',
+                    body: {
+                        bio: bio
+                    }
+                });
+
+            if (data.username !== username)
+                await resApi(`personal/username/${username}`, {
+                    method: 'PUT'
+                });
+
+        }, handleDeleteAccount = async () => {
+            await resApi('personal/account', {
+                method: 'DELETE'
             });
-        }
-
-        if (data.name !== firstName || data.lastName !== lastName)
-            await resApi('personal/name', {
-                method: 'PUT',
-                body: {
-                    firstName: firstName,
-                    lastName: lastName
-                }
-            });
-
-        if (data.bio !== bio)
-            await resApi('personal/bio', {
-                method: 'PUT',
-                body: {
-                    bio: bio
-                }
-            });
-
-        if (data.username !== username)
-            await resApi(`personal/username/${username}`, {
-                method: 'PUT'
-            });
-
-    }, handleDeleteAccount = async () => {
-        await resApi('personal/account', {
-            method: 'DELETE'
-        });
-        setHasClickedDeleteAccount(!hasClickedDeleteAccount);
-        removeAllCookie();
-    }, handleFirstName = d => {
-        setFirstName(d);
-    }, handleBio = d => {
-        setBio(d);
-    }, handleLastName = d => {
-        setLastName(d);
-    }, handleUsername = d => {
-        setUsername(d);
-    }, handleCheckBox = () => {
-        setHasCheckBoxChecked(!hasCheckBoxChecked);
-    }, handleChangeImage = e => {
-        if (e.target.files.length > 0) {
-            setAvatarFile(e.target.files[0]);
-            setAvatar(URL.createObjectURL(e.target.files[0]));
-        }
-    };
+            setHasClickedDeleteAccount(!hasClickedDeleteAccount);
+            removeAllCookie();
+        }, handleChangeImage = e => {
+            if (e.target.files.length > 0) {
+                setAvatarFile(e.target.files[0]);
+                setAvatar(URL.createObjectURL(e.target.files[0]));
+            }
+        };
 
     useEffect(() => {
         response();

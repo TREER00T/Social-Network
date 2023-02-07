@@ -10,53 +10,49 @@ import {useCookies} from "react-cookie";
 
 export default function PrivacyActivity() {
 
-    const [userInfo, setUserInfo] = useState({});
     const [email, setEmail] = useState('');
     const [cookies] = useCookies(['apiKey']);
+    const [userInfo, setUserInfo] = useState({});
+    const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [oldPassword, setOldPassword] = useState('');
     const [twoStepHasEnable, setTwoStepHasEnable] = useState(false);
-    const isValidNewPassword = isPassword(newPassword);
-    const isValidConfirmPassword = isPassword(confirmPassword);
-    const isValidOldPassword = isPassword(oldPassword);
     const isValidEmail = isEmail(email);
+    const isValidNewPassword = isPassword(newPassword);
+    const isValidOldPassword = isPassword(oldPassword);
+    const isValidConfirmPassword = isPassword(confirmPassword);
     const isNewPasswordEqualToConfirmPassword = newPassword === confirmPassword;
 
-    const response = async () => {
-        let data = await resApi('personal/user');
-        setUserInfo(data.data);
-    }, handleNewPassword = d => {
-        setNewPassword(d);
-    }, handleOldPassword = d => {
-        setOldPassword(d);
-    }, handleConfirmPassword = d => {
-        setConfirmPassword(d);
-    }, handleEmail = d => {
-        setEmail(d);
-    }, handleTwoStepVerificationRequest = async () => {
-        await resApi('personal/twoAuth/enable', {
-            method: 'PUT',
-            body: {
-                email: email,
-                password: newPassword
-            }
-        });
-    }, handleRestPasswordRequest = async () => {
-        await resApi('personal/twoAuth/rest/password', {
-            method: 'PUT',
-            body: {
-                old: oldPassword,
-                new: newPassword
-            }
-        })
-    }, handleTwoStepEnable = async () => {
-        setTwoStepHasEnable(!twoStepHasEnable);
-        if (!twoStepHasEnable)
-            await resApi('personal/twoAuth/disable', {
-                method: 'PUT'
+    const handleNewPassword = d => setNewPassword(d),
+        handleOldPassword = d => setOldPassword(d),
+        handleConfirmPassword = d => setConfirmPassword(d),
+        handleEmail = d => setEmail(d),
+        handleTwoStepVerificationRequest = async () => {
+            await resApi('personal/twoAuth/enable', {
+                method: 'PUT',
+                body: {
+                    email: email,
+                    password: newPassword
+                }
             });
-    };
+        }, response = async () => {
+            let data = await resApi('personal/user');
+            setUserInfo(data.data);
+        }, handleRestPasswordRequest = async () => {
+            await resApi('personal/twoAuth/rest/password', {
+                method: 'PUT',
+                body: {
+                    old: oldPassword,
+                    new: newPassword
+                }
+            })
+        }, handleTwoStepEnable = async () => {
+            setTwoStepHasEnable(!twoStepHasEnable);
+            if (!twoStepHasEnable)
+                await resApi('personal/twoAuth/disable', {
+                    method: 'PUT'
+                });
+        };
 
 
     useEffect(() => {
