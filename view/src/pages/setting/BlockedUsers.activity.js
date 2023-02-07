@@ -52,8 +52,8 @@ function Item({data: {img, defaultColor, name, lastName, isActive, _id}}) {
 
 export default function BlockedUsersActivity() {
 
-    const [userInfo, setUserInfo] = useState({});
     const [cookies] = useCookies(['apiKey']);
+    const [userInfo, setUserInfo] = useState({});
     const [listOfBlockedUsers, setListOfBlockedUsers] = useState([]);
 
     const response = async () => {

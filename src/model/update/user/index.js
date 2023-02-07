@@ -18,13 +18,6 @@ module.exports = {
     },
 
 
-    async userOnline(phone, status) {
-
-        await user().updateOne({phone: phone}, {$set: {isActive: status}});
-
-    },
-
-
     async username(phone, username) {
 
         await user().updateOne({phone: phone}, {$set: {username: username}});

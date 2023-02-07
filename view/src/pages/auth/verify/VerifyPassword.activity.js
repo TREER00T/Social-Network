@@ -11,31 +11,29 @@ import {isPassword, handleStorage, getAuthExpirePayload} from "util/Utils";
 function VerifyPasswordActivity() {
 
     const [password, setPassword] = useState('');
+    const isValidPassword = isPassword(password);
+    const [data, setData] = useState({});
     const [cookies] = useCookies(['apiKey', 'phone']);
     const [hasClicked, setHasClicked] = useState(false);
-    const [data, setData] = useState({});
-    const isValidPassword = isPassword(password);
 
-    const getText = d => {
-        setPassword(d);
-    }, handleOpenDialog = () => {
-        setHasClicked(!hasClicked);
-    }, response = async () => {
-        let location = await (await fetch('https://get.geojs.io/v1/ip/geo.json')).json();
+    const getText = d => setPassword(d),
+        handleOpenDialog = () => setHasClicked(!hasClicked),
+        response = async () => {
+            let location = await (await fetch('https://get.geojs.io/v1/ip/geo.json')).json();
 
-        let data = await resApi('auth/verify/twoStep', {
-            method: 'POST',
-            body: {
-                password: password,
-                deviceLocation: `${location?.country} ${location?.longitude},${location?.latitude}`
-            }
-        });
+            let data = await resApi('auth/verify/twoStep', {
+                method: 'POST',
+                body: {
+                    password: password,
+                    deviceLocation: `${location?.country} ${location?.longitude},${location?.latitude}`
+                }
+            });
 
-        if (data?.statusCode === 212)
-            getAuthExpirePayload(data?.data).forEach(e => handleStorage(e));
+            if (data?.statusCode === 212)
+                getAuthExpirePayload(data?.data).forEach(e => handleStorage(e));
 
-        setData(data);
-    };
+            setData(data);
+        };
 
     return (
         <div>

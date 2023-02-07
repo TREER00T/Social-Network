@@ -39,13 +39,18 @@ paths:
   /*:
     - on: connection
       events:
-        - name: onlineStatus
+        - name: emitNotifyListOfUserOnlineStatus
           description: By notifying all sockets known to the user.
+        - name: emitListOfUserOnlineStatusForSpecificUser
+          description: Return list of active userId
 
     - on: disconnect
       events:
-        - name: onlineStatus
+        - name: emitNotifyListOfUserOnlineStatus
           description: By notifying all sockets known to the user.
+        - name: emitListOfUserOnlineStatusForSpecificUser
+          description: Return list of active userId
+
 
   /common:
     - on: onUserActivities

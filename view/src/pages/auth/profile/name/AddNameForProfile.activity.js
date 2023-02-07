@@ -9,30 +9,27 @@ import Button from "component/Button";
 import {haveName} from "util/Utils";
 
 function AddNameForProfile() {
+    const [data, setData] = useState({});
     const [lastName, setLastName] = useState('');
     const [firstName, setFirstName] = useState('');
+    const haveFirstName = haveName(firstName);
     const [hasClicked, setHasClicked] = useState(false);
     const [cookies] = useCookies(['apiKey', 'phone']);
-    const [data, setData] = useState({});
-    const haveFirstName = haveName(firstName);
 
-    const getFirstName = d => {
-        setFirstName(d);
-    }, getLastName = d => {
-        setLastName(d);
-    }, handleOpenDialog = () => {
-        setHasClicked(!hasClicked);
-    }, response = async () => {
-        let data = await resApi('auth/profile/name', {
-            method: 'PUT',
-            body: {
-                firstName: firstName,
-                ...(lastName ? {lastName: lastName} : {})
-            }
-        });
-        setData(data);
-        setHasClicked(!hasClicked);
-    };
+    const getFirstName = d => setFirstName(d),
+        getLastName = d => setLastName(d),
+        handleOpenDialog = () => setHasClicked(!hasClicked),
+        response = async () => {
+            let data = await resApi('auth/profile/name', {
+                method: 'PUT',
+                body: {
+                    firstName: firstName,
+                    ...(lastName ? {lastName: lastName} : {})
+                }
+            });
+            setData(data);
+            setHasClicked(!hasClicked);
+        };
 
     return (
         <div>

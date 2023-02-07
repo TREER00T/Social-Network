@@ -1,3 +1,5 @@
+import {RoomId} from "../../../util/Types";
+
 let {
         group,
         groupUser,
@@ -9,9 +11,18 @@ let {
 
 export default {
 
-    async id(id: string) {
+    async id(id: string | RoomId) {
 
-        let data = await group().findById(id, {
+        if (typeof id === 'string') {
+
+            let data = await group().findById(id, {
+                _id: 1
+            });
+
+            return data?._id?.toString();
+        }
+
+        let data = await group().findOne({[id.type === 'groupId' ? '_id' : id.type]: id.id}, {
             _id: 1
         });
 
@@ -33,9 +44,7 @@ export default {
 
     async links(groupId: string) {
 
-        return await group().find({
-            _id: groupId
-        }, {
+        return await group().findById(groupId, {
             _id: 0,
             publicLink: 1,
             inviteLink: 1
@@ -89,17 +98,39 @@ export default {
 
     },
 
+    async getInfo(groupId: string, isOwnerOrAdmin: boolean) {
 
-    async getInfo(groupId: string) {
+        if (isOwnerOrAdmin)
+            return await group().findById(groupId);
 
-        return await group().findById(groupId);
+        return await group().findById(groupId, {
+            _id: 1,
+            img: 1,
+            name: 1,
+            inviteLink: 0,
+            publicLink: 1,
+            description: 1,
+            defaultColor: 1
+        });
 
     },
 
+    async isOwnerOrAdmin(adminId: string, groupId: string) {
+
+        let data = await groupAdmin().findOne({
+            adminId: adminId,
+            groupId: groupId
+        }, {
+            _id: 1
+        });
+
+        return !!data?._id?.toString();
+
+    },
 
     async getCountOfUsers(groupId: string) {
 
-        return await group().find({_id: groupId}).countDocuments();
+        return await group().findById(groupId).countDocuments();
 
     },
 

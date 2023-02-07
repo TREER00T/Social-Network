@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Post} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post} from '@nestjs/common';
 import {GroupAdminService} from './GroupAdmin.service';
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
@@ -9,6 +9,27 @@ import {Group} from "../../base/Group";
 export class GroupAdminController extends Group {
     constructor(private readonly appService: GroupAdminService) {
         super();
+    }
+
+    @Get()
+    async userAccessResource(@Body("groupId") groupId: string) {
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(groupId),
+            this.verifyUser(this.userId),
+            this.isGroupExist(groupId),
+            this.isUserJoined(groupId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        if (await this.isAdmin(groupId, this.userId))
+            return Json.builder(Response.HTTP_ACCESS_RESOURCE_ADMIN);
+
+        if (await this.isOwner(groupId))
+            return Json.builder(Response.HTTP_ACCESS_RESOURCE_OWNER);
+
+        return Json.builder(Response.HTTP_FORBIDDEN);
     }
 
     @Post()

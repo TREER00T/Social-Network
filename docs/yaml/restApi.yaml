@@ -2213,6 +2213,66 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
+    get:
+      tags:
+        - Group
+      summary: Help to handle user access resource
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: groupId
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        805:
+          description: "Access resource: admin"
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        806:
+          description: "Access resource: owner"
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
     delete:
       tags:
         - Group
@@ -2500,7 +2560,7 @@ paths:
     get:
       tags:
         - Group
-      summary: Return group chat room information
+      summary: Return group chat room information , invite and public link help to find group info when we have not access to group unique id for example when clicked invite id in app
       consumes:
         - application/json
       parameters:
@@ -2508,6 +2568,14 @@ paths:
           name: groupId
           type: string
           required: true
+        - in: body
+          name: publicLink
+          type: string
+          required: false
+        - in: body
+          name: inviteLink
+          type: string
+          required: false
       security:
         - apiKey: [ ]
         - token: [ ]
@@ -3082,6 +3150,66 @@ paths:
             $ref: '#/definitions/Status'
 
   /channel/admins:
+    get:
+      tags:
+        - Channel
+      summary: Help to handle user access resource
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: groupId
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        805:
+          description: "Access resource: admin"
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        806:
+          description: "Access resource: owner"
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
     post:
       tags:
         - Channel
@@ -3428,7 +3556,7 @@ paths:
     get:
       tags:
         - Channel
-      summary: Return channel chat room information
+      summary: : Return channel chat room information , invite and public link help to find channel info when we have not access to channel unique id for example when clicked invite id in app
       consumes:
         - application/json
       parameters:
@@ -3436,6 +3564,14 @@ paths:
           name: channelId
           type: string
           required: true
+        - in: body
+          name: inviteLink
+          type: string
+          required: false
+        - in: body
+          name: publicLink
+          type: string
+          required: false
       security:
         - apiKey: [ ]
         - token: [ ]
@@ -3536,8 +3672,6 @@ definitions:
         type: string
       lastName:
         type: string
-      isActive:
-        type: boolean
       bio:
         type: string
   ResponseInfoInOptionObject:
@@ -3570,8 +3704,6 @@ definitions:
         type: string
       lastName:
         type: string
-      isActive:
-        type: boolean
       username:
         type: string
       defaultColor:
@@ -3692,8 +3824,6 @@ definitions:
         type: string
       bio:
         type: string
-      isActive:
-        type: boolean
       username:
         type: string
       lastName:
@@ -3708,8 +3838,6 @@ definitions:
         type: string
       bio:
         type: string
-      isActive:
-        type: boolean
       username:
         type: string
       lastName:

@@ -2,30 +2,41 @@ import {Injectable} from "@nestjs/common";
 import {Server} from "socket.io";
 import Find from "../../model/find/user";
 
-let Update = require("../../model/update/user"),
-    Redis = require("../../database/redisDbDriver");
+let Redis = require("../../database/redisDbDriver");
 
 
 @Injectable()
 export class SocketGatewayService {
 
-    async updateUserStatus(userPhone: string, status: number) {
-        await Update.userOnline(userPhone, status);
-    }
-
-    async sendUserOnlineStatusForSpecificUsers(io: Server, status: boolean, userId: string) {
+    async sendListOfUserOnlineStatusForSpecificUser(io: Server, userId: string, status: boolean) {
 
         let users = await Find.getUsersFromListOfUser(userId);
+
+        await this.notifyingOtherUsersForUserConnection(io, userId, users, status);
 
         for (const u of users) {
             let user = await Redis.get(u);
 
             if (user)
-                io.to(user.socketId).emit('onlineStatus', {
-                    userId: user.id,
+                users = {userId: user.id, socketId: user.socketId};
+        }
+
+        let user = await Redis.get(userId);
+
+        io.to(user.socketId).emit('emitListOfUserOnlineStatusForSpecificUser', userId);
+
+    }
+
+    async notifyingOtherUsersForUserConnection(io: Server, userId: string, listOfUser: string[], status: boolean) {
+
+        for (const u of listOfUser) {
+            let user = await Redis.get(u);
+
+            if (user)
+                io.to(user.socketId).emit('emitNotifyListOfUserOnlineStatus', {
+                    userId: userId,
                     isOnline: status
                 });
-
         }
 
     }

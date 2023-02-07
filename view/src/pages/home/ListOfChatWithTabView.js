@@ -6,13 +6,22 @@ import SavedMessage from "img/saved-message.svg";
 import NotFound from "component/NotFound";
 import {useCookies} from "react-cookie";
 
-function Item({data: {img, _id, name, defaultColor, type}, getData}) {
+function Item({data: {img, defaultColor, lastName, username, publicLink, bio, description, _id, name, type}, getData}) {
 
     const isSavedMessage = type === 'SA';
 
-    const handleClick = () => {
-        getData({img, _id, name, defaultColor, type});
-    };
+    const handleClick = () => getData({
+        img,
+        defaultColor,
+        lastName,
+        username,
+        publicLink,
+        bio,
+        description,
+        _id,
+        name,
+        type
+    });
 
     return (
         <li className="flex py-2 hover:cursor-pointer hover:bg-gray-100 hover:rounded-lg"
@@ -37,6 +46,7 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
     const [userActivities, setUserActivities] = useState([
         {
             type: 'Channel',
+            publicLink: 'sdllddll',
             _id: '1',
             name: 'Channel',
             defaultColor: '#418aff'
@@ -56,6 +66,8 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
         {
             type: 'E2E',
             _id: '4',
+            username: 'UsernameE2E',
+            bio: 'Test simple text',
             name: 'E2E',
             defaultColor: '#ffae00'
         }
@@ -64,6 +76,7 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
         {
             type: 'Channel',
             _id: '1',
+            publicLink: 'sdllddll',
             name: 'Channel',
             defaultColor: '#418aff'
         },
@@ -82,15 +95,16 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
         {
             type: 'E2E',
             _id: '4',
+            username: 'UsernameE2E',
             name: 'E2E',
             defaultColor: '#ffae00'
         }
     ]);
-    const [searchData, setSearchData] = useState([]);
     const [cookies] = useCookies(['phone']);
-    const [hasExistSavedMessage, setHasExistSavedMessage] = useState(false);
+    const [searchData, setSearchData] = useState([]);
     const [haveNotActivity, setHaveNotActivity] = useState(false);
     const assign = (o, t) => Object.assign(o ?? {}, {type: t});
+    const [hasExistSavedMessage, setHasExistSavedMessage] = useState(false);
     const dataComposition = data => [
         assign(data?.e2es, 'E2E'),
         assign(data?.groups, 'Group'),

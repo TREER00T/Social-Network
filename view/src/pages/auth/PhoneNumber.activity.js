@@ -10,26 +10,24 @@ import {isValidPhoneNumber} from "util/Utils";
 
 function PhoneNumberActivity() {
 
+    const [data, setData] = useState({});
     const [phone, setPhone] = useState('');
+    const isPhoneNumber = isValidPhoneNumber(phone);
     const [cookies] = useCookies(['apiKey']);
     const [hasClicked, setHasClicked] = useState(false);
-    const [data, setData] = useState({});
-    const isPhoneNumber = isValidPhoneNumber(phone);
 
-    const getText = (d) => {
-        setPhone(d);
-    }, handleOpenDialog = () => {
-        setHasClicked(!hasClicked);
-    }, response = async () => {
-        let data = await resApi('auth/generate/user', {
-            method: 'POST',
-            body: {
-                phone: phone
-            }
-        });
-        setData(data);
-        setHasClicked(!hasClicked);
-    };
+    const getText = (d) => setPhone(d),
+        handleOpenDialog = () => setHasClicked(!hasClicked),
+        response = async () => {
+            let data = await resApi('auth/generate/user', {
+                method: 'POST',
+                body: {
+                    phone: phone
+                }
+            });
+            setData(data);
+            setHasClicked(!hasClicked);
+        };
 
     return (
         <div>

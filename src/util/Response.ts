@@ -287,6 +287,14 @@ export default {
     HTTP_UNAUTHORIZED_INVALID_API_KEY: {
         statusCode: 804,
         message: 'Unauthorized! Invalid Api Key'
+    },
+    HTTP_ACCESS_RESOURCE_ADMIN: {
+        statusCode: 805,
+        message: 'Access resource: admin'
+    },
+    HTTP_ACCESS_RESOURCE_OWNER: {
+        statusCode: 806,
+        message: 'Access resource: owner'
     }
 
 };

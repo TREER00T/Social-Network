@@ -1,3 +1,5 @@
+import {RoomId} from "../../../util/Types";
+
 let {
     channel,
     channelUser,
@@ -6,9 +8,18 @@ let {
 
 export default {
 
-    async id(id: string) {
+    async id(id: string | RoomId) {
 
-        let data = await channel().findById(id, {
+        if (typeof id === 'string') {
+
+            let data = await channel().findById(id, {
+                _id: 1
+            });
+
+            return data?._id?.toString();
+        }
+
+        let data = await channel().findOne({[id.type === 'channelId' ? '_id' : id.type]: id.id}, {
             _id: 1
         });
 
@@ -30,9 +41,7 @@ export default {
 
     async links(channelId: string) {
 
-        return await channel().find({
-            _id: channelId
-        }, {
+        return await channel().findById(channelId, {
             _id: 0,
             publicLink: 1,
             inviteLink: 1
@@ -93,22 +102,34 @@ export default {
 
     },
 
-    async getInfo(channelId: string) {
+    async getInfo(channelId: string, isOwnerOrAdmin?: boolean) {
 
-        return await channel().findById(channelId);
+        if (isOwnerOrAdmin)
+            return await channel().findById(channelId);
+
+        return await channel().findById(channelId, {
+            _id: 1,
+            img: 1,
+            name: 1,
+            inviteLink: 0,
+            publicLink: 1,
+            description: 1,
+            defaultColor: 1
+        });
 
     },
 
-
     async getCountOfUsers(channelId: string) {
 
-        return await channel().find({_id: channelId}).countDocuments();
+        return await channel().findById(channelId).countDocuments();
 
     },
 
     async getAllUsers(channelId: string) {
 
-        return await channelUser().find({channelId: channelId}, {
+        return await channelUser().find({
+            channelId: channelId
+        }, {
             _id: 0,
             userId: 1
         });

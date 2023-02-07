@@ -4,6 +4,7 @@ import {Group} from "../../base/Group";
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
 import PromiseVerify from "../../base/PromiseVerify";
+import {GroupLinkDto} from "../../base/dto/GroupLink.dto";
 
 @Controller()
 export class GroupInfoController extends Group {
@@ -12,20 +13,23 @@ export class GroupInfoController extends Group {
     }
 
     @Get()
-    async groupInfo(@Body("groupId") groupId: string) {
+    async groupInfo(@Body() dto: GroupLinkDto) {
         await this.init();
 
         let haveErr = await PromiseVerify.all([
-            this.isUndefined(groupId),
-            this.isGroupExist(groupId)
+            this.handleRoomId(dto)
         ]);
 
-        if (haveErr)
+        if (haveErr?.statusCode)
             return haveErr;
 
+        let isExist = await this.isGroupExist(haveErr);
+        if (isExist?.statusCode)
+            return isExist;
+
         return Json.builder(Response.HTTP_OK,
-            await this.appService.groupInfo(groupId), {
-                memberSize: await this.appService.countOfUsersInGroup(groupId)
+            await this.appService.groupInfo(isExist, await this.isOwnerOrAdmin(isExist)), {
+                memberSize: await this.appService.countOfUsersInGroup(isExist)
             });
     }
 }
