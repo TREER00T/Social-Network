@@ -18,7 +18,7 @@ export class UserProfileController extends User {
         await this.appService.updateFirstAndLastName(this.phoneNumber, dto);
 
         return Json.builder(Response.HTTP_OK,
-            await this.appService.getApiKey(this.phoneNumber));
+            {apiKey: await this.appService.getApiKey(this.phoneNumber)});
     }
 
 }

@@ -18,7 +18,7 @@ export default {
         }, {
             _id: 1,
             messageCreatedBySenderId: 1
-        }, tableName).toArray();
+        }, tableName);
 
         return !Util.isUndefined(data);
 
@@ -72,7 +72,7 @@ export default {
         }, {
             _id: 0,
             [objKey]: 1
-        }, `listOfUser${type}s`).toArray();
+        }, `listOfUser${type}s`);
 
 
         return await findMany({
@@ -83,7 +83,7 @@ export default {
             img: 1,
             name: 1,
             defaultColor: 1
-        }, `${type === 'e2e' ? 'user' : type}s`).toArray();
+        }, `${type === 'e2e' ? 'user' : type}s`)
 
     },
 

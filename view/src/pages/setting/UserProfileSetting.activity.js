@@ -11,8 +11,8 @@ import {removeAllCookie} from "common/removeAllCookie";
 export default function UserProfileSettingActivity() {
     const [bio, setBio] = useState('');
     const [data, setData] = useState({});
-    const [phone, setPhone] = useState('');
     const [avatarFile, setAvatarFile] = useState();
+    const [phone, setPhone] = useState('');
     const [avatar, setAvatar] = useState('');
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
@@ -39,11 +39,11 @@ export default function UserProfileSettingActivity() {
 
             if (avatar && data.img !== avatar) {
                 await resApi('personal/upload/avatar', {
-                    body: {
-                        file: avatarFile,
-                        name: 'avatar'
-                    },
-                    isFile: true
+                    body: [{
+                        value: avatarFile,
+                        key: 'avatar'
+                    }],
+                    with: 'axios'
                 });
             }
 
@@ -119,7 +119,6 @@ export default function UserProfileSettingActivity() {
 
                             <div className="w-32 h-32 mx-auto my-auto">
                                 <label htmlFor="upload-avatar" className="hover:cursor-pointer">
-                                    {avatar}
                                     {
                                         avatar ?
                                             <img src={avatar} alt="My Profile"

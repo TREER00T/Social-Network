@@ -1,15 +1,16 @@
-import {Body, Controller, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
-import {CreateGroupService} from './CreateGroup.service';
+import {Body, Controller, Delete, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
+import {GroupService} from './Group.service';
 import {FileInterceptor} from "@nestjs/platform-express";
-import Util from "../../../util/Util";
-import Response from "../../../util/Response";
-import Json from "../../../util/ReturnJson";
-import {User} from "../../base/User";
-import File from "../../../util/File";
+import Util from "../../util/Util";
+import Response from "../../util/Response";
+import Json from "../../util/ReturnJson";
+import File from "../../util/File";
+import PromiseVerify from "../base/PromiseVerify";
+import {Group} from "../base/Group";
 
 @Controller()
-export class CreateGroupController extends User {
-    constructor(private readonly appService: CreateGroupService) {
+export class GroupController extends Group {
+    constructor(private readonly appService: GroupService) {
         super();
     }
 
@@ -35,5 +36,22 @@ export class CreateGroupController extends User {
         await this.appService.createGroupContent(this.userId, groupId);
 
         return Json.builder(Response.HTTP_CREATED);
+    }
+
+    @Delete()
+    async removeGroup(@Body("groupId") groupId: string) {
+        await this.init();
+
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(groupId),
+            this.isOwner(groupId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        await this.appService.removeGroup(groupId);
+
+        return Json.builder(Response.HTTP_OK);
     }
 }

@@ -245,7 +245,7 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /e2e/create:
+  /e2e:
     post:
       tags:
         - E2E
@@ -1615,7 +1615,57 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /group/create:
+  /group:
+    delete:
+      tags:
+        - Group
+      summary: Delete group chat room
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: groupId
+          type: string
+          required: true
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        803:
+          description: User Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        403:
+          description: Forbidden
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
     post:
       tags:
         - Group
@@ -1734,58 +1784,6 @@ paths:
             $ref: '#/definitions/Status'
         802:
           description: In valid json object key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        400:
-          description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-
-  /group/{groupId}:
-    delete:
-      tags:
-        - Group
-      summary: Delete group chat room
-      consumes:
-        - application/json
-      parameters:
-        - in: body
-          name: groupId
-          type: string
-          required: true
-      security:
-        - apiKey: [ ]
-        - token: [ ]
-      responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        404:
-          description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        403:
-          description: Forbidden
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2611,57 +2609,6 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /channel/create:
-    post:
-      tags:
-        - Channel
-      summary: Create Channel Chat Room
-      consumes:
-        - multipart/form-data
-      parameters:
-        - in: formData
-          name: name
-          required: true
-          type: string
-        - in: formData
-          name: file
-          required: false
-          type: string
-      security:
-        - apiKey: [ ]
-        - token: [ ]
-      responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        200:
-          description: OK
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        404:
-          description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        400:
-          description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-
   /channel/upload/file:
     post:
       tags:
@@ -2739,7 +2686,56 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
-  /channel/{channelId}:
+  /channel:
+    post:
+      tags:
+        - Channel
+      summary: Create Channel Chat Room
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: name
+          required: true
+          type: string
+        - in: formData
+          name: file
+          required: false
+          type: string
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        800:
+          description: Unauthorized! Token was invalid
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        804:
+          description: Unauthorized! Invalid Api Key
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        519:
+          description: Unauthorized! Token was expired
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
     delete:
       tags:
         - Channel

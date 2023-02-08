@@ -121,8 +121,8 @@ function ChatNavbar({
                 onClick={handleClickUserProfile}>
                 {
                     img ?
-                        <img className="h-14 rounded-lg" src={img} alt="User Avatar"/> :
-                        <div className="flex flex-col w-14 h-14 rounded-lg place-content-center mr-3" style={{
+                        <img className="h-14 w-14 rounded-lg mr-3 shadow-xl" src={img} alt="User Avatar"/> :
+                        <div className="flex flex-col w-14 h-14 rounded-lg place-content-center mr-3 shadow-xl" style={{
                             color: 'white',
                             backgroundColor: defaultColor
                         }}>{isSavedMessage ? <img className="h-6 rounded-full" src={SavedMessage} alt="User Avatar"/> :
@@ -164,7 +164,7 @@ function ChatNavbar({
                 handler={handleClickedBlockUser}
                 accessToNavigate={hasBlockUser}
                 getAccessToAction={handleAccessToBlockUser}
-                children={`Do you want to ${hasBlockUserByMe ? 'UnBlock' : 'block'} this user?`}/>
+                children={`Do you want to ${hasBlockUserByMe ? 'Un' : ''} Block this user?`}/>
 
         </div>
     );

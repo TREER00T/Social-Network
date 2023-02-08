@@ -5,8 +5,7 @@ import Util from "../../../util/Util";
 import Find from "../../../model/find/user";
 import Insert from "../../../model/add/user";
 
-let Update = require("../../../model/update/user"),
-    CreateUser = require("../../../model/create/user");
+let Update = require("../../../model/update/user");
 
 @Injectable()
 export class GenerateUserService {
@@ -16,9 +15,7 @@ export class GenerateUserService {
             isPhoneNumberInDb = await Find.userPhone(userPhone);
 
         if (!isPhoneNumberInDb) {
-            let data = await Insert.phoneAndAuthCode(userPhone, Generate.getVerificationCode(), Util.getRandomHexColor());
-
-            await CreateUser.savedMessage(data._id?.toString());
+            await Insert.phoneAndAuthCode(userPhone, Generate.getVerificationCode(), Util.getRandomHexColor());
 
             return true;
         }

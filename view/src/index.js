@@ -10,7 +10,6 @@ import VerifyPasswordActivity from "pages/auth/verify/VerifyPassword.activity";
 import MainActivity from "pages/main/Main.activity";
 import HomeActivity from "pages/home/Home.activity";
 import VerifyOTPCodeActivity from "pages/auth/verify/VerifyOTPCode.activity";
-import CreateSavedMessageActivity from "pages/create/savedMessage/CreateSavedMessage.activity";
 import CreateChannelActivity from "pages/create/channel/CreateChannel.activity";
 import CreateGroupActivity from "pages/create/group/CreateGroup.activity";
 import PrivacyActivity from "pages/setting/Privacy.activity";
@@ -38,7 +37,6 @@ root.render(
                     <Route path="home/settings/blockedUsers" element={<BlockedUsersActivity/>}/>
                     <Route path="home/create/group" element={<CreateGroupActivity/>}/>
                     <Route path="home/create/channel" element={<CreateChannelActivity/>}/>
-                    <Route path="home/create/savedMessage" element={<CreateSavedMessageActivity/>}/>
                     <Route path='*' element={<NotFoundActivity/>}/>
                 </Routes>
             </BrowserRouter>

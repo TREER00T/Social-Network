@@ -8,7 +8,7 @@ module.exports = {
 
     async insertOne(obj, name) {
 
-        return await db.collection(name).insertOne(obj);
+        return await db.collection(name.toLowerCase()).insertOne(obj);
 
     },
 
@@ -17,26 +17,26 @@ module.exports = {
         if (filter?._id)
             filter._id = new ObjectId(filter._id);
 
-        await db.collection(name).updateOne(filter, {$set: obj}, {upsert: true});
+        await db.collection(name.toLowerCase()).updateOne(filter, {$set: obj}, {upsert: true});
 
     },
 
     async dropCollection(name) {
 
-        db.listCollections({name: name}).next((err, isExist) => {
+        db.listCollections({name: name.toLowerCase()}).next((err, isExist) => {
 
             if (isExist)
-                db.collection(name).drop();
+                db.collection(name.toLowerCase()).drop();
         });
 
     },
 
     createCollection(name) {
 
-        db.listCollections({name: name}).next((err, isExist) => {
+        db.listCollections({name: name.toLowerCase()}).next((err, isExist) => {
 
             if (!isExist)
-                db.createCollection(name);
+                db.createCollection(name.toLowerCase());
         });
 
     },
@@ -46,13 +46,13 @@ module.exports = {
         if (filter?._id?.$in)
             filter?._id?.$in = filter?._id?.$in.map(e => new ObjectId(e));
 
-        await db.collection(name).deleteMany(filter);
+        await db.collection(name.toLowerCase()).deleteMany(filter);
 
     },
 
     async countRows(name) {
 
-        return await db.collection(name).countDocuments();
+        return await db.collection(name.toLowerCase()).countDocuments();
 
     },
 
@@ -67,16 +67,16 @@ module.exports = {
         let result;
 
         if (typeof projection === "string")
-            result = await db.collection(projection).find(filter);
+            result = await db.collection(projection.toLowerCase()).find(filter);
         else
-            result = await db.collection(name).find(filter, {
+            result = await db.collection(name.toLowerCase()).find(filter, {
                 projection: projection
             });
 
         if (typeof filter === "string")
-            result = await db.collection(filter).find();
+            result = await db.collection(filter.toLowerCase()).find();
 
-        return result;
+        return result.toArray();
 
     },
 
@@ -84,7 +84,7 @@ module.exports = {
 
         return new Promise(res => {
 
-            db.listCollections({name: name}).next((err, isExist) => {
+            db.listCollections({name: name.toLowerCase()}).next((err, isExist) => {
 
                 res(isExist);
 

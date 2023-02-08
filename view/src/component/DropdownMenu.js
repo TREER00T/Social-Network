@@ -1,9 +1,11 @@
 import {useState} from "react";
 
-export function DropDownItem({getHasClicked, name, img, haveAction, navigate}) {
+export function DropDownItem({getHasClicked, name, img, sendReq, haveAction, navigate}) {
     const [hasClicked, setHasClicked] = useState(false);
 
     const handleClickItem = () => {
+        if (typeof sendReq === 'function')
+            sendReq();
         setHasClicked(!hasClicked);
         if (getHasClicked)
             getHasClicked(!hasClicked);
