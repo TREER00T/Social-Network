@@ -1,15 +1,29 @@
-import {Body, Controller, Delete, Param} from '@nestjs/common';
-import {E2EDeleteChatService} from './E2EDeleteChat.service';
-import Json from "../../../util/ReturnJson";
-import Response from "../../../util/Response";
-import {E2EMessage} from "../../base/E2EMessage";
-import PromiseVerify from "../../base/PromiseVerify";
+import {Body, Controller, Delete, Param, Post} from '@nestjs/common';
+import {E2EService} from './E2E.service';
+import Json from "../../util/ReturnJson";
+import Response from "../../util/Response";
+import PromiseVerify from "../base/PromiseVerify";
+import {E2EMessage} from "../base/E2EMessage";
 
 
 @Controller()
-export class E2EDeleteChatController extends E2EMessage {
-    constructor(private readonly appService: E2EDeleteChatService) {
+export class E2EController extends E2EMessage {
+    constructor(private readonly appService: E2EService) {
         super();
+    }
+
+    @Post()
+    async createRoom(@Body("targetUserId") targetUserId: string) {
+        await this.init();
+
+        let haveErr = await this.verifyUser(targetUserId);
+
+        if (haveErr)
+            return haveErr;
+
+        await this.appService.initializationRoom(targetUserId, this.userId);
+
+        return Json.builder(Response.HTTP_CREATED);
     }
 
     @Delete("/:targetUserId/us")

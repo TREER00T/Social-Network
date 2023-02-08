@@ -64,11 +64,6 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
         let userPhone = tokenPayload.phoneNumber,
             userId = tokenPayload.id;
 
-        let isExistUserInRedis = await Redis.get(userId);
-
-        if (isExistUserInRedis)
-            return this.canActive = true;
-
         let isValidApiKey = await Util.isValidApiKey(userPhone, userApiKey?.toString());
 
         if (isValidApiKey) {

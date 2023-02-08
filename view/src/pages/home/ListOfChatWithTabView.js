@@ -28,12 +28,12 @@ function Item({data: {img, defaultColor, lastName, username, publicLink, bio, de
             onClick={handleClick}>
             {
                 img ?
-                    <img className="ml-2 h-12 rounded-full" src={img} alt="User Avatar"/> :
-                    <div className="flex flex-col ml-2 w-12 h-12 rounded-full place-content-center mr-3" style={{
+                    <img className="ml-2 h-12 w-12 rounded-full mr-3 shadow-xl" src={img} alt="User Avatar"/> :
+                    <div className="flex flex-col ml-2 w-12 h-12 rounded-full place-content-center mr-3 shadow-xl" style={{
                         color: 'white',
                         backgroundColor: defaultColor
                     }}>{isSavedMessage ? <img className="h-6 rounded-full" src={SavedMessage} alt="User Avatar"/> :
-                        <span className="text-center">{name.slice(0, 2)}</span>}</div>
+                        <span className="text-center">{name?.slice(0, 2)}</span>}</div>
             }
             <span
                 className="py-4 my-auto text-sm font-medium text-slate-900">{name}</span>
@@ -43,73 +43,17 @@ function Item({data: {img, defaultColor, lastName, username, publicLink, bio, de
 
 export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, getItemData}) {
 
-    const [userActivities, setUserActivities] = useState([
-        {
-            type: 'Channel',
-            publicLink: 'sdllddll',
-            _id: '1',
-            name: 'Channel',
-            defaultColor: '#418aff'
-        },
-        {
-            type: 'Group',
-            _id: '2',
-            name: 'Group',
-            defaultColor: '#418aff'
-        },
-        {
-            type: 'SA',
-            _id: '3',
-            name: 'Saved Message',
-            defaultColor: '#e33737'
-        },
-        {
-            type: 'E2E',
-            _id: '4',
-            username: 'UsernameE2E',
-            bio: 'Test simple text',
-            name: 'E2E',
-            defaultColor: '#ffae00'
-        }
-    ]);
-    const [stateUserActivities, setStateUserActivities] = useState([
-        {
-            type: 'Channel',
-            _id: '1',
-            publicLink: 'sdllddll',
-            name: 'Channel',
-            defaultColor: '#418aff'
-        },
-        {
-            type: 'Group',
-            _id: '2',
-            name: 'Group',
-            defaultColor: '#418aff'
-        },
-        {
-            type: 'SA',
-            _id: '3',
-            name: 'Saved Message',
-            defaultColor: '#e33737'
-        },
-        {
-            type: 'E2E',
-            _id: '4',
-            username: 'UsernameE2E',
-            name: 'E2E',
-            defaultColor: '#ffae00'
-        }
-    ]);
+    const [userActivities, setUserActivities] = useState([]);
+    const [stateUserActivities, setStateUserActivities] = useState([]);
     const [cookies] = useCookies(['phone']);
     const [searchData, setSearchData] = useState([]);
     const [haveNotActivity, setHaveNotActivity] = useState(false);
-    const assign = (o, t) => Object.assign(o ?? {}, {type: t});
+    const assign = (o, t) => o ? o.map(d => Object.assign(d, {type: t})) : [];
     const [hasExistSavedMessage, setHasExistSavedMessage] = useState(false);
-    const dataComposition = data => [
-        assign(data?.e2es, 'E2E'),
-        assign(data?.groups, 'Group'),
-        assign(data?.channels, 'Channel')
-    ];
+    const dataComposition = data =>
+        assign(data?.e2es, 'E2E')
+            .concat(assign(data?.groups, 'Group'))
+            .concat(assign(data?.channels, 'Channel'));
 
 
     const handleUserActivities = d => {
@@ -120,6 +64,7 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
             if (typeof d === 'object') {
                 let result = dataComposition(d);
 
+                console.log(result)
                 if (hasExistSavedMessage)
                     result.unshift({
                         _id: cookies.phone,
@@ -138,7 +83,7 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
             }
         });
     }, handleColumnSelected = d => {
-        // handleUserActivities(d);
+        handleUserActivities(d);
 
         let res = stateUserActivities;
 
@@ -159,13 +104,14 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
         }
     };
 
-    // useEffect(() => {
-    //     if (!dataSearched)
-    //         handleUserActivities('all');
-    // });
+    useEffect(() => {
+        if (!dataSearched)
+            handleUserActivities('all');
 
-    // if (dataSearched && hasSearchViewOpen)
-    //     handleSearchResponse();
+        if (dataSearched && hasSearchViewOpen)
+            handleSearchResponse();
+    }, []);
+
 
     return (
         <div className="flex flex-col ml-3">

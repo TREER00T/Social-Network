@@ -25,7 +25,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
             let tokenPayload = await Util.tokenVerify(token, res);
 
-            if (!tokenPayload) {
+            if (!tokenPayload && reqResult === 'RequireJwtToken') {
                 res.send(Res.HTTP_UNAUTHORIZED_INVALID_TOKEN);
                 return Json.builder(Res.HTTP_UNAUTHORIZED_INVALID_TOKEN);
             }

@@ -1,6 +1,7 @@
+import CreateBaseRoom from "pages/common/CreateBaseRoom";
+
 export default function CreateGroupActivity() {
-    return(
-        <>
-        </>
+    return (
+        <CreateBaseRoom type="group"/>
     )
 }

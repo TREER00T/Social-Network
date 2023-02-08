@@ -2,15 +2,12 @@ import Cookies from "universal-cookie";
 import config from 'config';
 import axios from "axios";
 
-const cookies = new Cookies();
-const accessToken = cookies.get('accessToken');
-const apiKey = cookies.get('apiKey');
-const getInStorage = key => cookies.get(key);
-const setInStorage = (key, value) => cookies.set(key, value);
-
-async function uploadFile(endPoint, option) {
+async function axiosReq(endPoint, option) {
     const formData = new FormData();
-    formData.append(option.name, option.file);
+
+    for (let d in option.body)
+        formData.append(option.body[d].key, option.body[d].value);
+
     let data = await axios[option?.method ?? 'put'](`${config.url.rest}${endPoint}`, formData);
 
     return {statusCode: data.status};
@@ -18,11 +15,21 @@ async function uploadFile(endPoint, option) {
 
 export async function resApi(endPoint, option) {
 
+    let requestWith = option?.with;
+
+    delete option?.with;
+
+    const cookies = new Cookies();
+    const accessToken = cookies.get('accessToken');
+    const apiKey = cookies.get('apiKey');
+    const getInStorage = key => cookies.get(key);
+    const setInStorage = (key, value) => cookies.set(key, value);
+
     let baseHeader = {
         'Content-type': option?.headers?.['Content-type'] ?? 'application/json'
     }
 
-    if (option?.body && !option?.isFile)
+    if (option?.body && requestWith !== 'axios')
         option.body = JSON.stringify(option.body);
 
     if (accessToken) {
@@ -42,10 +49,8 @@ export async function resApi(endPoint, option) {
 
 
     let responseOfRequest = async endPoint => {
-        if (option?.isFile) {
-            delete option.isFile;
-            return await uploadFile(endPoint, option.body);
-        }
+        if (requestWith === 'axios')
+            return await axiosReq(endPoint, option);
 
         return await fetch(`${config.url.rest}${endPoint}`, {
             mode: 'cors',

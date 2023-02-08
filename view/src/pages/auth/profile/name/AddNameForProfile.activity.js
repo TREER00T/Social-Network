@@ -33,9 +33,7 @@ function AddNameForProfile() {
 
     return (
         <div>
-            {cookies?.apiKey ? <Navigate to="/home"/> : <></>}
             {cookies?.phone ? <></> : <Navigate to="/user/login"/>}
-
 
             <ErrorHandler
                 setCookie={{key: 'apiKey', value: data?.data?.apiKey}}
@@ -45,6 +43,7 @@ function AddNameForProfile() {
                 statusCode={data?.statusCode}
                 redirectTo="/home"/>
 
+            {cookies?.apiKey ? <Navigate to="/home"/> : <></>}
 
             <div className="flex flex-col items-center">
 
