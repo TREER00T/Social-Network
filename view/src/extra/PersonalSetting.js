@@ -1,4 +1,4 @@
-export const settingSidebarItems = [
+export const PersonalSettingSidebarItems = [
     {
         name: 'Account Profile',
         icon: (

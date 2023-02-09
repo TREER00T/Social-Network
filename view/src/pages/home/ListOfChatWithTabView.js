@@ -1,12 +1,27 @@
 import TabHeaderView from "component/TabHeaderView";
 import {useEffect, useState} from "react";
 import {resApi} from "common/fetch";
-import Io from 'common/io';
 import SavedMessage from "img/saved-message.svg";
 import NotFound from "component/NotFound";
 import {useCookies} from "react-cookie";
+import {assign, dataComposition} from "util/Utils";
 
-function Item({data: {img, defaultColor, lastName, username, publicLink, bio, description, _id, name, type}, getData}) {
+function Item({
+                  data: {
+                      img,
+                      defaultColor,
+                      lastName,
+                      username,
+                      publicLink,
+                      bio,
+                      description,
+                      isActive,
+                      _id,
+                      name,
+                      type
+                  },
+                  getData
+              }) {
 
     const isSavedMessage = type === 'SA';
 
@@ -29,10 +44,11 @@ function Item({data: {img, defaultColor, lastName, username, publicLink, bio, de
             {
                 img ?
                     <img className="ml-2 h-12 w-12 rounded-full mr-3 shadow-xl" src={img} alt="User Avatar"/> :
-                    <div className="flex flex-col ml-2 w-12 h-12 rounded-full place-content-center mr-3 shadow-xl" style={{
-                        color: 'white',
-                        backgroundColor: defaultColor
-                    }}>{isSavedMessage ? <img className="h-6 rounded-full" src={SavedMessage} alt="User Avatar"/> :
+                    <div className="flex flex-col ml-2 w-12 h-12 rounded-full place-content-center mr-3 shadow-xl"
+                         style={{
+                             color: 'white',
+                             backgroundColor: defaultColor
+                         }}>{isSavedMessage ? <img className="h-6 rounded-full" src={SavedMessage} alt="User Avatar"/> :
                         <span className="text-center">{name?.slice(0, 2)}</span>}</div>
             }
             <span
@@ -41,77 +57,57 @@ function Item({data: {img, defaultColor, lastName, username, publicLink, bio, de
     )
 }
 
-export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, getItemData}) {
+export default function ListOfChatWithTabView({dataSearched, getItemData}) {
 
     const [userActivities, setUserActivities] = useState([]);
     const [stateUserActivities, setStateUserActivities] = useState([]);
     const [cookies] = useCookies(['phone']);
-    const [searchData, setSearchData] = useState([]);
-    const [haveNotActivity, setHaveNotActivity] = useState(false);
-    const assign = (o, t) => o ? o.map(d => Object.assign(d, {type: t})) : [];
-    const [hasExistSavedMessage, setHasExistSavedMessage] = useState(false);
-    const dataComposition = data =>
-        assign(data?.e2es, 'E2E')
-            .concat(assign(data?.groups, 'Group'))
-            .concat(assign(data?.channels, 'Channel'));
+    const [haveActivity, setHaveActivity] = useState(false);
 
 
-    const handleUserActivities = d => {
-        let {socket} = new Io('common');
-
-        socket.emit('onUserActivities', {type: d.toLowerCase()});
-        socket.on('emitUserActivities', d => {
-            if (typeof d === 'object') {
-                let result = dataComposition(d);
-
-                console.log(result)
-                if (hasExistSavedMessage)
-                    result.unshift({
-                        _id: cookies.phone,
-                        type: 'SA',
-                        name: 'Saved Message',
-                        defaultColor: '#418aff'
-                    });
-
-                setUserActivities(result);
-                setStateUserActivities(result);
-            } else {
-                if (d.length === 0)
-                    setHaveNotActivity(!haveNotActivity);
-                setUserActivities(d);
-                setStateUserActivities(d);
+    const handleUserActivities = async d => {
+        let {data} = await resApi('common/rooms', {
+            query: {
+                type: d
             }
         });
+        if (!Array.isArray(data)) {
+            let {statusCode} = await resApi('personal/savedMessage/exist');
+            let result = dataComposition(data);
+
+            if (statusCode === 200)
+                result.unshift({
+                    _id: cookies.phone,
+                    type: 'SA',
+                    name: 'Saved Message',
+                    defaultColor: '#418aff'
+                });
+
+            setHaveActivity(result.length > 0);
+            setUserActivities(result);
+            setStateUserActivities(result);
+        } else {
+            data = assign(data, d);
+
+            setHaveActivity(data.length === 0 && d === 'All' || data.length > 0);
+            setUserActivities(data);
+            setStateUserActivities(data);
+        }
     }, handleColumnSelected = d => {
         handleUserActivities(d);
 
         let res = stateUserActivities;
 
-        if (d.toLowerCase() !== 'all')
+        if (d !== 'All')
             res = res.filter(it => it.type === d);
 
         setUserActivities(res);
-    }, handleHasExistSavedMessage = async () => {
-        let data = await resApi('personal/savedMessage/exist');
-        setHasExistSavedMessage(data?.statusCode);
-    }, handleSearchResponse = async () => {
-        let data = await resApi(`common/search?v=${dataSearched}`);
-
-        setHaveNotActivity(data?.statusCode === 404);
-        if (data?.statusCode === 200) {
-            await handleHasExistSavedMessage();
-            setSearchData(dataComposition(data.data));
-        }
     };
 
     useEffect(() => {
-        if (!dataSearched)
-            handleUserActivities('all');
-
-        if (dataSearched && hasSearchViewOpen)
-            handleSearchResponse();
+        if (dataSearched.length === 0)
+            handleUserActivities('All');
     }, []);
-
 
     return (
         <div className="flex flex-col ml-3">
@@ -120,14 +116,14 @@ export default function ListOfChatWithTabView({dataSearched, hasSearchViewOpen, 
                 getColumnSelected={handleColumnSelected}/>
 
             {
-                haveNotActivity ? <NotFound/> : <></>
+                haveActivity || dataSearched ? <></> : <NotFound/>
             }
 
             <ul role="list" className="divide-y divide-slate-200 pt-3">
 
                 {
-                    searchData.length > 0 ?
-                        searchData.map((e, i) =>
+                    dataSearched.length !== 0 ?
+                        dataSearched.map((e, i) =>
                             <Item data={e}
                                   key={i}
                                   getData={getItemData}/>) :

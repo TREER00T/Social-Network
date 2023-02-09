@@ -95,3 +95,24 @@ export function isValidPhoneNumber(phone) {
 export function isEmail(email) {
     return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(email);
 }
+
+export function url() {
+    return window.location.pathname;
+}
+
+export function getRoomType() {
+    let urlPath = url();
+    return urlPath.split('/')[2]?.charAt(0)?.toUpperCase() + urlPath.split('/')[2]?.slice(1);
+}
+
+export function getRoomId() {
+    let urlPath = url();
+    return urlPath.split('/')[3];
+}
+
+export const assign = (o, t) => o ? o.map(d => Object.assign(d, {type: t})) : [];
+
+export const dataComposition = data =>
+    assign(data?.e2es, 'E2E')
+        .concat(assign(data?.groups, 'Group'))
+        .concat(assign(data?.channels, 'Channel'));

@@ -10,6 +10,8 @@ import BlockUser from "img/hand-stop.svg";
 import {useEffect, useRef, useState} from "react";
 import {resApi} from "common/fetch";
 import Trash from "img/trash.svg";
+import Setting from "img/settings.svg";
+import {Navigate} from "react-router-dom";
 import UserProfile from "component/UserProfile";
 
 function ChatNavbar({
@@ -22,6 +24,7 @@ function ChatNavbar({
                             bio,
                             description,
                             _id,
+                            isActive,
                             name,
                             type,
                             activities
@@ -31,20 +34,21 @@ function ChatNavbar({
 
     const isSavedMessage = type === 'SA';
     const wrapperRef = useRef('navbar');
-    const [isActive, setIsActive] = useState(true);
-    const [hasClearChat, setHasClearChat] = useState(false);
-    const [hasBlockUser, setHasBlockUser] = useState(false);
     const [openUserProfile, setOpenUserProfile] = useState(false);
-    const [hasBlockUserByMe, setHasBlockUserByMe] = useState(false);
+    const [hasClickedSetting, setHasClickedSetting] = useState(false);
     const [hasMeBlockedByUser, setHasMeBlockedByUser] = useState(false);
     const [hasClickedCheckBox, setHasClickedCheckBox] = useState(false);
+    const [hasClickedClearChat, setHasClickedClearChat] = useState(false);
+    const [hasClickedBlockUser, setHasClickedBlockUser] = useState(false);
     const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(false);
+    const [hasClickedBlockUserByMe, setHasClickedBlockUserByMe] = useState(false);
 
     const handleClickUserProfile = () => setOpenUserProfile(!openUserProfile),
         handleBackClick = () => backButton(),
         handleClickMenuOption = () => setHasOpenedOptionMenu(!hasOpenedOptionMenu),
-        handleClickedClearChat = () => setHasClearChat(!hasClearChat),
-        handleClickedBlockUser = () => setHasBlockUser(!hasBlockUser),
+        handleClickedClearChat = () => setHasClickedClearChat(!hasClickedClearChat),
+        handleClickedSetting = () => setHasClickedSetting(!hasClickedSetting),
+        handleClickedBlockUser = () => setHasClickedBlockUser(!hasClickedBlockUser),
         handleClickCheckBoxForClearChatUs = () => setHasClickedCheckBox(!hasClickedCheckBox),
         handleAccessToClearChat = async d => {
             if (!d)
@@ -67,14 +71,14 @@ function ChatNavbar({
             });
         }, handleDisableOrEnableMessageForBlockedUser = async () => {
             let data = await resApi('e2e/user/block', {
-                body: {
+                query: {
                     targetUserId: _id
                 }
             });
 
             let mapResult = {
-                210: () => setHasBlockUserByMe(true),
-                211: () => setHasMeBlockedByUser(true)
+                210: setHasClickedBlockUserByMe(true),
+                211: setHasMeBlockedByUser(true)
             };
 
             if (data.statusCode === 404)
@@ -87,9 +91,10 @@ function ChatNavbar({
         setHasOpenedOptionMenu(false);
     });
 
-    // useEffect(() => {
-    //    handleDisableOrEnableMessageForBlockedUser();
-    // });
+    useEffect(() => {
+        if (type === 'E2E')
+            handleDisableOrEnableMessageForBlockedUser();
+    }, []);
 
     return (
         <div className="flex items-center relative w-screen max-w-4xl pb-1" style={{
@@ -130,13 +135,16 @@ function ChatNavbar({
                 }
                 <div className="flex py-2 flex-col">
                     <span className="my-auto text-lg font-medium text-slate-900">{name}</span>
-                    <div className="flex items-center">
-                        <div
-                            className={(isActive ? "bg-green-500" : "bg-red-500") + " h-2.5 w-2.5 rounded-full mr-2"}/>
-                        {
-                            isActive ? 'Online' : 'Offline'
-                        }
-                    </div>
+                    {
+                        type === 'E2E' ?
+                            <div className="flex items-center">
+                                <div
+                                    className={(isActive ? "bg-green-500" : "bg-red-500") + " h-2.5 w-2.5 rounded-full mr-2"}/>
+                                {
+                                    isActive ? 'Online' : 'Offline'
+                                }
+                            </div> : <></>
+                    }
                 </div>
             </div>
 
@@ -150,21 +158,27 @@ function ChatNavbar({
                                       getHasClicked={handleClickedBlockUser}/>
                         <DropDownItem key="Clear Chat" name="Clear Chat" img={Trash}
                                       getHasClicked={handleClickedClearChat}/>
+                        {
+                            type === 'Group' || type === 'Channel' ?
+                                <DropDownItem key="Setting" name="Setting" img={Setting}
+                                              navigate={(<Navigate to={`/setting/${type.toLowerCase()}/${_id}`}/>)}
+                                              getHasClicked={handleClickedSetting}/> : <></>
+                        }
                     </DropdownMenu> : <></>
             }
 
             <AgreeDialog
                 handler={handleClickedClearChat}
-                accessToNavigate={hasClearChat}
+                accessToNavigate={hasClickedClearChat}
                 getAccessToAction={handleAccessToClearChat}>
                 <Checkbox label="Remove chat for us" onClick={handleClickCheckBoxForClearChatUs}/>
             </AgreeDialog>
 
             <AgreeDialog
                 handler={handleClickedBlockUser}
-                accessToNavigate={hasBlockUser}
+                accessToNavigate={hasClickedBlockUser}
                 getAccessToAction={handleAccessToBlockUser}
-                children={`Do you want to ${hasBlockUserByMe ? 'Un' : ''} Block this user?`}/>
+                children={`Do you want to ${hasClickedBlockUserByMe ? 'Un' : ''} Block this user?`}/>
 
         </div>
     );

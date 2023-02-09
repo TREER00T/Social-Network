@@ -1,5 +1,5 @@
 import {Navigate} from "react-router-dom";
-import SettingSidebar from "pages/setting/SettingSidebar";
+import SettingSidebar from "pages/setting/personal/SettingSidebar";
 import {useEffect, useState} from "react";
 import {resApi} from "common/fetch";
 import Button from "component/Button";
@@ -68,7 +68,7 @@ export default function PrivacyActivity() {
 
 
             {/* Sidebar Menu */}
-            <SettingSidebar userInfo={userInfo}>
+            <SettingSidebar>
 
                 <div className="mb-8">
                     <span className="font-bold text-blue-100 text-lg">Two-Step Verification</span>

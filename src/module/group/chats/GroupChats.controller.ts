@@ -1,4 +1,4 @@
-import {Body, Controller, Get} from '@nestjs/common';
+import {Controller, Get, Query} from '@nestjs/common';
 import {GroupChatsService} from './GroupChats.service';
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
@@ -12,7 +12,7 @@ export class GroupChatsController extends Group {
     }
 
     @Get()
-    async listOfChat(@Body() dto: RoomDataQuery) {
+    async listOfChat(@Query() dto: RoomDataQuery) {
         await this.init();
 
         let hasFoundGroupNameInListOfUserGroups = await this

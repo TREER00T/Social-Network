@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Query} from '@nestjs/common';
 import {ChannelAdminService} from './ChannelAdmin.service';
 import {Channel} from "../../base/Channel";
 import Json from "../../../util/ReturnJson";
@@ -12,7 +12,25 @@ export class ChannelAdminController extends Channel {
     }
 
     @Get()
-    async userAccessResource(@Body("channelId") channelId: string) {
+    async listOfAdmin(@Query("channelId") channelId: string) {
+        await this.init();
+
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(channelId),
+            this.verifyUser(this.userId),
+            this.isChannelExist(channelId),
+            this.isUserJoined(channelId),
+            this.isOwnerOrAdmin(channelId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        return Json.builder(Response.HTTP_OK, await this.userDetails(await this.appService.listOfAdmin(channelId)));
+    }
+
+    @Get("haveAccess")
+    async userAccessResource(@Query("channelId") channelId: string) {
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),
             this.verifyUser(this.userId),

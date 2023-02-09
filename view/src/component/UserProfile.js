@@ -55,7 +55,7 @@ export default function UserProfile({
                     <div className="flex flex-col ml-4">
                         <div className="text-base font-semibold text-gray-750">{name} {lastName}</div>
                         {
-                            isActive ? <div className="flex items-center">
+                            isActive && type === 'E2E' ? <div className="flex items-center">
                                 <div
                                     className={(isActive ? "bg-green-500" : "bg-red-500") + " h-2.5 w-2.5 rounded-full mr-2"}/>
                                 {

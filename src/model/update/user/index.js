@@ -82,6 +82,12 @@ module.exports = {
 
         await user().updateOne({phone: phone}, {$set: {hasLogout: hasLogout}});
 
+    },
+
+    async updateUserStatus(userId, status) {
+
+        await user().updateOne({_id: userId}, {$set: {isActive: status}});
+
     }
 
 }

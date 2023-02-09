@@ -37,6 +37,8 @@ export function DropdownMenu({className, children}) {
                             key={i}
                             navigate={e.navigate}
                             name={e.name}
+                            sendReq={e?.sendReq ? e.sendReq() : () => {
+                            }}
                             img={e.img}/>) : children
                 }
             </ul>

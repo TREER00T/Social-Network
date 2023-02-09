@@ -54,6 +54,10 @@ type ListOfUserTargetId = Array<{
     userTargetId: string
 }>
 
+type ListOfAdmin = Array<{
+    adminId: string
+}>
+
 type ListOfUserId = Array<{
     userId: string
 }>
@@ -90,6 +94,7 @@ export {
     IResponse,
     TToken,
     RoomId,
+    ListOfAdmin,
     TUserDeviceInfo,
     TTokenWithApiKey,
     TSaveMessage,

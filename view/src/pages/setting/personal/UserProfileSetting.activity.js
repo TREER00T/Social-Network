@@ -1,7 +1,7 @@
 import {useCookies} from "react-cookie";
 import {useEffect, useState} from "react";
 import {Navigate} from "react-router-dom";
-import SettingSidebar from "pages/setting/SettingSidebar";
+import SettingSidebar from "pages/setting/personal/SettingSidebar";
 import {resApi} from "common/fetch";
 import Button from "component/Button";
 import EditText from "component/EditText";
@@ -93,7 +93,7 @@ export default function UserProfileSettingActivity() {
             }
 
             {/* Sidebar Menu */}
-            <SettingSidebar userInfo={data}>
+            <SettingSidebar>
                 <div className="flex flex-col">
                     <div>
                         <div className="float-left mt-1">

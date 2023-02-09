@@ -12,16 +12,16 @@ export abstract class Channel extends User {
     async handleRoomId(dto: ChannelLinkDto) {
         let data = {};
 
-        if (!Util.isUndefined(dto.channelId))
+        if (!Util.isUndefined(dto?.channelId))
             data = {type: 'channelId', id: dto.channelId};
 
-        if (!Util.isUndefined(dto.publicLink))
+        if (!Util.isUndefined(dto?.publicLink))
             data = {type: 'publicLink', id: dto.publicLink};
 
-        if (!Util.isUndefined(dto.inviteLink))
+        if (!Util.isUndefined(dto?.inviteLink))
             data = {type: 'inviteLink', id: dto.inviteLink};
 
-        if (Util.isUndefined(dto.channelId) && Util.isUndefined(dto.inviteLink) && Util.isUndefined(dto.publicLink))
+        if (Util.isUndefined(dto?.channelId) && Util.isUndefined(dto?.inviteLink) && Util.isUndefined(dto?.publicLink))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
         return data;

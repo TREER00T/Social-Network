@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Query} from '@nestjs/common';
 import {GroupUserService} from './GroupUser.service';
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
@@ -12,7 +12,7 @@ export class GroupUserController extends Group {
     }
 
     @Get()
-    async listOfUsers(@Body("groupId") groupId: string) {
+    async listOfUsers(@Query("groupId") groupId: string) {
         await this.init();
 
         let haveErr = await PromiseVerify.all([

@@ -13,7 +13,7 @@ import AgreeDialog from "component/AgreeDialog";
 import {removeAllCookie} from "common/removeAllCookie";
 import {resApi} from "common/fetch";
 
-function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
+function HomeNavbar({getTextSearched}) {
 
     const wrapperRef = useRef('navbar');
     const [hasSearchOff, setHasSearchOff] = useState(true);
@@ -26,16 +26,13 @@ function HomeNavbar({getTextSearched, hasSearchViewOpen}) {
         setHasOpenedOptionMenu(false);
         setHasSearchOff(true);
         setHasOpenedUserMenu(false);
-        hasSearchViewOpen(hasSearchOff);
     });
 
     const handleClickedLogout = d => setHasClickedLogout(d),
         handleOptionMenuState = () => setHasOpenedOptionMenu(!hasOpenedOptionMenu),
         handleUserMenu = () => setHasOpenedUserMenu(!hasOpenedUserMenu),
-        handleSearchState = () => {
-            setHasSearchOff(!hasSearchOff);
-            hasSearchViewOpen(hasSearchOff);
-        }, handleAccessToLogout = async d => {
+        handleSearchState = () => setHasSearchOff(!hasSearchOff),
+        handleAccessToLogout = async d => {
             setAccessToLogout(d);
             if (d) {
                 await resApi('personal/account', {

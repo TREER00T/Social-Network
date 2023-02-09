@@ -5,7 +5,7 @@ import {HandleMessage} from "./HandleMessage";
 import PromiseVerify from "./PromiseVerify";
 import File from "../../util/File";
 import OptionQuerySearch from "../../util/OptionQuerySearch";
-import {MessagePayload} from "../../util/Types";
+import {ListOfAdmin, ListOfUserTargetId, MessagePayload} from "../../util/Types";
 import CommonInsert from "../../model/add/common";
 import Find from "../../model/find/user";
 import {PersonalDataQuery} from "./dto/PersonalDataQuery";
@@ -68,6 +68,10 @@ export abstract class User extends HandleMessage {
             Response.HTTP_OK,
             listOfMessage
         );
+    }
+
+    async userDetails(listOfUserId: ListOfUserTargetId | ListOfAdmin) {
+        return await Find.getUserDetailsInUsersTable(listOfUserId);
     }
 
 }

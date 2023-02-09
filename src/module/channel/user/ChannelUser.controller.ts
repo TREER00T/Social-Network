@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Query} from '@nestjs/common';
 import {ChannelUserService} from './ChannelUser.service';
 import {Channel} from "../../base/Channel";
 import Response from "../../../util/Response";
@@ -12,7 +12,7 @@ export class ChannelUserController extends Channel {
     }
 
     @Get()
-    async listOfUsers(@Body("channelId") channelId: string) {
+    async listOfUsers(@Query("channelId") channelId: string) {
         await this.init();
 
         let haveErr = await PromiseVerify.all([

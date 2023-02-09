@@ -3,6 +3,7 @@ import {Server} from "socket.io";
 import Find from "../../model/find/user";
 
 let Redis = require("../../database/redisDbDriver");
+let Update = require("../../model/update/user");
 
 
 @Injectable()
@@ -46,6 +47,10 @@ export class SocketGatewayService {
             toUser: receiverId,
             fromUser: socketUserId
         });
+    }
+
+    async updateUserStatus(userId, status: boolean) {
+        await Update.updateUserStatus(userId, status);
     }
 
 }

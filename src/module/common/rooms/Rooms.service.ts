@@ -1,8 +1,8 @@
 import {Injectable} from "@nestjs/common";
-import CommonFind from "../../model/find/common";
+import CommonFind from "../../../model/find/common";
 
 @Injectable()
-export class CommonService {
+export class RoomsService {
 
     async listOfUserActivity(userId: string, type: string) {
         return await CommonFind.getListOfUserGroupsChannelsOrE2EsActivity(userId, type);

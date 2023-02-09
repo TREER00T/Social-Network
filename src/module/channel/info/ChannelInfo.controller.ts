@@ -1,4 +1,4 @@
-import {Body, Controller, Get} from '@nestjs/common';
+import {Controller, Get, Query} from '@nestjs/common';
 import {ChannelInfoService} from './ChannelInfo.service';
 import {Channel} from "../../base/Channel";
 import Json from "../../../util/ReturnJson";
@@ -13,7 +13,7 @@ export class ChannelInfoController extends Channel {
     }
 
     @Get()
-    async channelInfo(@Body() dto: ChannelLinkDto) {
+    async channelInfo(@Query() dto: ChannelLinkDto) {
         await this.init();
 
         let haveErr = await PromiseVerify.all([
