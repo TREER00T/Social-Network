@@ -22,6 +22,7 @@ function ChatNavbar({
                             bio,
                             description,
                             _id,
+                            isActive,
                             name,
                             type,
                             activities
@@ -31,7 +32,6 @@ function ChatNavbar({
 
     const isSavedMessage = type === 'SA';
     const wrapperRef = useRef('navbar');
-    const [isActive, setIsActive] = useState(true);
     const [hasClearChat, setHasClearChat] = useState(false);
     const [hasBlockUser, setHasBlockUser] = useState(false);
     const [openUserProfile, setOpenUserProfile] = useState(false);
@@ -67,14 +67,14 @@ function ChatNavbar({
             });
         }, handleDisableOrEnableMessageForBlockedUser = async () => {
             let data = await resApi('e2e/user/block', {
-                body: {
+                query: {
                     targetUserId: _id
                 }
             });
 
             let mapResult = {
-                210: () => setHasBlockUserByMe(true),
-                211: () => setHasMeBlockedByUser(true)
+                210: setHasBlockUserByMe(true),
+                211: setHasMeBlockedByUser(true)
             };
 
             if (data.statusCode === 404)
@@ -87,9 +87,10 @@ function ChatNavbar({
         setHasOpenedOptionMenu(false);
     });
 
-    // useEffect(() => {
-    //    handleDisableOrEnableMessageForBlockedUser();
-    // });
+    useEffect(() => {
+        if (type === 'E2E')
+            handleDisableOrEnableMessageForBlockedUser();
+    }, []);
 
     return (
         <div className="flex items-center relative w-screen max-w-4xl pb-1" style={{
@@ -130,13 +131,16 @@ function ChatNavbar({
                 }
                 <div className="flex py-2 flex-col">
                     <span className="my-auto text-lg font-medium text-slate-900">{name}</span>
-                    <div className="flex items-center">
-                        <div
-                            className={(isActive ? "bg-green-500" : "bg-red-500") + " h-2.5 w-2.5 rounded-full mr-2"}/>
-                        {
-                            isActive ? 'Online' : 'Offline'
-                        }
-                    </div>
+                    {
+                        type === 'E2E' ?
+                            <div className="flex items-center">
+                                <div
+                                    className={(isActive ? "bg-green-500" : "bg-red-500") + " h-2.5 w-2.5 rounded-full mr-2"}/>
+                                {
+                                    isActive ? 'Online' : 'Offline'
+                                }
+                            </div> : <></>
+                    }
                 </div>
             </div>
 

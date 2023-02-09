@@ -2,13 +2,13 @@ import Cookies from "universal-cookie";
 import config from 'config';
 import axios from "axios";
 
-async function axiosReq(endPoint, option) {
+async function axiosReq(url, option) {
     const formData = new FormData();
 
     for (let d in option.body)
         formData.append(option.body[d].key, option.body[d].value);
 
-    let data = await axios[option?.method ?? 'put'](`${config.url.rest}${endPoint}`, formData);
+    let data = await axios[option?.method ?? 'put'](url, formData);
 
     return {statusCode: data.status};
 }
@@ -16,8 +16,10 @@ async function axiosReq(endPoint, option) {
 export async function resApi(endPoint, option) {
 
     let requestWith = option?.with;
+    let query = option?.query;
 
     delete option?.with;
+    delete option?.query;
 
     const cookies = new Cookies();
     const accessToken = cookies.get('accessToken');
@@ -48,11 +50,20 @@ export async function resApi(endPoint, option) {
         delete option.headers;
 
 
-    let responseOfRequest = async endPoint => {
-        if (requestWith === 'axios')
-            return await axiosReq(endPoint, option);
+    let responseOfRequest = async (endPoint, refreshTokenRequest) => {
 
-        return await fetch(`${config.url.rest}${endPoint}`, {
+        let url = `${config.url.rest}${endPoint}`;
+
+        if (requestWith === 'axios' && !refreshTokenRequest)
+            return await axiosReq(url, option);
+
+        if (query && !refreshTokenRequest) {
+            let u = new URL(url);
+            u.search = new URLSearchParams(query).toString();
+            url = u.href;
+        }
+
+        return await fetch(url, {
             mode: 'cors',
             headers: orgHeader ? {
                 ...baseHeader,
@@ -72,7 +83,7 @@ export async function resApi(endPoint, option) {
         let firstRequestFailedMethod = option?.method ? option?.method : 'GET';
         option['method'] = 'POST';
 
-        let refreshTokenResponse = await responseOfRequest('auth/refresh/token');
+        let refreshTokenResponse = await responseOfRequest('auth/refresh/token', true);
 
         baseHeader.authorization = `Bearer ${refreshTokenResponse?.data?.accessToken}`;
         axios.defaults.headers.authorization = `Bearer ${refreshTokenResponse?.data?.accessToken}`;

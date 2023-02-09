@@ -1,4 +1,4 @@
-import {Body, Controller, Get} from '@nestjs/common';
+import {Controller, Get, Query} from '@nestjs/common';
 import {ChannelChatsService} from './ChannelChats.service';
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
@@ -12,7 +12,7 @@ export class ChannelChatsController extends Channel {
     }
 
     @Get()
-    async listOfChat(@Body() dto: RoomDataQuery) {
+    async listOfChat(@Query() dto: RoomDataQuery) {
         await this.init();
 
         let hasFoundChannelNameInListOfUserChannels = await this

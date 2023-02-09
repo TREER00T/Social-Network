@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post, Put} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Put, Query} from '@nestjs/common';
 import {PersonalMessageService} from './PersonalMessage.service';
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
@@ -16,7 +16,7 @@ export class PersonalMessageController extends SavedMessage {
     }
 
     @Get()
-    async listOfMessage(@Body() dto: PersonalDataQuery) {
+    async listOfMessage(@Query() dto: PersonalDataQuery) {
         await this.init();
 
         let haveErr = await PromiseVerify.all([

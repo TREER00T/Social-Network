@@ -1,4 +1,4 @@
-import {Body, Controller, Get} from '@nestjs/common';
+import {Controller, Get, Query} from '@nestjs/common';
 import {GroupInfoService} from './GroupInfo.service';
 import {Group} from "../../base/Group";
 import Json from "../../../util/ReturnJson";
@@ -13,7 +13,7 @@ export class GroupInfoController extends Group {
     }
 
     @Get()
-    async groupInfo(@Body() dto: GroupLinkDto) {
+    async groupInfo(@Query() dto: GroupLinkDto) {
         await this.init();
 
         let haveErr = await PromiseVerify.all([

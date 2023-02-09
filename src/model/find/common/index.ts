@@ -43,7 +43,7 @@ export default {
                 ]
             };
 
-        let userData = await user().find(filter, {...projection, bio: 1, lastName: 1, username: 1});
+        let userData = await user().find(filter, {...projection, bio: 1, lastName: 1, username: 1, isActive: 1});
 
         filter.$or[0] = {
             publicLink: {$regex: like}
@@ -78,7 +78,7 @@ export default {
         return await findMany({
             _id: {$in: listOfId.map(e => `${e[objKey]}`)}
         }, {
-            ...(type === 'e2e' ? {lastName: 1, bio: 1, username: 1} : {description: 1, publicLink: 1}),
+            ...(type === 'e2e' ? {lastName: 1, bio: 1, username: 1, isActive: 1} : {description: 1, publicLink: 1}),
             _id: 1,
             img: 1,
             name: 1,

@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Put} from '@nestjs/common';
+import {Body, Controller, Get, Put, Query} from '@nestjs/common';
 import {E2EBlockUserService} from './E2EBlockUser.service';
 import {User} from "../../base/User";
 import Response from "../../../util/Response";
@@ -11,7 +11,7 @@ export class E2EBlockUserController extends User {
     }
 
     @Get()
-    async hasUserBlock(@Body("targetUserId") targetUserId: string) {
+    async hasUserBlock(@Query("targetUserId") targetUserId: string) {
         await this.init();
 
         let haveErr = await this.verifyUser(targetUserId);

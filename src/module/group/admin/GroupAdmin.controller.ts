@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Query} from '@nestjs/common';
 import {GroupAdminService} from './GroupAdmin.service';
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
@@ -12,7 +12,7 @@ export class GroupAdminController extends Group {
     }
 
     @Get()
-    async userAccessResource(@Body("groupId") groupId: string) {
+    async userAccessResource(@Query("groupId") groupId: string) {
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId),
             this.verifyUser(this.userId),

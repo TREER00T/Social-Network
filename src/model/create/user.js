@@ -17,6 +17,7 @@ module.exports = {
             username: String,
             password: String,
             lastName: String,
+            isActive: Boolean,
             hasLogout: Boolean,
             defaultColor: String,
             twoStepVerification: Boolean

@@ -232,6 +232,7 @@ export default {
             bio: 1,
             img: 1,
             name: 1,
+            isActive: 1,
             username: 1,
             lastName: 1,
             defaultColor: 1
@@ -249,6 +250,7 @@ export default {
             name: 1,
             email: 1,
             phone: 1,
+            isActive: 1,
             username: 1,
             lastName: 1,
             defaultColor: 1
@@ -320,6 +322,7 @@ export default {
             _id: 1,
             img: 1,
             name: 1,
+            isActive: 1,
             lastName: 1,
             username: 1,
             defaultColor: 1
@@ -338,9 +341,13 @@ export default {
             _id: {$in: arr}
         }, {
             _id: 1,
+            bio: 1,
             img: 1,
             name: 1,
-            username: 1
+            isActive: 1,
+            lastName: 1,
+            username: 1,
+            defaultColor: 1
         });
 
         return !Util.isNotEmptyArr(data) ? false : data;

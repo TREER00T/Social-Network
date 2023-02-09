@@ -46,6 +46,7 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
             delete this.users[socketId];
             await Redis.remove(socketId);
             await this.socketGatewayService.sendListOfUserOnlineStatusForSpecificUser(this.io, socket.id, false);
+            await this.socketGatewayService.updateUserStatus(socket.id, false);
         }
     }
 
@@ -74,6 +75,7 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
             });
 
             await this.socketGatewayService.sendListOfUserOnlineStatusForSpecificUser(this.io, userId, true);
+            await this.socketGatewayService.updateUserStatus(userId, true);
             this.users[socketId] = userId;
 
             return this.canActive = true;

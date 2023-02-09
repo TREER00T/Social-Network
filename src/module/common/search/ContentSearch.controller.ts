@@ -10,7 +10,7 @@ export class ContentSearchController {
     }
 
     @Get()
-    async search(@Query() v: string) {
+    async search(@Query('v') v: string) {
         if (Util.isUndefined(v))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 

@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Put} from '@nestjs/common';
+import {Body, Controller, Get, Put, Query} from '@nestjs/common';
 import {GroupLinkService} from './GroupLink.service';
 import Json from "../../../util/ReturnJson";
 import Response from "../../../util/Response";
@@ -13,7 +13,7 @@ export class GroupLinkController extends Group {
     }
 
     @Get()
-    async getInviteAndPublicLink(@Body("groupId") groupId: string) {
+    async getInviteAndPublicLink(@Query("groupId") groupId: string) {
         await this.init();
 
         let haveErr = await PromiseVerify.all([

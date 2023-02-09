@@ -6,17 +6,29 @@ import {Navigate} from "react-router-dom";
 import {useCookies} from "react-cookie";
 import {useState} from "react";
 import NotFound from "component/NotFound";
+import {resApi} from "common/fetch";
+import {dataComposition} from "util/Utils";
 
 function HomeActivity() {
 
-    const [search, setSearch] = useState('');
     const [cookies] = useCookies(['apiKey']);
-    const [hasSearchViewOpen, setHasSearchViewOpen] = useState('');
+    const [dataSearched, setDataSearched] = useState([]);
+    const [haveDataSearched, setHaveDataSearched] = useState(false);
     const [tabViewItemClickedData, setTabViewItemClickedData] = useState({});
 
     const handleTabViewItemClickedData = d => setTabViewItemClickedData(d),
-        handleTextSearched = d => setSearch(d),
-        handleHasSearchViewOpen = d => setHasSearchViewOpen(d),
+        handleTextSearched = async d => {
+            if (!d) {
+                setDataSearched([]);
+                return;
+            }
+            let data = await resApi(`common/search`, {query: {v: d}});
+
+            setHaveDataSearched(data?.statusCode === 404);
+
+            if (data?.statusCode === 200)
+                setDataSearched(dataComposition(data.data));
+        },
         handleNavbarBackButton = () => setTabViewItemClickedData({});
 
     return (
@@ -27,16 +39,15 @@ function HomeActivity() {
 
             {/* Navbar */}
             <HomeNavbar
-                getTextSearched={handleTextSearched}
-                hasSearchViewOpen={handleHasSearchViewOpen}/>
+                getTextSearched={handleTextSearched}/>
 
             {/* Body */}
             <div className="flex mt-3">
 
                 {/* List Of Channel, Group, E2E Or Saved Message */}
                 <ListOfChatWithTabView
-                    dataSearched={search}
-                    hasSearchViewOpen={hasSearchViewOpen}
+                    dataSearched={dataSearched}
+                    haveDataSearched={haveDataSearched}
                     getItemData={handleTabViewItemClickedData}/>
 
                 {

@@ -51,20 +51,6 @@ paths:
         - name: emitListOfUserOnlineStatusForSpecificUser
           description: Return list of active userId
 
-
-  /common:
-    - on: onUserActivities
-      description: Return list of user chats
-      tags:
-        - E2E
-      parameters:
-        - name: type
-          type: string
-          description: The activity type => [ 'e2e' , 'channel', 'group' , 'all' ]
-          required: true
-      events:
-        - name: emitUserActivities
-          description: Emitting list of rooms
   /e2e:
     - on: onPvTyping
       tags:

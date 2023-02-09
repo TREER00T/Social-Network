@@ -42,12 +42,12 @@ import {ChannelLinkModule} from "./module/channel/link/ChannelLink.module";
 import {ChannelController} from "./io/channel/Channel.controller";
 import {E2EController} from "./io/e2e/E2E.controller";
 import {GroupController} from "./io/group/Group.controller";
-import {CommonController} from "./io/common/Common.controller";
 import {UserProfileModule} from "./module/user/profile/UserProfile.module";
 import {LoggerMiddleware} from "./LoggerMiddleware";
 import {GroupModule} from "./module/group/Group.module";
 import {ChannelModule} from "./module/channel/Channel.module";
 import {E2EModule} from "./module/e2e/E2E.module";
+import {RoomsModule} from "./module/common/rooms/Rooms.module";
 
 @Module({
     imports: [
@@ -106,6 +106,7 @@ import {E2EModule} from "./module/e2e/E2E.module";
 
         // Common module
         ContentSearchModule,
+        RoomsModule,
 
         RouterModule.register([
             {
@@ -338,6 +339,10 @@ import {E2EModule} from "./module/e2e/E2E.module";
                             {
                                 path: "search",
                                 module: ContentSearchModule
+                            },
+                            {
+                                path: "rooms",
+                                module: RoomsModule
                             }
                         ]
                     }
@@ -347,7 +352,7 @@ import {E2EModule} from "./module/e2e/E2E.module";
         ])
     ],
     // Socket.io
-    providers: [ChannelController, E2EController, GroupController, CommonController]
+    providers: [ChannelController, E2EController, GroupController]
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
