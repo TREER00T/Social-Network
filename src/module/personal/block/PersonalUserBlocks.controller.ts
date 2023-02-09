@@ -21,6 +21,6 @@ export class PersonalUserBlocksController extends User {
             return Json.builder(Response.HTTP_NOT_FOUND);
 
         return Json.builder(Response.HTTP_OK,
-            await this.appService.userDetails(listOfBlockedUsers));
+            await this.userDetails(listOfBlockedUsers));
     }
 }

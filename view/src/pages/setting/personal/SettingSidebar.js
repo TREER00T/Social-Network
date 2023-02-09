@@ -1,35 +1,28 @@
-import {useState} from "react";
-import {settingSidebarItems} from "extra/setting";
+import {PersonalSettingSidebarItems} from "extra/PersonalSetting";
+import SettingItem from "component/SettingItem";
+import {resApi} from "common/fetch";
+import {useEffect, useState} from "react";
 
-function Item({data: {url, icon, name}}) {
+export default function SettingSidebar({children}) {
+    const [userInfo, setUserInfo] = useState({});
 
-    const isValidPath = url === window.location.pathname;
-    const [hasClicked, setHasClicked] = useState(false);
+    const response = async () => {
+        let data = await resApi('personal/user');
+        setUserInfo(data.data);
+    };
 
-    const handleClick = () => setHasClicked(!hasClicked);
+    useEffect(() => {
+        response();
+    }, []);
 
-    return (
-        <li>
-            <a href={url}
-               onClick={handleClick}
-               className={(hasClicked || isValidPath ? "bg-gray-200 " : "") + "flex items-center space-x-3 text-gray-700 p-2 rounded-md font-medium hover:bg-gray-200 focus:shadow-outline"}>
-                <span className={hasClicked || isValidPath ? "text-blue-100" : "text-gray-600"}>
-                    {icon}
-                </span>
-                <span className={hasClicked || isValidPath ? "text-blue-100" : "text-gray-600"}>{name}</span>
-            </a>
-        </li>
-    )
-}
-
-export default function SettingSidebar({userInfo, children}) {
     return (
         <div className="flex flex-wrap bg-gray-80">
 
             {/* Sidebar Menu */}
-            <div className="w-3/12 bg-white rounded p-3 shadow-lg h-screen sticky top-0">
+            <div className="w-3/12 bg-white rounded p-3 shadow-xl h-screen sticky top-0">
                 <div className="flex items-center space-x-4 p-2 mb-5">
-                    {userInfo?.img ? <img className="h-12 rounded-full" src={userInfo?.img} alt="My Avatar"/> :
+                    {userInfo?.img ?
+                        <img className="h-12 h-12 rounded-full shadow-lg" src={userInfo?.img} alt="My Avatar"/> :
                         <div className="flex flex-col w-12 h-12 rounded-full" style={{
                             color: 'white',
                             backgroundColor: userInfo?.defaultColor
@@ -43,7 +36,7 @@ export default function SettingSidebar({userInfo, children}) {
                 </div>
                 <ul className="space-y-2 text-sm">
                     {
-                        settingSidebarItems.map((o, i) => <Item key={i} data={o}/>)
+                        PersonalSettingSidebarItems.map((o, i) => <SettingItem key={i} data={o}/>)
                     }
                 </ul>
             </div>

@@ -12,11 +12,14 @@ import HomeActivity from "pages/home/Home.activity";
 import VerifyOTPCodeActivity from "pages/auth/verify/VerifyOTPCode.activity";
 import CreateChannelActivity from "pages/create/channel/CreateChannel.activity";
 import CreateGroupActivity from "pages/create/group/CreateGroup.activity";
-import PrivacyActivity from "pages/setting/Privacy.activity";
-import DevicesActivity from "pages/setting/Devices.activity";
-import UserProfileSettingActivity from "pages/setting/UserProfileSetting.activity";
-import BlockedUsersActivity from "pages/setting/BlockedUsers.activity";
+import PrivacyActivity from "pages/setting/personal/Privacy.activity";
+import DevicesActivity from "pages/setting/personal/Devices.activity";
+import UserProfileSettingActivity from "pages/setting/personal/UserProfileSetting.activity";
+import BlockedUsersActivity from "pages/setting/personal/BlockedUsers.activity";
 import AddNameForProfile from "pages/auth/profile/name/AddNameForProfile.activity";
+import RoomSettingActivity from "pages/setting/room/RoomSetting.activity";
+import LinksActivity from "pages/setting/room/Links.activity";
+import AdminsActivity from "pages/setting/room/Admins.activity";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -38,6 +41,12 @@ root.render(
                     <Route path="home/create/group" element={<CreateGroupActivity/>}/>
                     <Route path="home/create/channel" element={<CreateChannelActivity/>}/>
                     <Route path='*' element={<NotFoundActivity/>}/>
+                    <Route path='setting/group/:id' element={<RoomSettingActivity/>}/>
+                    <Route path='setting/group/:id/links' element={<LinksActivity/>}/>
+                    <Route path='setting/group/:id/admins' element={<AdminsActivity/>}/>
+                    <Route path='setting/channel/:id' element={<RoomSettingActivity/>}/>
+                    <Route path='setting/channel/:id/links' element={<LinksActivity/>}/>
+                    <Route path='setting/channel/:id/admins' element={<AdminsActivity/>}/>
                 </Routes>
             </BrowserRouter>
         </ThemeProvider>

@@ -12,16 +12,16 @@ export abstract class Group extends User {
     async handleRoomId(dto: GroupLinkDto) {
         let data = {};
 
-        if (!Util.isUndefined(dto.groupId))
+        if (!Util.isUndefined(dto?.groupId))
             data = {type: 'groupId', id: dto.groupId};
 
-        if (!Util.isUndefined(dto.publicLink))
+        if (!Util.isUndefined(dto?.publicLink))
             data = {type: 'publicLink', id: dto.publicLink};
 
-        if (!Util.isUndefined(dto.inviteLink))
+        if (!Util.isUndefined(dto?.inviteLink))
             data = {type: 'inviteLink', id: dto.inviteLink};
 
-        if (Util.isUndefined(dto.groupId) && Util.isUndefined(dto.inviteLink) && Util.isUndefined(dto.publicLink))
+        if (Util.isUndefined(dto?.groupId) && Util.isUndefined(dto?.inviteLink) && Util.isUndefined(dto?.publicLink))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
         return data;

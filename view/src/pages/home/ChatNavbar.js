@@ -10,6 +10,8 @@ import BlockUser from "img/hand-stop.svg";
 import {useEffect, useRef, useState} from "react";
 import {resApi} from "common/fetch";
 import Trash from "img/trash.svg";
+import Setting from "img/settings.svg";
+import {Navigate} from "react-router-dom";
 import UserProfile from "component/UserProfile";
 
 function ChatNavbar({
@@ -32,19 +34,21 @@ function ChatNavbar({
 
     const isSavedMessage = type === 'SA';
     const wrapperRef = useRef('navbar');
-    const [hasClearChat, setHasClearChat] = useState(false);
-    const [hasBlockUser, setHasBlockUser] = useState(false);
     const [openUserProfile, setOpenUserProfile] = useState(false);
-    const [hasBlockUserByMe, setHasBlockUserByMe] = useState(false);
+    const [hasClickedSetting, setHasClickedSetting] = useState(false);
     const [hasMeBlockedByUser, setHasMeBlockedByUser] = useState(false);
     const [hasClickedCheckBox, setHasClickedCheckBox] = useState(false);
+    const [hasClickedClearChat, setHasClickedClearChat] = useState(false);
+    const [hasClickedBlockUser, setHasClickedBlockUser] = useState(false);
     const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(false);
+    const [hasClickedBlockUserByMe, setHasClickedBlockUserByMe] = useState(false);
 
     const handleClickUserProfile = () => setOpenUserProfile(!openUserProfile),
         handleBackClick = () => backButton(),
         handleClickMenuOption = () => setHasOpenedOptionMenu(!hasOpenedOptionMenu),
-        handleClickedClearChat = () => setHasClearChat(!hasClearChat),
-        handleClickedBlockUser = () => setHasBlockUser(!hasBlockUser),
+        handleClickedClearChat = () => setHasClickedClearChat(!hasClickedClearChat),
+        handleClickedSetting = () => setHasClickedSetting(!hasClickedSetting),
+        handleClickedBlockUser = () => setHasClickedBlockUser(!hasClickedBlockUser),
         handleClickCheckBoxForClearChatUs = () => setHasClickedCheckBox(!hasClickedCheckBox),
         handleAccessToClearChat = async d => {
             if (!d)
@@ -73,7 +77,7 @@ function ChatNavbar({
             });
 
             let mapResult = {
-                210: setHasBlockUserByMe(true),
+                210: setHasClickedBlockUserByMe(true),
                 211: setHasMeBlockedByUser(true)
             };
 
@@ -154,21 +158,27 @@ function ChatNavbar({
                                       getHasClicked={handleClickedBlockUser}/>
                         <DropDownItem key="Clear Chat" name="Clear Chat" img={Trash}
                                       getHasClicked={handleClickedClearChat}/>
+                        {
+                            type === 'Group' || type === 'Channel' ?
+                                <DropDownItem key="Setting" name="Setting" img={Setting}
+                                              navigate={(<Navigate to={`/setting/${type.toLowerCase()}/${_id}`}/>)}
+                                              getHasClicked={handleClickedSetting}/> : <></>
+                        }
                     </DropdownMenu> : <></>
             }
 
             <AgreeDialog
                 handler={handleClickedClearChat}
-                accessToNavigate={hasClearChat}
+                accessToNavigate={hasClickedClearChat}
                 getAccessToAction={handleAccessToClearChat}>
                 <Checkbox label="Remove chat for us" onClick={handleClickCheckBoxForClearChatUs}/>
             </AgreeDialog>
 
             <AgreeDialog
                 handler={handleClickedBlockUser}
-                accessToNavigate={hasBlockUser}
+                accessToNavigate={hasClickedBlockUser}
                 getAccessToAction={handleAccessToBlockUser}
-                children={`Do you want to ${hasBlockUserByMe ? 'Un' : ''} Block this user?`}/>
+                children={`Do you want to ${hasClickedBlockUserByMe ? 'Un' : ''} Block this user?`}/>
 
         </div>
     );

@@ -1,5 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import Insert from "../../../model/add/channel";
+import Find from "../../../model/find/channel";
 
 let Delete = require("../../../model/remove/channel");
 
@@ -11,5 +12,9 @@ export class ChannelAdminService {
 
     async removeAdmin(channelId: string, targetUserId: string) {
         await Delete.admin(channelId, targetUserId);
+    }
+
+    async listOfAdmin(channelId: string) {
+        return await Find.listOfAdmin(channelId);
     }
 }

@@ -1,5 +1,4 @@
 import {RoomId} from "../../../util/Types";
-
 let {
     channel,
     channelUser,
@@ -111,7 +110,6 @@ export default {
             _id: 1,
             img: 1,
             name: 1,
-            inviteLink: 0,
             publicLink: 1,
             description: 1,
             defaultColor: 1
@@ -132,6 +130,17 @@ export default {
         }, {
             _id: 0,
             userId: 1
+        });
+
+    },
+
+    async listOfAdmin(channelId: string) {
+
+        return await channelAdmin().find({
+            channelId: channelId
+        }, {
+            _id: 0,
+            adminId: 1
         });
 
     }

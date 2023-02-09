@@ -2,7 +2,7 @@ import {ObjectId} from "mongodb";
 import Util from '../../../util/Util';
 import FindInGroup from '../../../model/find/group';
 import FindInChannel from '../../../model/find/channel';
-import {AuthMsgBelongingToBetweenTwoUsers, ListOfUserId, ListOfUserTargetId} from "../../../util/Types";
+import {AuthMsgBelongingToBetweenTwoUsers, ListOfAdmin, ListOfUserId, ListOfUserTargetId} from "../../../util/Types";
 
 let {
         haveCollection,
@@ -312,9 +312,9 @@ export default {
     },
 
 
-    async getUserDetailsInUsersTable(array: ListOfUserTargetId) {
+    async getUserDetailsInUsersTable(array: ListOfUserTargetId | ListOfAdmin) {
 
-        let arr = array.map(e => new ObjectId(e.userTargetId));
+        let arr = array.map(e => new ObjectId(e?.userTargetId ? e.userTargetId : e.adminId));
 
         let data = await user().find({
             _id: {$in: arr}
@@ -331,7 +331,6 @@ export default {
         return !Util.isNotEmptyArr(data) ? false : data;
 
     },
-
 
     async getUserDetailsInUsersTableForMember(array: ListOfUserId) {
 

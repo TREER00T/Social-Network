@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {useCookies} from "react-cookie";
 import {resApi} from "common/fetch";
 import {Navigate} from "react-router-dom";
-import SettingSidebar from "pages/setting/SettingSidebar";
+import SettingSidebar from "pages/setting/personal/SettingSidebar";
 
 function Item({data: {deviceIp, createdAt, deviceName, deviceLocation}}) {
     return (
@@ -27,19 +27,14 @@ function Item({data: {deviceIp, createdAt, deviceName, deviceLocation}}) {
 export default function DevicesActivity() {
 
     const [cookies] = useCookies(['apiKey']);
-    const [userInfo, setUserInfo] = useState({});
     const [listOfDevice, setListOfDevice] = useState([]);
 
-    const response = async () => {
-        let data = await resApi('personal/user');
-        setUserInfo(data.data);
-    }, handleListDevice = async () => {
+    const handleListDevice = async () => {
         let data = await resApi('personal/devices');
         setListOfDevice(data.data);
     };
 
     useEffect(() => {
-        response();
         handleListDevice();
     }, []);
 
@@ -52,7 +47,7 @@ export default function DevicesActivity() {
 
 
             {/* Sidebar Menu */}
-            <SettingSidebar userInfo={userInfo}>
+            <SettingSidebar>
                 <div>
                     <span className="font-bold text-blue-100 text-2xl">Devices connected</span>
                 </div>
