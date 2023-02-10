@@ -63,7 +63,7 @@ paths:
             - components/emitPvTypingError
             - components/emitPvTyping
 
-    - on: onPvMessage
+    - on: onPvSendMessage
       tags:
         - E2E
       parameters:
@@ -73,8 +73,8 @@ paths:
             - components/DataMessage
       events:
         - $ref:
-            - components/emitPvMessageError
-            - components/emitPvMessage
+            - components/emitPvSendMessageError
+            - components/emitPvSendMessage
 
     - on: onPvEditMessage
       tags:
@@ -102,18 +102,7 @@ paths:
             - components/emitPvDeleteMessage
 
   /group:
-    - on: onLeaveUserFromGroup
-      tags:
-        - Group
-      parameters:
-        - $ref:
-            - components/RoomId
-      events:
-        - $ref:
-            - components/emitLeaveUserFromGroupError
-            - components/emitLeaveUserFromGroup
-
-    - on: onGroupMessage
+    - on: onGroupSendMessage
       tags:
         - Group
       parameters:
@@ -122,8 +111,8 @@ paths:
             - components/DataMessage
       events:
         - $ref:
-            - components/emitGroupMessageError
-            - components/emitGroupMessage
+            - components/emitGroupSendMessageError
+            - components/emitGroupSendMessage
 
     - on: onGroupEditMessage
       tags:
@@ -151,18 +140,7 @@ paths:
             - components/emitGroupDeleteMessage
 
   /channel:
-    - on: onLeaveChannel
-      tags:
-        - Channel
-      parameters:
-        - $ref:
-            - components/RoomId
-      events:
-        - $ref:
-            - components/emitLeaveUserFromChannelError
-            - components/emitLeaveUserFromChannel
-
-    - on: onChannelMessage
+    - on: onChannelSendMessage
       tags:
         - Channel
       parameters:
@@ -171,8 +149,8 @@ paths:
             - components/DataMessage
       events:
         - $ref:
-            - components/emitChannelMessageError
-            - components/emitChannelMessage
+            - components/emitChannelSendMessageError
+            - components/emitChannelSendMessage
 
     - on: onChannelEditMessage
       tags:
@@ -242,12 +220,6 @@ components:
     emitPvDeleteMessage:
       - name: emitPvDeleteMessage
         description: Emitting list of message id deleted for specific user into pv chat
-    emitLeaveUserFromGroup:
-      - name: emitLeaveUserFromGroup
-        description: Return status code and message
-    emitLeaveUserFromGroupError:
-      - name: emitLeaveUserFromGroupError
-        description: Return error status code and message
     emitGroupMessageError:
       - name: emitGroupMessageError
         description: Return error status code and message
@@ -266,12 +238,6 @@ components:
     emitGroupDeleteMessage:
       - name: emitGroupDeleteMessage
         description: Emitting list of message id deleted for specific group
-    emitLeaveUserFromChannel:
-      - name: emitLeaveUserFromChannel
-        description: Return status code and message
-    emitLeaveUserFromChannelError:
-      - name: emitLeaveUserFromChannelError
-        description: Return error status code and message
     emitChannelMessageError:
       - name: emitChannelMessageError
         description: Return error status code and message

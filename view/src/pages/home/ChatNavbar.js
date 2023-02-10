@@ -15,6 +15,7 @@ import {Navigate} from "react-router-dom";
 import UserProfile from "component/UserProfile";
 
 function ChatNavbar({
+                        socket,
                         data: {
                             img,
                             defaultColor,
@@ -109,6 +110,15 @@ function ChatNavbar({
     });
 
     useEffect(() => {
+        socket.emit('onGroupSendMessage', {
+            roomId: _id,
+            type: 'None',
+            text: 'Hello'
+        });
+        socket.on('emitGroupSendMessageError', d => {
+            console.log(d)
+        })
+
         if (type === 'E2E')
             handleDisableOrEnableMessageForBlockedUser();
 

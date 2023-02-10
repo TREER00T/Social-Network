@@ -18,29 +18,12 @@ import {AbstractChannel} from "../base/abstract/AbstractChannel";
 @Controller()
 export class ChannelController extends AbstractChannel {
 
-    @SubscribeMessage("onLeaveUserChannel")
-    async leaveUserFromChannel(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
-        let channelId = data?.roomId;
-
-        let haveErr = PromiseVerify.all([
-            this.isUndefined(channelId),
-            this.isChannelExist(channelId)
-        ]);
-
-        if (haveErr)
-            return socket.emit('emitLeaveChannelError', haveErr);
-
-        this.leaveUserFromRoom(socket, channelId, 'channel');
-
-        socket.emit('emitLeaveUserFromChannel', Response.HTTP_OK);
-    }
-
-    @SubscribeMessage("onChannelMessage")
+    @SubscribeMessage("onChannelSendMessage")
     async sendMessageInChannel(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
         let channelId = data?.roomId,
-            senderId = this.getUserId(socket.id);
+            senderId = await this.getUserId(socket.id);
 
-        let haveErr = PromiseVerify.all([
+        let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),
             this.isChannelExist(channelId),
             this.isUserJoined(channelId, senderId),
@@ -48,7 +31,7 @@ export class ChannelController extends AbstractChannel {
         ]);
 
         if (haveErr)
-            return socket.emit('emitChannelMessageError', haveErr);
+            return socket.emit('emitChannelSendMessageError', haveErr);
 
         delete data.roomId;
         data.messageCreatedBySenderId = senderId;
@@ -57,11 +40,11 @@ export class ChannelController extends AbstractChannel {
         let message = await this.handleMessage(data);
 
         if (message?.statusCode)
-            return socket.emit('emitChannelMessageError', message);
+            return socket.emit('emitChannelSendMessageError', message);
 
-        this.handleUserJoinState(socket, channelId, 'channel');
+        await this.handleUserJoinState(socket, channelId, 'channel');
 
-        this.emitToSpecificSocket(channelId, 'emitChannelMessage', message);
+        this.emitToSpecificSocket(channelId, 'emitChannelSendMessage', message);
 
         await this.saveMessage({
             tableName: data.messageSentRoomId,
@@ -69,12 +52,11 @@ export class ChannelController extends AbstractChannel {
         });
     }
 
-
     @SubscribeMessage("onChannelEditMessage")
     async updateMessageInChannel(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
         let messageId = data?.messageId,
             channelId = data?.roomId,
-            senderId = this.getUserId(socket.id);
+            senderId = await this.getUserId(socket.id);
 
         let haveErr = await PromiseVerify.all([
             this.isUndefined(messageId),
@@ -87,7 +69,7 @@ export class ChannelController extends AbstractChannel {
         if (haveErr)
             return socket.emit('emitChannelEditMessageError', haveErr);
 
-        this.handleUserJoinState(socket, channelId, 'channel');
+        await this.handleUserJoinState(socket, channelId, 'channel');
 
         let isUserMessage = this.isUserMessage(senderId, messageId, `${channelId}ChannelContents`);
 
@@ -116,7 +98,7 @@ export class ChannelController extends AbstractChannel {
     async removeMessageInChannel(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
         let listOfId = data?.listOfId,
             channelId = data?.roomId,
-            senderId = this.getUserId(socket.id);
+            senderId = await this.getUserId(socket.id);
 
         if (!Array.isArray(listOfId) && listOfId.length === 0)
             return socket.emit('emitChannelDeleteMessageError', Response.HTTP_BAD_REQUEST);
@@ -137,7 +119,7 @@ export class ChannelController extends AbstractChannel {
         if (!isUserMessage)
             return socket.emit('emitChannelDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-        this.handleUserJoinState(socket, channelId, 'channel');
+        await this.handleUserJoinState(socket, channelId, 'channel');
 
         this.emitToSpecificSocket(channelId, 'emitChannelDeleteMessage', Response.HTTP_OK);
 

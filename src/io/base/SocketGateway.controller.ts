@@ -4,14 +4,14 @@ import {
     OnGatewayInit,
     WebSocketServer,
     OnGatewayDisconnect,
-    OnGatewayConnection
+    OnGatewayConnection, ConnectedSocket
 } from "@nestjs/websockets";
 import {Server, Socket} from "socket.io";
 import {SocketGatewayService} from "./SocketGateway.service";
 import Util from "../../util/Util";
 import Response from "../../util/Response";
 import {HandleMessage} from "../../module/base/HandleMessage";
-import {TSaveMessage, Users} from "../../util/Types";
+import {TSaveMessage} from "../../util/Types";
 import CommonDelete from "../../model/remove/common";
 import CommonInsert from "../../model/add/common";
 
@@ -25,9 +25,7 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
 
     private readonly socketGatewayService: SocketGatewayService = new SocketGatewayService();
 
-    private users: Users = {};
-
-    protected canActive: boolean = false;
+    private users = new Map();
 
     private logger: Logger = new Logger('SocketIoService');
 
@@ -38,27 +36,33 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
     @WebSocketServer()
     io: Server;
 
-    async handleDisconnect(client: Socket) {
+    async handleDisconnect(@ConnectedSocket() client: Socket) {
         let socketId = client.id;
 
-        if (this.canActive) {
-            let socket = await Redis.get(this.getUserId(socketId));
-            delete this.users[socketId];
-            await Redis.remove(socketId);
-            await this.socketGatewayService.sendListOfUserOnlineStatusForSpecificUser(this.io, socket.id, false);
-            await this.socketGatewayService.updateUserStatus(socket.id, false);
+        let socket = await Redis.get(await this.getUserId(socketId));
+
+        if (socket?.group || socket?.channel) {
+            socket?.group.forEach(id => client.leave(id));
+            socket?.channel.forEach(id => client.leave(id));
         }
+
+        this.users.delete(socketId);
+        await Redis.remove(socketId);
+        await this.socketGatewayService.sendListOfUserOnlineStatusForSpecificUser(this.io, socket.id, false);
+        await this.socketGatewayService.updateUserStatus(socket.id, false);
     }
 
-    async handleConnection(client: Socket, ...args: any[]) {
+    async handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
         let accessToken: string = client.handshake.headers?.authorization;
         let userApiKey = client.handshake.query?.apiKey;
         let socketId = client.id;
 
         let isValidToken = await Util.isAccessToken(accessToken);
 
-        if (!isValidToken)
-            return this.canActive = false;
+        if (!isValidToken) {
+            client.disconnect(true);
+            return;
+        }
 
         let tokenPayload = await Util.getTokenPayLoad();
 
@@ -76,26 +80,25 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
 
             await this.socketGatewayService.sendListOfUserOnlineStatusForSpecificUser(this.io, userId, true);
             await this.socketGatewayService.updateUserStatus(userId, true);
-            this.users[socketId] = userId;
 
-            return this.canActive = true;
+            this.users.set(socketId, userId);
+            return;
         }
 
-        return this.canActive = false;
+        client.disconnect(true);
     }
 
-    handleUserJoinState(socket: Socket, roomId: string, type: string) {
-        let isRoomAddedInSocketList = this.io.sockets.adapter.rooms.get(roomId + type);
+    async handleUserJoinState(socket: Socket, roomId: string, type: string) {
+        let isRoomAddedInSocketList = socket.rooms.has(roomId + type);
 
-        if (!isRoomAddedInSocketList)
+        if (!isRoomAddedInSocketList) {
+            let user = await Redis.get(await this.getUserId(socket.id));
+            let existRoomArr = user?.[type] ?? [];
+            existRoomArr.push(roomId);
+            delete user?.[type];
+            await Redis.set(user.id, {...user, [type]: existRoomArr})
             socket.join(roomId + type);
-    }
-
-    leaveUserFromRoom(socket: Socket, roomId: string, type: string) {
-        let isRoomAddedInSocketList = this.io.sockets.adapter.rooms.get(roomId + type);
-
-        if (isRoomAddedInSocketList)
-            socket.leave(roomId + type);
+        }
     }
 
     emitToSpecificSocket =
@@ -115,8 +118,8 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
         return !socketId ? 'SOCKET_OFFLINE' : socketId;
     }
 
-    getUserId(socketId: string) {
-        return this.users[socketId];
+    async getUserId(socketId: string) {
+        return await this.users.get(socketId);
     }
 
     async saveMessage(data: TSaveMessage) {

@@ -22,10 +22,6 @@ type Activities = {
     type: string // 'all' | 'group' | 'channel' | 'e2e'
 }
 
-type Users = {
-    [key: string]: string
-}
-
 type IFile = {
     size: number,
     buffer: ArrayBuffer,
@@ -90,7 +86,6 @@ export {
     ListOfChannelId,
     ListOfGroupId,
     ListOfUserId,
-    Users,
     IResponse,
     TToken,
     RoomId,

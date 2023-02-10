@@ -33,19 +33,19 @@ export class E2EController extends AbstractRoom {
         this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvTyping', data);
     }
 
-    @SubscribeMessage("onPvMessage")
+    @SubscribeMessage("onPvSendMessage")
     async sendPvMessage(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
-        let d = await this.verifyPv(socket, 'emitPvMessageError', data);
+        let d = await this.verifyPv(socket, 'emitPvSendMessageError', data);
 
         if (typeof d !== "object")
             return;
 
-        let haveErr = PromiseVerify.all([
+        let haveErr = await PromiseVerify.all([
             this.isUndefined(data?.roomId)
         ]);
 
         if (haveErr)
-            return socket.emit('emitPvMessageError', haveErr);
+            return socket.emit('emitPvSendMessageError', haveErr);
 
         data.messageCreatedBySenderId = d.senderId;
         data.messageSentRoomId = data.roomId;
@@ -54,9 +54,9 @@ export class E2EController extends AbstractRoom {
         let message = await this.handleMessage(data);
 
         if (message?.statusCode)
-            return socket.emit('emitPvMessageError', message);
+            return socket.emit('emitPvSendMessageError', message);
 
-        this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvMessage', message);
+        this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvSendMessage', message);
 
         await this.saveMessage({
             tableName: data.roomId,
@@ -110,7 +110,7 @@ export class E2EController extends AbstractRoom {
         let listOfId = data?.listOfId,
             roomId = data?.roomId;
 
-        let haveErr = PromiseVerify.all([
+        let haveErr = await PromiseVerify.all([
             this.isUndefined(roomId)
         ]);
 
@@ -151,7 +151,7 @@ export class E2EController extends AbstractRoom {
         if (!receiverSocketId || receiverSocketId === 'SOCKET_OFFLINE')
             return true;
 
-        let senderId = this.getUserId(socket.id);
+        let senderId = await this.getUserId(socket.id);
 
         let isUserBlocked = await this.appService.isBlocked(senderId, receiverId);
 

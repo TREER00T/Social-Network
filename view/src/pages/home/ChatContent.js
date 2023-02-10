@@ -1,4 +1,4 @@
-function ChatContent({data: {img, defaultColor, _id, name, type}}) {
+function ChatContent({data: {img, defaultColor, _id, name, type}, socket}) {
 
     return (
         <div className="flex flex-col">
