@@ -4,19 +4,29 @@ import ChatNavbar from "pages/home/ChatNavbar";
 import ChatContent from "pages/home/ChatContent";
 import {Navigate} from "react-router-dom";
 import {useCookies} from "react-cookie";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import NotFound from "component/NotFound";
 import {resApi} from "common/fetch";
+import Io from "common/io";
 import {dataComposition} from "util/Utils";
 
 function HomeActivity() {
 
+    const [socket, setSocket] = useState();
     const [cookies] = useCookies(['apiKey']);
     const [dataSearched, setDataSearched] = useState([]);
     const [haveDataSearched, setHaveDataSearched] = useState(false);
     const [tabViewItemClickedData, setTabViewItemClickedData] = useState({});
 
-    const handleTabViewItemClickedData = d => setTabViewItemClickedData(d),
+    const handleTabViewItemClickedData = d => {
+            setTabViewItemClickedData(d);
+            let roomType = d?.type?.toLowerCase();
+
+            if (roomType !== 'sa') {
+                let socketRoom = new Io(roomType);
+                setSocket(socketRoom.socket);
+            }
+        },
         handleTextSearched = async d => {
             if (!d) {
                 setDataSearched([]);
@@ -56,10 +66,11 @@ function HomeActivity() {
                         <div className="flex flex-col ml-6">
 
                             {/* Chat NavBar */}
-                            <ChatNavbar data={tabViewItemClickedData} backButton={handleNavbarBackButton}/>
+                            <ChatNavbar socket={socket} data={tabViewItemClickedData}
+                                        backButton={handleNavbarBackButton}/>
 
                             {/* Chat Contents */}
-                            <ChatContent data={tabViewItemClickedData}/>
+                            <ChatContent socket={socket} data={tabViewItemClickedData}/>
 
                         </div> : <NotFound/>
                 }

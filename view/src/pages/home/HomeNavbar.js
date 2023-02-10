@@ -23,9 +23,9 @@ function HomeNavbar({getTextSearched}) {
     const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(false);
 
     useOutsideAlerter(wrapperRef, () => {
-        setHasOpenedOptionMenu(false);
         setHasSearchOff(true);
         setHasOpenedUserMenu(false);
+        setHasOpenedOptionMenu(false);
     });
 
     const handleClickedLogout = d => setHasClickedLogout(d),
