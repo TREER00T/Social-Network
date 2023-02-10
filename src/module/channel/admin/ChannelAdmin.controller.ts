@@ -31,6 +31,8 @@ export class ChannelAdminController extends Channel {
 
     @Get("haveAccess")
     async userAccessResource(@Query("channelId") channelId: string) {
+        await this.init();
+
         let haveErr = await PromiseVerify.all([
             this.isUndefined(channelId),
             this.verifyUser(this.userId),

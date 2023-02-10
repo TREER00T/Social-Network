@@ -110,18 +110,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -209,18 +199,8 @@ paths:
       security:
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -261,28 +241,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -331,23 +296,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        802:
-          description: In valid json object key
+        415:
+          description: Unsupported Media Type
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -378,23 +333,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -423,18 +363,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -501,23 +431,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -548,23 +463,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -595,28 +495,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -651,28 +536,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -699,18 +569,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -736,18 +596,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -783,18 +633,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -829,18 +669,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -876,18 +706,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -913,18 +733,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -961,18 +771,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1009,18 +809,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1046,18 +836,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1083,18 +863,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1115,18 +885,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1152,18 +912,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1187,18 +937,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1219,18 +959,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1249,18 +979,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1306,18 +1026,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1382,18 +1092,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1407,8 +1107,8 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-        802:
-          description: In valid json object key
+        415:
+          description: Unsupported Media Type
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1429,18 +1129,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1506,18 +1196,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1531,8 +1211,8 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-        802:
-          description: In valid json object key
+        415:
+          description: Unsupported Media Type
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1574,18 +1254,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1599,13 +1269,8 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        802:
-          description: In valid json object key
+        415:
+          description: Unsupported Media Type
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1631,28 +1296,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1685,18 +1335,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1752,18 +1392,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1777,13 +1407,8 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        802:
-          description: In valid json object key
+        415:
+          description: Unsupported Media Type
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1813,18 +1438,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1840,11 +1455,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1874,18 +1484,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1901,11 +1501,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1935,18 +1530,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1962,11 +1547,6 @@ paths:
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -1992,18 +1572,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2019,11 +1589,6 @@ paths:
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2049,18 +1614,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2076,11 +1631,6 @@ paths:
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2110,18 +1660,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2137,11 +1677,6 @@ paths:
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2167,28 +1702,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2229,28 +1749,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2293,18 +1798,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2320,11 +1815,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2352,18 +1842,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2379,11 +1859,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2409,18 +1884,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2431,11 +1896,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2464,18 +1924,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2509,28 +1959,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2585,23 +2020,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2640,18 +2060,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2707,18 +2117,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2732,13 +2132,8 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        802:
-          description: In valid json object key
+        415:
+          description: Unsupported Media Type
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2768,18 +2163,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2813,28 +2198,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2869,18 +2239,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2896,11 +2256,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2930,18 +2285,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2957,11 +2302,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -2991,18 +2331,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3018,11 +2348,6 @@ paths:
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3048,18 +2373,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3075,11 +2390,6 @@ paths:
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3105,18 +2415,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3132,11 +2432,6 @@ paths:
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3166,18 +2461,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3193,11 +2478,6 @@ paths:
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3223,28 +2503,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3285,28 +2550,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3349,18 +2599,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3376,11 +2616,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3408,18 +2643,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3435,11 +2660,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3465,18 +2685,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3510,28 +2720,13 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
         404:
           description: Not Found
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3560,18 +2755,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3582,11 +2767,6 @@ paths:
             $ref: '#/definitions/Status'
         400:
           description: Bad Request
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3641,23 +2821,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        803:
-          description: User Not Found
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3696,18 +2861,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3743,18 +2898,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'
@@ -3787,18 +2932,8 @@ paths:
         - apiKey: [ ]
         - token: [ ]
       responses:
-        800:
-          description: Unauthorized! Token was invalid
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        804:
-          description: Unauthorized! Invalid Api Key
-          schema:
-            type: object
-            $ref: '#/definitions/Status'
-        519:
-          description: Unauthorized! Token was expired
+        401:
+          description: Unauthorized
           schema:
             type: object
             $ref: '#/definitions/Status'

@@ -63,9 +63,9 @@ export class GroupLinkController extends Group {
 
         let link = Generate.makeIdForPublicLink(publicLink);
 
-        let hsExistPublicLink = await this.appService.hasExistPublicLink(link);
+        let hasExistPublicLink = await this.appService.hasExistPublicLink(link);
 
-        if (hsExistPublicLink)
+        if (hasExistPublicLink)
             return Json.builder(Response.HTTP_CONFLICT);
 
         await this.appService.updatePublicLink(groupId, link);

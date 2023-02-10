@@ -26,16 +26,16 @@ export class LoggerMiddleware implements NestMiddleware {
             let tokenPayload = await Util.tokenVerify(token, res);
 
             if (!tokenPayload && reqResult === 'RequireJwtToken') {
-                res.send(Res.HTTP_UNAUTHORIZED_INVALID_TOKEN);
-                return Json.builder(Res.HTTP_UNAUTHORIZED_INVALID_TOKEN);
+                res.send(Res.HTTP_UNAUTHORIZED);
+                return Json.builder(Res.HTTP_UNAUTHORIZED);
             }
 
             if (reqResult === 'RequireJwtTokenAndApiKey') {
                 let isValidApiKey = await Util.isValidApiKey(tokenPayload.phoneNumber, apiKey);
 
                 if (!isValidApiKey) {
-                    res.send(Res.HTTP_UNAUTHORIZED_INVALID_API_KEY);
-                    return Json.builder(Res.HTTP_UNAUTHORIZED_INVALID_API_KEY);
+                    res.send(Res.HTTP_UNAUTHORIZED);
+                    return Json.builder(Res.HTTP_UNAUTHORIZED);
                 }
 
             }

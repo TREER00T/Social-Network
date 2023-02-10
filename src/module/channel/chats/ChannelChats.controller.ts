@@ -19,7 +19,7 @@ export class ChannelChatsController extends Channel {
             .appService.getChannelNameFromListOfUserChannels(dto.roomId, this.userId);
 
         if (!hasFoundChannelNameInListOfUserChannels)
-            return Json.builder(Response.HTTP_USER_NOT_FOUND);
+            return Json.builder(Response.HTTP_NOT_FOUND);
 
         return await this.getListOfMessageFromRoom(dto,
             `${hasFoundChannelNameInListOfUserChannels}ChannelContents`);

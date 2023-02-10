@@ -76,7 +76,7 @@ export async function resApi(endPoint, option) {
     let res = await responseOfRequest(endPoint);
 
     // token or api key was invalid or access token was expired
-    if ([519, 800, 804].includes(res?.statusCode)) {
+    if (res.statusCode === 401) {
         axios.defaults.headers.authorization = `Bearer ${getInStorage('refreshToken')}`;
         baseHeader.authorization = `Bearer ${getInStorage('refreshToken')}`;
 

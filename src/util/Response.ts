@@ -264,30 +264,6 @@ export default {
         statusCode: 511,
         message: 'Network Authentication Required'
     },
-    HTTP_UNAUTHORIZED_TOKEN_EXP: {
-        statusCode: 519,
-        message: 'Unauthorized! Token was expired'
-    },
-    HTTP_UNAUTHORIZED_INVALID_TOKEN: {
-        statusCode: 800,
-        message: 'Unauthorized! Token was invalid'
-    },
-    HTTP_TOKEN_OR_API_KEY_WAS_NOT_FOUND: {
-        statusCode: 801,
-        message: 'Token Or Api-Key was not found!'
-    },
-    HTTP_INVALID_JSON_OBJECT_KEY: {
-        statusCode: 802,
-        message: 'In valid json object key'
-    },
-    HTTP_USER_NOT_FOUND: {
-        statusCode: 803,
-        message: 'User Not Found'
-    },
-    HTTP_UNAUTHORIZED_INVALID_API_KEY: {
-        statusCode: 804,
-        message: 'Unauthorized! Invalid Api Key'
-    },
     HTTP_ACCESS_RESOURCE_ADMIN: {
         statusCode: 805,
         message: 'Access resource: admin'

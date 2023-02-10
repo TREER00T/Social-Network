@@ -19,7 +19,7 @@ export class GroupChatsController extends Group {
             .appService.getGroupNameFromListOfUserGroups(dto.roomId, this.userId);
 
         if (!hasFoundGroupNameInListOfUserGroups)
-            return Json.builder(Response.HTTP_USER_NOT_FOUND);
+            return Json.builder(Response.HTTP_NOT_FOUND);
 
         return await this.getListOfMessageFromRoom(dto,
             `${hasFoundGroupNameInListOfUserGroups}GroupContents`);

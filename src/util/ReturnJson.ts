@@ -1,5 +1,6 @@
 import {Response} from "express";
 import {IResponse} from "./Types";
+import {CUSTOM_HTTP_CODE} from './CustomHttpCode';
 
 // instance of response object express
 let res: Response;
@@ -10,7 +11,7 @@ export default {
         let jsonContent = JSON.parse(JSON.stringify(this.jsonObject(obj, data, option)));
         if (!res)
             return jsonContent;
-        res.status(obj.statusCode);
+        res.status(CUSTOM_HTTP_CODE.includes(obj.statusCode) ? 200 : obj.statusCode);
         return jsonContent;
     },
 

@@ -31,6 +31,8 @@ export class GroupAdminController extends Group {
 
     @Get("haveAccess")
     async userAccessResource(@Query("groupId") groupId: string) {
+        await this.init();
+
         let haveErr = await PromiseVerify.all([
             this.isUndefined(groupId),
             this.verifyUser(this.userId),

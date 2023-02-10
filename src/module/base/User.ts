@@ -33,7 +33,7 @@ export abstract class User extends HandleMessage {
         let isUserExist = await Find.isExist(userId);
 
         if (!isUserExist)
-            return Json.builder(Response.HTTP_USER_NOT_FOUND);
+            return Json.builder(Response.HTTP_NOT_FOUND);
 
         let hasLogout = await Find.hasLogout(this.userId);
 
