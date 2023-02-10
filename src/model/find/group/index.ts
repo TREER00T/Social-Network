@@ -32,7 +32,7 @@ export default {
 
     async isPublicKeyUsed(publicLink: string) {
 
-        let data = await group().find({
+        let data = await group().findOne({
             publicLink: publicLink
         }, {
             _id: 1

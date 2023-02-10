@@ -14,6 +14,8 @@ export default function UserProfile({
                                             bio,
                                             isActive,
                                             publicLink,
+                                            isAdmin,
+                                            isOwner,
                                             description,
                                             _id,
                                             activities,

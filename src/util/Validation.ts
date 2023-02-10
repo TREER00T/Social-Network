@@ -46,15 +46,15 @@ export default {
                     if (err instanceof TokenExpiredError) {
                         res("TOKEN_EXP");
                         if (response)
-                            response.send(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
-                        return Json.builder(Response.HTTP_UNAUTHORIZED_TOKEN_EXP);
+                            response.send(Response.HTTP_UNAUTHORIZED);
+                        return Json.builder(Response.HTTP_UNAUTHORIZED);
                     }
 
                     if (err instanceof JsonWebTokenError) {
                         res("IN_VALID_TOKEN");
                         if (response)
-                            response.send(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
-                        return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
+                            response.send(Response.HTTP_UNAUTHORIZED);
+                        return Json.builder(Response.HTTP_UNAUTHORIZED);
                     }
 
                     res(decoded);
@@ -79,8 +79,8 @@ export default {
 
             if (!decryptedVal?.plaintext) {
                 if (res)
-                    res.send(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
-                return Json.builder(Response.HTTP_UNAUTHORIZED_INVALID_TOKEN);
+                    res.send(Response.HTTP_UNAUTHORIZED);
+                return Json.builder(Response.HTTP_UNAUTHORIZED);
             }
 
             return token.replace(/["]+/g, "");

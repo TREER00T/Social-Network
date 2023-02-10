@@ -34,6 +34,8 @@ function ChatNavbar({
 
     const isSavedMessage = type === 'SA';
     const wrapperRef = useRef('navbar');
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isOwner, setIsOwner] = useState(false);
     const [openUserProfile, setOpenUserProfile] = useState(false);
     const [hasClickedSetting, setHasClickedSetting] = useState(false);
     const [hasMeBlockedByUser, setHasMeBlockedByUser] = useState(false);
@@ -77,12 +79,27 @@ function ChatNavbar({
             });
 
             let mapResult = {
-                210: setHasClickedBlockUserByMe(true),
-                211: setHasMeBlockedByUser(true)
+                210: () => setHasClickedBlockUserByMe(true),
+                211: () => setHasMeBlockedByUser(true)
             };
 
             if (data.statusCode === 404)
                 return;
+
+            mapResult[data.statusCode]();
+        }, handleResourceAccess = async () => {
+            let data = await resApi(`${type.toLowerCase()}/admins/haveAccess`, {
+                query: {
+                    [type === 'Group' ? 'groupId' : 'channelId']: _id
+                }
+            });
+
+            let mapResult = {
+                805: () => setIsAdmin(true),
+                806: () => setIsOwner(true),
+                403: () => {
+                }
+            };
 
             mapResult[data.statusCode]();
         };
@@ -94,6 +111,9 @@ function ChatNavbar({
     useEffect(() => {
         if (type === 'E2E')
             handleDisableOrEnableMessageForBlockedUser();
+
+        if (type === 'Group' || type === 'Channel')
+            handleResourceAccess();
     }, []);
 
     return (
@@ -112,6 +132,8 @@ function ChatNavbar({
                              publicLink,
                              isActive,
                              username,
+                             isOwner,
+                             isAdmin,
                              activities,
                              bio,
                              description,
@@ -159,7 +181,7 @@ function ChatNavbar({
                         <DropDownItem key="Clear Chat" name="Clear Chat" img={Trash}
                                       getHasClicked={handleClickedClearChat}/>
                         {
-                            type === 'Group' || type === 'Channel' ?
+                            (type === 'Group' || type === 'Channel') && (isOwner || isAdmin) ?
                                 <DropDownItem key="Setting" name="Setting" img={Setting}
                                               navigate={(<Navigate to={`/setting/${type.toLowerCase()}/${_id}`}/>)}
                                               getHasClicked={handleClickedSetting}/> : <></>

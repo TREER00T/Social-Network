@@ -19,7 +19,7 @@ export abstract class HandleMessage extends UserInput {
         let message = Util.validateMessage(msg);
 
         if (message === Util.IN_VALID_MESSAGE_TYPE || message === Util.IN_VALID_OBJECT_KEY)
-            return Json.builder(Response.HTTP_INVALID_JSON_OBJECT_KEY);
+            return Json.builder(Response.HTTP_UNSUPPORTED_MEDIA_TYPE);
 
         return message;
     }
