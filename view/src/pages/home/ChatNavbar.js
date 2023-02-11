@@ -7,7 +7,7 @@ import ImageButton from "component/ImageButton";
 import GridDotsMenu from "img/grid-dots.svg";
 import BackIcon from "img/arrow-left.svg";
 import BlockUser from "img/hand-stop.svg";
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {resApi} from "common/fetch";
 import Trash from "img/trash.svg";
 import Setting from "img/settings.svg";
@@ -30,28 +30,27 @@ function ChatNavbar({
                             type,
                             activities
                         },
+                        hasClickedBlockUser,
+                        hasClickedBlockUserByMe,
+                        handleClickedBlockUser,
+                        isOwner,
+                        isAdmin,
                         backButton
                     }) {
 
     const isSavedMessage = type === 'SA';
     const wrapperRef = useRef('navbar');
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [isOwner, setIsOwner] = useState(false);
     const [openUserProfile, setOpenUserProfile] = useState(false);
     const [hasClickedSetting, setHasClickedSetting] = useState(false);
-    const [hasMeBlockedByUser, setHasMeBlockedByUser] = useState(false);
     const [hasClickedCheckBox, setHasClickedCheckBox] = useState(false);
     const [hasClickedClearChat, setHasClickedClearChat] = useState(false);
-    const [hasClickedBlockUser, setHasClickedBlockUser] = useState(false);
     const [hasOpenedOptionMenu, setHasOpenedOptionMenu] = useState(false);
-    const [hasClickedBlockUserByMe, setHasClickedBlockUserByMe] = useState(false);
 
     const handleClickUserProfile = () => setOpenUserProfile(!openUserProfile),
         handleBackClick = () => backButton(),
         handleClickMenuOption = () => setHasOpenedOptionMenu(!hasOpenedOptionMenu),
         handleClickedClearChat = () => setHasClickedClearChat(!hasClickedClearChat),
         handleClickedSetting = () => setHasClickedSetting(!hasClickedSetting),
-        handleClickedBlockUser = () => setHasClickedBlockUser(!hasClickedBlockUser),
         handleClickCheckBoxForClearChatUs = () => setHasClickedCheckBox(!hasClickedCheckBox),
         handleAccessToClearChat = async d => {
             if (!d)
@@ -72,59 +71,11 @@ function ChatNavbar({
                     targetUserId: _id
                 }
             });
-        }, handleDisableOrEnableMessageForBlockedUser = async () => {
-            let data = await resApi('e2e/user/block', {
-                query: {
-                    targetUserId: _id
-                }
-            });
-
-            let mapResult = {
-                210: () => setHasClickedBlockUserByMe(true),
-                211: () => setHasMeBlockedByUser(true)
-            };
-
-            if (data.statusCode === 404)
-                return;
-
-            mapResult[data.statusCode]();
-        }, handleResourceAccess = async () => {
-            let data = await resApi(`${type.toLowerCase()}/admins/haveAccess`, {
-                query: {
-                    [type === 'Group' ? 'groupId' : 'channelId']: _id
-                }
-            });
-
-            let mapResult = {
-                805: () => setIsAdmin(true),
-                806: () => setIsOwner(true),
-                403: () => {
-                }
-            };
-
-            mapResult[data.statusCode]();
         };
 
     useOutsideAlerter(wrapperRef, () => {
         setHasOpenedOptionMenu(false);
     });
-
-    useEffect(() => {
-        socket.emit('onGroupSendMessage', {
-            roomId: _id,
-            type: 'None',
-            text: 'Hello'
-        });
-        socket.on('emitGroupSendMessageError', d => {
-            console.log(d)
-        })
-
-        if (type === 'E2E')
-            handleDisableOrEnableMessageForBlockedUser();
-
-        if (type === 'Group' || type === 'Channel')
-            handleResourceAccess();
-    }, []);
 
     return (
         <div className="flex items-center relative w-screen max-w-4xl pb-1" style={{

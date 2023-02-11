@@ -458,7 +458,13 @@ paths:
         - in: query
           name: userId
           type: string
-          required: true
+          required: false
+          description: It is required when username does not exist
+        - in: query
+          name: username
+          type: string
+          required: false
+          description: It is required when userId does not exist
       security:
         - apiKey: [ ]
         - token: [ ]

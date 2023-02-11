@@ -56,7 +56,7 @@ module.exports = {
 
     },
 
-    async findMany(filter, projection, name) {
+    async findMany(filter, projection, name, toArray) {
 
         if (filter?._id && !filter?._id?.$in)
             filter.id = new ObjectId(filter._id);
@@ -68,7 +68,8 @@ module.exports = {
 
         if (typeof projection === "string")
             result = await db.collection(projection.toLowerCase()).find(filter);
-        else
+
+        if (typeof name === 'string')
             result = await db.collection(name.toLowerCase()).find(filter, {
                 projection: projection
             });
@@ -76,7 +77,10 @@ module.exports = {
         if (typeof filter === "string")
             result = await db.collection(filter.toLowerCase()).find();
 
-        return result.toArray();
+        if (toArray || typeof name === 'boolean' || typeof projection === 'boolean')
+            return result;
+        else
+            return result.toArray();
 
     },
 
