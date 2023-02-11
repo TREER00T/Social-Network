@@ -75,6 +75,16 @@ type AuthMsgBelongingToBetweenTwoUsers = {
     toUser: string
 }
 
+type UserIdWithType = {
+    id: string,
+    type: string
+}
+
+type ListOfIdWithType = Array<{
+    id: string,
+    type: string // room type for example : channel, group, e2e, personal
+}>
+
 type HasOwner = 0 | 1;
 
 export {
@@ -89,10 +99,12 @@ export {
     IResponse,
     TToken,
     RoomId,
+    UserIdWithType,
     ListOfAdmin,
     TUserDeviceInfo,
     TTokenWithApiKey,
     TSaveMessage,
+    ListOfIdWithType,
     ListOfUserTableChat,
     AuthMsgBelongingToBetweenTwoUsers,
     JsonObject

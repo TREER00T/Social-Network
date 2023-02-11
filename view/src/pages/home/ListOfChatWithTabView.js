@@ -59,10 +59,10 @@ function Item({
 
 export default function ListOfChatWithTabView({dataSearched, getItemData}) {
 
-    const [userActivities, setUserActivities] = useState([]);
-    const [stateUserActivities, setStateUserActivities] = useState([]);
     const [cookies] = useCookies(['phone']);
     const [haveActivity, setHaveActivity] = useState(false);
+    const [userActivities, setUserActivities] = useState([]);
+    const [stateUserActivities, setStateUserActivities] = useState([]);
 
 
     const handleUserActivities = async d => {

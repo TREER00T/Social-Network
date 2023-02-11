@@ -41,7 +41,7 @@ export class PersonalMessageController extends SavedMessage {
             InputException(e);
         }
 
-        if (Util.isUndefined(messageIdOrListOfMessageId))
+        if (!Util.isNotEmptyArr(messageIdOrListOfMessageId))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
         let haveErr = await PromiseVerify.all([

@@ -6,6 +6,7 @@ import {resApi} from "common/fetch";
 import {getRoomType, getRoomId} from "util/Utils";
 import EditText from "component/EditText";
 import Button from "component/Button";
+import {Checkbox} from "@material-tailwind/react";
 
 
 export default function RoomSettingActivity() {
@@ -16,6 +17,8 @@ export default function RoomSettingActivity() {
     const [cookies] = useCookies(['apiKey']);
     const [roomInfo, setRoomInfo] = useState({});
     const [description, setDescription] = useState('');
+    const [hasRoomDelete, setHasRoomDelete] = useState(false);
+    const [hasClickedCheckBoxForDeleteRoom, setHasClickedCheckBoxForDeleteRoom] = useState(false);
 
     const handleChangeImage = e => {
             if (e.target.files.length > 0) {
@@ -66,7 +69,18 @@ export default function RoomSettingActivity() {
                 });
 
         }, handleDescription = d => setDescription(d),
-        handleName = d => setName(d);
+        handleName = d => setName(d),
+        handleClickedCheckBoxForDeleteRoom = () => setHasClickedCheckBoxForDeleteRoom(!hasClickedCheckBoxForDeleteRoom),
+        handleDeleteRoomRequest = async () => {
+            await resApi(`${roomType}`, {
+                method: 'DELETE',
+                body: {
+                    [roomType === 'group' ? 'groupId' : 'channelId']: getRoomId()
+                }
+            });
+
+            setHasRoomDelete(true);
+        };
 
     useEffect(() => {
         response();
@@ -116,6 +130,25 @@ export default function RoomSettingActivity() {
                     </div>
                 </div>
 
+                <div className="flex flex-col">
+                    <div className="my-7">
+                        <span className="font-bold text-2xl text-blue-100">Delete Room</span>
+                    </div>
+                    <span className="font-bold text-me text-gray-600 mb-3">
+                        All your information will be deleted from the database and you will no longer be able to access the deleted information,
+                        Do you agree with this?
+                    </span>
+                    <Checkbox color="blue" label="Agree" onClick={handleClickedCheckBoxForDeleteRoom}/>
+                    <Button className="w-44 mt-3"
+                            color="red" onClick={handleDeleteRoomRequest}
+                            disabled={!hasClickedCheckBoxForDeleteRoom}>Delete Room</Button>
+                </div>
+
+                {
+                    hasRoomDelete ?
+                        <Navigate to="/home"/>
+                        : <></>
+                }
             </SettingSidebar>
         </div>
     )

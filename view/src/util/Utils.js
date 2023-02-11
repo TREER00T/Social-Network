@@ -110,6 +110,22 @@ export function getRoomId() {
     return urlPath.split('/')[3];
 }
 
+export const imageFormats = [
+    "JPEG",
+    "PNG",
+    "SVG"
+];
+
+export const videoFormats = [
+    "GIF",
+    "MP4",
+    "MKV"
+];
+
+export function getFileFormat(d) {
+    return d.match(/.*\.([A-Za-z0-9]+)/)[1].toUpperCase();
+}
+
 export const assign = (o, t) => o ? o.map(d => Object.assign(d, {type: t})) : [];
 
 export const dataComposition = data =>

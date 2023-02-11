@@ -3,6 +3,7 @@ import {E2EUserInfoService} from './E2EUserInfo.service';
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
 import {User} from "../../base/User";
+import {UserIdDto} from "./UserId.dto";
 
 @Controller()
 export class E2EUserInfoController extends User {
@@ -11,8 +12,13 @@ export class E2EUserInfoController extends User {
     }
 
     @Get()
-    async userInfo(@Query("userId") userId: string) {
+    async userInfo(@Query() dto: UserIdDto) {
         await this.init();
+
+        let userId = await this.handleUserId(dto);
+
+        if (userId?.statusCode)
+            return userId;
 
         let haveErr = await this.verifyUser(userId);
 

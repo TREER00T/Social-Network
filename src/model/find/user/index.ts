@@ -2,7 +2,13 @@ import {ObjectId} from "mongodb";
 import Util from '../../../util/Util';
 import FindInGroup from '../../../model/find/group';
 import FindInChannel from '../../../model/find/channel';
-import {AuthMsgBelongingToBetweenTwoUsers, ListOfAdmin, ListOfUserId, ListOfUserTargetId} from "../../../util/Types";
+import {
+    AuthMsgBelongingToBetweenTwoUsers,
+    ListOfAdmin,
+    ListOfUserId,
+    ListOfUserTargetId,
+    UserIdWithType
+} from "../../../util/Types";
 
 let {
         haveCollection,
@@ -146,11 +152,21 @@ export default {
 
     },
 
-    async isExist(userId: string) {
+    async isExist(userId: string | UserIdWithType) {
 
-        let data = await user().findById(userId, {
-            _id: 1
-        });
+        let data;
+
+        if (typeof userId === 'string') {
+            data = await user().findById(userId, {
+                _id: 1
+            });
+        } else {
+            data = await user().findOne({
+                [userId.type]: userId.id
+            }, {
+                _id: 1
+            });
+        }
 
         return data?._id?.toString();
 
@@ -163,7 +179,7 @@ export default {
                 [data.order === 'id' ? '_id' : data.order]: data.sort?.toLowerCase()
             });
 
-            queryResult.limit(data.limit);
+            query.limit(data.limit);
 
             if (data.startFrom !== 0)
                 query.skip(data.startFrom);
@@ -199,7 +215,7 @@ export default {
 
             let queryResult = await findMany({
                 type: data.type
-            }, data.tableName);
+            }, data.tableName, true);
 
             return queryFilter(queryResult);
         }
@@ -208,12 +224,12 @@ export default {
 
             let queryResult = await findMany({
                 text: {$regex: new RegExp(data.search)}
-            }, data.tableName);
+            }, data.tableName, true);
 
             return queryFilter(queryResult);
         }
 
-        let queryResult = await findMany(data.tableName);
+        let queryResult = await findMany(data.tableName, true);
 
         return queryFilter(queryResult);
 
@@ -225,10 +241,9 @@ export default {
 
     },
 
-    async getUserPvDetails(userId: string) {
-
-        return await user().findById(userId, {
-            _id: 0,
+    async getUserPvDetails(userId: string | UserIdWithType) {
+        let projection = {
+            _id: 1,
             bio: 1,
             img: 1,
             name: 1,
@@ -236,8 +251,12 @@ export default {
             username: 1,
             lastName: 1,
             defaultColor: 1
-        });
+        };
 
+        if (typeof userId === 'string')
+            return await user().findById(userId, projection);
+
+        return await user().findOne({[userId.type]: userId.id}, projection);
     },
 
 

@@ -42,8 +42,8 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
         let socket = await Redis.get(await this.getUserId(socketId));
 
         if (socket?.group || socket?.channel) {
-            socket?.group.forEach(id => client.leave(id));
-            socket?.channel.forEach(id => client.leave(id));
+            socket?.group?.forEach(id => client.leave(id));
+            socket?.channel?.forEach(id => client.leave(id));
         }
 
         this.users.delete(socketId);

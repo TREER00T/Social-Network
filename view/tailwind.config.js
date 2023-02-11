@@ -7,7 +7,7 @@ module.exports = withMT({
     ],
     theme: {
         maxWidth: {
-            '4xl': '950px',
+            '4xl': '950px'
         },
         colors: {
             white: 'white',
@@ -26,13 +26,21 @@ module.exports = withMT({
             gray: {
                 80: '#f1f1f1',
                 100: '#e7e7e7',
+                110: '#eaeaea',
                 600: '#707070',
                 700: '#565656',
                 750: '#3a3d3d',
                 900: '#242526'
             }
         },
-        extend: {}
+        extend: {
+            spacing: {
+                21: '11%'
+            },
+            height: {
+                '45': '500px'
+            }
+        }
     },
     plugins: []
 })

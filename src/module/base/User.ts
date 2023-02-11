@@ -5,11 +5,12 @@ import {HandleMessage} from "./HandleMessage";
 import PromiseVerify from "./PromiseVerify";
 import File from "../../util/File";
 import OptionQuerySearch from "../../util/OptionQuerySearch";
-import {ListOfAdmin, ListOfUserTargetId, MessagePayload} from "../../util/Types";
+import {ListOfAdmin, ListOfUserTargetId, MessagePayload, UserIdWithType} from "../../util/Types";
 import CommonInsert from "../../model/add/common";
 import Find from "../../model/find/user";
 import {PersonalDataQuery} from "./dto/PersonalDataQuery";
 import {RoomDataQuery} from "./dto/RoomDataQuery";
+import {UserIdDto} from "../e2e/info/UserId.dto";
 
 export abstract class User extends HandleMessage {
 
@@ -22,7 +23,7 @@ export abstract class User extends HandleMessage {
         this.phoneNumber = tokenPayload.phoneNumber;
     }
 
-    async verifyUser(userId) {
+    async verifyUser(userId: string | UserIdWithType) {
         let haveErr = await PromiseVerify.all([
             this.isUndefined(userId)
         ]);
@@ -72,6 +73,21 @@ export abstract class User extends HandleMessage {
 
     async userDetails(listOfUserId: ListOfUserTargetId | ListOfAdmin) {
         return await Find.getUserDetailsInUsersTable(listOfUserId);
+    }
+
+    async handleUserId(dto: UserIdDto) {
+        if (Util.isUndefined(dto?.userId) && Util.isUndefined(dto?.username))
+            return Json.builder(Response.HTTP_BAD_REQUEST);
+
+        let data;
+
+        if (dto?.userId)
+            data = {type: '_id', id: dto.userId};
+
+        if (dto?.username)
+            data = {type: 'username', id: dto.username};
+
+        return data;
     }
 
 }

@@ -29,5 +29,6 @@ export class DataQuery {
     @IsString()
     @IsNotEmpty()
     @Length(1)
-    search: string;
+    @IsOptional()
+    search?: string;
 }
