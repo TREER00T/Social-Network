@@ -120,6 +120,7 @@ export class GroupController extends AbstractGroup {
 
         this.emitToSpecificSocket(groupId, 'emitGroupDeleteMessage', Response.HTTP_OK);
 
+        await this.deleteOldFiles('group', groupId, listOfId);
         await this.removeMessage(`${groupId}GroupContents`, listOfId);
     }
 

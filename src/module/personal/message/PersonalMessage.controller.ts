@@ -51,6 +51,7 @@ export class PersonalMessageController extends SavedMessage {
         if (haveErr)
             return haveErr;
 
+        await this.appService.deleteOldFile(this.userId, messageIdOrListOfMessageId);
         await this.appService.removeMessageOrListOfMessage(this.userId, messageIdOrListOfMessageId);
 
         return Json.builder(Response.HTTP_OK);

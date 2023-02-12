@@ -5,12 +5,19 @@ import {HandleMessage} from "./HandleMessage";
 import PromiseVerify from "./PromiseVerify";
 import File from "../../util/File";
 import OptionQuerySearch from "../../util/OptionQuerySearch";
-import {ListOfAdmin, ListOfUserTargetId, MessagePayload, UserIdWithType} from "../../util/Types";
+import {
+    ListOfAdmin, ListOfFileUrl,
+    ListOfUserTargetId,
+    MessagePayload, RoomType,
+    RoomTypeWithOutE2E,
+    UserIdWithType
+} from "../../util/Types";
 import CommonInsert from "../../model/add/common";
 import Find from "../../model/find/user";
 import {PersonalDataQuery} from "./dto/PersonalDataQuery";
 import {RoomDataQuery} from "./dto/RoomDataQuery";
 import {UserIdDto} from "../e2e/info/UserId.dto";
+import FindInUser from "../../model/find/user";
 
 export abstract class User extends HandleMessage {
 
@@ -88,6 +95,19 @@ export abstract class User extends HandleMessage {
             data = {type: 'username', id: dto.username};
 
         return data;
+    }
+
+    async deleteOldFile(type: RoomTypeWithOutE2E, roomId?: string) {
+        let url = await Find.getAvatarUploadedUrl(type, roomId);
+        await File.deleteOldFile(url);
+    }
+
+    async deleteOldFileWhenAdminWantToDeleteRoom(roomType: RoomType, roomId: string) {
+        let listOfUrl: ListOfFileUrl = await FindInUser.getListOfUploadedFileUrl(roomType, roomId);
+
+        listOfUrl.map(async d => {
+            await File.deleteOldFile(d.fileUrl);
+        });
     }
 
 }

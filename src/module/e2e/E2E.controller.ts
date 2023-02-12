@@ -37,6 +37,7 @@ export class E2EController extends E2EMessage {
             return haveErr;
 
         await this.appService.deleteChatForUs(roomId, this.userId, targetUserId);
+        await this.deleteOldFileWhenAdminWantToDeleteRoom('e2e', roomId);
 
         return Json.builder(Response.HTTP_OK);
     }

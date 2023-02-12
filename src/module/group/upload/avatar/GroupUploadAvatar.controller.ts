@@ -27,6 +27,8 @@ export class GroupUploadAvatarController extends Group {
         if (haveErr)
             return haveErr;
 
+        await this.deleteOldFile('group', groupId);
+
         let FileGenerated = await File.validationAndWriteFile({
             size: avatar.size,
             dataBinary: avatar.buffer,

@@ -6,6 +6,9 @@ type JsonObject = { [key: string]: any }
 type TToken = { accessToken: string, refreshToken: string }
 type TTokenWithApiKeyAndUserId = { accessToken: string, refreshToken: string, apiKey: string, userId: string }
 
+type RoomTypeWithOutE2E = 'personal' | 'group' | 'channel';
+type RoomType = 'e2e' | 'personal' | 'group' | 'channel';
+
 type UserId = {
     userId: string
 }
@@ -89,6 +92,8 @@ type ListOfIdWithType = Array<{
     type: string // room type for example : channel, group, e2e, personal
 }>
 
+type ListOfFileUrl = Array<{fileUrl:string}>;
+
 type HasOwner = 0 | 1;
 
 export {
@@ -105,6 +110,9 @@ export {
     RoomId,
     UserId,
     UserIdWithType,
+    RoomType,
+    ListOfFileUrl,
+    RoomTypeWithOutE2E,
     ListOfAdmin,
     TUserDeviceInfo,
     TTokenWithApiKeyAndUserId,
