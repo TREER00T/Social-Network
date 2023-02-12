@@ -50,6 +50,7 @@ export class GroupController extends Group {
         if (haveErr)
             return haveErr;
 
+        await this.deleteOldFileWhenAdminWantToDeleteRoom('group', groupId);
         await this.appService.removeGroup(groupId);
 
         return Json.builder(Response.HTTP_OK);

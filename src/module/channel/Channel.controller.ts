@@ -51,6 +51,7 @@ export class ChannelController extends Channel {
             return haveErr;
 
         await this.appService.removeChannel(channelId);
+        await this.deleteOldFileWhenAdminWantToDeleteRoom('channel', channelId);
 
         return Json.builder(Response.HTTP_OK);
     }

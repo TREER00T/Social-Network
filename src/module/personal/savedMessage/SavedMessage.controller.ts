@@ -40,6 +40,7 @@ export class SavedMessageController extends SavedMessage {
 
         await this.appService.removeSavedMessage(this.userId);
 
+        await this.deleteOldFileWhenAdminWantToDeleteRoom('personal', this.userId);
         return Json.builder(Response.HTTP_OK);
     }
 }

@@ -1,4 +1,5 @@
 import {RoomId} from "../../../util/Types";
+import {findMany} from "../../../database/mongoDbDriverConnection";
 
 let {
         group,
@@ -153,6 +154,25 @@ export default {
             adminId: 1
         });
 
-    }
+    },
 
+    async getAvatarUrl(groupId: string) {
+
+        let data = await group().findById(groupId, {
+            _id: 0,
+            img: 1
+        });
+
+        return data?.img;
+
+    },
+
+    async getListOfFileUrl(listOfId: string[], groupId: string) {
+        return await findMany(listOfId.length > 0 ? {
+            _id: {$in: listOfId}
+        } : {fileUrl: {$ne: null}}, {
+            _id: 0,
+            fileUrl: 1
+        }, `${groupId}GroupContents`);
+    }
 }

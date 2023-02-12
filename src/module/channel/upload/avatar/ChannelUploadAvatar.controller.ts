@@ -27,6 +27,8 @@ export class ChannelUploadAvatarController extends Channel {
         if (haveErr)
             return haveErr;
 
+        await this.deleteOldFile('channel', channelId);
+
         let FileGenerated = await File.validationAndWriteFile({
             size: avatar.size,
             dataBinary: avatar.buffer,

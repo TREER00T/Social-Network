@@ -21,6 +21,8 @@ export class PersonalUploadAvatarController extends User {
         if (Util.isUndefined(avatar))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
+        await this.deleteOldFile('personal', this.userId);
+
         let FileGenerated = await File.validationAndWriteFile({
             size: avatar.size,
             dataBinary: avatar.buffer,

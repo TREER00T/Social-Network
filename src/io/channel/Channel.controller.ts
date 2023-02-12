@@ -123,6 +123,7 @@ export class ChannelController extends AbstractChannel {
 
         this.emitToSpecificSocket(channelId, 'emitChannelDeleteMessage', Response.HTTP_OK);
 
+        await this.deleteOldFiles('channel', channelId, listOfId);
         await this.removeMessage(`${channelId}ChannelContents`, listOfId);
     }
 

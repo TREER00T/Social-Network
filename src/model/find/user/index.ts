@@ -6,7 +6,7 @@ import {
     AuthMsgBelongingToBetweenTwoUsers,
     ListOfAdmin,
     ListOfUserId,
-    ListOfUserTargetId,
+    ListOfUserTargetId, RoomType, RoomTypeWithOutE2E,
     UserIdWithType
 } from "../../../util/Types";
 
@@ -176,7 +176,7 @@ export default {
 
         const queryFilter = async queryResult => {
             let query = await queryResult.sort({
-                [data.order]: data.sort?.toLowerCase()
+                [data.order]: data.sort?.toLowerCase() === 'asc' ? -1 : 1
             });
 
             if (data.limit > 1)
@@ -507,6 +507,56 @@ export default {
         let data = await user().findById(userId);
 
         return data?.hasLogout;
-    }
+    },
 
+    async getAvatarUrlFromPersonal(userId: string) {
+        let data = await user().findById(userId, {
+            _id: 0,
+            img: 1
+        });
+
+        return data?.img;
+    },
+
+    async getAvatarUploadedUrl(type: RoomTypeWithOutE2E, id: string) {
+        if (type === 'group')
+            return await FindInGroup.getAvatarUrl(id);
+
+        if (type === 'channel')
+            return await FindInChannel.getAvatarUrl(id);
+
+        return await this.getAvatarUrlFromPersonal(id);
+    },
+
+
+    async getListOfUploadedFileUrl(roomType: RoomType, roomId: string, listOfId?: string[]) {
+        if (roomType === 'e2e')
+            return await this.getListOfFileUrlFromE2E(listOfId, roomId);
+
+        if (roomType === 'group')
+            return await FindInGroup.getListOfFileUrl(listOfId, roomId);
+
+        if (roomType === 'channel')
+            return await FindInChannel.getListOfFileUrl(listOfId, roomId);
+
+        return await this.getListOfFileUrlFromPersonal(listOfId, roomId);
+    },
+
+    async getListOfFileUrlFromPersonal(listOfId: string[], userId: string) {
+        return await findMany(listOfId.length > 0 ? {
+            _id: {$in: listOfId}
+        } : {fileUrl: {$ne: null}}, {
+            _id: 0,
+            fileUrl: 1
+        }, `${userId}SavedMessage`);
+    },
+
+    async getListOfFileUrlFromE2E(listOfId: string[], roomId: string) {
+        return await findMany(listOfId.length > 0 ? {
+            _id: {$in: listOfId}
+        } : {fileUrl: {$ne: null}}, {
+            _id: 0,
+            fileUrl: 1
+        }, `${roomId}E2EContents`);
+    }
 }

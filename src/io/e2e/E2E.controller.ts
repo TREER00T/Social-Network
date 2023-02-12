@@ -133,6 +133,7 @@ export class E2EController extends AbstractRoom {
 
         this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvDeleteMessage', Response.HTTP_OK);
 
+        await this.deleteOldFiles('e2e', roomId, listOfId);
         await this.removeMessage(roomId, listOfId);
     }
 

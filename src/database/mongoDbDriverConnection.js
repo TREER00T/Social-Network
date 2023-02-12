@@ -84,6 +84,25 @@ module.exports = {
 
     },
 
+
+    async findOne(filter, projection, name) {
+
+        if (filter?._id)
+            filter.id = new ObjectId(filter._id);
+
+        let result;
+
+        if (typeof projection === "string")
+            result = await db.collection(projection.toLowerCase()).findOne(filter);
+
+        if (typeof name === 'string')
+            result = await db.collection(name.toLowerCase()).findOne(filter, {
+                projection: projection
+            });
+
+        return result.toArray();
+    },
+
     async haveCollection(name) {
 
         return new Promise(res => {

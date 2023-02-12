@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {resApi} from "common/fetch";
 import {useCookies} from "react-cookie";
 
@@ -33,12 +33,13 @@ function Item({
     const [cookies] = useCookies(['userId']);
     const isFile = type === 'Video' || type === 'Document';
     const haveText = text && type === 'None';
-    const isMyMessage = cookies.userId === messageCreatedBySenderId || cookies.userId === forwardData?._id
+    const isMyMessage = cookies.userId === messageCreatedBySenderId || cookies.userId === forwardData?._id;
 
     return (
-        <div>
+        <div className="mx-2 my-3 ml-auto">
             {
-                haveText ? <span className="bg-gray-50">{text}</span> : <></>
+                haveText ? <span
+                    className={`p-2 rounded-t-xl ${isMyMessage ? 'rounded-bl-xl rounded-br bg-gray-110' : 'rounded-bl rounded-br-xl bg-blue-100 text-white'}`}>{text}</span> : <></>
             }
         </div>
     )
@@ -62,6 +63,7 @@ function ChatContent({
                          socket
                      }) {
 
+    const lastMessageRef = useRef(null);
     const [roomContent, setRoomContent] = useState([]);
     const [contentNotFound, setContentNotFound] = useState(false);
 
@@ -74,7 +76,7 @@ function ChatContent({
         }
 
         setRoomContent(data);
-    }, handleSendMessageInfoSavedMessage = async () => {
+    }, handleSendMessageIntoSavedMessage = async () => {
         if (inputMessage?.data) {
             await resApi('personal/message', {
                 method: 'post',
@@ -86,6 +88,8 @@ function ChatContent({
                 method: 'POST',
                 body: inputMessage
             });
+
+        setRoomContent([...roomContent, inputMessage]);
     };
 
     useEffect(() => {
@@ -96,14 +100,21 @@ function ChatContent({
         }
     }, []);
 
-    if (inputMessage?.type || inputMessage?.data)
-        handleSendMessageInfoSavedMessage();
+
+    useEffect(() => {
+        lastMessageRef.current?.scrollIntoView({behavior: 'smooth'});
+
+        if (inputMessage?.type || inputMessage?.data)
+            handleSendMessageIntoSavedMessage();
+    }, [inputMessage]);
+
 
     return (
         <div className="flex flex-col absolute overflow-y-auto h-45 top-21 left-0 right-0 pb-3">
             {
                 roomContent.map((d, i) => <Item data={d} key={i}/>)
             }
+            <ChatContent/>
         </div>
     );
 

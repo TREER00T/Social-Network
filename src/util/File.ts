@@ -109,6 +109,22 @@ export default {
         }
 
         return !!isExistFolder;
+    },
+
+    async deleteOldFile(url: string) {
+        if (!url)
+            return;
+
+        let path = url.split('/');
+        let fileName = path.at(-1);
+        let fileType = path.at(-2);
+        let filePath = `${cacheFolderPath}${fileType.toLowerCase()}/${fileName}`;
+
+        let isExistFolder = this.isExistFolder();
+
+        if (isExistFolder)
+            fs.promises.stat(filePath)
+                .then(async () => await fs.promises.unlink(filePath));
     }
 
 }
