@@ -1,5 +1,3 @@
-import Util from "./Util";
-
 export default {
 
     build(obj: any) {
@@ -10,11 +8,11 @@ export default {
             sort = obj?.sort,
             type = obj?.type,
             search = obj?.search,
-            getLimit = !Util.isUndefined(limit) ? limit : 1,
-            getSort = !Util.isUndefined(sort) ? sort : 'DESC',
-            getOrder = !Util.isUndefined(order) ? order : 'id',
-            getPage = !Util.isUndefined(page) ? page : 1,
-            startFrom = (getPage - 1) * limit;
+            getLimit = Number(limit ?? 1),
+            getSort = sort ?? 'DESC',
+            getOrder = order ?? '_id',
+            getPage = Number(page ?? 1),
+            startFrom = (getPage - 1) * getLimit;
 
         return {
             type: type,

@@ -28,6 +28,6 @@ export class TwoStepController extends User {
         await this.appService.logoutUser(this.phoneNumber);
 
         return Json.builder(Response.HTTP_ACCEPTED,
-            await this.appService.getUserApiKey(this.phoneNumber, dto, req.ip, req.headers['user-agent']));
+            await this.appService.getUserApiKeyWithUserId(this.phoneNumber, dto, req.ip, req.headers['user-agent']));
     }
 }

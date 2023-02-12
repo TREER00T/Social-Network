@@ -11,8 +11,9 @@ export class UserProfileService {
         await Update.name(userPhone, dto.firstName, dto?.lastName ? dto.lastName : '');
     }
 
-    async getApiKey(userPhone: string) {
-        return await Find.getApiKey(userPhone);
+    async getApiKeyWithUserId(userPhone: string) {
+        let data = await Find.getApiKeyAndUserId(userPhone);
+        return {apiKey: data.apiKey, userId: data._id};
     }
 
 }

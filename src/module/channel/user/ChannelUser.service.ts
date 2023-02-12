@@ -1,10 +1,10 @@
 import {Injectable} from '@nestjs/common';
-import {UserId} from "../../base/dto/User";
 import Insert from "../../../model/add/channel";
 import DeleteInUser from "../../../model/remove/user";
 import FindInUser from "../../../model/find/user";
 import Find from "../../../model/find/channel";
 import InsertInUser from "../../../model/add/user";
+import {UserId} from "../../../util/Types";
 
 let Delete = require("../../../model/remove/channel");
 

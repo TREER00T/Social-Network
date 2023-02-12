@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {UserId} from "../../base/dto/User";
+import {UserId} from "../../../util/Types";
 import Insert from "../../../model/add/group";
 import DeleteInUser from "../../../model/remove/user";
 import FindInUser from "../../../model/find/user";

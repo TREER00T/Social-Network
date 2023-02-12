@@ -1,4 +1,5 @@
 import {IsBoolean, IsNotEmpty, IsOptional, IsString} from "class-validator";
+import {Type} from "class-transformer";
 
 export class Message {
     @IsOptional()
@@ -10,10 +11,12 @@ export class Message {
     @IsNotEmpty()
     type: string;
 
+    @Type(() => Boolean)
     @IsBoolean()
     @IsOptional()
     isReply?: boolean;
 
+    @Type(() => Boolean)
     @IsBoolean()
     @IsOptional()
     isForward?: boolean;

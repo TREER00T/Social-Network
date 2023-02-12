@@ -59,6 +59,15 @@ export function getAuthExpirePayload(data) {
             }
         });
 
+    if (data?.userId)
+        result.push({
+            key: 'userId',
+            value: data.userId,
+            option: {
+                expires: getExpireTime()
+            }
+        });
+
     return result;
 }
 
@@ -123,7 +132,7 @@ export const videoFormats = [
 ];
 
 export function getFileFormat(d) {
-    return d.match(/.*\.([A-Za-z0-9]+)/)[1].toUpperCase();
+    return d?.match(/.*\.([A-Za-z0-9]+)/)?.[1]?.toUpperCase();
 }
 
 export const assign = (o, t) => o ? o.map(d => Object.assign(d, {type: t})) : [];

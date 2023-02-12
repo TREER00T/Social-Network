@@ -12,7 +12,7 @@ export class TwoStepService {
         return await Find.isValidPassword(userPhone, Generate.getHashData(password.trim(), userPhone));
     }
 
-    async getUserApiKey(userPhone: string, dto: TwoStepDto, deviceIp: string, deviceName: string) {
+    async getUserApiKeyWithUserId(userPhone: string, dto: TwoStepDto, deviceIp: string, deviceName: string) {
 
         let user = await Find.getApiKeyAndUserId(userPhone);
 
@@ -23,7 +23,8 @@ export class TwoStepService {
         })
 
         return {
-            apiKey: user.apiKey
+            apiKey: user.apiKey,
+            userId: user._id
         }
 
     }
