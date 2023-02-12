@@ -176,39 +176,38 @@ export default {
 
         const queryFilter = async queryResult => {
             let query = await queryResult.sort({
-                [data.order === 'id' ? '_id' : data.order]: data.sort?.toLowerCase()
+                [data.order]: data.sort?.toLowerCase()
             });
 
-            query.limit(data.limit);
+            if (data.limit > 1)
+                query.limit(data.limit);
 
-            if (data.startFrom !== 0)
+            if (data.startFrom > 1)
                 query.skip(data.startFrom);
 
             let result = await query.toArray();
 
-            return result.map(async d => {
-                if (!d?.messageCreatedBySenderId || !d?.messageSentRoomId)
-                    return d;
-
-                let haveFromE2ERoom = /(.*?)E2EContents/.test(d.messageSentRoomId);
+            for (let i in result) {
+                let d = result[i];
                 let haveFromGroupRoom = /(.*?)GroupContents/.test(d.messageSentRoomId);
                 let haveFromChannelRoom = /(.*?)ChannelContents/.test(d.messageSentRoomId);
-                let haveFromPersonalRoom = /(.*?)SavedMessage/.test(d.messageSentRoomId);
 
                 const getChannelInfo = async () => await FindInChannel.getInfo(d.messageSentRoomId),
                     getUserInfo = async () => await this.getUserPvDetails(d.messageCreatedBySenderId);
 
-                if (haveFromPersonalRoom || haveFromGroupRoom || haveFromE2ERoom)
-                    d.forwardData = await getUserInfo();
+                if (haveFromGroupRoom)
+                    result[i].forwardData = await getUserInfo();
 
                 if (haveFromChannelRoom)
-                    d.forwardData = await getChannelInfo();
+                    result[i].forwardData = await getChannelInfo();
 
-                delete d.messageCreatedBySenderId;
-                delete d.messageSentRoomId;
+                if (haveFromGroupRoom || haveFromGroupRoom) {
+                    delete result[i].messageCreatedBySenderId;
+                    delete result[i].messageSentRoomId;
+                }
+            }
 
-                return d;
-            });
+            return result;
         }
 
         if (data.type) {
@@ -217,7 +216,7 @@ export default {
                 type: data.type
             }, data.tableName, true);
 
-            return queryFilter(queryResult);
+            return await queryFilter(queryResult);
         }
 
         if (data.search) {
@@ -226,12 +225,12 @@ export default {
                 text: {$regex: new RegExp(data.search)}
             }, data.tableName, true);
 
-            return queryFilter(queryResult);
+            return await queryFilter(queryResult);
         }
 
         let queryResult = await findMany(data.tableName, true);
 
-        return queryFilter(queryResult);
+        return await queryFilter(queryResult);
 
     },
 

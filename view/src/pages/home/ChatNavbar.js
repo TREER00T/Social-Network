@@ -58,9 +58,14 @@ function ChatNavbar({
 
             backButton();
 
-            await resApi(`e2e/${_id}/${hasClickedCheckBox ? 'us' : 'me'}`, {
-                method: 'DELETE'
-            });
+            if (type === 'SA')
+                await resApi('personal/savedMessage', {
+                    method: 'DELETE'
+                });
+            else
+                await resApi(`e2e/${_id}/${hasClickedCheckBox ? 'us' : 'me'}`, {
+                    method: 'DELETE'
+                });
         }, handleAccessToBlockUser = async d => {
             if (!d)
                 return;
@@ -137,10 +142,18 @@ function ChatNavbar({
             {
                 hasOpenedOptionMenu ?
                     <DropdownMenu className="inset-y-3 right-0 mr-3">
-                        <DropDownItem key="Block User" name="Block User" img={BlockUser}
-                                      getHasClicked={handleClickedBlockUser}/>
-                        <DropDownItem key="Clear Chat" name="Clear Chat" img={Trash}
-                                      getHasClicked={handleClickedClearChat}/>
+                        {
+                            type === 'Group' || type === 'Channel' || type === 'SA' ?
+                                <></> :
+                                <DropDownItem key="Block User" name="Block User" img={BlockUser}
+                                              getHasClicked={handleClickedBlockUser}/>
+                        }
+                        {
+                            type === 'Group' || type === 'Channel' ?
+                                <></> :
+                                <DropDownItem key="Clear Chat" name="Clear Chat" img={Trash}
+                                              getHasClicked={handleClickedClearChat}/>
+                        }
                         {
                             (type === 'Group' || type === 'Channel') && (isOwner || isAdmin) ?
                                 <DropDownItem key="Setting" name="Setting" img={Setting}
@@ -154,7 +167,10 @@ function ChatNavbar({
                 handler={handleClickedClearChat}
                 accessToNavigate={hasClickedClearChat}
                 getAccessToAction={handleAccessToClearChat}>
-                <Checkbox label="Remove chat for us" onClick={handleClickCheckBoxForClearChatUs}/>
+                {
+                    type === 'SA' ? 'Remove Saved Message' :
+                        <Checkbox label="Remove chat for us" onClick={handleClickCheckBoxForClearChatUs}/>
+                }
             </AgreeDialog>
 
             <AgreeDialog

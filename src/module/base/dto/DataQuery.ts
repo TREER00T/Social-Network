@@ -1,14 +1,15 @@
-import {IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, Length} from "class-validator";
+import {IsInt, IsNotEmpty, IsOptional, IsString, Length} from "class-validator";
+import {Type} from "class-transformer";
 
 export class DataQuery {
+    @Type(() => Number)
     @IsOptional()
     @IsInt()
-    @IsPositive()
     limit?: number;
 
+    @Type(() => Number)
     @IsOptional()
     @IsInt()
-    @IsPositive()
     page?: number;
 
     @IsString()

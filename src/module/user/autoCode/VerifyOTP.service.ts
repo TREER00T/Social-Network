@@ -4,7 +4,7 @@ import Generate from "../../../util/Generate";
 import Device from "../../base/Device";
 import Token from "../../../util/Token";
 import Find from "../../../model/find/user";
-import {TTokenWithApiKey, TToken} from "../../../util/Types";
+import {TTokenWithApiKeyAndUserId, TToken} from "../../../util/Types";
 
 let Update = require("../../../model/update/user")
 
@@ -30,7 +30,7 @@ export class VerifyOTPService {
 
     }
 
-    async generateTokenAndAddDeviceInfo(dto: VerifyOTPDto, deviceIp: string, deviceName: string): Promise<TTokenWithApiKey> {
+    async generateTokenAndAddDeviceInfo(dto: VerifyOTPDto, deviceIp: string, deviceName: string): Promise<TTokenWithApiKeyAndUserId> {
 
         let userPhone = dto.phone;
 
@@ -49,7 +49,8 @@ export class VerifyOTPService {
 
         return {
             ...await Token.setup(userPhone, user._id),
-            apiKey: user.apiKey
+            apiKey: user.apiKey,
+            userId: user._id
         }
 
     }

@@ -4,7 +4,11 @@ import {TE2EMessage} from "../module/base/dto/TE2EMessage";
 
 type JsonObject = { [key: string]: any }
 type TToken = { accessToken: string, refreshToken: string }
-type TTokenWithApiKey = { accessToken: string, refreshToken: string, apiKey: string }
+type TTokenWithApiKeyAndUserId = { accessToken: string, refreshToken: string, apiKey: string, userId: string }
+
+type UserId = {
+    userId: string
+}
 
 type IResponse = { statusCode: number, message: string }
 
@@ -99,10 +103,11 @@ export {
     IResponse,
     TToken,
     RoomId,
+    UserId,
     UserIdWithType,
     ListOfAdmin,
     TUserDeviceInfo,
-    TTokenWithApiKey,
+    TTokenWithApiKeyAndUserId,
     TSaveMessage,
     ListOfIdWithType,
     ListOfUserTableChat,

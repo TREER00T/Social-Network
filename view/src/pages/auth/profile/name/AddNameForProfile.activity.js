@@ -36,7 +36,10 @@ function AddNameForProfile() {
             {cookies?.phone ? <></> : <Navigate to="/user/login"/>}
 
             <ErrorHandler
-                setCookie={{key: 'apiKey', value: data?.data?.apiKey}}
+                setCookie={[
+                    {key: 'apiKey', value: data?.data?.apiKey},
+                    {key: 'userId', value: data?.data?.userId}
+                ]}
                 errMsg={data?.message}
                 visibility={hasClicked}
                 handler={handleOpenDialog}
