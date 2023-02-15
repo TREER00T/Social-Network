@@ -11,6 +11,7 @@ import {useRef, useState} from "react";
 import {resApi} from "common/fetch";
 import Trash from "img/trash.svg";
 import Setting from "img/settings.svg";
+import DoAction from "img/from-check.svg";
 import {Navigate} from "react-router-dom";
 import UserProfile from "component/UserProfile";
 
@@ -33,6 +34,8 @@ function ChatNavbar({
                         hasClickedBlockUser,
                         hasClickedBlockUserByMe,
                         handleClickedBlockUser,
+                        hasClickedDeleteMessage,
+                        handleDoAction,
                         isOwner,
                         isAdmin,
                         backButton
@@ -136,8 +139,12 @@ function ChatNavbar({
                 </div>
             </div>
 
-            <ImageButton className="absolute right-0 mr-3" src={GridDotsMenu} onClick={handleClickMenuOption}
-                         innerRef={wrapperRef}/>
+            <ImageButton
+                className="absolute right-0 mr-3"
+                src={hasClickedDeleteMessage ? DoAction : GridDotsMenu}
+                onClick={hasClickedDeleteMessage ? handleDoAction : handleClickMenuOption}
+                innerRef={wrapperRef}/>
+
 
             {
                 hasOpenedOptionMenu ?

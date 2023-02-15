@@ -21,9 +21,11 @@ function HomeActivity() {
     const [inputMessage, setInputMessage] = useState({});
     const [dataSearched, setDataSearched] = useState([]);
     const [haveDataSearched, setHaveDataSearched] = useState(false);
+    const [hasClickedDoAction, setHasClickedDoAction] = useState(false);
     const [hasMeBlockedByUser, setHasMeBlockedByUser] = useState(false);
     const [hasClickedBlockUser, setHasClickedBlockUser] = useState(false);
     const [tabViewItemClickedData, setTabViewItemClickedData] = useState({});
+    const [hasClickedDeleteMessage, setHasCLickedDeleteMessage] = useState(false);
     const [hasClickedBlockUserByMe, setHasClickedBlockUserByMe] = useState(false);
 
     const handleClickedBlockUser = () => setHasClickedBlockUser(!hasClickedBlockUser),
@@ -90,6 +92,7 @@ function HomeActivity() {
                 setDataSearched(dataComposition(data.data));
         },
         handleEditMessage = d => setEditMessage(d),
+        handleDoAction = () => setHasClickedDoAction(!hasClickedDoAction),
         handleNavbarBackButton = () => setTabViewItemClickedData({});
 
     return (
@@ -120,8 +123,10 @@ function HomeActivity() {
                             <ChatNavbar socket={socket}
                                         isAdmin={isAdmin}
                                         isOwner={isOwner}
+                                        handleDoAction={handleDoAction}
                                         handleClickedBlockUser={handleClickedBlockUser}
                                         hasClickedBlockUser={hasClickedBlockUser}
+                                        hasClickedDeleteMessage={hasClickedDeleteMessage}
                                         hasClickedBlockUserByMe={hasClickedBlockUserByMe}
                                         data={tabViewItemClickedData}
                                         backButton={handleNavbarBackButton}/>
@@ -130,14 +135,18 @@ function HomeActivity() {
                             <ChatContent socket={socket}
                                          isAdmin={isAdmin}
                                          isOwner={isOwner}
+                                         hasAccessToDelete={hasClickedDoAction}
                                          editMessage={handleEditMessage}
                                          inputMessage={inputMessage}
-                                         hasClickedBlockUser={hasClickedBlockUser}
-                                         hasClickedBlockUserByMe={hasClickedBlockUserByMe}
-                                         hasMeBlockedByUser={hasMeBlockedByUser}
+                                         getHasClickedDeleteMessage={d => setHasCLickedDeleteMessage(d)}
                                          data={tabViewItemClickedData}/>
 
-                            <MessageInput getMessage={handleInputMessage} editMessage={editMessage}/>
+                            <MessageInput
+                                hasClickedBlockUserByMe={hasClickedBlockUserByMe}
+                                hasMeBlockedByUser={hasMeBlockedByUser}
+                                getMessage={handleInputMessage}
+                                handleUnBlockUser={handleClickedBlockUser}
+                                editMessage={editMessage}/>
                         </div> : <NotFound/>
                 }
 

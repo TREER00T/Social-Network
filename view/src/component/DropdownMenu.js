@@ -26,9 +26,11 @@ export function DropDownItem({getHasClicked, name, img, sendReq, haveAction, nav
     );
 }
 
-export function DropdownMenu({className, children}) {
+export function DropdownMenu({className, children, style, wrapperRef}) {
     return (
         <div
+            style={style}
+            ref={wrapperRef}
             className={`z-10 absolute mt-14 divide-y divide-gray-100 shadow w-44 ${className}`}>
             <ul className="py-2 rounded-lg text-sm bg-blue-200">
                 {

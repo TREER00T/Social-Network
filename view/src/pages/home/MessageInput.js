@@ -2,8 +2,15 @@ import AddFile from 'img/plus.svg';
 import SendMessage from 'img/send-message.svg';
 import {useState} from "react";
 import {getFileFormat, imageFormats, videoFormats} from "util/Utils";
+import Button from "component/Button";
 
-export default function MessageInput({getMessage, editMessage}) {
+export default function MessageInput({
+                                         getMessage,
+                                         editMessage,
+                                         hasClickedBlockUserByMe,
+                                         hasMeBlockedByUser,
+                                         handleUnBlockUser
+                                     }) {
 
     const [file, setFile] = useState({});
     const [text, setText] = useState('');
@@ -39,31 +46,38 @@ export default function MessageInput({getMessage, editMessage}) {
 
 
     return (
-        <div className="flex fixed absolute bottom-0 mb-2 mx-1 left-0 right-0 rounded-lg bg-gray-110">
+        <div>
+            {!hasMeBlockedByUser || !hasClickedBlockUserByMe ? <div
+                className={`flex fixed absolute bottom-0 mb-2 mx-1 left-0 right-0 rounded-lg ${hasMeBlockedByUser || hasClickedBlockUserByMe ? 'bg-white' : 'bg-gray-110'}`}>
 
-            <label htmlFor="upload-file" className="mx-2 hover:cursor-pointer mt-4">
-                <img src={AddFile}
-                     alt="Icon"/>
-            </label>
+                <label htmlFor="upload-file" className="mx-2 hover:cursor-pointer mt-4">
+                    <img src={AddFile}
+                         alt="Icon"/>
+                </label>
 
-            <input type="text"
-                   onChange={handleInput}
-                   value={text}
-                   className="block w-full py-4 text-sm text-gray-900 border rounded-lg bg-gray-110 outline-none"
-                   placeholder="Type your message..."/>
+                <input type="text"
+                       onChange={handleInput}
+                       value={text}
+                       className="block w-full py-4 text-sm text-gray-900 border rounded-lg bg-gray-110 outline-none"
+                       placeholder="Type your message..."/>
 
-            {
-                text || file?.name ?
-                    <img src={SendMessage}
-                         alt="Icon"
-                         onClick={handleSendMessage}
-                         className="mx-2 hover:cursor-pointer"/>
-                    : <></>
-            }
+                {
+                    text || file?.name ?
+                        <img src={SendMessage}
+                             alt="Icon"
+                             onClick={handleSendMessage}
+                             className="mx-2 hover:cursor-pointer"/>
+                        : <></>
+                }
 
-            <input className="hidden"
-                   type="file" id="upload-file"
-                   onChange={handleUploadFile}/>
+                <input className="hidden"
+                       type="file" id="upload-file"
+                       onChange={handleUploadFile}/>
+            </div> : !hasMeBlockedByUser ? <span
+                    className="flex fixed absolute bottom-0 mb-2 mx-1 left-0 right-0 place-content-center"
+                    onClick={handleUnBlockUser}><Button>UnBLock User</Button></span> :
+                <span>You are blocked by this user</span>}
         </div>
+
     );
 }

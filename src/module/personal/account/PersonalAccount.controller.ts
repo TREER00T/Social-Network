@@ -15,6 +15,7 @@ export class PersonalAccountController extends User {
         await this.init();
 
         await this.appService.deleteAccount(this.userId);
+        await this.deleteOldFile('personal', this.userId);
 
         return Json.builder(Response.HTTP_OK);
     }
