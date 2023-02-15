@@ -2957,7 +2957,7 @@ paths:
 definitions:
   ListOfIdForDeleteMessage:
     properties:
-      listOfId:
+      data:
         type:
           - string
           - array

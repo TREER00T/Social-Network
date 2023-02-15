@@ -78,7 +78,7 @@ export default {
             delete jsonObject.locationLon;
         }
 
-        jsonObject.type = haveText ? jsonObject?.type ? jsonObject?.type : 'Image' : MESSAGE_WITHOUT_FILE;
+        jsonObject.type = haveText ? MESSAGE_WITHOUT_FILE : jsonObject?.type ? jsonObject?.type : 'Image';
 
         jsonObject.isReply = haveReplyId ?? false;
 

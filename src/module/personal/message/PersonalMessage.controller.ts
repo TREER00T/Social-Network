@@ -36,7 +36,7 @@ export class PersonalMessageController extends SavedMessage {
         let messageIdOrListOfMessageId;
 
         try {
-            messageIdOrListOfMessageId = JSON.parse(data)?.listOfId;
+            messageIdOrListOfMessageId = JSON.parse(data)?.data;
         } catch (e) {
             InputException(e);
         }
