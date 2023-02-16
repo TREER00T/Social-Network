@@ -1,6 +1,6 @@
 import {RoomId} from "../../../util/Types";
 import {group} from "../../create/group";
-import {findMany} from "../../../database/mongoDbDriverConnection";
+import {findMany, findOne} from "../../../database/mongoDbDriverConnection";
 
 let {
     channel,
@@ -159,13 +159,18 @@ export default {
 
     },
 
-
     async getListOfFileUrl(listOfId: string[], channelId: string) {
         return await findMany(listOfId.length > 0 ? {
             _id: {$in: listOfId}
         } : {fileUrl: {$ne: null}}, {
             _id: 0,
             fileUrl: 1
+        }, `${channelId}ChannelContents`);
+    },
+
+    async getMessage(messageId: string, channelId: string) {
+        return await findOne({
+            _id: messageId
         }, `${channelId}ChannelContents`);
     }
 }

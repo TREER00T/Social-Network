@@ -4,6 +4,7 @@ import {Channel} from "../../base/Channel";
 import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
 import PromiseVerify from "../../base/PromiseVerify";
+import {ChannelUserDto} from "./ChannelUser.dto";
 
 @Controller()
 export class ChannelUserController extends Channel {
@@ -26,6 +27,23 @@ export class ChannelUserController extends Channel {
         return Json.builder(Response.HTTP_OK,
             await this.appService.listOfUserWithDetails(
                 await this.appService.listOfUser(channelId)));
+    }
+
+    @Get("/hasJoined")
+    async hasJoinedInRoom(@Query() dto: ChannelUserDto) {
+        await this.init();
+        let userId = dto?.userId ? dto.userId : this.userId;
+
+        let haveErr = await PromiseVerify.all([
+            this.verifyUser(userId),
+            this.isChannelExist(dto.channelId),
+            this.isUserJoined(dto.channelId, userId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        return Json.builder(Response.HTTP_OK);
     }
 
     @Delete()
@@ -68,6 +86,5 @@ export class ChannelUserController extends Channel {
         await this.appService.joinUser(channelId, this.userId);
 
         return Json.builder(Response.HTTP_CREATED);
-
     }
 }

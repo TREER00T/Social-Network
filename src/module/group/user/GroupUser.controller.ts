@@ -4,6 +4,7 @@ import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
 import PromiseVerify from "../../base/PromiseVerify";
 import {Group} from "../../base/Group";
+import {GroupUserDto} from "./GroupUser.dto";
 
 @Controller()
 export class GroupUserController extends Group {
@@ -25,6 +26,23 @@ export class GroupUserController extends Group {
         return Json.builder(Response.HTTP_OK,
             await this.appService.listOfUserWithDetails(
                 await this.appService.listOfUser(groupId)));
+    }
+
+    @Get("/hasJoined")
+    async hasJoinedInRoom(@Query() dto: GroupUserDto) {
+        await this.init();
+        let userId = dto?.userId ? dto.userId : this.userId;
+
+        let haveErr = await PromiseVerify.all([
+            this.verifyUser(userId),
+            this.isGroupExist(dto.groupId),
+            this.isUserJoined(dto.groupId, userId)
+        ]);
+
+        if (haveErr)
+            return haveErr;
+
+        return Json.builder(Response.HTTP_OK);
     }
 
     @Delete()
@@ -67,6 +85,5 @@ export class GroupUserController extends Group {
         await this.appService.joinUser(groupId, this.userId);
 
         return Json.builder(Response.HTTP_CREATED);
-
     }
 }

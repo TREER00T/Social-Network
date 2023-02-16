@@ -1,13 +1,10 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState, createRef, forwardRef} from "react";
 import {resApi} from "common/fetch";
-import DownloadIcon from 'img/download.svg'
+import DownloadIcon from 'img/download.svg';
+import Reply from 'img/arrow-back-black.svg';
 import {useCookies} from "react-cookie";
-import useOutsideAlerter from "common/useOutsideAlerter";
-import Edit from "img/pencil.svg";
-import Trash from "img/trash.svg";
-import Reply from "img/arrow-back.svg";
-import {DropDownItem, DropdownMenu} from "component/DropdownMenu";
 import {Checkbox} from "@material-tailwind/react";
+import {updateObject} from "util/Utils";
 
 function Item({
                   data: {
@@ -43,6 +40,7 @@ function Item({
                   getRightClickItemData,
                   wrapperRef,
                   setXY,
+                  content,
                   firstItemForDelete,
                   setListOfIdForDelete,
                   hasClickedDelete,
@@ -93,25 +91,46 @@ function Item({
         });
     }, hanCheckBox = () => setListOfIdForDelete(_id);
 
+    let replyData = content.find(o => o._id === targetReplyId);
+
     return (
         <div
             onContextMenu={handleContextMenu}
             className={`mx-2 items-center flex ${isMyMessage ? 'ml-auto' : ''} ${hasClickedDelete && !haveEmptyDeleteList ? 'my-1' : 'my-3'}`}
             ref={wrapperRef}>
+
             <div
                 className={`${isImage ? `rounded-t-xl ${isMyMessage ? 'ml-auto rounded-bl-xl rounded-br bg-gray-110' : 'rounded-bl rounded-br-xl bg-blue-100 text-white'}` : ''}`}>
+                {
+                    isReply && targetReplyId && replyData?._id && (isImage || isFile) ?
+                        <div className="p-1 bg-gray-400 rounded-lg">
+                            <span>{replyData.text ? replyData.text : replyData.fileName}</span>
+                        </div> : <></>
+                }
                 {
                     isImage ?
                         <img className="p-2 rounded-3xl pb-4 max-h-80 max-w-80" src={fileUrl} alt="Image"/> : <></>
                 }
                 {
-                    haveText && !isImage ? <span
-                        className={`p-2 rounded-t-xl ${isMyMessage ? 'rounded-bl-xl rounded-br bg-gray-110' : 'rounded-bl rounded-br-xl bg-blue-100 text-white'}`}>{text}</span> : <></>
+                    haveText && !isImage ?
+                        isReply && targetReplyId && replyData?._id ?
+                            <div
+                                className={`flex flex-col rounded-t-lg ${isMyMessage ? 'rounded-bl-xl rounded-br bg-gray-110' : 'rounded-bl rounded-br-xl bg-blue-100 text-white'}`}>
+                                <div className="p-2 m-1 rounded-lg bg-gray-400 flex">
+                                    <img src={Reply} alt="Icon" className="mr-2"/>
+                                    <span>{replyData.text ? replyData.text : replyData.fileName}</span>
+                                </div>
+                                <span
+                                    className="p-2 rounded-t-xl">{text}</span>
+                            </div> :
+                            haveText && !isImage ? <span
+                                    className={`p-2 rounded-t-xl ${isMyMessage ? 'rounded-bl-xl rounded-br bg-gray-110' : 'rounded-bl rounded-br-xl bg-blue-100 text-white'}`}>{text}</span>
+                                : <></> : <></>
                 }
                 {
                     isFile || isVideo ?
                         <div
-                            className={`flex rounded-t-xl ${isMyMessage ? 'rounded-bl-xl rounded-br bg-gray-110' : 'rounded-bl rounded-br-xl bg-blue-100 text-white'}`}>
+                            className={`flex flex-col rounded-t-xl ${isMyMessage ? 'rounded-bl-xl rounded-br bg-gray-110' : 'rounded-bl rounded-br-xl bg-blue-100 text-white'}`}>
                             {isFile ?
                                 <div className="flex">
                                     <div
@@ -130,7 +149,7 @@ function Item({
                                 </video>
                             }
                             {
-                                haveText ? <span
+                                text ? <span
                                     className={`p-2 rounded-t-xl ${isMyMessage ? 'rounded-bl-xl rounded-br bg-gray-110' : 'rounded-bl rounded-br-xl bg-blue-100 text-white'}`}>{text}</span> : <></>
                             }
                         </div> : <></>
@@ -160,52 +179,87 @@ function ChatContent({
                          isOwner,
                          isAdmin,
                          inputMessage,
-                         editMessage,
                          getHasClickedDeleteMessage,
+                         setHasOpenContextMenu,
+                         setHasClickedDoAction,
+                         hasClickedEditMessage,
+                         setListOfIdForDelete,
+                         setContextMenuXY,
+                         hasClickedReply,
+                         setHasClickedDelete,
+                         hasClickedDelete,
+                         wrapperRef,
+                         firstItemForDelete,
+                         setRightClickData,
+                         listOfIdForDelete,
+                         setHasClickedReply,
+                         setHasClickedEditMessage,
+                         rightClickData,
                          hasAccessToDelete,
                          socket
                      }) {
 
     const lastMessageRef = useRef(null);
-    const wrapperRef = useRef('contextMenu');
     const [roomContent, setRoomContent] = useState([]);
-    const [contextMenuXY, setContextMenuXY] = useState([]);
-    const [rightClickData, setRightClickData] = useState({});
-    const [hasClickedDelete, setHasClickDelete] = useState(false);
     const [contentNotFound, setContentNotFound] = useState(false);
-    const [listOfIdForDelete, setListOfIdForDelete] = useState([]);
-    const [firstItemForDelete, setFirstItemForDelete] = useState('');
-    const [hasOpenContextMenu, setHasOpenContextMenu] = useState(false);
 
-
-    useOutsideAlerter(wrapperRef, () => {
-        setHasOpenContextMenu(false);
-    });
-
-    const handleSavedMessageContent = async () => {
-            let {data} = await resApi('personal/message');
-
-            if (data.length === 0) {
-                setContentNotFound(true);
-                return;
+    const handleRoomMessageContent = async () => {
+            let result = [];
+            if (type === 'SA') {
+                let {data} = await resApi('personal/message');
+                if (data.length === 0) {
+                    setContentNotFound(true);
+                    return;
+                }
+                result = data;
+            } else {
+                // socket
             }
 
-            setRoomContent(data);
-        }, handleSendMessageIntoSavedMessage = async () => {
-            if (inputMessage?.data) {
-                await resApi('personal/upload/file', {
-                    method: 'post',
-                    with: 'axios',
-                    body: inputMessage.data
-                });
-            } else
-                await resApi('personal/message', {
-                    method: 'POST',
-                    body: inputMessage
-                });
+            setRoomContent(result);
+        }, handleSendMessage = async () => {
+            let id = rightClickData?._id;
 
-            setRoomContent([...roomContent, inputMessage]);
-        }, handleDeleteMultiMessage = id => {
+            if (hasClickedEditMessage)
+                delete rightClickData._id;
+
+            if (type === 'SA')
+                if (inputMessage?.data)
+                    await resApi('personal/upload/file', {
+                        method: 'post',
+                        with: 'axios',
+                        body: inputMessage.data
+                    });
+                else {
+                    await resApi('personal/message', {
+                        method: hasClickedEditMessage ? 'PUT' : 'POST',
+                        body: hasClickedEditMessage ? {
+                            ...updateObject(rightClickData, inputMessage),
+                            messageId: id
+                        } : hasClickedReply ? {
+                            ...updateObject(inputMessage, {
+                                isReply: true,
+                                targetReplyId: id
+                            })
+                        } : inputMessage
+                    });
+                }
+            else {
+                // socket
+            }
+
+            if (hasClickedReply)
+                setHasClickedReply(false);
+
+            if (!hasClickedEditMessage)
+                setRoomContent([...roomContent, inputMessage]);
+            else {
+                let result = roomContent.map(o => o._id === id ? updateObject(rightClickData, inputMessage) : o);
+                setRoomContent([...result]);
+                setHasClickedEditMessage(false);
+            }
+        },
+        handleDeleteMultiMessage = id => {
             if (!listOfIdForDelete.includes(id)) {
                 setListOfIdForDelete(arr => [...arr, id]);
                 getHasClickedDeleteMessage(true);
@@ -220,14 +274,12 @@ function ChatContent({
         handleDeleteMessage = async () => {
             let listOfId = [...listOfIdForDelete, rightClickData?._id];
             let newContent = roomContent;
-            for (let i = 0; i < newContent.length; i++) {
-                for (let j = 0; j < listOfId.length; j++) {
-                    if (newContent[j]._id === listOfId[j]) {
-                        delete newContent[i];
-                    }
-                }
-            }
+            newContent = newContent.filter(obj => !listOfId.includes(obj._id));
             setRoomContent(() => [...newContent]);
+            setHasClickedDoAction();
+            setHasClickedDelete(false);
+            setListOfIdForDelete([]);
+            getHasClickedDeleteMessage(false);
             if (type === 'SA') {
                 await resApi('personal/message', {
                     method: 'DELETE',
@@ -241,72 +293,45 @@ function ChatContent({
                 // socket
             }
         },
-        handleClickDeleteMessageInDropDownItemMenu = async () => {
-            if (!listOfIdForDelete.includes(rightClickData._id)) {
-                setHasClickDelete(true);
-                getHasClickedDeleteMessage(true);
-                setHasOpenContextMenu(false);
-                setFirstItemForDelete(rightClickData?._id);
-                setListOfIdForDelete(arr => [...arr, rightClickData?._id]);
-            } else {
-                setHasClickDelete(false);
-                getHasClickedDeleteMessage(false);
-                let content = listOfIdForDelete.filter(s => s !== rightClickData._id);
-                setListOfIdForDelete(() => [...content]);
-                setFirstItemForDelete('');
-            }
-        },
         handleRightClickData = d => setRightClickData(d),
         handleContextMenuXY = d => setContextMenuXY(d);
 
+
     useEffect(() => {
-        if (type === 'SA')
-            handleSavedMessageContent();
-        else {
-            // socket
-        }
-    }, []);
+        setRoomContent([]);
+        handleRoomMessageContent();
+    }, [type]);
 
     useEffect(() => {
         if (hasAccessToDelete)
             handleDeleteMessage();
-    }, [hasAccessToDelete])
-
-
-    useEffect(() => {
-        lastMessageRef.current?.scrollIntoView({behavior: 'smooth'});
 
         if (inputMessage?.type || inputMessage?.data)
-            handleSendMessageIntoSavedMessage();
-    }, [inputMessage]);
+            handleSendMessage();
+    }, [hasAccessToDelete, inputMessage]);
+
+    useEffect(() => {
+        lastMessageRef.current.scrollIntoView({behavior: 'smooth'});
+    });
 
 
     return (
-        <div className="flex flex-col absolute overflow-y-auto h-45 top-21 left-0 right-0" ref={wrapperRef}>
+        <div className="flex flex-col absolute overflow-y-auto h-45 top-21 left-0 right-0">
             {
                 !contentNotFound ? roomContent.map((d, i) =>
                         <Item data={d} key={i} wrapperRef={wrapperRef}
                               getRightClickItemData={handleRightClickData}
                               setXY={handleContextMenuXY}
                               firstItemForDelete={firstItemForDelete}
+                              content={roomContent}
                               hasClickedDelete={hasClickedDelete}
                               setListOfIdForDelete={handleDeleteMultiMessage}
                               haveEmptyDeleteList={listOfIdForDelete.length === 0}
                               setHasOpenContextMenu={(d) => setHasOpenContextMenu(d)}/>) :
                     <span className="text-center my-auto text-lg">Not Found</span>
             }
-            {
-                hasOpenContextMenu ?
-                    <DropdownMenu wrapperRef={wrapperRef} style={{
-                        left: (contextMenuXY[0] / 2) + 50,
-                        top: contextMenuXY[1] - 200
-                    }} className="right-0 mr-3">
-                        <DropDownItem key="Edit" name="Edit" img={Edit}/>
-                        <DropDownItem key="Delete" name="Delete" img={Trash}
-                                      sendReq={handleClickDeleteMessageInDropDownItemMenu}/>
-                        <DropDownItem key="Reply" name="Reply" img={Reply}/>
-                    </DropdownMenu> : <></>
-            }
+
+            <div ref={lastMessageRef}/>
         </div>
     );
 

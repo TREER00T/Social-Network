@@ -124,4 +124,24 @@ export class GroupController extends AbstractGroup {
         await this.removeMessage(`${groupId}GroupContents`, listOfId);
     }
 
+    @SubscribeMessage("onGroupSpecificMessage")
+    async getSpecificItem(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
+        let insertedId = data?.insertedId,
+            groupId = data?.roomId,
+            senderId = await this.getUserId(socket.id);
+
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(insertedId),
+            this.isUndefined(groupId),
+            this.isGroupExist(groupId),
+            this.isUserJoined(groupId, senderId)
+        ]);
+
+        if (haveErr)
+            return socket.emit('emitGroupSpecificMessageError', haveErr);
+
+        this.emitToSpecificSocket(groupId, 'emitGroupSpecificMessage',
+            await this.getMessageInRoom('group', insertedId, groupId));
+    }
+
 }
