@@ -4,10 +4,10 @@ import Response from "../../../util/Response";
 import Json from "../../../util/ReturnJson";
 import Util from "../../../util/Util";
 import {PersonalMessage} from "../../base/dto/PersonalMessage";
-import {InputException} from "../../../exception/InputException";
 import {SavedMessage} from "../../base/SavedMessage";
 import PromiseVerify from "../../base/PromiseVerify";
 import {PersonalDataQuery} from "../../base/dto/PersonalDataQuery";
+import {ListOfIdObject} from "../../../util/Types";
 
 @Controller()
 export class PersonalMessageController extends SavedMessage {
@@ -30,18 +30,10 @@ export class PersonalMessageController extends SavedMessage {
     }
 
     @Delete()
-    async deleteMessage(@Body('listOfId') data: string) {
+    async deleteMessage(@Body('listOfId') data: ListOfIdObject) {
         await this.init();
 
-        let messageIdOrListOfMessageId;
-
-        try {
-            messageIdOrListOfMessageId = JSON.parse(data)?.data;
-        } catch (e) {
-            InputException(e);
-        }
-
-        if (!Util.isNotEmptyArr(messageIdOrListOfMessageId))
+        if (!Util.isNotEmptyArr(data?.data))
             return Json.builder(Response.HTTP_BAD_REQUEST);
 
         let haveErr = await PromiseVerify.all([
@@ -51,8 +43,8 @@ export class PersonalMessageController extends SavedMessage {
         if (haveErr)
             return haveErr;
 
-        await this.appService.deleteOldFile(this.userId, messageIdOrListOfMessageId);
-        await this.appService.removeMessageOrListOfMessage(this.userId, messageIdOrListOfMessageId);
+        await this.appService.deleteOldFile(this.userId, data.data);
+        await this.appService.removeMessageOrListOfMessage(this.userId, data?.data);
 
         return Json.builder(Response.HTTP_OK);
     }

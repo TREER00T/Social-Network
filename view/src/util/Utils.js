@@ -135,6 +135,13 @@ export function getFileFormat(d) {
     return d?.match(/.*\.([A-Za-z0-9]+)/)?.[1]?.toUpperCase();
 }
 
+export function updateObject(first, second) {
+    for (const key in second) {
+        first[key] = second[key];
+    }
+    return first;
+}
+
 export const assign = (o, t) => o ? o.map(d => Object.assign(d, {type: t})) : [];
 
 export const dataComposition = data =>

@@ -1,5 +1,5 @@
 import {RoomId} from "../../../util/Types";
-import {findMany} from "../../../database/mongoDbDriverConnection";
+import {findMany, findOne} from "../../../database/mongoDbDriverConnection";
 
 let {
         group,
@@ -173,6 +173,12 @@ export default {
         } : {fileUrl: {$ne: null}}, {
             _id: 0,
             fileUrl: 1
+        }, `${groupId}GroupContents`);
+    },
+
+    async getMessage(messageId: string, groupId: string) {
+        return await findOne({
+            _id: messageId
         }, `${groupId}GroupContents`);
     }
 }

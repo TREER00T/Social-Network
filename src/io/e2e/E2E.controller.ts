@@ -137,6 +137,28 @@ export class E2EController extends AbstractRoom {
         await this.removeMessage(roomId, listOfId);
     }
 
+    @SubscribeMessage("onPvSpecificMessage")
+    async getSpecificItem(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
+        let insertedId = data?.insertedId,
+            roomId = data?.roomId;
+
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(insertedId),
+            this.isUndefined(roomId)
+        ]);
+
+        if (haveErr)
+            return socket.emit('emitPvSpecificMessageError', haveErr);
+
+        let d = await this.verifyPv(socket, 'emitPvSpecificMessageError', data);
+
+        if (typeof d !== "object")
+            return;
+
+        this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvSpecificMessage',
+            await this.getMessageInRoom('e2e', insertedId, roomId));
+    }
+
     async verifyPv(socket: Socket, errEmit: string, data: JsonObject) {
         let receiverId = data?.receiverId;
 

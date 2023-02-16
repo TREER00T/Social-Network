@@ -35,7 +35,8 @@ module.exports = withMT({
         },
         extend: {
             spacing: {
-                21: '11%'
+                21: '11%',
+                18: '4.5rem'
             },
             height: {
                 '45': '500px'

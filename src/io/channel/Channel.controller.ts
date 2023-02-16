@@ -127,5 +127,24 @@ export class ChannelController extends AbstractChannel {
         await this.removeMessage(`${channelId}ChannelContents`, listOfId);
     }
 
+    @SubscribeMessage("onChannelSpecificMessage")
+    async getSpecificItem(@MessageBody() data: JsonObject, @ConnectedSocket() socket: Socket) {
+        let insertedId = data?.insertedId,
+            channelId = data?.roomId,
+            senderId = await this.getUserId(socket.id);
+
+        let haveErr = await PromiseVerify.all([
+            this.isUndefined(insertedId),
+            this.isUndefined(channelId),
+            this.isChannelExist(channelId),
+            this.isUserJoined(channelId, senderId)
+        ]);
+
+        if (haveErr)
+            return socket.emit('emitChannelSpecificMessageError', haveErr);
+
+        this.emitToSpecificSocket(channelId, 'emitChannelSpecificMessage',
+            await this.getMessageInRoom('channel', insertedId, channelId));
+    }
 
 }

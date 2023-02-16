@@ -1874,6 +1874,48 @@ paths:
             type: object
             $ref: '#/definitions/Status'
 
+  /group/users/hasJoined:
+    get:
+      tags:
+        - Group
+      summary: Return join state of user for group
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: groupId
+          type: string
+          required: true
+        - in: query
+          name: userId
+          type: string
+          required: false
+          default: your user id
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataAndOptionObject'
+        400:
+          description: Bad Request
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
   /group/users:
     post:
       tags:
@@ -2671,6 +2713,48 @@ paths:
             $ref: '#/definitions/Status'
         200:
           description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+
+  /channel/users/hasJoined:
+    get:
+      tags:
+        - Channel
+      summary: Return join state of user for channel
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: channelId
+          type: string
+          required: true
+        - in: query
+          name: userId
+          type: string
+          required: false
+          default: your user id
+      security:
+        - apiKey: [ ]
+        - token: [ ]
+      responses:
+        401:
+          description: Unauthorized
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        404:
+          description: Not Found
+          schema:
+            type: object
+            $ref: '#/definitions/Status'
+        200:
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/StatusWithDataAndOptionObject'
+        400:
+          description: Bad Request
           schema:
             type: object
             $ref: '#/definitions/Status'

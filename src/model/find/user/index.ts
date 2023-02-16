@@ -9,6 +9,7 @@ import {
     ListOfUserTargetId, RoomType, RoomTypeWithOutE2E,
     UserIdWithType
 } from "../../../util/Types";
+import {findOne} from "../../../database/mongoDbDriverConnection";
 
 let {
         haveCollection,
@@ -557,6 +558,12 @@ export default {
         } : {fileUrl: {$ne: null}}, {
             _id: 0,
             fileUrl: 1
+        }, `${roomId}E2EContents`);
+    },
+
+    async getMessage(messageId: string, roomId: string) {
+        return await findOne({
+            _id: messageId
         }, `${roomId}E2EContents`);
     }
 }

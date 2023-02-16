@@ -63,6 +63,17 @@ paths:
             - components/emitPvTypingError
             - components/emitPvTyping
 
+    - on: onPvSpecificMessage
+      tags:
+        - E2E
+      parameters:
+        - $ref:
+            - components/ReceiverId
+      events:
+        - $ref:
+            - components/emitPvSpecificMessageError
+            - components/emitPvSpecificMessage
+
     - on: onPvSendMessage
       tags:
         - E2E
@@ -114,6 +125,18 @@ paths:
             - components/emitGroupSendMessageError
             - components/emitGroupSendMessage
 
+    - on: onGroupSpecificMessage
+      tags:
+        - Group
+      parameters:
+        - $ref:
+            - components/RoomId
+            - components/DataMessage
+      events:
+        - $ref:
+            - components/emitGroupSpecificMessageError
+            - components/emitGroupSpecificMessage
+
     - on: onGroupEditMessage
       tags:
         - Group
@@ -151,6 +174,18 @@ paths:
         - $ref:
             - components/emitChannelSendMessageError
             - components/emitChannelSendMessage
+
+    - on: onChannelSpecificMessage
+      tags:
+        - Channel
+      parameters:
+        - $ref:
+            - components/RoomId
+            - components/DataMessage
+      events:
+        - $ref:
+            - components/emitChannelSpecificMessageError
+            - components/emitChannelSpecificMessage
 
     - on: onChannelEditMessage
       tags:
