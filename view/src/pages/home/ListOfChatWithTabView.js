@@ -57,7 +57,11 @@ function Item({
     )
 }
 
-export default function ListOfChatWithTabView({dataSearched, getItemData}) {
+export default function ListOfChatWithTabView({
+                                                  dataSearched, getItemData,
+                                                  dataPayloadForLeaveRoom,
+                                                  hasClickedLeaveRoom
+                                              }) {
 
     const [cookies] = useCookies(['phone']);
     const [haveActivity, setHaveActivity] = useState(false);
@@ -108,6 +112,14 @@ export default function ListOfChatWithTabView({dataSearched, getItemData}) {
         if (dataSearched.length === 0)
             handleUserActivities('All');
     }, []);
+
+    useEffect(() => {
+        if (hasClickedLeaveRoom) {
+            let filter = userActivities.filter(o => o._id !== dataPayloadForLeaveRoom.id)
+            setUserActivities([...filter]);
+        }
+    }, [hasClickedLeaveRoom])
+
 
     return (
         <div className="flex flex-col ml-3">

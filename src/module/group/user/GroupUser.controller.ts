@@ -79,11 +79,11 @@ export class GroupUserController extends Group {
 
         let isJoinedUser = await this.isNotJoinedUser(groupId);
 
-        if (isJoinedUser)
-            return Json.builder(Response.HTTP_CONFLICT);
+        if (!isJoinedUser) {
+            await this.appService.joinUser(groupId, this.userId);
+            return Json.builder(Response.HTTP_CREATED);
+        }
 
-        await this.appService.joinUser(groupId, this.userId);
-
-        return Json.builder(Response.HTTP_CREATED);
+        return Json.builder(Response.HTTP_CONFLICT);
     }
 }

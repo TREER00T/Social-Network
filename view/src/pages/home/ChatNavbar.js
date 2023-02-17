@@ -10,6 +10,7 @@ import BlockUser from "img/hand-stop.svg";
 import {useRef, useState} from "react";
 import {resApi} from "common/fetch";
 import Trash from "img/trash.svg";
+import Leave from "img/leave.svg";
 import Setting from "img/settings.svg";
 import DoAction from "img/from-check.svg";
 import {Navigate} from "react-router-dom";
@@ -38,6 +39,8 @@ function ChatNavbar({
                         handleDoAction,
                         isOwner,
                         isAdmin,
+                        setDataPayloadForLeaveRoom,
+                        setHasClickedLeaveRoom,
                         backButton
                     }) {
 
@@ -55,6 +58,17 @@ function ChatNavbar({
         handleClickedClearChat = () => setHasClickedClearChat(!hasClickedClearChat),
         handleClickedSetting = () => setHasClickedSetting(!hasClickedSetting),
         handleClickCheckBoxForClearChatUs = () => setHasClickedCheckBox(!hasClickedCheckBox),
+        handleClickedLeaveRoom = async () => {
+            await resApi(`${type.toLowerCase()}/users`, {
+                method: 'DELETE',
+                body: {
+                    [type === 'Group' ? 'groupId' : 'channelId']: _id
+                }
+            });
+            setHasClickedLeaveRoom(true);
+            setDataPayloadForLeaveRoom({id: _id});
+            backButton();
+        },
         handleAccessToClearChat = async d => {
             if (!d)
                 return;
@@ -162,10 +176,13 @@ function ChatNavbar({
                                               getHasClicked={handleClickedClearChat}/>
                         }
                         {
-                            (type === 'Group' || type === 'Channel') && (isOwner || isAdmin) ?
-                                <DropDownItem key="Setting" name="Setting" img={Setting}
-                                              navigate={(<Navigate to={`/setting/${type.toLowerCase()}/${_id}`}/>)}
-                                              getHasClicked={handleClickedSetting}/> : <></>
+                            type === 'Group' || type === 'Channel' ?
+                                isOwner || isAdmin ?
+                                    <DropDownItem key="Setting" name="Setting" img={Setting}
+                                                  navigate={(<Navigate to={`/setting/${type.toLowerCase()}/${_id}`}/>)}
+                                                  getHasClicked={handleClickedSetting}/> :
+                                    <DropDownItem key="Leave Room" name={`Leave ${type}`} img={Leave}
+                                                  getHasClicked={handleClickedLeaveRoom}/> : <></>
                         }
                     </DropdownMenu> : <></>
             }

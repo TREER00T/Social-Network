@@ -34,10 +34,7 @@ export class GroupAdminController extends Group {
         await this.init();
 
         let haveErr = await PromiseVerify.all([
-            this.isUndefined(groupId),
-            this.verifyUser(this.userId),
-            this.isGroupExist(groupId),
-            this.isUserJoined(groupId)
+            this.isUndefined(groupId)
         ]);
 
         if (haveErr)
@@ -46,7 +43,7 @@ export class GroupAdminController extends Group {
         if (await this.isAdmin(groupId, this.userId))
             return Json.builder(Response.HTTP_ACCESS_RESOURCE_ADMIN);
 
-        if (await this.isOwner(groupId))
+        if (!(await this.isOwner(groupId)))
             return Json.builder(Response.HTTP_ACCESS_RESOURCE_OWNER);
 
         return Json.builder(Response.HTTP_FORBIDDEN);
@@ -92,9 +89,7 @@ export class GroupAdminController extends Group {
         return await PromiseVerify.all([
             this.isUndefined(targetUserId),
             this.isUndefined(groupId),
-            this.isGroupExist(groupId),
             this.verifyUser(targetUserId),
-            this.verifyUser(this.userId),
             this.isOwner(groupId),
             this.isUserJoined(groupId),
             this.isUserJoined(groupId, targetUserId)

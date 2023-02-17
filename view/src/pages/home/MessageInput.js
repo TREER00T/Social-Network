@@ -112,7 +112,7 @@ export default function MessageInput({
                             onClick={handleUnBlockUser}><Button>UnBLock User</Button></div> : <></>}
 
             {
-                type === 'Group' && !hasJoinedInRoom ?
+                (type === 'Group' || type === 'Channel') && !hasJoinedInRoom ?
                     <div
                         onClick={() => setHasJoinedInRoom(true)}
                         className="flex fixed absolute bottom-0 mb-2 mx-1 left-0 right-0 place-content-center">
