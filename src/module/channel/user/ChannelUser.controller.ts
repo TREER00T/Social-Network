@@ -80,11 +80,11 @@ export class ChannelUserController extends Channel {
 
         let isJoinedUser = await this.isNotJoinedUser(channelId);
 
-        if (isJoinedUser)
-            return Json.builder(Response.HTTP_CONFLICT);
+        if (!isJoinedUser) {
+            await this.appService.joinUser(channelId, this.userId);
+            return Json.builder(Response.HTTP_CREATED);
+        }
 
-        await this.appService.joinUser(channelId, this.userId);
-
-        return Json.builder(Response.HTTP_CREATED);
+        return Json.builder(Response.HTTP_CONFLICT);
     }
 }

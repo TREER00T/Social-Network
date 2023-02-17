@@ -202,6 +202,7 @@ function ChatContent({
     const lastMessageRef = useRef(null);
     const [roomContent, setRoomContent] = useState([]);
     const [contentNotFound, setContentNotFound] = useState(false);
+    const event = (t, op) => `${t}${type === 'E2E' ? 'PV' : type}${op}Message`;
 
     const handleRoomMessageContent = async () => {
             let result = [];
@@ -245,7 +246,25 @@ function ChatContent({
                     });
                 }
             else {
-                // socket
+                socket.emit(event('on', hasClickedEditMessage ? 'Edit' : 'Send'),
+                    hasClickedEditMessage ? {
+                        ...updateObject(rightClickData, inputMessage),
+                        messageId: id,
+                        roomId: _id
+                    } : hasClickedReply ? {
+                        ...updateObject(inputMessage, {
+                            isReply: true,
+                            targetReplyId: id,
+                            roomId: _id
+                        })
+                    } : {
+                        ...inputMessage,
+                        roomId: _id
+                    });
+
+                // socket.on(event('emit', hasClickedEditMessage ? 'Edit' : 'Send'), _id, d => {
+                //     console.log(d)
+                // });
             }
 
             if (hasClickedReply)
@@ -295,7 +314,6 @@ function ChatContent({
         },
         handleRightClickData = d => setRightClickData(d),
         handleContextMenuXY = d => setContextMenuXY(d);
-
 
     useEffect(() => {
         setRoomContent([]);

@@ -34,10 +34,7 @@ export class ChannelAdminController extends Channel {
         await this.init();
 
         let haveErr = await PromiseVerify.all([
-            this.isUndefined(channelId),
-            this.verifyUser(this.userId),
-            this.isChannelExist(channelId),
-            this.isUserJoined(channelId)
+            this.isUndefined(channelId)
         ]);
 
         if (haveErr)
@@ -46,7 +43,7 @@ export class ChannelAdminController extends Channel {
         if (await this.isAdmin(channelId, this.userId))
             return Json.builder(Response.HTTP_ACCESS_RESOURCE_ADMIN);
 
-        if (await this.isOwner(channelId))
+        if (!(await this.isOwner(channelId)))
             return Json.builder(Response.HTTP_ACCESS_RESOURCE_OWNER);
 
         return Json.builder(Response.HTTP_FORBIDDEN);
@@ -92,9 +89,7 @@ export class ChannelAdminController extends Channel {
         return await PromiseVerify.all([
             this.isUndefined(targetUserId),
             this.isUndefined(channelId),
-            this.isChannelExist(channelId),
             this.verifyUser(targetUserId),
-            this.verifyUser(this.userId),
             this.isOwner(channelId),
             this.isUserJoined(channelId),
             this.isUserJoined(channelId, targetUserId)

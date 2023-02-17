@@ -115,7 +115,7 @@ export class E2EController extends AbstractRoom {
         ]);
 
         if (haveErr)
-            return socket.emit('emitPvMessageError', haveErr);
+            return socket.emit('emitPvDeleteMessageError', haveErr);
 
         if (!Array.isArray(listOfId) && listOfId.length === 0)
             return socket.emit('emitPvDeleteMessageError', Response.HTTP_BAD_REQUEST);

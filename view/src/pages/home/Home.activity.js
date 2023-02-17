@@ -37,9 +37,11 @@ function HomeActivity() {
     const [hasClickedDoAction, setHasClickedDoAction] = useState(false);
     const [hasMeBlockedByUser, setHasMeBlockedByUser] = useState(false);
     const [hasOpenContextMenu, setHasOpenContextMenu] = useState(false);
+    const [hasClickedLeaveRoom, setHasClickedLeaveRoom] = useState(false);
     const [hasClickedBlockUser, setHasClickedBlockUser] = useState(false);
     const [tabViewItemClickedData, setTabViewItemClickedData] = useState({});
     const [hasClickedEditMessage, setHasClickedEditMessage] = useState(false);
+    const [dataPayloadForLeaveRoom, setDataPayloadForLeaveRoom] = useState({});
     const [hasClickedDeleteMessage, setHasClickedDeleteMessage] = useState(false);
     const [hasClickedBlockUserByMe, setHasClickedBlockUserByMe] = useState(false);
 
@@ -91,6 +93,16 @@ function HomeActivity() {
             });
 
             setHasJoinedInRoom(data.statusCode === 200);
+        },
+        handleJoinUserRequest = async (type, id) => {
+            let data = await resApi(`${type.toLowerCase()}/users`, {
+                method: 'POST',
+                body: {
+                    [type === 'Group' ? 'groupId' : 'channelId']: id
+                }
+            });
+
+            setHasJoinedInRoom(data.statusCode === 201 || data.statusCode === 409);
         },
         handleTabViewItemClickedData = async d => {
             setTabViewItemClickedData(d);
@@ -159,6 +171,10 @@ function HomeActivity() {
         handleEditMessage();
     }, [hasClickedEditMessage]);
 
+    useEffect(() => {
+        if (hasJoinedInRoom)
+            handleJoinUserRequest(tabViewItemClickedData.type, tabViewItemClickedData._id);
+    }, [hasJoinedInRoom]);
 
     return (
         <div className="flex flex-col h-screen" ref={wrapperRef}>
@@ -176,6 +192,8 @@ function HomeActivity() {
                 {/* List Of Channel, Group, E2E Or Saved Message */}
                 <ListOfChatWithTabView
                     dataSearched={dataSearched}
+                    dataPayloadForLeaveRoom={dataPayloadForLeaveRoom}
+                    hasClickedLeaveRoom={hasClickedLeaveRoom}
                     haveDataSearched={haveDataSearched}
                     getItemData={handleTabViewItemClickedData}/>
 
@@ -189,6 +207,8 @@ function HomeActivity() {
                                         isAdmin={isAdmin}
                                         isOwner={isOwner}
                                         handleDoAction={handleDoAction}
+                                        setHasClickedLeaveRoom={d => setHasClickedLeaveRoom(d)}
+                                        setDataPayloadForLeaveRoom={d => setDataPayloadForLeaveRoom(d)}
                                         handleClickedBlockUser={handleClickedBlockUser}
                                         hasClickedBlockUser={hasClickedBlockUser}
                                         hasClickedDeleteMessage={hasClickedDeleteMessage}
