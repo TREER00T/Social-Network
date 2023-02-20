@@ -565,5 +565,23 @@ export default {
         return await findOne({
             _id: messageId
         }, `${roomId}E2EContents`);
+    },
+
+    async getUserGroupRooms(userId: string) {
+        return await listOfUserGroup().find({
+            userId: userId
+        }, {
+            _id: 0,
+            groupId: 1
+        });
+    },
+
+    async getUserChannelRooms(userId: string) {
+        return await listOfUserChannel().find({
+            userId: userId
+        }, {
+            _id: 0,
+            channelId: 1
+        });
     }
 }

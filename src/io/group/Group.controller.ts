@@ -41,9 +41,7 @@ export class GroupController extends AbstractGroup {
         if (message?.statusCode)
             return socket.emit('emitGroupSendMessageError', message);
 
-        await this.handleUserJoinState(socket, groupId, 'group');
-
-        this.emitToSpecificSocket(groupId, 'emitGroupSendMessage', message);
+        this.emitToSpecificSocket(groupId, 'emitGroupSendMessage', message, 'group');
 
         await this.saveMessage({
             tableName: data.messageSentRoomId,
@@ -65,9 +63,7 @@ export class GroupController extends AbstractGroup {
         ]);
 
         if (haveErr)
-            return socket.emit('emitGroupEditMessageError', haveErr);
-
-        await this.handleUserJoinState(socket, groupId, 'group');
+            return socket.emit('emitGroupEditMessageError', haveErr)
 
         let isUserMessage = this.isUserMessage(senderId, messageId, `${groupId}GroupContents`);
 
@@ -84,7 +80,7 @@ export class GroupController extends AbstractGroup {
         if (message?.statusCode)
             return socket.emit('emitGroupEditMessageError', message);
 
-        this.emitToSpecificSocket(groupId, 'emitGroupEditMessage', message);
+        this.emitToSpecificSocket(groupId, 'emitGroupEditMessage', message, 'group');
 
         await this.updateMessage({
             tableName: `${groupId}GroupContents`,
@@ -116,9 +112,7 @@ export class GroupController extends AbstractGroup {
         if (!isUserMessage)
             return socket.emit('emitGroupDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-        await this.handleUserJoinState(socket, groupId, 'group');
-
-        this.emitToSpecificSocket(groupId, 'emitGroupDeleteMessage', Response.HTTP_OK);
+        this.emitToSpecificSocket(groupId, 'emitGroupDeleteMessage', Response.HTTP_OK, 'group');
 
         await this.deleteOldFiles('group', groupId, listOfId);
         await this.removeMessage(`${groupId}GroupContents`, listOfId);
@@ -141,7 +135,7 @@ export class GroupController extends AbstractGroup {
             return socket.emit('emitGroupSpecificMessageError', haveErr);
 
         this.emitToSpecificSocket(groupId, 'emitGroupSpecificMessage',
-            await this.getMessageInRoom('group', insertedId, groupId));
+            await this.getMessageInRoom('group', insertedId, groupId), 'group');
     }
 
 }

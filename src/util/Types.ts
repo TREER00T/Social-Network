@@ -95,6 +95,8 @@ type ListOfIdWithType = Array<{
     type: string // room type for example : channel, group, e2e, personal
 }>
 
+type ListOfRoomId = Array<{ channelId?: string, groupId?: string }>;
+
 type ListOfFileUrl = Array<{ fileUrl: string }>;
 
 type HasOwner = 0 | 1;
@@ -114,6 +116,7 @@ export {
     UserId,
     UserIdWithType,
     RoomType,
+    ListOfRoomId,
     ListOfFileUrl,
     RoomTypeWithOutE2E,
     ListOfAdmin,

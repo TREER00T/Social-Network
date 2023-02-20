@@ -82,13 +82,23 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
             await this.socketGatewayService.updateUserStatus(userId, true);
 
             this.users.set(socketId, userId);
+
+            let userChannels = await this.getListOfUserRooms(userId, 'channel');
+            let userGroups = await this.getListOfUserRooms(userId, 'group');
+
+            if (userChannels.length > 0)
+                userChannels.forEach(o => this.handleUserJoinState(client, o.channelId, 'channel'));
+
+            if (userGroups.length > 0)
+                userGroups.forEach(o => this.handleUserJoinState(client, o.groupId, 'group'));
+
             return;
         }
 
         client.disconnect(true);
     }
 
-    async handleUserJoinState(socket: Socket, roomId: string, type: string) {
+    async handleUserJoinState(socket: Socket, roomId: string, type: 'channel' | 'group') {
         let isRoomAddedInSocketList = socket.rooms.has(roomId + type);
 
         if (!isRoomAddedInSocketList) {
@@ -102,7 +112,7 @@ export class SocketGatewayController extends HandleMessage implements OnGatewayD
     }
 
     emitToSpecificSocket =
-        (where: string, emitName: string, data: object) => this.io.to(where).emit(emitName, data);
+        (where: string, emitName: string, data: object, type?: 'group' | 'channel') => this.io.to(type ? where + type : where).emit(emitName, data);
 
     async isExistChatRoom(socket: Socket, receiverId: string, errEmitName: string): Promise<string | boolean> {
         let user = await Redis.get(receiverId),

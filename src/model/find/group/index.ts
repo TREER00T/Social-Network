@@ -23,7 +23,7 @@ export default {
             return data?._id?.toString();
         }
 
-        let data = await group().findOne({[id.type === 'groupId' ? '_id' : id.type]: id.id}, {
+        let data = await group().findOne({[id?.type === 'groupId' ? '_id' : id?.type]: id?.id}, {
             _id: 1
         });
 
