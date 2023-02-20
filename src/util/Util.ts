@@ -120,9 +120,13 @@ export default {
     },
 
     isUndefined(data): boolean {
-        if (typeof data === "number" || typeof data === "boolean" || typeof data === "bigint")
-            return true;
-        return !data || data?.length < 1;
+        if (typeof data === 'object' && Array.isArray(data))
+            return data?.length < 1;
+
+        if (typeof data === 'object')
+            return false;
+
+        return !data;
     },
 
     isNotEmptyArr(data): boolean {

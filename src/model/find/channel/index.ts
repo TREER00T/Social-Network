@@ -21,7 +21,7 @@ export default {
             return data?._id?.toString();
         }
 
-        let data = await channel().findOne({[id.type === 'channelId' ? '_id' : id.type]: id.id}, {
+        let data = await channel().findOne({[id?.type === 'channelId' ? '_id' : id?.type]: id?.id}, {
             _id: 1
         });
 

@@ -42,9 +42,7 @@ export class ChannelController extends AbstractChannel {
         if (message?.statusCode)
             return socket.emit('emitChannelSendMessageError', message);
 
-        await this.handleUserJoinState(socket, channelId, 'channel');
-
-        this.emitToSpecificSocket(channelId, 'emitChannelSendMessage', message);
+        this.emitToSpecificSocket(channelId, 'emitChannelSendMessage', message, 'channel');
 
         await this.saveMessage({
             tableName: data.messageSentRoomId,
@@ -69,8 +67,6 @@ export class ChannelController extends AbstractChannel {
         if (haveErr)
             return socket.emit('emitChannelEditMessageError', haveErr);
 
-        await this.handleUserJoinState(socket, channelId, 'channel');
-
         let isUserMessage = this.isUserMessage(senderId, messageId, `${channelId}ChannelContents`);
 
         if (!isUserMessage)
@@ -86,7 +82,7 @@ export class ChannelController extends AbstractChannel {
         if (message?.statusCode)
             return socket.emit('emitChannelEditMessageError', message);
 
-        this.emitToSpecificSocket(channelId, 'emitChannelEditMessage', message);
+        this.emitToSpecificSocket(channelId, 'emitChannelEditMessage', message, 'channel');
 
         await this.updateMessage({
             tableName: `${channelId}ChannelContents`,
@@ -119,9 +115,7 @@ export class ChannelController extends AbstractChannel {
         if (!isUserMessage)
             return socket.emit('emitChannelDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-        await this.handleUserJoinState(socket, channelId, 'channel');
-
-        this.emitToSpecificSocket(channelId, 'emitChannelDeleteMessage', Response.HTTP_OK);
+        this.emitToSpecificSocket(channelId, 'emitChannelDeleteMessage', Response.HTTP_OK, 'channel');
 
         await this.deleteOldFiles('channel', channelId, listOfId);
         await this.removeMessage(`${channelId}ChannelContents`, listOfId);
@@ -144,7 +138,7 @@ export class ChannelController extends AbstractChannel {
             return socket.emit('emitChannelSpecificMessageError', haveErr);
 
         this.emitToSpecificSocket(channelId, 'emitChannelSpecificMessage',
-            await this.getMessageInRoom('channel', insertedId, channelId));
+            await this.getMessageInRoom('channel', insertedId, channelId), 'channel');
     }
 
 }

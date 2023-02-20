@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState, createRef, forwardRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import {resApi} from "common/fetch";
 import DownloadIcon from 'img/download.svg';
 import Reply from 'img/arrow-back-black.svg';
@@ -262,9 +262,10 @@ function ChatContent({
                         roomId: _id
                     });
 
-                // socket.on(event('emit', hasClickedEditMessage ? 'Edit' : 'Send'), _id, d => {
-                //     console.log(d)
-                // });
+                socket.on(event('emit', hasClickedEditMessage ? 'Edit' : 'Send'), d => {
+                    console.log(d)
+                });
+
             }
 
             if (hasClickedReply)
