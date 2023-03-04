@@ -131,7 +131,7 @@ export class E2EController extends AbstractRoom {
         if (!isUserMessage)
             return socket.emit('emitPvDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-        this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvDeleteMessage', Response.HTTP_OK);
+        this.emitToSpecificSocket(d.receiverSocketId.toString(), 'emitPvDeleteMessage', {listOfId});
 
         await this.deleteOldFiles('e2e', roomId, listOfId);
         await this.removeMessage(roomId, listOfId);

@@ -112,7 +112,7 @@ export class GroupController extends AbstractGroup {
         if (!isUserMessage)
             return socket.emit('emitGroupDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-        this.emitToSpecificSocket(groupId, 'emitGroupDeleteMessage', Response.HTTP_OK, 'group');
+        this.emitToSpecificSocket(groupId, 'emitGroupDeleteMessage', {listOfId}, 'group');
 
         await this.deleteOldFiles('group', groupId, listOfId);
         await this.removeMessage(`${groupId}GroupContents`, listOfId);
