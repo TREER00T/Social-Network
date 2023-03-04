@@ -72,7 +72,7 @@ export default function MessageInput({
                         <span>{replyDataView?.text ? replyDataView?.text : replyDataView.fileName}</span>
                     </div> : <></>
             }
-            {(!hasMeBlockedByUser || !hasClickedBlockUserByMe) && (((type === 'Channel' || type === 'Group') && hasJoinedInRoom) ||
+            {(!hasMeBlockedByUser && !hasClickedBlockUserByMe && type === 'E2E') || (((type === 'Channel' || type === 'Group') && hasJoinedInRoom) ||
                 ((isAdmin || isOwner) && hasJoinedInRoom) || type === 'SA') ?
                 <div
                     className={`flex fixed absolute bottom-0 mb-2 mx-1 left-0 right-0 rounded-lg ${hasMeBlockedByUser || hasClickedBlockUserByMe ? 'bg-white' : 'bg-gray-110'}`}>
@@ -105,8 +105,8 @@ export default function MessageInput({
                            onChange={handleUploadFile}/>
                 </div> :
                 hasMeBlockedByUser && type === 'E2E' ?
-                    <span>You are blocked by this user</span> :
-                    type === 'E2E' ?
+                    <span className="flex fixed absolute bottom-0 mb-2 mx-1 left-0 right-0 place-content-center">You are blocked by this user</span> :
+                    type === 'E2E' && hasClickedBlockUserByMe ?
                         <div
                             className="flex fixed absolute bottom-0 mb-2 mx-1 left-0 right-0 place-content-center"
                             onClick={handleUnBlockUser}><Button>UnBLock User</Button></div> : <></>}
