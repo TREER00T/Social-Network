@@ -115,7 +115,7 @@ export class ChannelController extends AbstractChannel {
         if (!isUserMessage)
             return socket.emit('emitChannelDeleteMessageError', Response.HTTP_FORBIDDEN);
 
-        this.emitToSpecificSocket(channelId, 'emitChannelDeleteMessage', Response.HTTP_OK, 'channel');
+        this.emitToSpecificSocket(channelId, 'emitChannelDeleteMessage', {listOfId}, 'channel');
 
         await this.deleteOldFiles('channel', channelId, listOfId);
         await this.removeMessage(`${channelId}ChannelContents`, listOfId);

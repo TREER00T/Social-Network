@@ -23,6 +23,9 @@ export default function UserProfile({
                                             type
                                         }
                                     }) {
+
+    console.log(isActive)
+
     return (
         <Fragment>
             <Dialog open={open} handler={handleOpen} className="py-2 px-4">

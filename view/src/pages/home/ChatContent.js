@@ -52,7 +52,7 @@ function Item({
     const isImage = type === 'Image';
     const haveText = text && type === 'None';
     const [cookies] = useCookies(['userId']);
-    const isMyMessage = cookies.userId !== messageCreatedBySenderId || cookies.userId === forwardData?._id;
+    const isMyMessage = cookies.userId === messageCreatedBySenderId || cookies.userId === forwardData?._id;
 
     const handleContextMenu = e => {
         e.preventDefault();
@@ -213,8 +213,6 @@ function ChatContent({
                     return;
                 }
                 result = data;
-            } else {
-                // socket
             }
 
             setRoomContent(result);
@@ -261,22 +259,22 @@ function ChatContent({
                         ...inputMessage,
                         roomId: _id
                     });
-
-                socket.on(event('emit', hasClickedEditMessage ? 'Edit' : 'Send'), d => {
-                    console.log(d)
-                });
-
             }
 
             if (hasClickedReply)
                 setHasClickedReply(false);
 
-            if (!hasClickedEditMessage)
-                setRoomContent([...roomContent, inputMessage]);
-            else {
-                let result = roomContent.map(o => o._id === id ? updateObject(rightClickData, inputMessage) : o);
-                setRoomContent([...result]);
-                setHasClickedEditMessage(false);
+            if (!hasClickedEditMessage) {
+                if (type === 'SA')
+                    setRoomContent([...roomContent, inputMessage]);
+            } else {
+                if (type !== 'SA')
+                    setHasClickedEditMessage(false);
+                else {
+                    let result = roomContent.map(o => o._id === id ? updateObject(rightClickData, inputMessage) : o);
+                    setRoomContent([...result]);
+                    setHasClickedEditMessage(false);
+                }
             }
         },
         handleDeleteMultiMessage = id => {
@@ -310,7 +308,7 @@ function ChatContent({
                     }
                 });
             } else {
-                // socket
+                socket.emit(event('on', 'Delete'), {listOfId, roomId: _id});
             }
         },
         handleRightClickData = d => setRightClickData(d),
@@ -320,6 +318,18 @@ function ChatContent({
         setRoomContent([]);
         handleRoomMessageContent();
     }, [type]);
+
+    useEffect(() => {
+        if (type !== 'SA') {
+            socket.on(event('emit', hasClickedEditMessage ? 'Edit' : 'Send'), d => {
+                setRoomContent(data => [...data, d]);
+            });
+            socket.on(event('emit', 'Delete'), d => {
+                let filter = roomContent.filter(data => data._id !== d._id);
+                setRoomContent([...filter])
+            });
+        }
+    }, []);
 
     useEffect(() => {
         if (hasAccessToDelete)
