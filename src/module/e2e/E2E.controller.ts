@@ -21,7 +21,10 @@ export class E2EController extends E2EMessage {
         if (haveErr)
             return haveErr;
 
-        await this.appService.initializationRoom(targetUserId, this.userId);
+        let haveExistRoom = await this.appService.haveExistRoom(targetUserId, this.userId);
+
+        if (!haveExistRoom)
+            await this.appService.initializationRoom(targetUserId, this.userId);
 
         return Json.builder(Response.HTTP_CREATED);
     }

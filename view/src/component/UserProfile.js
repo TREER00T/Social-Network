@@ -18,13 +18,10 @@ export default function UserProfile({
                                             isOwner,
                                             description,
                                             _id,
-                                            activities,
                                             name,
                                             type
                                         }
                                     }) {
-
-    console.log(isActive)
 
     return (
         <Fragment>

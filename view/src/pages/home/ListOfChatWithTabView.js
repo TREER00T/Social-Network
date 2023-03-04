@@ -33,6 +33,7 @@ function Item({
         publicLink,
         bio,
         description,
+        isActive,
         _id,
         name,
         type

@@ -88,9 +88,9 @@ module.exports = {
     },
 
 
-    e2eContent(fromUser, toUser) {
+    e2eContent(tableName) {
 
-        createCollection(`${fromUser}And${toUser}E2EContents`);
+        createCollection(tableName);
 
     }
 

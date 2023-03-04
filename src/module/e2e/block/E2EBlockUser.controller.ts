@@ -19,12 +19,12 @@ export class E2EBlockUserController extends User {
         if (haveErr)
             return haveErr;
 
-        let hasBlockedByMe = this.appService.hasBlockedByUser(this.userId, targetUserId);
+        let hasBlockedByMe = await this.appService.hasBlockedByUser(this.userId, targetUserId);
 
         if (hasBlockedByMe)
             return Json.builder(Response.HTTP_OK_BUT_TARGET_USER_ID_BLOCKED_BY_ME);
 
-        let hasMeBlockedByTargetUserId = this.appService.hasBlockedByUser(targetUserId, this.userId);
+        let hasMeBlockedByTargetUserId = await this.appService.hasBlockedByUser(targetUserId, this.userId);
 
         if (hasMeBlockedByTargetUserId)
             return Json.builder(Response.HTTP_OK_BUT_ME_BLOCKED_BY_TARGET_USER_ID);

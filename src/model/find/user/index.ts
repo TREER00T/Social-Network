@@ -583,5 +583,14 @@ export default {
             _id: 0,
             channelId: 1
         });
+    },
+
+    async haveExistE2ERoom(targetUserId: string, userIdWhichCreatedChat: string) {
+        return await listOfUserE2E().find({
+            $or: [
+                {toUser: targetUserId, fromUser: userIdWhichCreatedChat},
+                {toUser: userIdWhichCreatedChat, fromUser: targetUserId}
+            ]
+        });
     }
 }

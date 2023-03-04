@@ -216,6 +216,13 @@ function ChatContent({
             }
 
             setRoomContent(result);
+        }, handleCreateE2ERoom = async () => {
+            await resApi('e2e', {
+                method: 'POST',
+                body: {
+                    targetUserId: _id
+                }
+            });
         }, handleSendMessage = async () => {
             let id = rightClickData?._id;
 
@@ -244,6 +251,7 @@ function ChatContent({
                     });
                 }
             else {
+                await handleCreateE2ERoom();
                 socket.emit(event('on', hasClickedEditMessage ? 'Edit' : 'Send'),
                     hasClickedEditMessage ? {
                         ...updateObject(rightClickData, inputMessage),

@@ -17,7 +17,6 @@ import {Navigate} from "react-router-dom";
 import UserProfile from "component/UserProfile";
 
 function ChatNavbar({
-                        socket,
                         data: {
                             img,
                             defaultColor,
@@ -29,8 +28,7 @@ function ChatNavbar({
                             _id,
                             isActive,
                             name,
-                            type,
-                            activities
+                            type
                         },
                         hasClickedBlockUser,
                         hasClickedBlockUserByMe,
@@ -117,7 +115,6 @@ function ChatNavbar({
                              username,
                              isOwner,
                              isAdmin,
-                             activities,
                              bio,
                              description,
                              _id,
